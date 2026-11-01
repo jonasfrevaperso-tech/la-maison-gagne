@@ -3,8 +3,8 @@
 > Reprise après coupure : lire ce fichier, `CLAUDE.md`, puis `docs/DECISIONS.md`. Lancer `tools/check.sh`.
 
 ## État courant
-- Phase en cours : **Phase 12 — Équilibrage**
-- Dernier tag : `phase-11-juice`
+- Phase en cours : **Livré (1.0.0)** — suite : `docs/ROADMAP.md`
+- Dernier tag : `phase-14-release`
 
 ## Phase 0 — Reconnaissance ✅
 - Environnement : Godot 4.7.2 (MCP godot OK), Blender 5.2.2, Python 3.14 + numpy 2.4 + Pillow 12, uv, gdtoolkit 4 (installé via uv), git 2.53, 12 cœurs.
@@ -72,6 +72,22 @@
 
 ## Phase 11 — Jus et polish ✅
 - Fait (catalogue section 9 complété) : zoom caméra sur la fin de course de la bille, jetons qui rebondissent à la pose, cases couvertes surlignées en or dans la zone de visée (action 6 de la revue), teinte de fond par créancier qui s'intensifie à chaque phase, ombres mouvantes, fondu « CRT qui s'éteint » vers titre/résumé, toasts déplacés. Tout reste modulé par `JuiceProfile` (0–100 %, mode réduit).
+
+## Phase 12 — Équilibrage ✅
+- Plan : mesurer avec le bot compétent (« synergy », Monte-Carlo), balayer les leviers avec le bot rapide (glouton), confirmer.
+- Fait : simulateur enrichi (offres suivies, taux de choix *quand proposé*, surcharges `--set=chemin=valeur` pour les balayages, bot qui sait relancer l'étal, Monte-Carlo 2× plus rapide). Balayage : baisser les dettes seul a peu d'effet (5 → 16 % pour le glouton) ; l'économie est le vrai levier. Réglage retenu : dettes 240/600/1200/2500/4800/8500/14000/21000, départ 8 $, récompenses 5/6/8 $, plafond d'intérêts 6 $.
+- Passe sur les grigris (taux de choix *quand proposé*) : nerf de 11 dominants, renfort de 10 délaissés ; une passe supplémentaire a été annulée (elle baissait la puissance sans corriger les taux de choix, qui reflètent surtout la préférence du bot pour les communs bon marché).
+- Résultat livré (300 runs, déterministe) : bot compétent **39,7 %** de victoires au Risque 0 (cible 35–45 %), survie régulière par palier (93/89/82/72/61/53/47 %), personnages entre 33 et 45 %. Runs gagnants : 48 tours en moyenne, 29,5 min au rythme du modèle (20 s/tour), ~35–42 min au rythme humain estimé (25–30 s/tour). Rapport : `docs/BALANCE.md`.
+- Écarts restants : 10 dominants (2,0–3,3×) et 12 délaissés, en grande partie artefacts du bot (documentés dans le rapport) ; à revalider avec des joueurs.
+- Risques : bots ≠ humains ; les grigris à croissance lente sont sous-évalués par le Monte-Carlo court (biais documenté dans BALANCE.md).
+
+## Phase 13 — QA ✅
+- Fait : fuzzing de graines (`tools/fuzz.gd`, intégré à `check.sh`) → 4 bugs réels corrigés avec tests de non-régression (perte de mises au rechargement, blocage par règles cumulées, tours négatifs, sérialisation inexacte) + fuite audio à la fermeture ; support manette complet du tapis (curseur, cycle des paris intérieurs, remappage) ; mesure de performance (`--perf` : 142 FPS de moyenne, 1 % lent 10 ms) ; résolutions 16:9/16:10 vérifiées ; plan et bilan dans `docs/QA.md`.
+- Testé : 54 tests, 2 400 runs fuzzés sans violation, `check.sh` vert.
+
+## Phase 14 — Livraison ✅
+- Fait : modèles d'export officiels 4.7.2 installés, `export_presets.cfg` (Linux x86_64, Windows x86_64, données JSON incluses, outillage exclu), binaires exportés et binaire Linux testé (données chargées, tours joués) ; `README.md`, `docs/RELEASE_NOTES.md`, `docs/POSTMORTEM.md`, `docs/ROADMAP.md`.
+- Limites : Windows et Steam Deck non testés sur matériel réel ; aucun test humain.
 
 ## Rapport de phase
 Format : fait / testé / reste à faire / risques.
