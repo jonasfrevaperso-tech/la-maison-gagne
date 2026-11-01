@@ -27,6 +27,7 @@ DataRegistry="*res://scripts/autoload/data_registry.gd"
 SaveSystem="*res://scripts/autoload/save_system.gd"
 AudioBus="*res://scripts/autoload/audio_bus.gd"
 GameState="*res://scripts/autoload/game_state.gd"
+Telemetry="*res://scripts/autoload/telemetry.gd"
 
 [debug]
 

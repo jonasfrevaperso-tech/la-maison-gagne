@@ -81,6 +81,8 @@ func default_profile() -> Dictionary:
 		"tutorial": {"done": false, "tips_seen": []},
 		"daily": {"last_date": "", "best": 0},
 		"favorites": [],
+		"history": [],
+		"tier_survival": {"entered": [], "passed": []},
 	}
 
 

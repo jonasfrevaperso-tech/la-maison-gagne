@@ -16,6 +16,9 @@ func build() -> void:
 	var copy: Button = UiKit.button(tr("PAUSE_COPY_SEED"), _copy_seed)
 	copy.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	body.add_child(copy)
+	var note_btn: Button = UiKit.button(tr("PAUSE_NOTE"), _note)
+	note_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	body.add_child(note_btn)
 	var quit_btn: Button = UiKit.button(tr("PAUSE_SAVE_QUIT"), _save_quit)
 	quit_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	body.add_child(quit_btn)
@@ -23,6 +26,11 @@ func build() -> void:
 	abandon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	body.add_child(abandon)
 	resume.call_deferred("grab_focus")
+
+
+func _note() -> void:
+	close()
+	EventBus.note_requested.emit()
 
 
 func _copy_seed() -> void:

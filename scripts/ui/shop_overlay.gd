@@ -164,7 +164,9 @@ func _on_buy_pack(i: int) -> void:
 
 
 func _on_reroll() -> void:
+	Telemetry.shop_rerolling(ctl.run)
 	if ShopModel.reroll(ctl.run, ctl.db):
+		Telemetry.shop_rerolled(ctl.run)
 		AudioBus.play("reroll")
 		_rerolls_here += 1
 		GameState.record_shop("reroll", {"rerolls_here": _rerolls_here})

@@ -73,9 +73,24 @@ func _ready() -> void:
 	ver.position += Vector2(-110, -40)
 	add_child(ver)
 	AudioBus.play_music("menu")
+	if not Settings.b("game", "telemetry_asked") and not DevMode.active():
+		_ask_telemetry.call_deferred()
 	if not SaveSystem.corrupted_files.is_empty():
 		EventBus.toast.emit.call_deferred(tr("TOAST_BACKUP_USED"), &"info")
 		SaveSystem.corrupted_files.clear()
+
+
+## Consentement à la télémétrie locale (demandé une seule fois, modifiable dans les options).
+func _ask_telemetry() -> void:
+	var dlg: ConfirmBox = ConfirmBox.new().configure(tr("CONFIRM_TELEMETRY"))
+	dlg.confirmed.connect(_set_telemetry.bind(true))
+	dlg.declined.connect(_set_telemetry.bind(false))
+	add_child(dlg)
+
+
+func _set_telemetry(on: bool) -> void:
+	Settings.set_value("game", "telemetry_asked", true)
+	Settings.set_value("game", "telemetry", on)
 
 
 ## Entrées optionnelles : n'apparaissent que si l'écran existe (développement incrémental).

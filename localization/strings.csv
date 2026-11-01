@@ -357,3 +357,34 @@ OPT_WM_EXCLUSIVE,Plein écran exclusif,Exclusive fullscreen
 OPT_WINDOW_SIZE,Taille de la fenêtre,Window size
 OPT_FPS_CAP,Images par seconde (limite),Frame rate cap
 OPT_FPS_UNLIMITED,Illimitée,Unlimited
+CONFIRM_TELEMETRY,"Enregistrer des statistiques de jeu sur cet ordinateur (tours, boutique, durée) pour aider à équilibrer le jeu ? Rien n'est envoyé sur Internet. Modifiable dans les options.","Record gameplay statistics on this computer (spins, shop, play time) to help balance the game? Nothing is sent over the Internet. You can change this in the options."
+OPT_TELEMETRY,Statistiques de jeu locales,Local gameplay statistics
+OPT_TELEMETRY_DESC,"Fichiers dans le dossier des données (télémétrie), jamais envoyés. F8 : noter un moment de jeu.","Files in the data folder (telemetry), never sent. F8: write a playtest note."
+OPT_OPEN_DATA,Ouvrir le dossier des données,Open the data folder
+PAUSE_NOTE,Noter ce moment (F8),Note this moment (F8)
+NOTE_TITLE,Note de test,Playtest note
+NOTE_INTRO,"Qu'as-tu ressenti ? Une incompréhension, un ennui, un bug, un grand moment : tout aide. La capture montre l'écran au moment de la note.","How did that feel? Confusion, boredom, a bug, a great moment: everything helps. The screenshot shows the screen when you opened this note."
+NOTE_MOOD_GREAT,Génial,Great
+NOTE_MOOD_GOOD,Bien,Good
+NOTE_MOOD_MEH,Bof,Meh
+NOTE_MOOD_BAD,Pénible,Frustrating
+NOTE_MOOD_BUG,Bug,Bug
+NOTE_PLACEHOLDER,Écris ici (facultatif)…,Write here (optional)…
+NOTE_ATTACH_SHOT,Joindre la capture d'écran,Attach the screenshot
+NOTE_SAVE,Enregistrer,Save
+TOAST_NOTE_SAVED,Note enregistrée. Merci !,Note saved. Thanks!
+STATS_PLAYTIME,Temps de jeu,Play time
+STATS_SURVIVAL,Survie par palier,Survival by tier
+STATS_SURVIVAL_DESC,Part des runs qui passent chaque palier après l'avoir atteint.,Share of runs that clear each tier once they reach it.
+STATS_RECENT,Derniers runs,Recent runs
+STATS_NO_HISTORY,Aucun run terminé pour le moment.,No finished run yet.
+STATS_COL_DATE,Date,Date
+STATS_COL_CHAR,Personnage,Character
+STATS_COL_RISK,Risque,Risk
+STATS_COL_RESULT,Résultat,Result
+STATS_COL_SPINS,Tours,Spins
+STATS_COL_TIME,Durée,Time
+STATS_COL_BEST,Meilleur tour,Best spin
+STATS_COL_SEED,Graine,Seed
+STATS_RESULT_WIN,Victoire,Victory
+STATS_RESULT_TIER,Palier %d,Tier %d

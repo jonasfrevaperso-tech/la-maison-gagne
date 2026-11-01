@@ -2,6 +2,7 @@ extends SceneTree
 ## Simulateur headless : joue N runs avec un bot et exporte des CSV + docs/BALANCE.md.
 ## Usage : godot --headless --path . -s res://scripts/sim/sim_main.gd -- --runs=500 --bot=greedy
 ##         [--character=lea|all] [--risk=0] [--seed=1] [--out=user://dev/sim] [--quiet] [--report]
+##         [--telemetry=user://dev/sim_telemetry]  (même format que la télémétrie joueur)
 
 const SECONDS_PER_SPIN: float = 20.0
 const SECONDS_PER_SHOP: float = 35.0
@@ -70,6 +71,10 @@ func play_run(db: ContentDB, cid: String, risk: int, seed_value: int, bot_kind: 
 	var ctl: RunController = RunController.new(db)
 	ctl.new_run(cid, risk, seed_value)
 	var bot: SimBot = SimBot.new(bot_kind, seed_value ^ 0x5bd1e995)
+	var tel: Array[Dictionary] = []
+	var with_tel: bool = opts.has("telemetry")
+	if with_tel:
+		tel.append(RunTelemetry.run_start(ctl.run, "bot:" + bot_kind, String(ProjectSettings.get_setting("application/config/version"))))
 	var spins: int = 0
 	var shops: int = 0
 	var best: int = 0
@@ -79,12 +84,27 @@ func play_run(db: ContentDB, cid: String, risk: int, seed_value: int, bot_kind: 
 		match run.phase:
 			RunState.Phase.BETTING:
 				bot.place_bets(ctl)
+				var pre: Dictionary = RunTelemetry.snapshot(run)
 				var out: RunController.SpinOutcome = ctl.spin(bot.aim(ctl))
+				if with_tel:
+					tel.append(RunTelemetry.spin(pre, ctl.run, out.ctx, SECONDS_PER_SPIN))
+					if out.deadline_won or out.deadline_failed:
+						tel.append(RunTelemetry.deadline(pre, ctl.run, out.ctx, out.deadline_won, 0.0))
 				best = maxi(best, out.ctx.total)
 				spins += 1
 			RunState.Phase.SHOP:
 				shops += 1
+				var owned: Array[String] = RunTelemetry.grigri_ids(run)
+				var offers0: Dictionary = bot.offers.duplicate()
+				var picks0: int = bot.picks.size()
+				var money0: int = run.money
+				var rerolls0: int = run.shop_rerolls
 				bot.shop(ctl)
+				if with_tel:
+					var rec: Dictionary = RunTelemetry.shop(
+						run, _grown(offers0, bot.offers), bot.picks.slice(picks0), owned, money0, run.shop_rerolls - rerolls0, SECONDS_PER_SHOP
+					)
+					tel.append(rec)
 				ctl.leave_shop()
 			RunState.Phase.PACT_OFFER:
 				bot.pact(ctl)
@@ -95,6 +115,9 @@ func play_run(db: ContentDB, cid: String, risk: int, seed_value: int, bot_kind: 
 		reached_tier = maxi(reached_tier, ctl.run.tier)
 	var r: RunState = ctl.run
 	var won: bool = r.phase == RunState.Phase.VICTORY
+	if with_tel:
+		tel.append(RunTelemetry.run_end(r, won, float(spins) * SECONDS_PER_SPIN + float(shops) * SECONDS_PER_SHOP))
+		_write_telemetry(tel, "run_%s_%d.jsonl" % [cid, seed_value])
 	var final_grigris: Array[String] = []
 	for g: GrigriInstance in r.grigris:
 		final_grigris.append(g.id)
@@ -293,3 +316,25 @@ func write_report(s: Dictionary) -> void:
 	if f != null:
 		f.store_string("\n".join(lines) + "\n")
 		f.close()
+
+
+## Identifiants dont le compteur a augmenté entre deux instantanés.
+static func _grown(before: Dictionary, after: Dictionary) -> Array[String]:
+	var out: Array[String] = []
+	for k: Variant in after.keys():
+		if int(after[k]) > int(before.get(k, 0)):
+			out.append(String(k))
+	return out
+
+
+func _write_telemetry(records: Array[Dictionary], file_name: String) -> void:
+	var dir: String = String(opts["telemetry"])
+	if not dir.ends_with("/"):
+		dir += "/"
+	DirAccess.make_dir_recursive_absolute(dir)
+	var f: FileAccess = FileAccess.open(dir + file_name, FileAccess.WRITE)
+	if f == null:
+		return
+	for rec: Dictionary in records:
+		f.store_line(JSON.stringify(rec))
+	f.close()

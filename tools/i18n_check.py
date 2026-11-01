@@ -17,7 +17,7 @@ PREFIXES = ("BET_", "BTN_", "CARD_", "CHAR_", "CONFIRM_", "CREDITOR_", "CREDITS_
             "FX_", "HINT_", "HISTORY_", "HUD_", "MENU_", "OPT_", "PACK_", "PACT_", "PAUSE_", "POCKET_", "RARITY_",
             "REJECT_", "REWARD_", "RISK_", "SHOP_", "SLOT_", "SUB_", "SUMMARY_", "TAG_", "TIP_", "TOAST_", "TUTO_",
             "WHY_", "GAME_", "DISCLAIMER_", "CELEB_", "LANG_", "SPEED_", "CB_", "ACTION_", "CODEX_", "HALL_",
-            "ACH_", "STATS_", "DLG_", "END_", "CAMPAIGN_", "CHALLENGE_", "EVENT_", "REPLAY_", "PROB_", "CALC_", "THROW_", "ACT_", "KEYNAME_")
+            "ACH_", "STATS_", "DLG_", "END_", "CAMPAIGN_", "CHALLENGE_", "EVENT_", "REPLAY_", "PROB_", "CALC_", "THROW_", "ACT_", "KEYNAME_", "NOTE_")
 PATTERN = re.compile(r'"([A-Z][A-Z0-9]*_[A-Z0-9_]*[A-Z0-9])"')
 
 TAGS = set()
@@ -44,6 +44,7 @@ DYNAMIC = {
     "ACTION_": ["UI_SPIN", "BET_UNDO", "BET_REPEAT", "BET_CLEAR", "SPEED_TOGGLE", "SKIP_ANIM", "BET_PLACE", "BET_CYCLE_PREV", "BET_CYCLE_NEXT"],
     "TAG_": sorted(t.upper() for t in TAGS),
     "CELEB_": ["GOOD", "HUGE", "JACKPOT", "BANK"],
+    "NOTE_MOOD_": ["GREAT", "GOOD", "MEH", "BAD", "BUG"],
 }
 EXTRA = ["LANG_FR", "LANG_EN", "SPEED_1", "SPEED_2", "SPEED_4", "CB_OFF", "CB_PROTAN", "CB_DEUTAN", "CB_TRITAN"]
 

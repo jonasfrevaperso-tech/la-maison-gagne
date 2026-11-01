@@ -23,7 +23,9 @@ const DEFAULTS: Dictionary = {
 		"confirm_irreversible": true,
 		"assist": false,
 		"show_probabilities": false,
-		"tutorial_tips": true
+		"tutorial_tips": true,
+		"telemetry": false,
+		"telemetry_asked": false
 	},
 	"access": {"colorblind": "off", "text_scale": 1.0, "high_contrast": false, "subtitles": true},
 	"input": {"bindings": {}},

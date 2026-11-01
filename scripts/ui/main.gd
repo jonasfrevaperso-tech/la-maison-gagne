@@ -36,6 +36,7 @@ func _ready() -> void:
 	var post: PostFx = PostFx.new()
 	add_child(post)
 	EventBus.screen_requested.connect(_on_screen_requested)
+	EventBus.note_requested.connect(_open_note)
 	if not _dev_hooks():
 		GameState.goto(&"title")
 
@@ -56,10 +57,24 @@ func _input(event: InputEvent) -> void:
 	var k: InputEventKey = event as InputEventKey
 	if k == null or not k.pressed or k.echo:
 		return
+	if k.keycode == KEY_F8:
+		_open_note()
+		get_viewport().set_input_as_handled()
+		return
 	if k.keycode == KEY_F11 or (k.keycode == KEY_ENTER and k.alt_pressed):
 		var windowed: bool = Settings.s("video", "window_mode") == "windowed"
 		Settings.set_value("video", "window_mode", "fullscreen" if windowed else "windowed")
 		get_viewport().set_input_as_handled()
+
+
+## Note de test : capture l'écran tel quel, puis ouvre le formulaire par-dessus.
+func _open_note() -> void:
+	if _overlay_layer.get_children().any(func(c: Node) -> bool: return c is NoteOverlay):
+		return
+	await RenderingServer.frame_post_draw
+	var img: Image = get_viewport().get_texture().get_image()
+	var o: NoteOverlay = NoteOverlay.new().configure(img, String(GameState.current_screen))
+	_overlay_layer.add_child(o)
 
 
 func _exit_tree() -> void:

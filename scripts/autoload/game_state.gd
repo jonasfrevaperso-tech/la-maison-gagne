@@ -53,6 +53,7 @@ func start_new_run(character_id: String, risk_level: int, seed_value: int, chall
 	controller.new_run(character_id, risk_level, seed_value, challenge_id)
 	controller.run.daily = daily
 	replay_log.clear()
+	Telemetry.begin(controller.run)
 	SaveSystem.add_stat("runs", 1)
 	SaveSystem.save_profile()
 	autosave()
@@ -66,6 +67,7 @@ func continue_run() -> bool:
 		return false
 	controller = RunController.new(DataRegistry.db)
 	controller.load_run(state)
+	Telemetry.resume(state)
 	EventBus.run_loaded.emit(state)
 	goto(SCREEN_RUN)
 	return true
@@ -87,6 +89,7 @@ func autosave() -> void:
 	if ph == RunState.Phase.GAME_OVER or ph == RunState.Phase.VICTORY:
 		SaveSystem.clear_run()
 		return
+	Telemetry.sync(controller.run)
 	SaveSystem.save_run(controller.run)
 
 
@@ -150,10 +153,14 @@ func end_run(victory: bool) -> void:
 		var daily: Dictionary = SaveSystem.profile["daily"]
 		daily["best"] = maxi(int(daily.get("best", 0)), r.deadlines_cleared)
 		daily["last_date"] = Time.get_date_string_from_system()
+	var seed_code: String = RngService.seed_to_code(r.rng.seed_value)
+	var hist: Dictionary = RunHistory.entry(r, victory, Telemetry.run_seconds(), seed_code, Time.get_datetime_string_from_system(false, true))
+	RunHistory.record(SaveSystem.profile, hist, Balance.i("run.tiers"))
 	_announce(MetaProgress.evaluate(SaveSystem.profile, DataRegistry.db, "run_end", MetaProgress.run_metrics(r, DataRegistry.db, victory)))
 	_announce(MetaProgress.evaluate(SaveSystem.profile, DataRegistry.db, "profile", MetaProgress.profile_metrics(SaveSystem.profile)))
 	SaveSystem.save_profile()
 	SaveSystem.clear_run()
+	Telemetry.end(r, victory)
 	EventBus.run_ended.emit(r, victory)
 	goto(SCREEN_SUMMARY, {"victory": victory})
 

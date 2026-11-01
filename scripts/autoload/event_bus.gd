@@ -29,4 +29,5 @@ signal juice_flash(color: Color, intensity: float)
 signal juice_hitstop(duration: float)
 signal subtitle(text: String)
 signal input_device_changed(using_pad: bool)
+signal note_requested
 @warning_ignore_restore("unused_signal")

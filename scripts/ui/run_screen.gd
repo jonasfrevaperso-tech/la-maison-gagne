@@ -475,6 +475,8 @@ func _music_for() -> String:
 
 
 func _set_state(s: UiState) -> void:
+	if s == UiState.BETTING and state != UiState.BETTING:
+		Telemetry.betting_started()
 	state = s
 	_refresh_all()
 
@@ -709,8 +711,10 @@ func _on_keep() -> void:
 
 
 func _commit() -> void:
+	Telemetry.before_spin(ctl.run)
 	var outcome: RunController.SpinOutcome = ctl.commit_spin()
 	_pending_outcome = outcome
+	Telemetry.after_spin(ctl.run, outcome)
 	GameState.record_spin(outcome)
 	table_view.flash_winners(outcome.ctx.landing_numbers)
 	presenter.debt_remaining = maxi(ctl.run.debt - (ctl.run.deadline_score - outcome.ctx.total), 1)
@@ -811,6 +815,7 @@ func _on_overlay_closed(o: Control, on_closed: Callable) -> void:
 
 
 func _open_shop() -> void:
+	Telemetry.shop_opened(ctl.run)
 	AudioBus.play_music("shop")
 	GameState.autosave()
 	_show_overlay(ShopOverlay.new().configure(ctl), _on_shop_closed)
@@ -818,6 +823,7 @@ func _open_shop() -> void:
 
 
 func _on_shop_closed() -> void:
+	Telemetry.shop_closed(ctl.run)
 	ctl.leave_shop()
 	GameState.autosave()
 	if ctl.run.phase == RunState.Phase.EVENT:

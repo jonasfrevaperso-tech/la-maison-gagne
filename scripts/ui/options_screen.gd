@@ -152,7 +152,10 @@ func _game_tab() -> void:
 	_check(b, "OPT_SHOW_PROBS", "game", "show_probabilities")
 	_check(b, "OPT_ASSIST", "game", "assist")
 	_check(b, "OPT_TUTORIAL_TIPS", "game", "tutorial_tips")
+	_check(b, "OPT_TELEMETRY", "game", "telemetry")
+	b.add_child(UiKit.label(tr("OPT_TELEMETRY_DESC"), UiKit.SIZE_SMALL, Palette.SMOKE))
 	b.add_child(UiKit.button(tr("OPT_RESET_TUTORIAL"), _reset_tutorial))
+	b.add_child(UiKit.button(tr("OPT_OPEN_DATA"), _open_data_dir))
 
 
 func _access_tab() -> void:
@@ -220,6 +223,11 @@ func _reset_input() -> void:
 	Settings.set_value("input", "bindings", {})
 	for a: String in REMAPPABLE:
 		_remap_buttons[a].text = _action_text(a)
+
+
+## Dossier des données (sauvegardes, journaux, télémétrie, captures des notes de test).
+func _open_data_dir() -> void:
+	OS.shell_open(ProjectSettings.globalize_path(DevMode.save_dir()))
 
 
 func _reset_tutorial() -> void:

@@ -3,6 +3,7 @@ extends Overlay
 ## Confirmation avant une action irréversible.
 
 signal confirmed
+signal declined
 
 var message: String = ""
 
@@ -32,4 +33,5 @@ func _yes() -> void:
 
 
 func _no() -> void:
+	declined.emit()
 	close()
