@@ -1,0 +1,8 @@
+.godot/
+/android/
+*.tmp
+build/
+export/
+__pycache__/
+.venv/
+*.blend1

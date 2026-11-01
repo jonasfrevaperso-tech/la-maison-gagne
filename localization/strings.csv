@@ -1,0 +1,33 @@
+keys,fr,en
+GAME_TITLE,La Maison Gagne,The House Wins
+GAME_TAGLINE,Un tour de roue à la fois.,One spin at a time.
+DISCLAIMER_SIMULATED,"Jeu de hasard simulé · monnaie fictive · aucun argent réel, aucun achat.","Simulated gambling · fictional currency · no real money, no purchases."
+MENU_CONTINUE,Reprendre la partie,Continue run
+MENU_NEW_RUN,Nouvelle partie,New run
+MENU_DAILY,Graine du jour,Daily seed
+MENU_HALL,Le Hall,The Hall
+MENU_CODEX,Codex,Codex
+MENU_ACHIEVEMENTS,Succès,Achievements
+MENU_STATS,Statistiques,Statistics
+MENU_OPTIONS,Options,Options
+MENU_CREDITS,Crédits,Credits
+MENU_QUIT,Quitter,Quit
+MENU_BACK,Retour,Back
+TOAST_SAVE_CORRUPT,Sauvegarde illisible : la copie de secours a échoué aussi.,Save unreadable: backup failed as well.
+BET_STRAIGHT,Plein,Straight
+BET_SPLIT,Cheval,Split
+BET_STREET,Transversale,Street
+BET_CORNER,Carré,Corner
+BET_SIX_LINE,Sixain,Six line
+BET_DOZEN,Douzaine,Dozen
+BET_COLUMN,Colonne,Column
+BET_RED,Rouge,Red
+BET_BLACK,Noir,Black
+BET_EVEN,Pair,Even
+BET_ODD,Impair,Odd
+BET_LOW,Manque,Low
+BET_HIGH,Passe,High
+CELEB_GOOD,Bien !,Nice!
+CELEB_HUGE,Énorme !,Huge!
+CELEB_JACKPOT,JACKPOT !,JACKPOT!
+CELEB_BANK,CASSE-LA-BANQUE !,BREAK THE BANK!

@@ -1,0 +1,182 @@
+{
+  "version": 1,
+  "run": {
+    "tiers": 8,
+    "acts": [
+      [
+        1,
+        2,
+        3
+      ],
+      [
+        4,
+        5,
+        6
+      ],
+      [
+        7,
+        8
+      ]
+    ],
+    "tier_debts": [
+      300,
+      800,
+      2000,
+      5000,
+      11000,
+      20000,
+      35000,
+      50000
+    ],
+    "deadline_kinds": [
+      "small",
+      "big",
+      "creditor"
+    ],
+    "deadline_multipliers": [
+      1.0,
+      1.5,
+      2.0
+    ],
+    "spins_per_deadline": 4,
+    "endless_debt_growth": 1.6
+  },
+  "bets": {
+    "bet_budget": 10,
+    "chip_value": 5,
+    "odds": {
+      "straight": 35,
+      "split": 17,
+      "street": 11,
+      "corner": 8,
+      "six_line": 5,
+      "dozen": 2,
+      "column": 2,
+      "red": 1,
+      "black": 1,
+      "even": 1,
+      "odd": 1,
+      "low": 1,
+      "high": 1
+    },
+    "stake_returned": true,
+    "table_limits": {
+      "straight": 2,
+      "split": 3,
+      "street": 4,
+      "corner": 4,
+      "six_line": 6
+    },
+    "outside_kinds": [
+      "dozen",
+      "column",
+      "red",
+      "black",
+      "even",
+      "odd",
+      "low",
+      "high"
+    ]
+  },
+  "score": {
+    "pocket_number_chips": 1,
+    "base_mult": 1.0,
+    "pocket_level_chips": 10
+  },
+  "throw": {
+    "base_precision": 1,
+    "max_precision": 7,
+    "control_by_precision": [
+      0.35,
+      0.45,
+      0.55,
+      0.62,
+      0.7,
+      0.78,
+      0.85
+    ],
+    "zone_width_by_precision": [
+      7,
+      7,
+      5,
+      5,
+      5,
+      3,
+      3
+    ],
+    "pointer_period_seconds": 2.4,
+    "near_miss_count": 2
+  },
+  "economy": {
+    "start_money": 4,
+    "deadline_rewards": [
+      3,
+      4,
+      5
+    ],
+    "money_per_unused_spin": 1,
+    "interest_step": 5,
+    "interest_per_step": 1,
+    "interest_cap": 5,
+    "sell_ratio": 0.5,
+    "zero_tax_money": 2
+  },
+  "shop": {
+    "grigri_offers": 3,
+    "pack_offers": 2,
+    "contract_offers": 1,
+    "reroll_base_cost": 3,
+    "reroll_cost_step": 1,
+    "rarity_weights": {
+      "common": 70,
+      "rare": 26,
+      "legendary": 4,
+      "cursed": 0
+    },
+    "pack_costs": {
+      "pocket": 4,
+      "fortune": 4,
+      "occult": 6
+    },
+    "pack_choices": {
+      "pocket": 3,
+      "fortune": 3,
+      "occult": 2
+    },
+    "pity_rerolls_without_rare": 3,
+    "pocket_upgrade_cost": 3,
+    "edition_chance": 0.08,
+    "pocket_pack_edition_chance": 0.15,
+    "pocket_pack_seal_chance": 0.15,
+    "occult_rarity_weights": {
+      "rare": 70,
+      "legendary": 30
+    },
+    "edition_costs": {
+      "brillante": 2,
+      "holo": 3,
+      "polychrome": 5,
+      "noire": 5
+    }
+  },
+  "slots": {
+    "grigri_slots": 5,
+    "grigri_slots_max": 8,
+    "fortune_slots": 2
+  },
+  "pact": {
+    "max_per_act": 1,
+    "extra_spins": 1,
+    "budget_sacrifice": 3
+  },
+  "anti_streak": {
+    "enabled": true,
+    "same_pocket_weight_penalty": 0.5
+  },
+  "rarity_cost": {
+    "common": 4,
+    "rare": 6,
+    "legendary": 10,
+    "cursed": 3
+  }
+}
