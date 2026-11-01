@@ -25,6 +25,7 @@ var fortune_bar: HBoxContainer = null
 var float_layer: FloatLayer = null
 var presenter: ScorePresenter = null
 var overlay_root: Control = null
+var tutorial: TutorialDirector = null
 
 var _content: Control = null
 var _title_label: Label = null
@@ -48,7 +49,6 @@ var _pending_outcome: RunController.SpinOutcome = null
 var _target_fortune_slot: int = -1
 var _overlay_queue: Array[Control] = []
 var _victory_reward: Dictionary = {}
-var tutorial: TutorialDirector = null
 
 
 func setup(_params: Dictionary) -> void:
