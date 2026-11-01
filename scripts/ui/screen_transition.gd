@@ -6,11 +6,11 @@ const CLOSE_TIME: float = 0.28
 const OPEN_TIME: float = 0.34
 const FRINGE_HEIGHT: float = 14.0
 
+## "curtains" (rideaux) ou "crt" (écran qui s'éteint en ligne).
+var style: String = "curtains"
 var _left: ColorRect = null
 var _right: ColorRect = null
 var _closed: bool = false
-## "curtains" (rideaux) ou "crt" (écran qui s'éteint en ligne).
-var style: String = "curtains"
 var _crt: ColorRect = null
 
 
