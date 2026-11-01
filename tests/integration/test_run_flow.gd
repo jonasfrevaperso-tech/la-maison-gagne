@@ -161,3 +161,33 @@ func test_lea_rethrow() -> void:
 	check(not c.can_rethrow(), "une seule relance")
 	var out: RunController.SpinOutcome = c.commit_spin()
 	check(out.ctx != null)
+
+
+func test_victory_then_endless() -> void:
+	var c: RunController = RunController.new(ContentDB.shared())
+	c.new_run("lea", 0, 21)
+	c.run.flags["debt_mult"] = 0.0001
+	c.run.debt = 1
+	var guard: int = 0
+	while c.run.phase != RunState.Phase.VICTORY and guard < 500:
+		guard += 1
+		match c.run.phase:
+			RunState.Phase.BETTING:
+				c.place_bet("red", 1)
+				c.ensure_some_bet()
+				c.spin(0)
+			RunState.Phase.SHOP:
+				c.leave_shop()
+			RunState.Phase.EVENT:
+				c.resolve_event(0)
+			RunState.Phase.PACT_OFFER:
+				c.accept_pact(c.pact_options()[0])
+			_:
+				break
+	eq(c.run.phase, RunState.Phase.VICTORY, "victoire atteinte")
+	eq(c.run.deadlines_cleared, 24, "24 échéances")
+	c.continue_endless()
+	eq(c.run.phase, RunState.Phase.SHOP)
+	c.leave_shop()
+	eq(c.run.tier, 9)
+	check(c.debt_for(9, 0) > c.debt_for(8, 0) * 0.5, "dette infinie croissante")

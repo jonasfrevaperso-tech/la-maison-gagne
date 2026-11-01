@@ -36,10 +36,16 @@ func _shot(tag: String) -> void:
 
 func _drive() -> void:
 	await _wait(1.5)
+	Settings.set_value("game", "speed", 4)
 	var done: int = 0
 	var guard: int = 0
-	while done < spins_wanted and guard < 2000:
+	while done < spins_wanted and guard < 20000:
 		guard += 1
+		if GameState.current_screen == GameState.SCREEN_SUMMARY:
+			await _wait(1.5)
+			await _shot("summary")
+			print("Autoplay : écran de résumé atteint (victoire=%s)" % str(GameState.last_run_victory))
+			break
 		var rs: RunScreen = _screen()
 		if rs == null:
 			await _wait(POLL)
@@ -51,6 +57,8 @@ func _drive() -> void:
 					rs._on_spot_changed("straight:17", 2)
 					rs._on_spot_changed("split:17-20", 1)
 					rs._on_spot_changed("corner:1", 2)
+					rs.ctl.ensure_some_bet()
+					rs._refresh_table()
 					await _shot("bets")
 				rs._on_spin_pressed()
 				await _wait(RELEASE_DELAY)
@@ -64,12 +72,21 @@ func _drive() -> void:
 				while rs.state == RunScreen.UiState.SCORING:
 					await _wait(POLL)
 				done += 1
-				print("Autoplay : tour %d terminé, score échéance %d / %d" % [done, rs.ctl.run.deadline_score, rs.ctl.run.debt])
+				if GameState.has_active_run():
+					var rr: RunState = rs.ctl.run
+					print(
+						(
+							"Autoplay : tour %d · palier %d · échéance %d · %d / %d"
+							% [done, rr.tier, rr.deadline_idx, rr.deadline_score, rr.debt]
+						)
+					)
 			RunScreen.UiState.RETHROW:
 				rs._on_keep()
 			RunScreen.UiState.OVERLAY:
 				await _shot("overlay")
-				var o: Node = rs.overlay_root.get_child(rs.overlay_root.get_child_count() - 1) if rs.overlay_root.get_child_count() > 0 else null
+				var o: Node = (
+					rs.overlay_root.get_child(rs.overlay_root.get_child_count() - 1) if rs.overlay_root.get_child_count() > 0 else null
+				)
 				if o is Overlay:
 					if o is PactOverlay:
 						(o as PactOverlay)._decline()

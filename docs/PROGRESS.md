@@ -3,8 +3,8 @@
 > Reprise après coupure : lire ce fichier, `CLAUDE.md`, puis `docs/DECISIONS.md`. Lancer `tools/check.sh`.
 
 ## État courant
-- Phase en cours : **Phase 3 — Boucle centrale**
-- Dernier tag : `phase-02-greybox`
+- Phase en cours : **Phase 4 — Systèmes de contenu**
+- Dernier tag : `phase-03-core-loop`
 
 ## Phase 0 — Reconnaissance ✅
 - Environnement : Godot 4.7.2 (MCP godot OK), Blender 5.2.2, Python 3.14 + numpy 2.4 + Pillow 12, uv, gdtoolkit 4 (installé via uv), git 2.53, 12 cœurs.
@@ -26,6 +26,13 @@
 - Testé : 33 tests unitaires/intégration verts, lint propre, pilote automatique : 6 tours réels joués à l'écran avec passage par récompense et boutique, captures vérifiées.
 - Reste : icônes définitives, audio, tutoriel.
 - Risques : perfs du rendu vectoriel de la roue (à profiler phase 13).
+
+## Phase 3 — Boucle centrale ✅
+- Plan : vérifier de bout en bout la boucle déjà écrite en logique (échéances, dette, tours, Zéro, pipeline, fin de run, mode Infini) à l'écran.
+- Fait : run complet joué par le pilote automatique jusqu'à l'écran de victoire (24 échéances, créanciers, pacte, boutique), mode Infini, résumé corrigé.
+- Testé : 34 tests (dont victoire→Infini en logique pure), `check.sh` vert.
+- Reste : contenu (phase 4+), équilibrage.
+- Risques : difficulté actuelle trop élevée pour un humain moyen (simulation 0 %) → ajustement avant la tranche verticale.
 
 ## Rapport de phase
 Format : fait / testé / reste à faire / risques.

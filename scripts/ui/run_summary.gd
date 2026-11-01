@@ -58,8 +58,8 @@ func _stats_text(r: RunState) -> String:
 		% [
 			Localization.name_of("characters", r.character_id),
 			r.risk_level,
-			r.tier,
-			tr("DEADLINE_" + r.deadline_kind().to_upper()),
+			r.tier if r.endless else mini(r.tier, Balance.i("run.tiers")),
+			tr("DEADLINE_" + r.deadline_kind().to_upper()) if not victory else tr("REWARD_VICTORY"),
 			r.deadlines_cleared,
 			r.total_spins,
 			Localization.format_number(float(r.best_spin)),

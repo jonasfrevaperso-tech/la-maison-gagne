@@ -64,6 +64,9 @@ func _dev_hooks() -> bool:
 	GameState.controller = RunController.new(DataRegistry.db)
 	GameState.controller.new_run(String(args["dev-run"]), int(args.get("dev-risk", "0")), int(args.get("dev-seed", "1")))
 	var r: RunState = GameState.controller.run
+	if args.has("dev-debt-mult"):
+		r.flags["debt_mult"] = float(String(args["dev-debt-mult"]))
+		r.debt = GameState.controller.debt_for(r.tier, r.deadline_idx)
 	match String(args.get("dev-phase", "")):
 		"shop":
 			r.money = 30
