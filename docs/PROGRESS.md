@@ -3,8 +3,8 @@
 > Reprise après coupure : lire ce fichier, `CLAUDE.md`, puis `docs/DECISIONS.md`. Lancer `tools/check.sh`.
 
 ## État courant
-- Phase en cours : **Phase 6 — Contenu complet**
-- Dernier tag : `phase-05-vertical-slice`
+- Phase en cours : **Phase 8 — Tutoriel**
+- Dernier tag : `phase-07-meta-campaign`
 
 ## Phase 0 — Reconnaissance ✅
 - Environnement : Godot 4.7.2 (MCP godot OK), Blender 5.2.2, Python 3.14 + numpy 2.4 + Pillow 12, uv, gdtoolkit 4 (installé via uv), git 2.53, 12 cœurs.
@@ -48,6 +48,15 @@
 - Testé : `check.sh` vert ; Acte I joué à l'écran avec le son, zéro erreur.
 - Revue : `docs/REVIEW_VERTICAL_SLICE.md` (7 actions planifiées).
 - Risques : ressenti humain non vérifié (aucun joueur réel).
+
+## Phase 6 — Contenu complet ✅
+- Fait : 150 grigris (60/55/20/15, dont 108 écrits par le sous-agent « contenu »), 30 Fortune, 20 contrats, 24 cases + 4 éditions + 6 sceaux, 12 créanciers + 2 secrets + Patron + La Maison (3 phases), 6 personnages, 8 risques, 20 événements (garantis à chaque acte, 40 % aux autres paliers, choix conditionnels), 60 succès, 20 défis ; tables `docs/content/*.md` générées (`tools/gen_content_docs.py`) ; 235 icônes.
+- Testé : couverture à 100 % (harnais enrichi d'une boutique simulée), tests événements/succès/défis ; `check.sh` vert.
+- Risques : équilibrage du nouveau contenu → phase 12.
+
+## Phase 7 — Méta et campagne ✅
+- Fait : Hall (personnages, Risque max, défis jouables, graine du jour, fins), Codex (collection vue/masquée, créanciers rencontrés), Succès (60, notifications), Statistiques ; campagne : intros Actes I-III, clôtures d'acte, finale à choix → 3 fins + vraie fin secrète (lettre de grand-père + aucun pacte) ; créancier secret L'Ombre du Grand-Père (déclenché par l'histoire), Croupier d'Or en mode Infini ; Fantôme débloqué par succès.
+- Testé : `check.sh` vert, captures des écrans méta.
 
 ## Rapport de phase
 Format : fait / testé / reste à faire / risques.

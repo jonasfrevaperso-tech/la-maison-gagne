@@ -45,9 +45,14 @@ func new_run(character_id: String, risk_level: int, seed_value: int, challenge_i
 	run.fortune_slots = Balance.i("slots.fortune_slots")
 	run.wheel = WheelModel.standard()
 	_apply_setup(db.get_entry("characters", character_id))
+	if challenge_id != "" and db.get_entry("challenges", challenge_id).has("risk"):
+		run.risk_level = int(db.get_entry("challenges", challenge_id)["risk"])
 	_apply_risks()
 	if challenge_id != "":
-		_apply_setup(db.get_entry("challenges", challenge_id))
+		var ch: Dictionary = db.get_entry("challenges", challenge_id)
+		_apply_setup(ch)
+		if ch.has("risk"):
+			run.risk_level = int(ch["risk"])
 	_plan_creditors()
 	EffectRunner.fire(&"on_run_start", run, null, db)
 	start_deadline()
@@ -89,7 +94,13 @@ func _apply_setup(def: Dictionary) -> void:
 
 
 func _apply_wheel_op(op: Dictionary) -> void:
-	var nums: Array = op.get("numbers", [])
+	var nums: Array = []
+	var raw: Variant = op.get("numbers", [])
+	if raw is String and String(raw) == "all":
+		for n: int in WheelLayout.POCKET_COUNT:
+			nums.append(n)
+	elif raw is Array:
+		nums = raw as Array
 	match String(op.get("op", "")):
 		"set_type":
 			for n: Variant in nums:
@@ -175,11 +186,19 @@ func start_deadline() -> void:
 	run.creditor_phase = 0
 	if run.is_creditor():
 		var plan: Array = run.flags.get("creditor_plan", [])
-		if run.tier - 1 < plan.size():
+		var override_key: String = "creditor_override_%d" % run.tier
+		if run.flags.has(override_key):
+			run.creditor_id = String(run.flags[override_key])
+		elif run.endless and run.tier == Balance.i("run.tiers") + 1:
+			run.creditor_id = "cr_croupier_or"
+		elif run.tier - 1 < plan.size():
 			run.creditor_id = String(plan[run.tier - 1])
 		elif not plan.is_empty():
 			run.creditor_id = String(plan[run.rng.randi_range_in(RngStreams.EVENTS, 0, plan.size() - 1)])
 	run.debt = debt_for(run.tier, run.deadline_idx)
+	if run.flags.has("next_debt_pct"):
+		run.debt = maxi(int(round(float(run.debt) * (1.0 + float(run.flags["next_debt_pct"])))), 1)
+		run.flags.erase("next_debt_pct")
 	run.spins_total = maxi(Balance.i("run.spins_per_deadline") + run.extra_spins_per_deadline + int(run.flags.get("spins_mod", 0)), 1)
 	run.spins_left = run.spins_total
 	run.spin_index = 0
@@ -192,6 +211,9 @@ func start_deadline() -> void:
 		var cdef: Dictionary = db.get_entry("creditors", run.creditor_id)
 		for k: Variant in cdef.get("allowed_kinds", []):
 			run.allowed_kinds.append(StringName(String(k)))
+	if run.allowed_kinds.is_empty():
+		for k2: Variant in run.flags.get("allowed_kinds_always", []):
+			run.allowed_kinds.append(StringName(String(k2)))
 	EffectRunner.fire(&"on_deadline_start", run, null, db)
 	begin_betting()
 
@@ -409,6 +431,8 @@ func _deadline_won() -> Dictionary:
 			return reward
 	if run.act() != prev_act:
 		run.flags["act_changed"] = true
+	elif run.deadline_idx == 0 and run.rng.chance(RngStreams.EVENTS, Balance.f("run.event_chance_per_tier")):
+		run.flags["event_due"] = true
 	ShopModel.enter(run, db)
 	return reward
 
@@ -512,8 +536,10 @@ func leave_shop() -> void:
 	if run.phase != RunState.Phase.SHOP:
 		return
 	run.shop_state = {}
-	if bool(run.flags.get("act_changed", false)):
+	var act_change: bool = bool(run.flags.get("act_changed", false))
+	if act_change or bool(run.flags.get("event_due", false)):
 		run.flags.erase("act_changed")
+		run.flags.erase("event_due")
 		var ev: String = _pick_event()
 		if ev != "":
 			run.pending_event_id = ev
@@ -537,20 +563,33 @@ func _pick_event() -> String:
 	return pick
 
 
+func _event_env() -> EffectEnv:
+	var env: EffectEnv = EffectEnv.new()
+	env.run = run
+	env.db = db
+	env.source_kind = ScoreEvent.SRC_SYSTEM
+	env.source_id = run.pending_event_id
+	return env
+
+
+## Un choix d'événement peut exiger des conditions (ex. argent suffisant).
+func event_choice_available(choice: Dictionary) -> bool:
+	return EffectRunner.check_all(choice.get("if", []) as Array, _event_env())
+
+
 ## Résout un choix d'événement entre actes (effets on_use du choix), puis reprend.
 func resolve_event(choice_index: int) -> void:
 	if run.phase != RunState.Phase.EVENT:
 		return
 	var def: Dictionary = db.get_entry("events", run.pending_event_id)
 	var choices: Array = def.get("choices", [])
-	if choice_index >= 0 and choice_index < choices.size():
-		var env: EffectEnv = EffectEnv.new()
-		env.run = run
-		env.db = db
-		env.source_kind = ScoreEvent.SRC_SYSTEM
-		env.source_id = run.pending_event_id
+	if choice_index >= 0 and choice_index < choices.size() and event_choice_available(choices[choice_index] as Dictionary):
+		var env: EffectEnv = _event_env()
 		for eff: Variant in (choices[choice_index] as Dictionary).get("effects", []):
 			EffectRunner.run_effect(eff as Dictionary, env)
+		var event_log: Array = run.flags.get("event_log", [])
+		event_log.append("%s:%d" % [run.pending_event_id, choice_index])
+		run.flags["event_log"] = event_log
 	run.pending_event_id = ""
 	start_deadline()
 
@@ -579,6 +618,7 @@ func use_fortune(slot: int, pocket_index: int = -1) -> bool:
 		env.pocket = run.wheel.at(pocket_index)
 		env.pocket_index = pocket_index
 	run.fortunes.remove_at(slot)
+	run.flags["fortunes_used"] = int(run.flags.get("fortunes_used", 0)) + 1
 	for eff: Variant in def.get("effects", []):
 		if String((eff as Dictionary).get("trigger", "on_use")) == "on_use":
 			EffectRunner.run_effect(eff as Dictionary, env)

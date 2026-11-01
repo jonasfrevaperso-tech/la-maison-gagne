@@ -26,6 +26,7 @@ var _intensity: float = 0.0
 var _ambience: AudioStreamPlayer = null
 ## En headless (tests, simulation, CI), le pilote audio factice ne libère jamais les lectures.
 var _silent: bool = false
+var _music_tweens: Array[Tween] = []
 
 
 func _ready() -> void:
@@ -51,6 +52,11 @@ func _ready() -> void:
 
 ## Arrête et détache tous les flux (évite des lectures orphelines à la fermeture).
 func shutdown() -> void:
+	_music_id = ""
+	for t: Tween in _music_tweens:
+		if t != null and t.is_valid():
+			t.kill()
+	_music_tweens.clear()
 	var players: Array[AudioStreamPlayer] = []
 	players.append_array(_pool)
 	players.append_array(_music_layers)
@@ -166,6 +172,7 @@ func play_music(music_id: String) -> void:
 		var tw: Tween = create_tween()
 		tw.tween_property(player, "volume_db", SILENT_DB, FADE_TIME * 0.5)
 		tw.tween_callback(_swap_layer.bind(player, stream, i))
+		_music_tweens.append(tw)
 
 
 func _swap_layer(player: AudioStreamPlayer, stream: AudioStream, layer: int) -> void:

@@ -64,6 +64,7 @@ const PREDICATES: Array[StringName] = [
 	&"bet_covers_landing_neighbor",
 	&"grigri_position",
 	&"first_pass",
+	&"flag",
 ]
 const VARIABLES: Array[StringName] = [
 	&"counter",
@@ -162,6 +163,7 @@ const OPS: Array[StringName] = [
 	&"add_random_seal",
 	&"add_random_edition_grigri",
 	&"add_fortune_slot",
+	&"next_debt_pct",
 ]
 const MAX_DEPTH: int = 3
 const CMP_DEFAULT: String = ">="
@@ -187,6 +189,8 @@ static func fire(trigger: StringName, run: RunState, ctx: ScoreContext, db: Cont
 		var phases: Array = cdef.get("phases", [])
 		if run.creditor_phase < phases.size():
 			_fire_entry(trigger, phases[run.creditor_phase] as Dictionary, base, ScoreEvent.SRC_CREDITOR, run.creditor_id, 0, null)
+	if run.challenge_id != "":
+		_fire_entry(trigger, db.get_entry("challenges", run.challenge_id), base, ScoreEvent.SRC_SYSTEM, run.challenge_id, 0, null)
 	if run.flags.has("risk_effects"):
 		for rid: Variant in run.flags["risk_effects"]:
 			_fire_entry(trigger, db.get_entry("risks", String(rid)), base, ScoreEvent.SRC_SYSTEM, String(rid), 0, null)
@@ -325,6 +329,8 @@ static func check(cond: Dictionary, env: EffectEnv) -> bool:
 			return p != null and env.run.last_number == p.number
 		&"near_miss":
 			return ctx != null and ctx.near_miss
+		&"flag":
+			return bool(env.run.flags.get(String(cond.get("v", "")), false))
 		&"first_pass":
 			return ctx != null and ctx.pocket_pass <= 1
 		&"in_zone":
@@ -531,6 +537,11 @@ static func var_value(name: StringName, env: EffectEnv, params: Dictionary = {})
 			return float(run.deadline_score)
 		&"debt":
 			return float(run.debt)
+		&"pacts_used":
+			var pacts: int = 0
+			for pv: Variant in run.pacts_used.values():
+				pacts += int(pv)
+			return float(pacts)
 		&"debt_progress":
 			return float(run.deadline_score) / maxf(float(run.debt), 1.0)
 	push_error("Variable d'effet inconnue : %s" % name)
@@ -554,6 +565,9 @@ static func apply(a: Dictionary, env: EffectEnv) -> void:
 	var ctx: ScoreContext = env.ctx
 	var v: float = value(a.get("v", 0), env)
 	var label: String = String(a.get("label", ""))
+	# Contributions nulles : aucun effet, aucun bruit à l'écran (« +0 Mult »).
+	if (op in [&"add_chips", &"add_mult"] and is_zero_approx(v)) or (op == &"mul_mult" and is_equal_approx(v, 1.0)):
+		return
 	match op:
 		&"add_chips":
 			if ctx != null:
@@ -669,10 +683,12 @@ static func apply(a: Dictionary, env: EffectEnv) -> void:
 			var p3: Pocket = _target_pocket(env)
 			if p3 != null:
 				p3.edition = StringName(String(a.get("edition", "")))
+				_emit(env, ScoreEvent.TRANSFORM, float(p3.number), label)
 		&"set_pocket_seal":
 			var p4: Pocket = _target_pocket(env)
 			if p4 != null:
 				p4.seal = StringName(String(a.get("seal", "")))
+				_emit(env, ScoreEvent.TRANSFORM, float(p4.number), label)
 		&"add_random_seal":
 			var seals: Array[String] = env.db.ids("seals")
 			if not seals.is_empty():
@@ -727,6 +743,8 @@ static func apply(a: Dictionary, env: EffectEnv) -> void:
 			_emit(env, ScoreEvent.INFO, v, label if label != "" else "debt")
 		&"debt_add":
 			run.debt = maxi(run.debt + int(v), 1)
+		&"next_debt_pct":
+			run.flags["next_debt_pct"] = float(run.flags.get("next_debt_pct", 0.0)) + v
 		&"protect_zero":
 			if ctx != null:
 				ctx.zero_protected = true

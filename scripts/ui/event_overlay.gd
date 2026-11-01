@@ -7,6 +7,7 @@ var ctl: RunController = null
 
 func configure(p_ctl: RunController) -> EventOverlay:
 	ctl = p_ctl
+	panel_width = 1150.0
 	return self
 
 
@@ -19,8 +20,9 @@ func build() -> void:
 	var choices: Array = e.get("choices", [])
 	for i: int in choices.size():
 		var ch: Dictionary = choices[i]
-		var b: Button = UiKit.button(Localization.t(ch, "text"), _pick.bind(i), Vector2(800, 56))
+		var b: Button = UiKit.button(Localization.t(ch, "text"), _pick.bind(i), Vector2(1000, 56))
 		b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		b.disabled = not ctl.event_choice_available(ch)
 		body.add_child(b)
 		if i == 0:
 			b.call_deferred("grab_focus")

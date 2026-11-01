@@ -288,3 +288,40 @@ THROW_PERFECT,Pile dessus !,Spot on!
 THROW_WILD,Rebond fou !,Wild bounce!
 THROW_ATTRACTED,Aimantée !,Magnetised!
 THROW_STUCK,Collée !,Stuck!
+TOAST_ACHIEVEMENT,Succès débloqué : %s,Achievement unlocked: %s
+FX_GIFT,Cadeau !,Gift!
+TAG_CONTRACT,Contrat,Contract
+TAG_CORNER,Carré,Corner
+TAG_EDITION,Édition,Edition
+TAG_FORTUNE,Fortune,Fortune
+TAG_RANGE,Manque/Passe,Low/High
+TAG_SEAL,Sceau,Seal
+TAG_SIX_LINE,Sixain,Six line
+TAG_STREET,Transversale,Street
+CODEX_GRIGRIS,Grigris,Charms
+CODEX_POCKETS,Cases,Pockets
+CODEX_FORTUNES,Cartes Fortune,Fortune cards
+CODEX_CONTRACTS,Contrats,Contracts
+CODEX_CREDITORS,Créanciers,Creditors
+CODEX_UNKNOWN,Pas encore rencontré.,Not met yet.
+HALL_CHARACTERS,Personnages,Characters
+HALL_MAX_RISK,Risque max débloqué : %d,Max Risk unlocked: %d
+HALL_LOCKED_HINT,Atteindre la Cave du Zéro pour débloquer.,Reach the Zero Cellar to unlock.
+HALL_CHALLENGES,Défis,Challenges
+HALL_DAILY,Graine du jour,Daily seed
+HALL_DAILY_BEST,Graine %s · meilleur résultat : %d échéances,Seed %s · best: %d deadlines
+HALL_ENDINGS,Fins découvertes,Endings found
+ENDING_REPAY,Rembourser,Repay
+ENDING_FLEE,S'enfuir,Flee
+ENDING_TAKE,Reprendre la Maison,Take the House
+ENDING_SECRET,La Roue s'arrête,The Wheel Stops
+ACH_PROGRESS,%d / %d débloqués,%d / %d unlocked
+STATS_RUNS,Runs commencés,Runs started
+STATS_WINS,Victoires,Wins
+STATS_WINRATE,Taux de victoire,Win rate
+STATS_SPINS,Tours joués,Spins played
+STATS_BEST_SPIN,Meilleur tour,Best spin
+STATS_ZEROS,Zéros vus,Zeros seen
+STATS_ACHIEVEMENTS,Succès,Achievements
+STATS_CHALLENGES,Défis réussis,Challenges done
+STATS_SEEN,Grigris vus,Charms seen

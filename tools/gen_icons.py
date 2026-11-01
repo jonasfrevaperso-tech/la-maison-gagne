@@ -517,9 +517,11 @@ COLOR_CYCLE = ["magenta", "cyan", "emerald", "gold", "mult", "blue", "orange", "
 
 
 def load_specs() -> dict:
-    if SPECS.exists():
-        return json.loads(SPECS.read_text(encoding="utf-8"))
-    return {}
+    """Fusionne tools/icon_specs*.json (un fichier par lot de contenu)."""
+    out: dict = {}
+    for f in sorted(SPECS.parent.glob("icon_specs*.json")):
+        out.update(json.loads(f.read_text(encoding="utf-8")))
+    return out
 
 
 def entries(cat_dir: str, prefix: str) -> list:

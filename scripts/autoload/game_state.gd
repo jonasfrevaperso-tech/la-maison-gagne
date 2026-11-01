@@ -12,6 +12,9 @@ const SCREEN_HALL: StringName = &"hall"
 const SCREEN_ACHIEVEMENTS: StringName = &"achievements"
 const SCREEN_STATS: StringName = &"stats"
 
+## Délai laissé au thread audio pour libérer les lectures avant de quitter.
+const QUIT_AUDIO_GRACE: float = 0.2
+
 var controller: RunController = null
 var current_screen: StringName = &""
 var last_run_victory: bool = false
@@ -32,8 +35,7 @@ func quit_game() -> void:
 	autosave()
 	SaveSystem.save_profile()
 	AudioBus.shutdown()
-	await get_tree().process_frame
-	await get_tree().process_frame
+	await get_tree().create_timer(QUIT_AUDIO_GRACE, true, false, true).timeout
 	get_tree().quit()
 
 
@@ -43,6 +45,8 @@ func goto(screen_id: StringName, params: Dictionary = {}) -> void:
 
 
 func start_new_run(character_id: String, risk_level: int, seed_value: int, challenge_id: String = "", daily: bool = false) -> void:
+	if challenge_id != "":
+		character_id = String(DataRegistry.db.get_entry("challenges", challenge_id).get("character", character_id))
 	controller = RunController.new(DataRegistry.db)
 	controller.new_run(character_id, risk_level, seed_value, challenge_id)
 	controller.run.daily = daily
@@ -88,6 +92,32 @@ func log_input(entry: Dictionary) -> void:
 	replay_log.append(entry)
 
 
+# --------------------------------------------------------------------------- succès
+
+
+func _announce(ids: Array[String]) -> void:
+	for aid: String in ids:
+		var a: Dictionary = DataRegistry.db.get_entry("achievements", aid)
+		EventBus.achievement_unlocked.emit(aid)
+		EventBus.toast.emit(tr("TOAST_ACHIEVEMENT") % Localization.t(a, "name"), &"success")
+		AudioBus.play("celebrate")
+	if not ids.is_empty():
+		SaveSystem.save_profile()
+
+
+func record_spin(outcome: RunController.SpinOutcome) -> void:
+	var r: RunState = controller.run
+	_announce(MetaProgress.evaluate(SaveSystem.profile, DataRegistry.db, "spin", MetaProgress.spin_metrics(r, outcome.ctx)))
+	if outcome.deadline_won:
+		_announce(MetaProgress.evaluate(SaveSystem.profile, DataRegistry.db, "deadline_won", MetaProgress.deadline_metrics(r)))
+
+
+func record_shop(action: String, data: Dictionary) -> void:
+	var m: Dictionary = data.duplicate()
+	m["action"] = action
+	_announce(MetaProgress.evaluate(SaveSystem.profile, DataRegistry.db, "shop", m))
+
+
 ## Fin de run : statistiques de profil, déblocages, puis résumé.
 func end_run(victory: bool) -> void:
 	if not has_active_run():
@@ -104,6 +134,21 @@ func end_run(victory: bool) -> void:
 		mr[r.character_id] = maxi(prev, r.risk_level + 1)
 	var camp: Dictionary = SaveSystem.profile["campaign"]
 	camp["act_reached"] = maxi(int(camp.get("act_reached", 1)), r.act())
+	if victory and r.flags.has("ending"):
+		var endings: Array = camp.get("endings", [])
+		if not endings.has(String(r.flags["ending"])):
+			endings.append(String(r.flags["ending"]))
+		camp["endings"] = endings
+	if MetaProgress.challenge_completed(DataRegistry.db, r, victory):
+		var done: Array = SaveSystem.profile["challenges_done"]
+		if not done.has(r.challenge_id):
+			done.append(r.challenge_id)
+	if r.daily:
+		var daily: Dictionary = SaveSystem.profile["daily"]
+		daily["best"] = maxi(int(daily.get("best", 0)), r.deadlines_cleared)
+		daily["last_date"] = Time.get_date_string_from_system()
+	_announce(MetaProgress.evaluate(SaveSystem.profile, DataRegistry.db, "run_end", MetaProgress.run_metrics(r, DataRegistry.db, victory)))
+	_announce(MetaProgress.evaluate(SaveSystem.profile, DataRegistry.db, "profile", MetaProgress.profile_metrics(SaveSystem.profile)))
 	SaveSystem.save_profile()
 	SaveSystem.clear_run()
 	EventBus.run_ended.emit(r, victory)

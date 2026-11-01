@@ -142,10 +142,21 @@ func _on_line_typed() -> void:
 		return
 	_waiting_choice = true
 	for i: int in choices.size():
+		if not _choice_available(choices[i] as Dictionary):
+			continue
 		var b: Button = UiKit.button(Localization.t(choices[i] as Dictionary, "text"), _choose.bind(i), Vector2(900, 50))
 		_choices.add_child(b)
-		if i == 0:
+		if _choices.get_child_count() == 1:
 			b.call_deferred("grab_focus")
+
+
+func _choice_available(choice: Dictionary) -> bool:
+	if run == null or not choice.has("if"):
+		return true
+	var env: EffectEnv = EffectEnv.new()
+	env.run = run
+	env.db = db
+	return EffectRunner.check_all(choice["if"] as Array, env)
 
 
 func _choose(i: int) -> void:

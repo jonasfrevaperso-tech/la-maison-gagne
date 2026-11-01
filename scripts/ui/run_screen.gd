@@ -47,6 +47,7 @@ var _flash: float = 0.0
 var _pending_outcome: RunController.SpinOutcome = null
 var _target_fortune_slot: int = -1
 var _overlay_queue: Array[Control] = []
+var _victory_reward: Dictionary = {}
 
 
 func setup(_params: Dictionary) -> void:
@@ -205,7 +206,7 @@ func _refresh_table() -> void:
 	table_view.slip = r.slip
 	table_view.wheel = r.wheel
 	table_view.chip_value = r.chip_value
-	table_view.hide_odds = bool(r.flags.get("hide_odds", false))
+	table_view.hide_odds = bool(r.flags.get("hide_odds", false)) or bool(r.flags.get("hide_odds_always", false))
 	var hl: Dictionary = {}
 	for spot_id: String in r.slip.order:
 		for n: int in BetCatalog.get_spot(spot_id).numbers:
@@ -570,6 +571,7 @@ func _on_keep() -> void:
 func _commit() -> void:
 	var outcome: RunController.SpinOutcome = ctl.commit_spin()
 	_pending_outcome = outcome
+	GameState.record_spin(outcome)
 	table_view.flash_winners(outcome.ctx.landing_numbers)
 	presenter.debt_remaining = maxi(ctl.run.debt - (ctl.run.deadline_score - outcome.ctx.total), 1)
 	# La logique a déjà avancé : on fige l'affichage (mises posées, jauge) le temps du score.
@@ -591,15 +593,16 @@ func _on_score_finished(_total: int) -> void:
 	if out.forgiven:
 		EventBus.toast.emit(tr("TOAST_FORGIVEN"), &"success")
 	if out.victory:
-		_show_overlay(RewardOverlay.new().configure(out.reward, true), _on_victory_closed)
+		_victory_reward = out.reward
+		_show_overlay(DialogueOverlay.new().configure("finale", ctl.run, ctl.db), _on_finale_closed)
 		return
 	if out.deadline_won:
 		AudioBus.play("deadline_won")
 		if bool(ctl.run.flags.get("act_changed", false)):
 			var outro: String = "act%d_creditor_won" % (ctl.run.act() - 1)
 			if ctl.db.has_entry("dialogues", outro):
-				_overlay_queue.append(RewardOverlay.new().configure(out.reward, false))
-				_show_overlay(DialogueOverlay.new().configure(outro, ctl.run, ctl.db), _on_reward_closed)
+				var reward: Dictionary = out.reward
+				_show_overlay(DialogueOverlay.new().configure(outro, ctl.run, ctl.db), _show_reward.bind(reward))
 				return
 		_show_overlay(RewardOverlay.new().configure(out.reward, false), _on_reward_closed)
 		return
@@ -616,6 +619,20 @@ func _on_score_finished(_total: int) -> void:
 
 func _on_reward_closed() -> void:
 	_open_shop()
+
+
+func _show_reward(reward: Dictionary) -> void:
+	_show_overlay(RewardOverlay.new().configure(reward, false), _on_reward_closed)
+
+
+func _on_finale_closed() -> void:
+	var ending: String = String(ctl.run.flags.get("ending", "end_repay"))
+	ctl.run.flags["ending"] = ending
+	_show_overlay(DialogueOverlay.new().configure("ending_" + ending.substr(4), ctl.run, ctl.db), _on_ending_closed)
+
+
+func _on_ending_closed() -> void:
+	_show_overlay(RewardOverlay.new().configure(_victory_reward, true), _on_victory_closed)
 
 
 func _on_victory_closed() -> void:

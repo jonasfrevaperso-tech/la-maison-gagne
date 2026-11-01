@@ -14,6 +14,7 @@ var _reroll_btn: Button = null
 var _owned: GrigriBar = null
 var _pack_box: VBoxContainer = null
 var _float: FloatLayer = null
+var _rerolls_here: int = 0
 
 
 func configure(p_ctl: RunController) -> ShopOverlay:
@@ -84,6 +85,7 @@ func _refresh(animate: bool = false) -> void:
 		card.disabled_look = bool(o["sold"])
 		card.activated.connect(_on_buy_grigri)
 		_offers_row.add_child(card)
+		SaveSystem.mark_seen("grigris", String(o["id"]))
 		if animate:
 			_flip_in(card, i)
 	for c2: Node in _packs_row.get_children():
@@ -140,6 +142,7 @@ func _on_buy_grigri(card: GrigriCard) -> void:
 	var pos: Vector2 = card.global_position + card.size * 0.5
 	if _feedback(ShopModel.buy_grigri(ctl.run, ctl.db, card.uid), pos):
 		SaveSystem.mark_seen("grigris", card.entry_id)
+		GameState.record_shop("buy", {"rarity": card.rarity(), "id": card.entry_id})
 		_refresh()
 		GameState.autosave()
 
@@ -161,6 +164,8 @@ func _on_buy_pack(i: int) -> void:
 func _on_reroll() -> void:
 	if ShopModel.reroll(ctl.run, ctl.db):
 		AudioBus.play("reroll")
+		_rerolls_here += 1
+		GameState.record_shop("reroll", {"rerolls_here": _rerolls_here})
 		_refresh(true)
 		GameState.autosave()
 

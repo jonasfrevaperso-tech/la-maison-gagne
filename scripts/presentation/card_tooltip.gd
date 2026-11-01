@@ -42,6 +42,12 @@ const TAG_GLYPHS: Dictionary = {
 	"contract": "✍",
 	"ghost": "☁",
 	"spins": "⟲",
+	"corner": "▦",
+	"edition": "◆",
+	"range": "↕",
+	"seal": "●",
+	"six_line": "⚏",
+	"street": "≡",
 }
 
 

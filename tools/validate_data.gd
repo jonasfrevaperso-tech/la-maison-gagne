@@ -75,6 +75,10 @@ func _validate_entry(db: ContentDB, cat: String, e: Dictionary) -> void:
 		_validate_effects(db, eid + "/phase", (ph as Dictionary).get("effects", []) as Array)
 	for ch: Variant in e.get("choices", []):
 		_validate_effects(db, eid + "/choice", (ch as Dictionary).get("effects", []) as Array)
+		for cc: Variant in (ch as Dictionary).get("if", []):
+			_validate_cond(eid + "/choice", cc as Dictionary)
+		if not (ch as Dictionary).has("text_fr") or not (ch as Dictionary).has("text_en"):
+			errors.append("%s : choix sans text_fr/text_en" % eid)
 	for ln: Variant in e.get("lines", []):
 		var who: String = String((ln as Dictionary).get("who", ""))
 		if who != "hero" and not db.has_entry("speakers", who) and not db.has_entry("creditors", who):
