@@ -16,7 +16,12 @@ Tous les assets (icônes, sprites, sons, musiques) sont **générés par les scr
 
 | Asset | Source | Licence |
 |---|---|---|
-| (à compléter au fil des phases) | | |
+| Police display « Limelight » | Sorkin Type Co, via google/fonts | SIL OFL 1.1 (`assets/fonts/licenses/limelight_OFL.txt`) |
+| Police UI « Josefin Sans » | Santiago Orozco, via google/fonts | SIL OFL 1.1 (`assets/fonts/licenses/josefinsans_OFL.txt`) |
+| Police mono « JetBrains Mono » | JetBrains, via google/fonts | SIL OFL 1.1 (`assets/fonts/licenses/jetbrainsmono_OFL.txt`) |
+| Icônes pixel art (`assets/icons/`) | générées par `tools/gen_icons.py` | originales (projet) |
+| Effets sonores et ambiance (`audio/sfx/`) | synthétisés par `tools/gen_audio.py` | originaux (projet) |
+| Musiques (`audio/music/`) | composées et synthétisées par `tools/gen_audio.py` | originales (projet) |
 
 ## Inspirations (mécaniques et ressenti uniquement)
 Balatro, Clover Pit, Raccoin. Aucun nom, personnage, visuel ou son n'en est repris.

@@ -11,6 +11,8 @@ const DEFAULTS: Dictionary = {
 	"input": {"bindings": {}},
 }
 
+## Surcharge de vitesse non persistée (QA automatisée) ; 0 = utiliser l'option du joueur.
+var speed_override: float = 0.0
 var _cfg: ConfigFile = ConfigFile.new()
 
 
@@ -80,6 +82,8 @@ func s(section: String, key: String) -> String:
 
 
 func speed() -> float:
+	if speed_override > 0.0:
+		return speed_override
 	return float(int(get_value("game", "speed")))
 
 

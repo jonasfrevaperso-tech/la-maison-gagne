@@ -25,6 +25,9 @@ const BOUNCE_HEIGHT: float = 0.06
 const NEAR_MISS_SLOWMO: float = 0.45
 const TILT: float = 0.82  # écrasement vertical pour l'effet 2.5D
 const FONT_SIZE_RATIO: float = 0.045
+const ASSIST_AIM_SLOWDOWN: float = 1.6
+const TYPE_ICON_RATIO: float = 0.64
+const TYPE_ICON_SIZE_RATIO: float = 0.085
 
 var wheel: WheelModel = null
 var db: ContentDB = null
@@ -100,6 +103,7 @@ func index_at_angle(screen_angle: float) -> int:
 func start_aim() -> void:
 	aiming = true
 	_aim_t = 0.0
+	_aim_period = Balance.f("throw.pointer_period_seconds") * (ASSIST_AIM_SLOWDOWN if Settings.b("game", "assist") else 1.0)
 
 
 ## Le pointeur est fixe en haut de l'écran (angle −90°) ; la roue tourne sous lui.
@@ -274,6 +278,8 @@ func _draw() -> void:
 		# séparateur
 		draw_line(to_screen(a0, r * POCKET_INNER), to_screen(a0, r * POCKET_OUTER), Palette.GOLD_DARK, 1.5, true)
 		_draw_number(i, p, r)
+		if p.type_id != Pocket.TYPE_STANDARD:
+			_draw_type_icon(i, p, r)
 		if p.seal != &"":
 			draw_circle(to_screen(a0 + span * 0.5, r * (POCKET_INNER + 0.04)), r * 0.016, PocketInfo.seal_color(p.seal))
 	# Zone de visée
@@ -336,6 +342,16 @@ func _draw_number(i: int, p: Pocket, r: float) -> void:
 		draw_string(
 			f, pos + Vector2(-w * 0.5, fs * 1.3), "+" + str(p.level), HORIZONTAL_ALIGNMENT_CENTER, -1, int(fs * 0.7), Palette.GOLD_LIGHT
 		)
+
+
+func _draw_type_icon(i: int, p: Pocket, r: float) -> void:
+	var tdef: Dictionary = db.get_entry("pocket_types", String(p.type_id)) if db != null else {}
+	var tex: Texture2D = IconLibrary.icon(String(tdef.get("icon", "")))
+	if tex == null:
+		return
+	var sz: float = r * TYPE_ICON_SIZE_RATIO * clampf(37.0 / float(maxi(wheel.size(), 1)), 0.6, 1.2)
+	var pos: Vector2 = to_screen(pocket_angle(i), r * TYPE_ICON_RATIO)
+	draw_texture_rect(tex, Rect2(pos - Vector2(sz, sz) * 0.5, Vector2(sz, sz)), false)
 
 
 func _draw_ellipse(c: Vector2, r: float, col: Color) -> void:

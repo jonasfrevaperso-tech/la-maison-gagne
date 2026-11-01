@@ -10,7 +10,15 @@ func build() -> void:
 		var l: Label = UiKit.label(tr(key), UiKit.SIZE_BODY)
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		body.add_child(l)
-	var b: Button = UiKit.button(tr("BTN_UNDERSTOOD"), close)
+	var b: Button = UiKit.button(tr("BTN_UNDERSTOOD"), _done)
 	b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	body.add_child(b)
 	b.call_deferred("grab_focus")
+
+
+func _done() -> void:
+	var tuto: Dictionary = SaveSystem.profile.get("tutorial", {})
+	tuto["done"] = true
+	SaveSystem.profile["tutorial"] = tuto
+	SaveSystem.save_profile()
+	close()

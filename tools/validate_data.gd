@@ -15,7 +15,7 @@ const REQUIRED_BY_CAT: Dictionary = {
 	"risks": ["level"],
 }
 const RARITIES: Array[String] = ["common", "rare", "legendary", "cursed"]
-const SKIP_DESC: Array[String] = ["dialogues", "achievements", "challenges", "events"]
+const SKIP_DESC: Array[String] = ["dialogues", "achievements", "challenges", "events", "speakers"]
 
 var errors: Array[String] = []
 var warnings: Array[String] = []
@@ -75,6 +75,14 @@ func _validate_entry(db: ContentDB, cat: String, e: Dictionary) -> void:
 		_validate_effects(db, eid + "/phase", (ph as Dictionary).get("effects", []) as Array)
 	for ch: Variant in e.get("choices", []):
 		_validate_effects(db, eid + "/choice", (ch as Dictionary).get("effects", []) as Array)
+	for ln: Variant in e.get("lines", []):
+		var who: String = String((ln as Dictionary).get("who", ""))
+		if who != "hero" and not db.has_entry("speakers", who) and not db.has_entry("creditors", who):
+			errors.append("%s : locuteur inconnu '%s'" % [eid, who])
+		if not (ln as Dictionary).has("text_fr") or not (ln as Dictionary).has("text_en"):
+			errors.append("%s : réplique sans text_fr/text_en" % eid)
+		for ch2: Variant in (ln as Dictionary).get("choices", []):
+			_validate_effects(db, eid + "/line_choice", (ch2 as Dictionary).get("effects", []) as Array)
 	var setup: Dictionary = e.get("setup", {})
 	for gid: Variant in setup.get("grigris", []):
 		if not db.has_entry("grigris", String(gid)):

@@ -1,0 +1,21 @@
+[
+  {"id": "act1_intro", "act": 1, "trigger": "act_start", "lines": [
+    {"who": "narrator", "text_fr": "Sous la ville, il y a un escalier que personne ne descend deux fois. Au bout, une porte dorée. Derrière, le Grand Zéro.", "text_en": "Beneath the city there is a staircase nobody takes twice. At the bottom, a golden door. Behind it, the Grand Zero."},
+    {"who": "house", "text_fr": "Bienvenue. Votre famille nous doit… voyons… tout.", "text_en": "Welcome. Your family owes us… let me see… everything."},
+    {"who": "hero", "text_fr": "Je viens rembourser.", "text_en": "I've come to pay."},
+    {"who": "house", "text_fr": "Un tour de roue à la fois. Comme votre grand-père. Et le père de votre grand-père. Une tradition charmante.", "text_en": "One spin at a time. Like your grandfather. And his father. A charming tradition."},
+    {"who": "hero", "text_fr": "Et si je gagne ?", "text_en": "And if I win?"},
+    {"who": "house", "text_fr": "Alors vous serez le premier. Le Rez-de-chaussée Doré est à vous. Les tables sont chaudes, la roue ne s'arrête jamais.", "text_en": "Then you'll be the first. The Golden Ground Floor is yours. The tables are warm, the wheel never stops."},
+    {"who": "croupier", "text_fr": "Psst. Petit conseil d'un vieux croupier : regarde la roue, pas tes mains. La bille va où la roue l'emmène.", "text_en": "Psst. A tip from an old dealer: watch the wheel, not your hands. The ball goes where the wheel takes it.",
+     "choices": [
+       {"text_fr": "« Merci. Je m'en souviendrai. »", "text_en": "« Thanks. I'll remember that. »", "effects": [{"trigger": "on_use", "do": [{"op": "perm_control", "v": 0.03}]}]},
+       {"text_fr": "« Gardez vos conseils, donnez-moi plutôt un jeton. »", "text_en": "« Keep the advice, give me a chip instead. »", "effects": [{"trigger": "on_use", "do": [{"op": "add_money", "v": 3}]}]}
+     ]},
+    {"who": "house", "text_fr": "Faites vos jeux.", "text_en": "Place your bets."}
+  ]},
+  {"id": "act1_creditor_won", "act": 1, "trigger": "creditor_won", "lines": [
+    {"who": "house", "text_fr": "Hm. Vous avez payé. C'est… inhabituel. L'ascenseur vous attend. Il ne monte pas.", "text_en": "Hm. You paid. That's… unusual. The lift is waiting. It doesn't go up."},
+    {"who": "hero", "text_fr": "Où mène-t-il ?", "text_en": "Where does it go?"},
+    {"who": "house", "text_fr": "Aux Salons Privés. Là où les dettes ont des prénoms.", "text_en": "To the Private Lounges. Where debts have first names."}
+  ]}
+]

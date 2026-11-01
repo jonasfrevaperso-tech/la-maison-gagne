@@ -1,0 +1,7 @@
+[
+  {"id": "house", "name_fr": "La Maison", "name_en": "The House", "portrait": "house", "blip": "blip_house", "color": "ff2e88"},
+  {"id": "patron", "name_fr": "Le Patron", "name_en": "The Boss", "portrait": "cr_patron", "blip": "blip_boss", "color": "d4af37"},
+  {"id": "croupier", "name_fr": "Le vieux croupier", "name_en": "The old dealer", "portrait": "npc_croupier", "blip": "blip_npc", "color": "29e0ff"},
+  {"id": "grandpa", "name_fr": "Grand-père", "name_en": "Grandfather", "portrait": "cr_ombre", "blip": "blip_ghost", "color": "6b6275"},
+  {"id": "narrator", "name_fr": "", "name_en": "", "portrait": "", "blip": "blip_npc", "color": "f5f0e6"}
+]

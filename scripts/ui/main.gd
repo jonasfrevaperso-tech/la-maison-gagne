@@ -54,6 +54,8 @@ func _dev_hooks() -> bool:
 		ap.spins_wanted = int(args["dev-autoplay"])
 		ap.shot_dir = String(args.get("shot-dir", ""))
 		add_child(ap)
+	if args.has("quit-frames"):
+		_quit_later(int(args["quit-frames"]))
 	if args.has("shot"):
 		_capture_later(String(args["shot"]), int(args.get("frames", "120")))
 	if args.has("dev-screen"):
@@ -78,6 +80,7 @@ func _dev_hooks() -> bool:
 			GameState.controller.start_deadline()
 		"grigris":
 			r.total_spins = 1
+			r.flags["act_intro_seen_1"] = true
 			for gid: String in ["g_red_ribbon", "g_blueprint", "g_house_key", "g_ouroboros", "g_iou"]:
 				ShopModel.acquire_grigri(r, DataRegistry.db, gid, &"holo" if gid == "g_house_key" else &"")
 			r.fortunes = ["f_gild", "f_focus"]
@@ -96,13 +99,24 @@ func _dev_hooks() -> bool:
 	return true
 
 
+func _quit_later(frames: int) -> void:
+	for _i: int in frames:
+		await get_tree().process_frame
+	GameState.quit_game()
+
+
 func _capture_later(path: String, frames: int) -> void:
 	for _i: int in frames:
 		await get_tree().process_frame
 	var img: Image = get_viewport().get_texture().get_image()
 	img.save_png(path)
 	print("Capture : ", ProjectSettings.globalize_path(path))
-	get_tree().quit()
+	GameState.quit_game()
+
+
+func _exit_tree() -> void:
+	UiKit.clear_cache()
+	IconLibrary.clear_cache()
 
 
 func _on_screen_requested(screen_id: StringName, params: Dictionary) -> void:

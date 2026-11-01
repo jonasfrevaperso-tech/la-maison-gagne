@@ -91,4 +91,4 @@ func _on_daily() -> void:
 
 
 func _on_quit() -> void:
-	get_tree().quit()
+	GameState.quit_game()

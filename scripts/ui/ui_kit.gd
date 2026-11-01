@@ -14,6 +14,7 @@ const RADIUS: int = 6
 const BORDER: int = 2
 const PAD: int = 14
 const BUTTON_MIN: Vector2 = Vector2(260, 56)
+const WEIGHTS: Dictionary = {"ui": 600, "mono": 600}
 
 static var _fonts: Dictionary[String, Font] = {}
 static var _theme: Theme = null
@@ -23,19 +24,34 @@ static func font(kind: String) -> Font:
 	if _fonts.has(kind):
 		return _fonts[kind]
 	var path: String = {"display": FONT_DISPLAY_PATH, "ui": FONT_UI_PATH, "mono": FONT_MONO_PATH}.get(kind, FONT_UI_PATH)
-	var f: Font = null
+	var base: Font = null
 	if ResourceLoader.exists(path):
-		f = load(path) as Font
-	if f == null:
+		base = load(path) as Font
+	var symbols: SystemFont = SystemFont.new()
+	symbols.font_names = PackedStringArray(["Noto Sans Symbols 2", "Noto Sans Symbols", "DejaVu Sans", "Noto Sans"])
+	var f: Font
+	if base == null:
 		var sf: SystemFont = SystemFont.new()
-		sf.font_names = (
-			PackedStringArray(["DejaVu Sans Mono"])
-			if kind == "mono"
-			else PackedStringArray(["DejaVu Serif", "Serif"]) if kind == "display" else PackedStringArray(["DejaVu Sans", "Sans"])
-		)
+		var names: Dictionary = {"mono": ["DejaVu Sans Mono", "Liberation Mono"], "display": ["DejaVu Serif", "Noto Serif"]}
+		sf.font_names = PackedStringArray(names.get(kind, ["DejaVu Sans", "Noto Sans"]))
+		sf.fallbacks = [symbols]
 		f = sf
+	else:
+		# Polices variables : on fixe une graisse lisible (les instances par défaut sont « Thin »).
+		var fv: FontVariation = FontVariation.new()
+		fv.base_font = base
+		if kind != "display":
+			fv.variation_opentype = {TextServerManager.get_primary_interface().name_to_tag("wght"): WEIGHTS.get(kind, 500)}
+		fv.fallbacks = [symbols]
+		f = fv
 	_fonts[kind] = f
 	return f
+
+
+## Libère les caches statiques (sinon fuite signalée à la fermeture).
+static func clear_cache() -> void:
+	_fonts.clear()
+	_theme = null
 
 
 static func flat(bg: Color, border: Color, border_w: int = BORDER, radius: int = RADIUS, pad: int = PAD) -> StyleBoxFlat:

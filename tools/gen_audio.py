@@ -1,0 +1,635 @@
+#!/usr/bin/env python3
+"""Synthèse de tous les sons et musiques du jeu (originaux, déterministes).
+
+- SFX : WAV 16 bits mono 44,1 kHz, 3 à 5 variantes par son (`<id>_<n>.wav`), dans audio/sfx/.
+- Musique : boucles OGG Vorbis à 3 couches synchronisées (`<piste>_<couche>.ogg`) dans audio/music/ :
+  couche 0 = base (rythme, basse, accords), 1 = mélodie, 2 = renfort (cuivres, percussions)
+  — les couches 1 et 2 montent avec le Mult (AudioBus.set_intensity).
+- Stingers : victoire, défaite, jackpot.
+
+Dépendances : numpy, ffmpeg (encodage OGG). Usage : python3 tools/gen_audio.py [--only sfx|music]
+"""
+from __future__ import annotations
+
+import argparse
+import pathlib
+import subprocess
+import tempfile
+import wave
+
+import numpy as np
+
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+SFX_DIR = ROOT / "audio" / "sfx"
+MUSIC_DIR = ROOT / "audio" / "music"
+SR = 44100
+RNG = np.random.default_rng(1931)
+
+
+# --------------------------------------------------------------------------- primitives
+
+def t_axis(dur: float) -> np.ndarray:
+    return np.arange(int(dur * SR)) / SR
+
+
+def midi(m: float) -> float:
+    return 440.0 * 2 ** ((m - 69) / 12)
+
+
+def env_adsr(n: int, a: float, d: float, s: float, r: float, sus_time: float | None = None) -> np.ndarray:
+    a_n, d_n, r_n = int(a * SR), int(d * SR), int(r * SR)
+    sus_n = max(n - a_n - d_n - r_n, 0) if sus_time is None else int(sus_time * SR)
+    e = np.concatenate([
+        np.linspace(0, 1, max(a_n, 1), endpoint=False),
+        np.linspace(1, s, max(d_n, 1), endpoint=False),
+        np.full(sus_n, s),
+        np.linspace(s, 0, max(r_n, 1)),
+    ])
+    if len(e) < n:
+        e = np.pad(e, (0, n - len(e)))
+    return e[:n]
+
+
+def env_exp(n: int, decay: float, attack: float = 0.002) -> np.ndarray:
+    t = np.arange(n) / SR
+    e = np.exp(-t / max(decay, 1e-4))
+    a = int(attack * SR)
+    if a > 0:
+        e[:a] *= np.linspace(0, 1, a)
+    return e
+
+
+def sine(f, t, phase=0.0):
+    return np.sin(2 * np.pi * f * t + phase)
+
+
+def saw(f, t):
+    return 2 * ((f * t) % 1.0) - 1
+
+
+def square(f, t, duty=0.5):
+    return np.where((f * t) % 1.0 < duty, 1.0, -1.0)
+
+
+def noise(n):
+    return RNG.uniform(-1, 1, n)
+
+
+def fft_filter(x: np.ndarray, lo: float = 0.0, hi: float = SR / 2, q: float = 1.0) -> np.ndarray:
+    """Passe-bande doux par FFT (pentes cosinus)."""
+    n = len(x)
+    if n < 8:
+        return x
+    spec = np.fft.rfft(x)
+    freqs = np.fft.rfftfreq(n, 1 / SR)
+    g = np.ones_like(freqs)
+    if lo > 0:
+        g *= np.clip((freqs / lo) ** (2 * q), 0, 1)
+    if hi < SR / 2:
+        g *= 1 / (1 + (freqs / hi) ** (4 * q))
+    return np.fft.irfft(spec * g, n)
+
+
+def fm(fc, ratio, index, t, idx_env=None):
+    mod = sine(fc * ratio, t) * index * (idx_env if idx_env is not None else 1.0)
+    return np.sin(2 * np.pi * fc * t + mod)
+
+
+def reverb(x: np.ndarray, decay: float = 1.2, mix: float = 0.25) -> np.ndarray:
+    n_ir = int(decay * SR)
+    ir = noise(n_ir) * np.exp(-np.arange(n_ir) / (decay * SR / 5))
+    ir = fft_filter(ir, 200, 6000)
+    ir /= np.sqrt(np.sum(ir ** 2)) + 1e-9
+    n = len(x) + n_ir
+    wet = np.fft.irfft(np.fft.rfft(x, n) * np.fft.rfft(ir, n), n)[: len(x) + n_ir]
+    out = np.concatenate([x, np.zeros(n_ir)]) * (1 - mix) + wet * mix
+    return out
+
+
+def addpad(*xs: np.ndarray) -> np.ndarray:
+    """Somme de signaux de longueurs différentes."""
+    n = max(len(x) for x in xs)
+    return sum(np.pad(x, (0, n - len(x))) for x in xs)
+
+
+def normalize(x: np.ndarray, peak: float = 0.9) -> np.ndarray:
+    m = np.max(np.abs(x)) + 1e-9
+    return x / m * peak
+
+
+def softclip(x: np.ndarray) -> np.ndarray:
+    return np.tanh(x)
+
+
+def write_wav(path: pathlib.Path, x: np.ndarray) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    data = (np.clip(x, -1, 1) * 32767).astype(np.int16)
+    with wave.open(str(path), "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(SR)
+        w.writeframes(data.tobytes())
+
+
+def write_ogg(path: pathlib.Path, x: np.ndarray, quality: int = 4) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory() as td:
+        tmp = pathlib.Path(td) / "t.wav"
+        write_wav(tmp, x)
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(tmp), "-c:a", "libvorbis", "-q:a", str(quality), str(path)], check=True)
+
+
+# --------------------------------------------------------------------------- instruments
+
+def inst_click(f=2200.0, dur=0.03):
+    t = t_axis(dur)
+    return sine(f, t) * env_exp(len(t), 0.006) + fft_filter(noise(len(t)), 2000, 9000) * env_exp(len(t), 0.003) * 0.5
+
+
+def inst_clack(f=1800.0, dur=0.09):
+    """Jeton qui claque : transitoire + résonance de céramique."""
+    t = t_axis(dur)
+    body = sine(f, t) * 0.5 + sine(f * 2.76, t) * 0.25 + sine(f * 5.4, t) * 0.1
+    return body * env_exp(len(t), 0.02) + fft_filter(noise(len(t)), 1500, 8000) * env_exp(len(t), 0.004)
+
+
+def inst_coin(f=2600.0, dur=0.35):
+    t = t_axis(dur)
+    x = sine(f, t) * 0.6 + sine(f * 2.32, t) * 0.3 + sine(f * 4.1, t) * 0.15
+    return x * env_exp(len(t), 0.12)
+
+
+def inst_bell(f=440.0, dur=2.0, index=4.0, ratio=1.4):
+    t = t_axis(dur)
+    e = env_exp(len(t), dur / 3)
+    return fm(f, ratio, index, t, e) * e
+
+
+def inst_ep(f, dur=0.8, vel=1.0):
+    """Piano électrique FM."""
+    t = t_axis(dur)
+    e = env_exp(len(t), 0.6) * vel
+    x = fm(f, 1.0, 2.2, t, env_exp(len(t), 0.15)) * 0.7 + sine(f * 2, t) * 0.1
+    return x * e * env_adsr(len(t), 0.003, 0.05, 1, 0.08)
+
+
+def inst_vibe(f, dur=0.9, vel=1.0):
+    t = t_axis(dur)
+    trem = 1 + 0.25 * sine(5.5, t)
+    x = sine(f, t) + 0.25 * sine(f * 4, t) * env_exp(len(t), 0.08)
+    return x * env_exp(len(t), 0.5) * trem * vel
+
+
+def inst_bass(f, dur=0.4, vel=1.0):
+    t = t_axis(dur)
+    x = sine(f, t) * 0.8 + fft_filter(saw(f, t), 0, f * 4) * 0.35
+    return x * env_adsr(len(t), 0.005, 0.12, 0.6, 0.06) * vel
+
+
+def inst_pluck(f, dur=0.35, vel=1.0):
+    t = t_axis(dur)
+    x = fft_filter(saw(f, t), 0, f * 6)
+    return x * env_exp(len(t), 0.12) * vel
+
+
+def inst_pad(f, dur=2.0, vel=1.0):
+    t = t_axis(dur)
+    x = sum(saw(f * (1 + d), t) for d in (-0.006, 0.0, 0.007)) / 3
+    x = fft_filter(x, 0, f * 3)
+    return x * env_adsr(len(t), 0.4, 0.3, 0.7, 0.6) * vel
+
+
+def inst_lead(f, dur=0.5, vel=1.0, kind="clarinet"):
+    t = t_axis(dur)
+    vib = 1 + 0.004 * sine(5.0, t) * np.clip(t / 0.25, 0, 1)
+    if kind == "clarinet":
+        x = fft_filter(square(f * vib, t, 0.5), 0, f * 5)
+    elif kind == "brass":
+        x = fft_filter(saw(f * vib, t), 0, f * (3 + 4 * np.mean(env_exp(len(t), 0.2))))
+    else:
+        x = sine(f * vib, t) + 0.3 * sine(2 * f * vib, t)
+    return x * env_adsr(len(t), 0.02, 0.1, 0.75, 0.08) * vel
+
+
+def inst_kick(dur=0.35):
+    t = t_axis(dur)
+    f = 45 + 110 * np.exp(-t / 0.04)
+    ph = 2 * np.pi * np.cumsum(f) / SR
+    return np.sin(ph) * env_exp(len(t), 0.18)
+
+
+def inst_brush(dur=0.18):
+    n = int(dur * SR)
+    return fft_filter(noise(n), 1500, 7000) * env_adsr(n, 0.02, 0.05, 0.3, 0.1) * 0.6
+
+
+def inst_snare(dur=0.2):
+    t = t_axis(dur)
+    return (fft_filter(noise(len(t)), 1200, 8000) * 0.7 + sine(190, t) * 0.4) * env_exp(len(t), 0.07)
+
+
+def inst_hat(dur=0.06, open_=False):
+    n = int((0.25 if open_ else dur) * SR)
+    return fft_filter(noise(n), 7000, 16000) * env_exp(n, 0.12 if open_ else 0.018) * 0.5
+
+
+def inst_ride(dur=0.6):
+    t = t_axis(dur)
+    x = fm(520, 2.71, 6, t) * 0.4 + fft_filter(noise(len(t)), 6000, 14000) * 0.3
+    return x * env_exp(len(t), 0.35) * 0.4
+
+
+def inst_gong(f=80.0, dur=3.0):
+    t = t_axis(dur)
+    e = env_exp(len(t), 1.0, 0.01)
+    x = fm(f, 1.41, 5 * env_exp(len(t), 0.6), t) + 0.5 * fm(f * 2.2, 1.7, 3, t)
+    return x * e
+
+
+def mix_at(buf: np.ndarray, x: np.ndarray, start: int, gain: float = 1.0, wrap: bool = True) -> None:
+    end = start + len(x)
+    if end <= len(buf):
+        buf[start:end] += x * gain
+    elif wrap:
+        k = len(buf) - start
+        buf[start:] += x[:k] * gain
+        rest = x[k:]
+        buf[: len(rest)] += rest[: len(buf)] * gain
+    else:
+        buf[start:] += x[: len(buf) - start] * gain
+
+
+# --------------------------------------------------------------------------- SFX
+
+def sfx_defs():
+    """id -> (fonction(variante) -> signal, nombre de variantes)."""
+    def v(k, spread=0.06):
+        return 1 + (k - 2) * spread
+
+    d = {}
+    d["click"] = (lambda k: inst_click(2000 * v(k)), 4)
+    d["hover"] = (lambda k: inst_click(3200 * v(k), 0.02) * 0.4, 3)
+    d["card_hover"] = (lambda k: fft_filter(noise(int(0.04 * SR)), 3000, 9000) * env_exp(int(0.04 * SR), 0.01) * 0.3, 3)
+    d["card_place"] = (lambda k: inst_clack(900 * v(k), 0.08) * 0.8, 4)
+    d["card_flip"] = (lambda k: fft_filter(noise(int(0.12 * SR)), 2000, 8000) * env_adsr(int(0.12 * SR), 0.01, 0.03, 0.3, 0.06) * 0.7, 4)
+    d["card_use"] = (lambda k: arpeggio([72, 76, 79, 84], 0.05 * v(k), inst_vibe), 3)
+    d["lock"] = (lambda k: inst_clack(3000 * v(k), 0.06), 3)
+    d["error"] = (lambda k: fft_filter(square(110 * v(k), t_axis(0.18)), 0, 900) * env_adsr(int(0.18 * SR), 0.005, 0.05, 0.6, 0.05) * 0.5, 3)
+    d["panel_open"] = (lambda k: sweep(300, 1200 * v(k), 0.18) * 0.4, 3)
+    d["panel_close"] = (lambda k: sweep(1200 * v(k), 300, 0.15) * 0.4, 3)
+    d["curtain"] = (lambda k: fft_filter(noise(int(0.35 * SR)), 300, 3000) * env_adsr(int(0.35 * SR), 0.1, 0.1, 0.6, 0.15) * 0.5, 3)
+    d["chip_place"] = (lambda k: inst_clack(1700 * v(k, 0.05)), 5)
+    d["chip_remove"] = (lambda k: inst_clack(1300 * v(k, 0.05)) * 0.7, 4)
+    d["chip_sweep"] = (lambda k: cluster(inst_clack, 6, 0.03, 1500), 3)
+    d["chip_lose"] = (lambda k: inst_bass(70 * v(k), 0.15) * 0.6, 3)
+    d["chips"] = (lambda k: cluster(inst_coin, 3, 0.025, 2400 * v(k)) * 0.6, 5)
+    d["chips_win"] = (lambda k: cluster(inst_coin, 5, 0.03, 2600 * v(k)) * 0.7, 5)
+    d["mult"] = (lambda k: sweep(400 * v(k), 1400 * v(k), 0.16, "square") * 0.35, 4)
+    d["xmult"] = (lambda k: (sweep(200 * v(k), 1800, 0.3, "saw") * 0.35 + inst_kick(0.3) * 0.6), 4)
+    d["coins"] = (lambda k: cluster(inst_coin, 8, 0.04, 2500 * v(k)) * 0.6, 4)
+    d["coin"] = (lambda k: inst_coin(2700 * v(k)) * 0.6, 5)
+    d["coin_loss"] = (lambda k: arpeggio([76, 72, 67], 0.07, inst_vibe) * 0.6, 3)
+    d["zero"] = (lambda k: reverb(inst_gong(70 * v(k, 0.03), 2.5), 1.5, 0.3) * 0.9, 3)
+    d["shatter"] = (lambda k: (fft_filter(noise(int(0.5 * SR)), 3000, 14000) * env_exp(int(0.5 * SR), 0.12) + cluster(inst_coin, 6, 0.02, 4200)[: int(0.5 * SR)] * 0.4) * 0.7, 3)
+    d["glass"] = d["shatter"]
+    d["transform"] = (lambda k: arpeggio([79, 83, 86, 91], 0.04, inst_vibe) * 0.6, 3)
+    d["clock"] = (lambda k: np.concatenate([inst_clack(2400, 0.06), np.zeros(int(0.12 * SR)), inst_clack(1900, 0.06)]) * 0.7, 3)
+    d["count_up"] = (lambda k: cluster(inst_click, 10, 0.035, 2600) * 0.5, 3)
+    d["celebrate"] = (lambda k: chord_hit([60, 64, 67, 72], inst_ep, 0.8) * 0.7, 3)
+    d["jackpot"] = (lambda k: reverb(np.concatenate([arpeggio([72, 76, 79, 84, 88], 0.06, inst_bell), np.zeros(int(0.2 * SR))]), 1.2, 0.3) * 0.8, 3)
+    d["ball_roll"] = (lambda k: ball_roll(3.6), 3)
+    d["ball_bounce"] = (lambda k: inst_clack(1100 * v(k, 0.08), 0.05) * 0.6, 5)
+    d["ball_land"] = (lambda k: np.concatenate([inst_clack(950 * v(k), 0.06), inst_clack(1050, 0.05) * 0.5, inst_clack(1000, 0.04) * 0.25]), 4)
+    d["ball_launch"] = (lambda k: sweep(200, 900 * v(k), 0.25, "noise") * 0.5, 3)
+    d["ball_wood"] = d["ball_land"]
+    d["ball_metal"] = (lambda k: inst_coin(1800 * v(k), 0.4) * 0.7, 3)
+    d["ball_glass"] = (lambda k: inst_bell(1900 * v(k), 0.6, 2, 3.5) * 0.5, 3)
+    d["wheel_spin"] = (lambda k: wheel_whir(1.2), 3)
+    d["deadline_won"] = (lambda k: reverb(fanfare([60, 64, 67, 72, 76]), 1.0, 0.25) * 0.8, 3)
+    d["deadline_failed"] = (lambda k: reverb(trombone_down(), 1.0, 0.25) * 0.7, 3)
+    d["buy"] = (lambda k: np.concatenate([inst_coin(2200, 0.1), inst_bell(1760 * v(k), 0.6, 1.5, 2)]) * 0.7, 3)
+    d["sell"] = (lambda k: (cluster(inst_coin, 6, 0.03, 2900 * v(k)) * 0.6), 3)
+    d["reroll"] = (lambda k: cluster(lambda f, dur=0.05: fft_filter(noise(int(dur * SR)), 2500, 9000) * env_exp(int(dur * SR), 0.01), 7, 0.03, 0) * 0.7, 3)
+    d["pack_open"] = (lambda k: np.concatenate([fft_filter(noise(int(0.15 * SR)), 1500, 9000) * env_adsr(int(0.15 * SR), 0.01, 0.05, 0.5, 0.05) * 0.6, arpeggio([84, 88, 91], 0.05, inst_vibe) * 0.5]), 3)
+    d["pact"] = (lambda k: reverb(inst_pad(midi(38), 2.0) * 0.6 + inst_bell(midi(62), 2.0, 6, 1.41) * 0.4, 2.0, 0.4) * 0.8, 2)
+    d["curse"] = (lambda k: reverb(chord_hit([48, 49, 55], inst_pad, 1.2), 1.5, 0.35) * 0.7, 3)
+    d["boss_enter"] = (lambda k: reverb(addpad(chord_hit([36, 43, 48, 51], lambda f, dur=1.2, vel=1.0: inst_lead(f, dur, vel, "brass"), 1.2) * 0.8, inst_gong(55, 1.5) * 0.4), 1.4, 0.3), 2)
+    d["stinger_victory"] = (lambda k: reverb(fanfare([60, 64, 67, 72, 76, 79, 84]), 1.6, 0.3) * 0.9, 1)
+    d["stinger_defeat"] = (lambda k: reverb(trombone_down(slow=True), 1.6, 0.3) * 0.8, 1)
+    d["deadline"] = d["deadline_won"]
+    d["breath"] = (lambda k: fft_filter(noise(int(0.6 * SR)), 300, 2500) * env_adsr(int(0.6 * SR), 0.2, 0.1, 0.5, 0.25) * 0.4, 2)
+    d["stamp"] = (lambda k: inst_kick(0.2) * 0.6 + np.pad(inst_clack(600, 0.08), (0, int(0.12 * SR))) * 0.6, 3)
+    d["paper"] = d["card_flip"]
+    d["cloth"] = (lambda k: fft_filter(noise(int(0.2 * SR)), 400, 3000) * env_adsr(int(0.2 * SR), 0.03, 0.05, 0.4, 0.1) * 0.5, 3)
+    d["fire"] = (lambda k: fft_filter(noise(int(0.6 * SR)), 200, 2500) * env_adsr(int(0.6 * SR), 0.05, 0.1, 0.6, 0.3) * 0.6, 3)
+    d["explosion"] = (lambda k: (inst_kick(0.6) + fft_filter(noise(int(0.6 * SR)), 60, 3000) * env_exp(int(0.6 * SR), 0.2)) * 0.8, 3)
+    d["magnet"] = (lambda k: fft_filter(saw(60 * v(k), t_axis(0.4)), 0, 600) * env_adsr(int(0.4 * SR), 0.05, 0.1, 0.6, 0.15) * 0.4, 3)
+    d["shimmer"] = d["transform"]
+    d["ghost"] = (lambda k: reverb(sweep(600 * v(k), 300, 0.6, "sine") * 0.4, 1.5, 0.5), 3)
+    d["jingle"] = (lambda k: cluster(inst_coin, 4, 0.05, 3200 * v(k)) * 0.5, 3)
+    d["double"] = (lambda k: np.concatenate([inst_clack(1500, 0.07), inst_clack(1500 * 1.5, 0.07)]), 3)
+    d["thorn"] = (lambda k: sweep(1400 * v(k), 2400, 0.08, "saw") * 0.3, 3)
+    d["sticky"] = (lambda k: fft_filter(noise(int(0.15 * SR)), 100, 1200) * env_exp(int(0.15 * SR), 0.05) * 0.6, 3)
+    d["tick"] = (lambda k: inst_clack(2600 * v(k), 0.05) * 0.6, 3)
+    d["choir"] = (lambda k: reverb(chord_hit([64, 67, 71, 76], lambda f, dur=1.0, vel=1.0: inst_lead(f, dur, vel, "sine"), 1.0) * 0.5, 2.0, 0.4), 2)
+    d["zap"] = (lambda k: sweep(3000 * v(k), 200, 0.15, "square") * 0.35, 3)
+    d["chime"] = (lambda k: inst_bell(1568 * v(k), 0.8, 2, 3.0) * 0.5, 4)
+    d["echo"] = (lambda k: np.concatenate([inst_bell(880, 0.25, 2, 2) * a for a in (0.6, 0.35, 0.2)]), 3)
+    d["vault"] = (lambda k: np.concatenate([inst_clack(400, 0.1), inst_clack(500, 0.1), inst_bell(660 * v(k), 0.6, 2, 2) * 0.5]), 3)
+    d["grow"] = (lambda k: arpeggio([67, 71, 74], 0.05 * v(k), inst_vibe) * 0.5, 3)
+    d["void"] = (lambda k: reverb(sweep(200, 60, 0.6, "sine") * 0.6, 1.5, 0.5), 2)
+    d["meow"] = (lambda k: sweep(700 * v(k), 450, 0.35, "saw") * env_adsr(int(0.35 * SR), 0.05, 0.1, 0.6, 0.1) * 0.25, 3)
+    d["quack"] = (lambda k: fft_filter(square(330 * v(k), t_axis(0.18), 0.3), 300, 2200) * env_adsr(int(0.18 * SR), 0.01, 0.05, 0.6, 0.05) * 0.35, 3)
+    d["blade"] = (lambda k: sweep(4000 * v(k), 8000, 0.12, "noise") * 0.4, 3)
+    d["clang"] = (lambda k: inst_bell(523 * v(k), 0.6, 5, 1.41) * 0.6, 3)
+    d["crack"] = (lambda k: inst_clack(700 * v(k), 0.08), 3)
+    d["stone"] = (lambda k: inst_kick(0.25) * 0.5 + np.pad(inst_clack(300, 0.1), (0, int(0.15 * SR))) * 0.5, 3)
+    d["dice"] = (lambda k: cluster(inst_clack, 4, 0.06, 1200 * v(k)) * 0.7, 3)
+    d["shield"] = d["clang"]
+    d["whoosh"] = (lambda k: sweep(300, 2000 * v(k), 0.3, "noise") * 0.5, 3)
+    d["sigh"] = (lambda k: fft_filter(noise(int(0.5 * SR)), 300, 1500) * env_adsr(int(0.5 * SR), 0.15, 0.1, 0.5, 0.2) * 0.4, 2)
+    d["wink"] = (lambda k: arpeggio([84, 91], 0.05, inst_vibe) * 0.5, 3)
+    d["lose_soft"] = d["chip_lose"]
+    for who, base in (("lea", 72), ("vic", 62), ("odile", 76), ("barnabe", 57), ("marthe", 69), ("ghost", 81), ("house", 45), ("boss", 50), ("npc", 66)):
+        d["blip_" + who] = ((lambda b: (lambda k: blip(b + k)))(base), 5)
+    return d
+
+
+def sweep(f0, f1, dur, wave_="sine"):
+    t = t_axis(dur)
+    f = np.geomspace(max(f0, 1), max(f1, 1), len(t))
+    ph = 2 * np.pi * np.cumsum(f) / SR
+    if wave_ == "square":
+        x = np.sign(np.sin(ph))
+    elif wave_ == "saw":
+        x = 2 * ((ph / (2 * np.pi)) % 1) - 1
+    elif wave_ == "noise":
+        x = fft_filter(noise(len(t)), 300, 6000) * (0.5 + 0.5 * np.sin(ph))
+    else:
+        x = np.sin(ph)
+    return x * env_adsr(len(t), 0.01, 0.05, 0.7, dur * 0.3)
+
+
+def cluster(fn, count, gap, f):
+    parts = []
+    total = int((gap * count + 0.4) * SR)
+    buf = np.zeros(total)
+    for i in range(count):
+        ff = f * (1 + RNG.uniform(-0.08, 0.08)) if f else 0
+        x = fn(ff) if f else fn(0)
+        mix_at(buf, x, int(i * gap * SR), 1.0 / (1 + i * 0.15), wrap=False)
+    return buf
+
+
+def arpeggio(notes, gap, fn):
+    total = int((gap * len(notes) + 0.9) * SR)
+    buf = np.zeros(total)
+    for i, m in enumerate(notes):
+        mix_at(buf, fn(midi(m)), int(i * gap * SR), 0.6, wrap=False)
+    return buf
+
+
+def chord_hit(notes, fn, dur):
+    buf = np.zeros(int((dur + 0.2) * SR))
+    for m in notes:
+        mix_at(buf, fn(midi(m), dur), 0, 1.0 / len(notes), wrap=False)
+    return buf
+
+
+def fanfare(notes):
+    buf = np.zeros(int(2.4 * SR))
+    for i, m in enumerate(notes):
+        mix_at(buf, inst_lead(midi(m), 0.5 if i < len(notes) - 1 else 1.4, 0.8, "brass"), int(i * 0.09 * SR), 0.5, wrap=False)
+    mix_at(buf, chord_hit([notes[0] - 12, notes[0], notes[2]], inst_ep, 1.6), int(len(notes) * 0.09 * SR), 0.6, wrap=False)
+    return buf
+
+
+def trombone_down(slow=False):
+    step = 0.45 if slow else 0.3
+    buf = np.zeros(int((step * 4 + 1.0) * SR))
+    for i, m in enumerate([55, 54, 53, 52]):
+        dur = step if i < 3 else 1.0
+        t = t_axis(dur)
+        f = midi(m) * (1 + (0.02 * np.sin(2 * np.pi * 6 * t) if i == 3 else 0))
+        x = fft_filter(saw(f, t), 0, 900) * env_adsr(len(t), 0.03, 0.05, 0.8, 0.1)
+        mix_at(buf, x, int(i * step * SR), 0.5, wrap=False)
+    return buf
+
+
+def ball_roll(dur):
+    n = int(dur * SR)
+    t = np.arange(n) / SR
+    rate = 30 * np.exp(-t / (dur * 0.6)) + 4
+    ph = np.cumsum(rate) / SR
+    rattle = (np.sin(2 * np.pi * ph) > 0.92).astype(float)
+    x = fft_filter(noise(n), 400, 3500) * 0.25 * np.exp(-t / dur)
+    x += fft_filter(rattle * noise(n), 1500, 7000) * 0.6
+    return x * env_adsr(n, 0.05, 0.1, 0.9, 0.3)
+
+
+def wheel_whir(dur):
+    n = int(dur * SR)
+    t = np.arange(n) / SR
+    am = 0.5 + 0.5 * np.sin(2 * np.pi * 18 * t)
+    return fft_filter(noise(n), 200, 1800) * am * env_adsr(n, 0.2, 0.1, 0.7, 0.4) * 0.35
+
+
+def blip(m):
+    t = t_axis(0.05)
+    return square(midi(m), t, 0.25) * env_adsr(len(t), 0.002, 0.01, 0.6, 0.02) * 0.25
+
+
+def gen_sfx() -> int:
+    SFX_DIR.mkdir(parents=True, exist_ok=True)
+    count = 0
+    for sid, (fn, n) in sfx_defs().items():
+        for k in range(n):
+            x = fn(k)
+            x = softclip(normalize(x, 0.95) * 1.1) * 0.85
+            fade = min(int(0.005 * SR), len(x) // 4)
+            if fade > 0:
+                x[-fade:] *= np.linspace(1, 0, fade)
+            write_wav(SFX_DIR / f"{sid}_{k + 1}.wav", x)
+            count += 1
+    amb = ambience(24.0)
+    write_wav(SFX_DIR / "ambience_casino.wav", amb)
+    return count + 1
+
+
+def ambience(dur):
+    """Brouhaha de salle : murmure filtré + tintements lointains, bouclable."""
+    n = int(dur * SR)
+    murmur = fft_filter(noise(n), 150, 900) * 0.25
+    t = np.arange(n) / SR
+    murmur *= 0.7 + 0.3 * np.sin(2 * np.pi * 0.11 * t) * np.sin(2 * np.pi * 0.07 * t)
+    buf = murmur
+    for _ in range(40):
+        pos = int(RNG.uniform(0, dur - 0.5) * SR)
+        mix_at(buf, inst_coin(RNG.uniform(2000, 3500), 0.3) * 0.08, pos)
+    for _ in range(12):
+        pos = int(RNG.uniform(0, dur - 0.5) * SR)
+        mix_at(buf, cluster(inst_clack, 3, 0.04, RNG.uniform(1400, 2000))[: int(0.4 * SR)] * 0.08, pos)
+    buf = reverb(buf, 1.2, 0.4)[:n]
+    edge = int(0.5 * SR)
+    buf[:edge] = buf[:edge] * np.linspace(0, 1, edge) + buf[-edge:] * np.linspace(1, 0, edge)
+    return normalize(buf[: n - edge], 0.5)
+
+
+# --------------------------------------------------------------------------- musique
+
+class Track:
+    """Une boucle de `bars` mesures à `bpm`, 3 couches synchronisées."""
+
+    def __init__(self, bpm: float, bars: int, beats: int = 4, swing: float = 0.0):
+        self.bpm, self.bars, self.beats, self.swing = bpm, bars, beats, swing
+        self.beat = 60.0 / bpm
+        self.length = int(bars * beats * self.beat * SR)
+        self.layers = [np.zeros(self.length) for _ in range(3)]
+
+    def pos(self, bar: int, beat: float) -> int:
+        b = beat
+        frac = b % 1.0
+        if self.swing and abs(frac - 0.5) < 1e-6:
+            b += self.swing * 0.5
+        return int(((bar * self.beats) + b) * self.beat * SR)
+
+    def add(self, layer: int, x: np.ndarray, bar: int, beat: float, gain: float = 1.0) -> None:
+        mix_at(self.layers[layer], x, self.pos(bar, beat) % self.length, gain)
+
+    def render(self, rev: float = 0.25) -> list[np.ndarray]:
+        out = []
+        peak = 1e-9
+        processed = []
+        for lay in self.layers:
+            wet = reverb(lay, 1.4, rev)
+            looped = wet[: self.length].copy()
+            tail = wet[self.length:]
+            looped[: len(tail)] += tail[: self.length]
+            processed.append(looped)
+            peak = max(peak, np.max(np.abs(looped)))
+        total_peak = np.max(np.abs(sum(processed))) + 1e-9
+        g = 0.85 / max(total_peak, peak)
+        for p in processed:
+            out.append(softclip(p * g * 1.2) * 0.9)
+        return out
+
+
+SCALES = {"major": [0, 2, 4, 5, 7, 9, 11], "minor": [0, 2, 3, 5, 7, 8, 10], "dorian": [0, 2, 3, 5, 7, 9, 10], "phrygian": [0, 1, 3, 5, 7, 8, 10], "harmonic": [0, 2, 3, 5, 7, 8, 11]}
+
+
+def chord_tones(root: int, quality: str) -> list[int]:
+    q = {"maj7": [0, 4, 7, 11], "m7": [0, 3, 7, 10], "7": [0, 4, 7, 10], "m": [0, 3, 7], "dim": [0, 3, 6, 9], "m7b5": [0, 3, 6, 10], "sus": [0, 5, 7, 10]}[quality]
+    return [root + x for x in q]
+
+
+def melody(rng, scale_root: int, scale: list[int], bars: int, beats: int, density: float, register: int = 72) -> list[tuple]:
+    notes = []
+    degree = 0
+    for bar in range(bars):
+        b = 0.0
+        while b < beats:
+            dur = rng.choice([0.5, 0.5, 1.0, 1.0, 1.5, 2.0])
+            if rng.random() < density:
+                degree += int(rng.choice([-2, -1, -1, 1, 1, 2, 0, 3, -3]))
+                degree = max(-3, min(10, degree))
+                octave, idx = divmod(degree, len(scale))
+                m = register + scale_root % 12 + scale[idx] + 12 * octave
+                notes.append((bar, b, min(dur, beats - b), m))
+            b += dur
+    return notes
+
+
+def build_track(name: str) -> list[np.ndarray]:
+    rng = np.random.default_rng(abs(hash(name)) % (2 ** 32))
+    cfg = {
+        "menu": dict(bpm=78, bars=8, swing=0.33, key=53, scale="major", prog=[(2, "m7"), (7, "7"), (0, "maj7"), (9, "m7")], lead="vibe", drums="brush", dens=0.45),
+        "act1": dict(bpm=104, bars=8, swing=0.33, key=53, scale="major", prog=[(0, "maj7"), (9, "m7"), (2, "m7"), (7, "7")], lead="vibe", drums="brush", dens=0.6),
+        "act2": dict(bpm=112, bars=8, swing=0.0, key=50, scale="harmonic", prog=[(0, "m"), (5, "m"), (7, "7"), (0, "m")], lead="clarinet", drums="habanera", dens=0.6),
+        "act3": dict(bpm=72, bars=8, swing=0.0, key=48, scale="phrygian", prog=[(0, "m"), (1, "maj7"), (0, "m"), (8, "maj7")], lead="sine", drums="sparse", dens=0.35),
+        "boss": dict(bpm=138, bars=8, swing=0.0, key=45, scale="harmonic", prog=[(0, "m"), (0, "m"), (8, "maj7"), (7, "7")], lead="brass", drums="drive", dens=0.7),
+        "shop": dict(bpm=120, bars=8, swing=0.25, key=55, scale="major", prog=[(0, "maj7"), (4, "m7"), (5, "maj7"), (7, "7")], lead="vibe", drums="brush", dens=0.55),
+    }[name]
+    tr = Track(cfg["bpm"], cfg["bars"], 4, cfg["swing"])
+    key = cfg["key"]
+    scale = SCALES[cfg["scale"]]
+    prog = cfg["prog"]
+    for bar in range(tr.bars):
+        root, q = prog[bar % len(prog)]
+        tones = chord_tones(key + root, q)
+        # Couche 0 : basse + accords + batterie
+        if cfg["drums"] == "habanera":
+            for b, step in ((0, 0), (1.5, 2), (2, 1), (3, 2)):
+                tr.add(0, inst_bass(midi(tones[step % len(tones)] - 24), 0.45), bar, b, 0.9)
+        elif cfg["drums"] == "drive":
+            for b in np.arange(0, 4, 0.5):
+                tr.add(0, inst_bass(midi(tones[0] - 24), 0.22), bar, float(b), 0.8)
+        else:
+            for b in range(4):
+                walk = tones[(b * 2) % len(tones)] - 24 + (1 if b == 3 else 0)
+                tr.add(0, inst_bass(midi(walk), tr.beat * 0.95), bar, b, 0.8 if cfg["drums"] != "sparse" or b % 2 == 0 else 0.0)
+        comp = inst_pad if cfg["drums"] in ("sparse",) else inst_ep
+        for b in ((0, 2.5) if cfg["drums"] != "sparse" else (0,)):
+            for m in tones:
+                tr.add(0, comp(midi(m), tr.beat * (2 if cfg["drums"] != "sparse" else 4)), bar, b, 0.22)
+        if cfg["drums"] == "brush":
+            for b in range(4):
+                tr.add(0, inst_ride(), bar, b, 0.35)
+                tr.add(0, inst_ride(0.3), bar, b + 0.5, 0.2)
+                if b in (1, 3):
+                    tr.add(0, inst_brush(), bar, b, 0.5)
+            tr.add(0, inst_kick(), bar, 0, 0.35)
+        elif cfg["drums"] == "habanera":
+            tr.add(0, inst_kick(), bar, 0, 0.6)
+            tr.add(0, inst_kick(), bar, 1.5, 0.4)
+            tr.add(0, inst_snare(), bar, 2, 0.35)
+            for b in np.arange(0, 4, 0.5):
+                tr.add(0, inst_hat(), bar, float(b), 0.3)
+        elif cfg["drums"] == "drive":
+            for b in range(4):
+                tr.add(0, inst_kick(), bar, b, 0.7)
+                tr.add(0, inst_hat(), bar, b + 0.5, 0.4)
+                if b in (1, 3):
+                    tr.add(0, inst_snare(), bar, b, 0.55)
+        else:
+            tr.add(0, inst_gong(midi(key - 24), 3.0), bar, 0, 0.12 if bar % 2 == 0 else 0.0)
+            tr.add(0, inst_hat(open_=True), bar, 3.5, 0.2)
+        # Couche 2 : renfort (cuivres / percussions en plus)
+        if bar % 2 == 1 or cfg["drums"] == "drive":
+            stab = [lambda f, d: inst_lead(f, d, 0.8, "brass")][0]
+            for m in tones[:3]:
+                tr.add(2, stab(midi(m), 0.35), bar, 3.5 if cfg["drums"] != "drive" else 0, 0.25)
+        for b in np.arange(0, 4, 0.25 if cfg["drums"] == "drive" else 0.5):
+            tr.add(2, inst_hat(), bar, float(b), 0.18)
+        tr.add(2, inst_snare(), bar, 3.75, 0.25)
+    # Couche 1 : mélodie
+    for bar, b, dur, m in melody(rng, key, scale, tr.bars, 4, cfg["dens"]):
+        if cfg["lead"] == "vibe":
+            x = inst_vibe(midi(m), dur * tr.beat + 0.3)
+        else:
+            x = inst_lead(midi(m), dur * tr.beat * 0.95, 0.8, cfg["lead"])
+        tr.add(1, x, bar, b, 0.45)
+    return tr.render(0.28 if name != "act3" else 0.45)
+
+
+def gen_music() -> int:
+    MUSIC_DIR.mkdir(parents=True, exist_ok=True)
+    count = 0
+    for name in ("menu", "act1", "act2", "act3", "boss", "shop"):
+        for i, layer in enumerate(build_track(name)):
+            write_ogg(MUSIC_DIR / f"{name}_{i}.ogg", layer)
+            count += 1
+    return count
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--only", choices=["sfx", "music"], default=None)
+    args = ap.parse_args()
+    if args.only in (None, "sfx"):
+        print(f"SFX : {gen_sfx()} fichiers")
+    if args.only in (None, "music"):
+        print(f"Musique : {gen_music()} couches")
+
+
+if __name__ == "__main__":
+    main()

@@ -36,7 +36,7 @@ func _shot(tag: String) -> void:
 
 func _drive() -> void:
 	await _wait(1.5)
-	Settings.set_value("game", "speed", 4)
+	Settings.speed_override = 4.0
 	var done: int = 0
 	var guard: int = 0
 	while done < spins_wanted and guard < 20000:
@@ -87,7 +87,9 @@ func _drive() -> void:
 				var o: Node = (
 					rs.overlay_root.get_child(rs.overlay_root.get_child_count() - 1) if rs.overlay_root.get_child_count() > 0 else null
 				)
-				if o is Overlay:
+				if o != null and o.has_method("_finish"):
+					o.call("_finish")
+				elif o is Overlay:
 					if o is PactOverlay:
 						(o as PactOverlay)._decline()
 					elif o is EventOverlay:
@@ -98,4 +100,4 @@ func _drive() -> void:
 			_:
 				await _wait(POLL)
 	print("Autoplay terminé : %d tours" % done)
-	get_tree().quit()
+	GameState.quit_game()

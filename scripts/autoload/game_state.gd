@@ -18,6 +18,25 @@ var last_run_victory: bool = false
 var replay_log: Array[Dictionary] = []
 
 
+func _ready() -> void:
+	get_tree().auto_accept_quit = false
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		quit_game()
+
+
+## Sortie propre : sauvegarde, coupe l'audio, laisse deux frames au thread audio, puis quitte.
+func quit_game() -> void:
+	autosave()
+	SaveSystem.save_profile()
+	AudioBus.shutdown()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	get_tree().quit()
+
+
 func goto(screen_id: StringName, params: Dictionary = {}) -> void:
 	current_screen = screen_id
 	EventBus.screen_requested.emit(screen_id, params)

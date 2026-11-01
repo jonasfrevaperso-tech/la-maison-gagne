@@ -24,9 +24,12 @@ var _music_layers: Array[AudioStreamPlayer] = []
 var _music_id: String = ""
 var _intensity: float = 0.0
 var _ambience: AudioStreamPlayer = null
+## En headless (tests, simulation, CI), le pilote audio factice ne libère jamais les lectures.
+var _silent: bool = false
 
 
 func _ready() -> void:
+	_silent = DisplayServer.get_name() == "headless"
 	_ensure_buses()
 	for i: int in POOL_SIZE:
 		var p: AudioStreamPlayer = AudioStreamPlayer.new()
@@ -44,6 +47,19 @@ func _ready() -> void:
 	add_child(_ambience)
 	apply_volumes()
 	EventBus.settings_changed.connect(apply_volumes)
+
+
+## Arrête et détache tous les flux (évite des lectures orphelines à la fermeture).
+func shutdown() -> void:
+	var players: Array[AudioStreamPlayer] = []
+	players.append_array(_pool)
+	players.append_array(_music_layers)
+	players.append(_ambience)
+	for p: AudioStreamPlayer in players:
+		if p != null:
+			p.stop()
+			p.stream = null
+	_sfx_cache.clear()
 
 
 func _ensure_buses() -> void:
@@ -101,6 +117,8 @@ func _variants(sfx_id: String) -> Array:
 
 ## Joue un SFX (variante et pitch aléatoires). `pitch` multiplie le pitch de base.
 func play(sfx_id: String, pitch: float = 1.0, volume_db: float = 0.0, bus: String = "SFX") -> void:
+	if _silent:
+		return
 	var v: Array = _variants(sfx_id)
 	if v.is_empty():
 		return
@@ -122,12 +140,24 @@ func _music_stream(music_id: String, layer: int) -> AudioStream:
 	for ext: String in ["ogg", "wav"]:
 		var path: String = "%s%s_%d.%s" % [MUSIC_DIR, music_id, layer, ext]
 		if ResourceLoader.exists(path):
-			return load(path) as AudioStream
+			return _looping(load(path) as AudioStream)
 	return null
 
 
+## Force le bouclage (OGG et WAV) quel que soit le réglage d'import.
+func _looping(stream: AudioStream) -> AudioStream:
+	if stream is AudioStreamOggVorbis:
+		(stream as AudioStreamOggVorbis).loop = true
+	elif stream is AudioStreamWAV:
+		var w: AudioStreamWAV = stream as AudioStreamWAV
+		w.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		w.loop_begin = 0
+		w.loop_end = int(w.get_length() * float(w.mix_rate))
+	return stream
+
+
 func play_music(music_id: String) -> void:
-	if music_id == _music_id:
+	if _silent or music_id == _music_id:
 		return
 	_music_id = music_id
 	for i: int in _music_layers.size():
@@ -166,7 +196,9 @@ func set_intensity(v: float) -> void:
 
 
 func play_ambience(amb_id: String) -> void:
+	if _silent:
+		return
 	var path: String = "%s%s.wav" % [SFX_DIR, amb_id]
-	if ResourceLoader.exists(path):
-		_ambience.stream = load(path) as AudioStream
+	if ResourceLoader.exists(path) and (_ambience.stream == null or _ambience.stream.resource_path != path):
+		_ambience.stream = _looping(load(path) as AudioStream)
 		_ambience.play()

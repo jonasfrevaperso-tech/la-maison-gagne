@@ -3,8 +3,8 @@
 > Reprise après coupure : lire ce fichier, `CLAUDE.md`, puis `docs/DECISIONS.md`. Lancer `tools/check.sh`.
 
 ## État courant
-- Phase en cours : **Phase 5 — Tranche verticale (Acte I)**
-- Dernier tag : `phase-04-content-systems`
+- Phase en cours : **Phase 6 — Contenu complet**
+- Dernier tag : `phase-05-vertical-slice`
 
 ## Phase 0 — Reconnaissance ✅
 - Environnement : Godot 4.7.2 (MCP godot OK), Blender 5.2.2, Python 3.14 + numpy 2.4 + Pillow 12, uv, gdtoolkit 4 (installé via uv), git 2.53, 12 cœurs.
@@ -40,6 +40,14 @@
 - Testé : 44 tests, `check.sh` vert (zéro erreur/warning dans tous les journaux).
 - Reste : contenu complet (phase 6).
 - Risques : aucun bloquant.
+
+## Phase 5 — Tranche verticale ✅
+- Plan : art provisoire cohérent (polices, icônes), audio provisoire (SFX + musique), narration de l'Acte I, équilibrage de l'Acte I, revue critique.
+- Fait : polices OFL (Limelight, Josefin Sans, JetBrains Mono) avec graisse fixée et repli symboles ; générateur d'icônes pixel art (`tools/gen_icons.py`, style validé sur 10 icônes puis 110 générées) ; synthétiseur audio (`tools/gen_audio.py` : 306 SFX avec variantes, ambiance de salle, 6 musiques × 3 couches dynamiques en OGG) ; système de dialogues visual novel (portraits, blips, choix à effets) + carte de titre d'acte animée + dialogue d'ouverture et de clôture de l'Acte I ; icônes de type sur la roue ; retour « dans la zone / rebond fou » ; option d'assistance de visée ; sortie propre sans fuite (audio coupé, caches statiques vidés).
+- Équilibrage : contrôle de base 35 → 45 %, première dette 240, courbe des paliers adoucie. Bot glouton : 90 % passent le palier 1, ~58 % l'Acte I, 9,8 % de victoires.
+- Testé : `check.sh` vert ; Acte I joué à l'écran avec le son, zéro erreur.
+- Revue : `docs/REVIEW_VERTICAL_SLICE.md` (7 actions planifiées).
+- Risques : ressenti humain non vérifié (aucun joueur réel).
 
 ## Rapport de phase
 Format : fait / testé / reste à faire / risques.

@@ -18,6 +18,7 @@ const CATEGORIES: Dictionary[String, Array] = {
 	"achievements": ["res://data/achievements", "achievements"],
 	"challenges": ["res://data/challenges", "challenges"],
 	"dialogues": ["res://data/events", "dialogues"],
+	"speakers": ["res://data/events", "speakers"],
 }
 
 static var _shared: ContentDB = null

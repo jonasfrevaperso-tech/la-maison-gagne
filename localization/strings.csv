@@ -276,3 +276,15 @@ FX_BUDGET_UP,+mises au prochain tour,+bets next spin
 FX_PRECISION_UP,Précision +,Precision +
 FX_PRECISION_DOWN,Précision −,Precision −
 TOAST_BACKUP_USED,Une sauvegarde abîmée a été restaurée depuis la copie de secours.,A damaged save was restored from its backup.
+ACT_NUMBER,ACTE %s,ACT %s
+ACT_1_TITLE,Le Rez-de-chaussée Doré,The Golden Ground Floor
+ACT_1_TITLE_SUB,"Vitrine, velours et sourires de façade.","Showcase, velvet and painted smiles."
+ACT_2_TITLE,Les Salons Privés,The Private Lounges
+ACT_2_TITLE_SUB,"Tricheurs, VIP et trahisons au champagne.","Cheats, VIPs and champagne betrayals."
+ACT_3_TITLE,La Cave du Zéro,The Zero Cellar
+ACT_3_TITLE_SUB,Là où la dette a commencé.,Where the debt began.
+THROW_IN_ZONE,Dans la zone,In the zone
+THROW_PERFECT,Pile dessus !,Spot on!
+THROW_WILD,Rebond fou !,Wild bounce!
+THROW_ATTRACTED,Aimantée !,Magnetised!
+THROW_STUCK,Collée !,Stuck!

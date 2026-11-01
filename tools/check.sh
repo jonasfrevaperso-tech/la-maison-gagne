@@ -47,7 +47,7 @@ tail -4 "$LOG_DIR/sim.log"
 scan "$LOG_DIR/sim.log" || status=1
 
 step "Démarrage du jeu (headless, 120 frames)"
-"$GODOT" --headless --path . --quit-after 120 >"$LOG_DIR/boot.log" 2>&1
+"$GODOT" --headless --path . -- --quit-frames=120 >"$LOG_DIR/boot.log" 2>&1
 scan "$LOG_DIR/boot.log" || status=1
 
 if [ $status -eq 0 ]; then printf '\n\033[1;32mOK : tout est vert.\033[0m\n'; else printf '\n\033[1;31mÉCHEC : voir %s\033[0m\n' "$LOG_DIR"; fi

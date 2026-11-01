@@ -46,6 +46,7 @@ var _shake: float = 0.0
 var _flash: float = 0.0
 var _pending_outcome: RunController.SpinOutcome = null
 var _target_fortune_slot: int = -1
+var _overlay_queue: Array[Control] = []
 
 
 func setup(_params: Dictionary) -> void:
@@ -60,6 +61,7 @@ func _ready() -> void:
 	EventBus.juice_shake.connect(_on_shake)
 	EventBus.juice_flash.connect(_on_flash)
 	EventBus.juice_hitstop.connect(_on_hitstop)
+	AudioBus.play_ambience("ambience_casino")
 	_enter_phase()
 
 
@@ -139,7 +141,7 @@ func _build() -> void:
 	menu_btn.position = Vector2(-MARGIN - 64, MARGIN * 0.5)
 	add_child(menu_btn)
 	_hint_label = UiKit.label("", UiKit.SIZE_SMALL, Palette.SMOKE)
-	_hint_label.position = Vector2(840, 360 + TABLE_SIZE.y + 92)
+	_hint_label.position = Vector2(840, 360 + TABLE_SIZE.y + 100)
 	_content.add_child(_hint_label)
 	# Grigris et Fortune
 	grigri_bar = GrigriBar.new()
@@ -303,10 +305,7 @@ func _enter_phase() -> void:
 		RunState.Phase.BETTING:
 			_set_state(UiState.BETTING)
 			AudioBus.play_music(_music_for())
-			if r.spin_index == 0 and r.is_creditor() and r.creditor_id != "":
-				_show_creditor_intro()
-			elif r.spin_index == 0 and r.deadline_idx == 0 and r.tier == 1 and r.total_spins == 0:
-				_show_overlay(TutorialHint.new())
+			_queue_intros()
 		RunState.Phase.SHOP:
 			_open_shop()
 		RunState.Phase.PACT_OFFER:
@@ -320,6 +319,44 @@ func _enter_phase() -> void:
 		_:
 			_set_state(UiState.BETTING)
 	GameState.autosave()
+
+
+## Enchaîne titre d'acte, dialogue d'ouverture, aide du premier tour et entrée du créancier.
+func _queue_intros() -> void:
+	var r: RunState = ctl.run
+	if r.spin_index != 0:
+		return
+	var act_key: String = "act_intro_seen_%d" % r.act()
+	var first_tier_of_act: bool = int((Balance.arr("run.acts")[r.act() - 1] as Array)[0]) == r.tier
+	if r.deadline_idx == 0 and first_tier_of_act and not r.flags.has(act_key):
+		r.flags[act_key] = true
+		_queue(ActTitle.new().configure(r.act()))
+		var dlg_id: String = "act%d_intro" % r.act()
+		if ctl.db.has_entry("dialogues", dlg_id):
+			_queue(DialogueOverlay.new().configure(dlg_id, r, ctl.db))
+	if r.tier == 1 and r.deadline_idx == 0 and r.total_spins == 0 and not bool(SaveSystem.profile.get("tutorial", {}).get("done", false)):
+		_queue(TutorialHint.new())
+	if r.is_creditor() and r.creditor_id != "":
+		_queue(CreditorIntro.new().configure(ctl.db.get_entry("creditors", r.creditor_id)))
+
+
+func _exit_tree() -> void:
+	for o: Control in _overlay_queue:
+		o.free()
+	_overlay_queue.clear()
+
+
+func _queue(o: Control) -> void:
+	_overlay_queue.append(o)
+	if state != UiState.OVERLAY:
+		_show_next_queued()
+
+
+func _show_next_queued() -> void:
+	if _overlay_queue.is_empty():
+		return
+	var o: Control = _overlay_queue.pop_front()
+	_show_overlay(o)
 
 
 func _music_for() -> String:
@@ -485,11 +522,34 @@ func _predict_near_miss(landing: int) -> bool:
 	return false
 
 
-func _on_ball_settled(_landing: int) -> void:
+func _on_ball_settled(landing: int) -> void:
+	_announce_throw(ctl.pending_throw, landing)
 	if ctl.can_rethrow():
 		_set_state(UiState.RETHROW)
 	else:
 		_commit()
+
+
+## Lecture du lancer pour le joueur : dans la zone, rebond fou, aimanté, collé.
+func _announce_throw(t: ThrowResolver.ThrowResult, landing: int) -> void:
+	if t == null:
+		return
+	var key: String = "THROW_IN_ZONE"
+	var col: Color = Palette.CYAN
+	if t.stuck:
+		key = "THROW_STUCK"
+		col = Palette.GOLD_LIGHT
+	elif t.attracted_from >= 0:
+		key = "THROW_ATTRACTED"
+		col = Palette.GOLD_LIGHT
+	elif not t.in_zone:
+		key = "THROW_WILD"
+		col = Palette.MAGENTA
+	elif landing == t.target_index:
+		key = "THROW_PERFECT"
+		col = Palette.EMERALD
+	var pos: Vector2 = wheel_view.global_position + wheel_view.pocket_screen_pos(landing) + Vector2(0, -60)
+	float_layer.pop_text(tr(key), pos, col, UiKit.SIZE_BODY)
 
 
 func _on_rethrow() -> void:
@@ -535,6 +595,12 @@ func _on_score_finished(_total: int) -> void:
 		return
 	if out.deadline_won:
 		AudioBus.play("deadline_won")
+		if bool(ctl.run.flags.get("act_changed", false)):
+			var outro: String = "act%d_creditor_won" % (ctl.run.act() - 1)
+			if ctl.db.has_entry("dialogues", outro):
+				_overlay_queue.append(RewardOverlay.new().configure(out.reward, false))
+				_show_overlay(DialogueOverlay.new().configure(outro, ctl.run, ctl.db), _on_reward_closed)
+				return
 		_show_overlay(RewardOverlay.new().configure(out.reward, false), _on_reward_closed)
 		return
 	if out.deadline_failed:
@@ -571,6 +637,9 @@ func _on_overlay_closed(o: Control, on_closed: Callable) -> void:
 	o.queue_free()
 	overlay_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	state = UiState.BETTING
+	if not _overlay_queue.is_empty():
+		_show_next_queued()
+		return
 	if on_closed.is_valid():
 		on_closed.call()
 	elif ctl.run.phase == RunState.Phase.BETTING:
@@ -607,10 +676,6 @@ func _on_pact_closed() -> void:
 func _open_event() -> void:
 	GameState.autosave()
 	_show_overlay(EventOverlay.new().configure(ctl), _enter_phase)
-
-
-func _show_creditor_intro() -> void:
-	_show_overlay(CreditorIntro.new().configure(ctl.db.get_entry("creditors", ctl.run.creditor_id)))
 
 
 # --------------------------------------------------------------------------- Fortune

@@ -29,3 +29,8 @@ static func _load(path: String) -> Texture2D:
 		return t
 	_missing[path] = true
 	return null
+
+
+static func clear_cache() -> void:
+	_cache.clear()
+	_missing.clear()
