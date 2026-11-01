@@ -5,6 +5,7 @@ extends Control
 const TOAST_TIME: float = 2.6
 const MARGIN: float = 24.0
 const WIDTH: float = 460.0
+const TOP_CLEARANCE: float = 80.0
 
 var _box: VBoxContainer = null
 var _subtitle: Label = null
@@ -15,7 +16,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_box = VBoxContainer.new()
 	_box.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	_box.position = Vector2(-WIDTH - MARGIN, MARGIN)
+	_box.position = Vector2(-WIDTH - MARGIN, MARGIN + TOP_CLEARANCE)
 	_box.custom_minimum_size = Vector2(WIDTH, 0.0)
 	_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_box)

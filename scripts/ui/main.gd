@@ -123,6 +123,7 @@ func _on_screen_requested(screen_id: StringName, params: Dictionary) -> void:
 	if not SCREENS.has(screen_id):
 		push_error("Écran inconnu : %s" % screen_id)
 		return
+	_transition.style = "crt" if screen_id in [&"title", &"summary"] else "curtains"
 	await _transition.close()
 	if _current != null:
 		_current.queue_free()

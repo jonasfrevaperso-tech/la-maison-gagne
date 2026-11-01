@@ -14,6 +14,8 @@ const OUTSIDE_H_RATIO: float = 0.75
 const CHIP_RADIUS_RATIO: float = 0.27
 const SHIFT_AMOUNT: int = 5
 const CHIP_SPRITE: String = "chip_magenta"
+const CHIP_POP_TIME: float = 0.18
+const CHIP_POP_HEIGHT: float = 14.0
 const EVEN_ORDER: Array[String] = ["low", "even", "red", "black", "odd", "high"]
 
 var slip: BetSlip = null
@@ -24,6 +26,7 @@ var hide_odds: bool = false
 var show_probabilities: bool = false
 var wheel: WheelModel = null
 var chip_value: int = 1
+var _pops: Dictionary = {}  # spot_id -> temps restant de l'animation de pose
 
 var _cw: float = 0.0
 var _ch: float = 0.0
@@ -194,6 +197,16 @@ func _process(delta: float) -> void:
 	if flash_t > 0.0:
 		flash_t = maxf(flash_t - delta, 0.0)
 		queue_redraw()
+	if not _pops.is_empty():
+		for k: Variant in _pops.keys():
+			_pops[k] = float(_pops[k]) - delta
+			if float(_pops[k]) <= 0.0:
+				_pops.erase(k)
+		queue_redraw()
+
+
+func pop_chip(spot_id: String) -> void:
+	_pops[spot_id] = CHIP_POP_TIME
 
 
 func flash_winners(numbers: Array[int]) -> void:
@@ -260,7 +273,9 @@ func _draw() -> void:
 			draw_line(Vector2(er.position.x, er.end.y), Vector2(er.end.x, er.position.y), Palette.DANGER, 4.0)
 	if slip != null:
 		for spot_id: String in slip.order:
-			_draw_chip(spot_anchor(spot_id), int(slip.chips[spot_id]))
+			var pop: float = float(_pops.get(spot_id, 0.0)) / CHIP_POP_TIME
+			var lift: float = sin(pop * PI) * CHIP_POP_HEIGHT * JuiceProfile.intensity()
+			_draw_chip(spot_anchor(spot_id) - Vector2(0, lift), int(slip.chips[spot_id]))
 	if hover_spot != "" and slip != null and slip.check(hover_spot) == BetSlip.PlaceResult.OK:
 		var ghost: Color = Palette.GOLD_LIGHT
 		ghost.a = 0.35

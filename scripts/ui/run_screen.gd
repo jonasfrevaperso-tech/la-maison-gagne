@@ -14,6 +14,8 @@ const SHAKE_DECAY: float = 7.0
 const FLASH_DECAY: float = 3.0
 const HEAT_SHADER: String = "res://shaders/heat.gdshader"
 const TENSION_FROM_DEBT: float = 0.6
+const BG_TINT_BASE: float = 0.12
+const BG_TINT_PER_PHASE: float = 0.1
 const TENSION_CREDITOR: float = 0.35
 const TENSION_LAST_SPIN: float = 0.35
 
@@ -54,6 +56,7 @@ var _target_fortune_slot: int = -1
 var _overlay_queue: Array[Control] = []
 var _victory_reward: Dictionary = {}
 var _heat: ColorRect = null
+var _bg: DecoBackground = null
 
 
 func setup(_params: Dictionary) -> void:
@@ -76,9 +79,9 @@ func _ready() -> void:
 
 
 func _build() -> void:
-	var bg: DecoBackground = DecoBackground.new()
-	bg.origin_ratio = Vector2(0.3, 0.55)
-	add_child(bg)
+	_bg = DecoBackground.new()
+	_bg.origin_ratio = Vector2(0.3, 0.55)
+	add_child(_bg)
 	_content = Control.new()
 	_content.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_content.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -276,6 +279,11 @@ func _refresh_heat() -> void:
 
 func _refresh_creditor() -> void:
 	_refresh_heat()
+	var tint: Color = Color(1, 1, 1, 0)
+	if ctl.run.is_creditor() and ctl.run.creditor_id != "":
+		tint = Color(String(ctl.db.get_entry("creditors", ctl.run.creditor_id).get("color", "ff2e88")))
+		tint.a = BG_TINT_BASE + BG_TINT_PER_PHASE * float(ctl.run.creditor_phase)
+	_bg.set_tint(tint)
 	var r: RunState = ctl.run
 	if r.creditor_id == "" or not r.is_creditor():
 		_creditor_label.text = ""
@@ -485,6 +493,7 @@ func _on_spot_changed(spot_id: String, delta: int) -> void:
 				_bet_rejected(res)
 				break
 			AudioBus.play("chip_place", 1.0 + 0.04 * float(ctl.run.slip.chips.get(spot_id, 0)))
+			table_view.pop_chip(spot_id)
 			tutorial.notify("bet_placed")
 			GameState.log_input({"t": "bet", "spot": spot_id})
 	else:

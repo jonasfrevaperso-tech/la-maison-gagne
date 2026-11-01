@@ -27,6 +27,8 @@ const TILT: float = 0.82  # écrasement vertical pour l'effet 2.5D
 const FONT_SIZE_RATIO: float = 0.045
 const ASSIST_AIM_SLOWDOWN: float = 1.6
 const TYPE_ICON_RATIO: float = 0.64
+const ZOOM_MAX: float = 0.08
+const ZOOM_START: float = 0.72
 const TYPE_ICON_SIZE_RATIO: float = 0.085
 
 var wheel: WheelModel = null
@@ -58,6 +60,8 @@ var _flash_t: float = 0.0
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
+	resized.connect(func() -> void: pivot_offset = size * 0.5)
+	pivot_offset = size * 0.5
 	_aim_period = Balance.f("throw.pointer_period_seconds")
 
 
@@ -189,6 +193,8 @@ func _update_ball(dt: float) -> void:
 		var bu: float = (u - 0.7) / 0.27
 		bounce = absf(sin(bu * PI * float(BOUNCE_COUNT))) * BOUNCE_HEIGHT * (1.0 - bu)
 	_ball_radius = lerpf(BALL_ORBIT, r_in, drop) + bounce
+	var z: float = 1.0 + ZOOM_MAX * smoothstep(ZOOM_START, 1.0, u) * JuiceProfile.intensity()
+	scale = Vector2(z, z)
 	if u > 0.7 and _trail.size() > 0 and bounce < 0.004 and RngService.cosmetic().randf() < 0.08:
 		AudioBus.play("ball_bounce", 1.0 + RngService.cosmetic().randf_range(-0.1, 0.2))
 	var p: Vector2 = to_screen(_ball_angle, radius() * _ball_radius)
@@ -201,6 +207,7 @@ func _update_ball(dt: float) -> void:
 		_trail.clear()
 		flash_pocket(_ball_landing)
 		AudioBus.play("ball_land")
+		create_tween().tween_property(self, "scale", Vector2.ONE, 0.6).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 		ball_settled.emit(_ball_landing)
 
 
@@ -290,6 +297,10 @@ func _draw() -> void:
 			var a0z: float = rotation_angle + float(ii) * span - PI * 0.5
 			var zc: Color = Palette.CYAN
 			zc.a = 0.45 if o == 0 else 0.22
+			# Les cases misées dans la zone ressortent en or : on voit ce que couvre le lancer.
+			if highlight_numbers.has(wheel.at(ii).number):
+				zc = Palette.GOLD_LIGHT
+				zc.a = 0.75
 			_draw_ring_sector(c, r * POCKET_OUTER, r * (POCKET_OUTER + 0.06), a0z, a0z + span, zc)
 		var tip: Vector2 = to_screen(-PI * 0.5, r * (POCKET_OUTER + 0.02))
 		draw_colored_polygon(PackedVector2Array([tip, tip + Vector2(-14, -30), tip + Vector2(14, -30)]), Palette.CYAN)

@@ -3,8 +3,8 @@
 > Reprise après coupure : lire ce fichier, `CLAUDE.md`, puis `docs/DECISIONS.md`. Lancer `tools/check.sh`.
 
 ## État courant
-- Phase en cours : **Phase 11 — Jus et polish**
-- Dernier tag : `phase-10-audio`
+- Phase en cours : **Phase 12 — Équilibrage**
+- Dernier tag : `phase-11-juice`
 
 ## Phase 0 — Reconnaissance ✅
 - Environnement : Godot 4.7.2 (MCP godot OK), Blender 5.2.2, Python 3.14 + numpy 2.4 + Pillow 12, uv, gdtoolkit 4 (installé via uv), git 2.53, 12 cœurs.
@@ -69,6 +69,9 @@
 ## Phase 10 — Audio ✅
 - Fait : table de mixage par son (`audio/sfx_mix.json`) qui ramène les sons à onde carrée (Mult, blips, erreurs) au niveau des autres ; musique adaptative pilotée par la tension (progression de la dette, créancier, dernier tour) en plus du Mult pendant le score ; sous-titres supplémentaires (remboursement, échec, créancier, destruction) ; rapport objectif `tools/audio_report.py` → `docs/AUDIO.md` (crête, RMS, silence, raccord des boucles) intégré à `check.sh`.
 - Limite : aucune écoute humaine ; seules des mesures objectives valident le son.
+
+## Phase 11 — Jus et polish ✅
+- Fait (catalogue section 9 complété) : zoom caméra sur la fin de course de la bille, jetons qui rebondissent à la pose, cases couvertes surlignées en or dans la zone de visée (action 6 de la revue), teinte de fond par créancier qui s'intensifie à chaque phase, ombres mouvantes, fondu « CRT qui s'éteint » vers titre/résumé, toasts déplacés. Tout reste modulé par `JuiceProfile` (0–100 %, mode réduit).
 
 ## Rapport de phase
 Format : fait / testé / reste à faire / risques.
