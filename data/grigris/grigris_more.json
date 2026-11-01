@@ -970,8 +970,8 @@
   "sfx": "paper",
   "name_fr": "Règlement intérieur",
   "name_en": "House Rules",
-  "desc_fr": "+2 Mult par Contrat signé.",
-  "desc_en": "+2 Mult per Contract signed.",
+  "desc_fr": "+1,5 Mult par Contrat signé.",
+  "desc_en": "+1.5 Mult per Contract signed.",
   "flavor_fr": "Article 1 : La Maison a raison. Article 2 : voir article 1.",
   "flavor_en": "Article 1: the House is right. Article 2: see article 1.",
   "effects": [
@@ -982,7 +982,7 @@
       "op": "add_mult",
       "v": {
        "var": "contract_count",
-       "mul": 2
+       "mul": 1.5
       }
      }
     ]

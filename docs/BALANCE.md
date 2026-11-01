@@ -1,4 +1,27 @@
-# Rapport d'équilibrage (généré par `scripts/sim/sim_main.gd`)
+# Équilibrage
+
+## Version 1.1 — Référence « bot expert »
+Bot expert (D-019) : dispositions de paris de tous types évaluées par le moteur de score, utilité plafonnée par le besoin de l'échéance, grigris jugés sur une échéance entière. 330 runs au Risque 0 (11 lots parallèles), télémétrie dans le format joueur, rapport `tools/telemetry_report.py`.
+
+| | Synergy (1.0) | Expert, espérance brute | **Expert, utilité plafonnée (référence)** |
+|---|---|---|---|
+| Victoires | 42 % (300 runs) | 36,6 % (320) | **44,2 % (330)** |
+| Survie palier 1 | 94 % | 86 % | 95 % |
+| Paris (part des jetons) | pleins 44 %, couleurs 54 % | chevaux 63 % | chevaux 44 %, pleins 21 %, couleurs 19 %, carrés 9 %, douzaines/colonnes/sixains 7 % |
+| Run gagné (modèle 20 s/tour + 35 s/boutique) | 29,1 min | 28,4 min | 29,1 min |
+
+Survie par palier (référence) : 95 / 97 / 94 / 91 / 86 / 82 / 87 / 91 %. Marge médiane score/dette : 2,05 au palier 1 → 1,29 au palier 8.
+
+Enseignements :
+- Maximiser l'espérance de score fait **perdre** (chevaux à forte variance, échéances de 4 tours ratées) : un joueur compétent vise la probabilité de rembourser. Le jeu récompense bien la prudence au bon moment.
+- Deux bots de stratégies très différentes encadrent la cible 35–45 % : pas de changement de dettes sans données humaines.
+- **Règlement intérieur** (commun, Mult par contrat) était le seul grigri dominant pour les deux bots (81 % de choix, 70 % de victoires) : +2 → +1,5 Mult par contrat (72 % de choix ensuite, encore à surveiller).
+- Les grigris « délaissés » par l'expert sont surtout des grigris à mise en place (zéro, croissance, roue) que l'évaluation sur une seule échéance sous-estime encore : à valider par la télémétrie joueurs.
+- Durée : le modèle de temps (20 s/tour) donne 29 min par run gagné ; la vraie durée viendra de la télémétrie (temps actif mesuré).
+
+---
+
+## Archive 1.0 — Rapport d'équilibrage (généré par `scripts/sim/sim_main.gd`)
 
 Bot : **synergy** · runs : 300 · risque 0 · durée de simulation 1373571 ms
 

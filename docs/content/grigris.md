@@ -27,7 +27,7 @@ Répartition : common 60, rare 55, legendary 20, cursed 15
 | g_half_moon | Demi-lune / Half Moon | +40 Jetons si le numéro est entre 19 et 36 et qu'au moins un pari gagne. | common | range, chips | on_score_calc→add_chips | La moitié haute de la nuit. |
 | g_high_heels | Talons hauts / High Heels | +5 Mult si le numéro est entre 19 et 36. | common | mult, range | on_score_calc→add_mult | Elle a dansé jusqu'au dernier jeton. |
 | g_horseshoe | Fer à cheval / Horseshoe | +6 Mult par cheval gagnant. | common | bets, split, mult | on_bet_win→add_mult | Le cheval, lui, n'a pas eu de chance. |
-| g_house_rules | Règlement intérieur / House Rules | +2 Mult par Contrat signé. | common | contract, mult | on_score_calc→add_mult | Article 1 : La Maison a raison. Article 2 : voir article 1. |
+| g_house_rules | Règlement intérieur / House Rules | +1,5 Mult par Contrat signé. | common | contract, mult | on_score_calc→add_mult | Article 1 : La Maison a raison. Article 2 : voir article 1. |
 | g_india_ink | Encre de Chine / India Ink | +40 Jetons si la bille tombe sur du noir. | common | color, chips | on_score_calc→add_chips | Pour signer en noir sur noir. |
 | g_lipstick | Rouge à lèvres / Lipstick | +40 Jetons si la bille tombe sur du rouge. | common | color, chips | on_score_calc→add_chips | La trace sur le verre n'est pas la vôtre. |
 | g_loaded_die | Dé pipé / Loaded Die | 1 chance sur 3 : +10 Mult. | common | chance, mult | on_score_calc→add_mult | Pipé dans quel sens ? Mystère. |

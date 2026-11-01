@@ -3,8 +3,8 @@
 > Reprise après coupure : lire ce fichier, `CLAUDE.md`, puis `docs/DECISIONS.md`. Lancer `tools/check.sh`.
 
 ## État courant
-- Phase en cours : **Livré (1.0.0)** — suite : `docs/ROADMAP.md`
-- Dernier tag : `phase-14-release`
+- Phase en cours : **Livré (1.1.0)** — suite : sessions humaines (`docs/PLAYTEST.md`), puis `docs/ROADMAP.md` (1.1.x)
+- Dernier tag : `v1.1.0`
 
 ## Phase 0 — Reconnaissance ✅
 - Environnement : Godot 4.7.2 (MCP godot OK), Blender 5.2.2, Python 3.14 + numpy 2.4 + Pillow 12, uv, gdtoolkit 4 (installé via uv), git 2.53, 12 cœurs.
@@ -88,6 +88,16 @@
 ## Phase 14 — Livraison ✅
 - Fait : modèles d'export officiels 4.7.2 installés, `export_presets.cfg` (Linux x86_64, Windows x86_64, données JSON incluses, outillage exclu), binaires exportés et binaire Linux testé (données chargées, tours joués) ; `README.md`, `docs/RELEASE_NOTES.md`, `docs/POSTMORTEM.md`, `docs/ROADMAP.md`.
 - Limites : Windows et Steam Deck non testés sur matériel réel ; aucun test humain.
+
+## Version 1.1 — Retours de table ✅
+Plan : (0) corriger les retours de la 1.0 → (1) télémétrie locale → (2) historique et statistiques → (3) notes de test F8 → (4) rapport joueurs vs bot + propositions → (5) audio (synthèse physique, loudness, table d'écoute) → (6) Steam Deck / Windows (multi-résolution, contrôle d'interface, veille, performance) → (7) bot expert et contrôle d'équilibrage → (8) docs, exports, tag.
+- (0) Ligne d'aide générée depuis les vraies touches (clavier ou manette), sessions de dev isolées dans `user://dev/` (cause de la « partie en cours »), confirmation avant d'écraser un run, cadre d'écrans + scène de référence (16:9 toute définition, 16:10, ultra-large), options d'affichage, options de dev retirées des exports.
+- (1–4) `RunTelemetry` (pur) + autoload `Telemetry` (consentement, temps actif, JSONL par run), `NoteOverlay` (F8, capture), `RunHistory` (derniers runs, survie par palier, temps de jeu), `sim_main --telemetry`, `tools/telemetry_report.py`, `docs/PLAYTEST.md`.
+- (5) Jetons, bille et cylindre en synthèse modale ; `tools/audio_mix.py` (loudness par famille, vérifiée par `check.sh`) ; table d'écoute dans les options.
+- (6) `--dev-ui-check` (focus manette, boutons dans l'écran, 10 écrans + 8 surcouches + 2 états du run × 3 tailles) a trouvé 4 défauts réels (pactes/événements hors écran, titre et sélection débordants avec texte agrandi, rangée de relance hors écran) ; sauvegarde à la mise en veille ; mesure GPU (`--perf`) et préréglage économie appliqué d'office sur Steam Deck.
+- (7) Bot expert : la version « espérance brute » ne gagnait que 36,6 % (paris à forte variance) ; avec une utilité plafonnée par le besoin de l'échéance, 44,2 % sur 330 runs, survie 95→91 %, paris variés. Règlement intérieur, seul dominant pour les deux bots, passe de +2 à +1,5 Mult par contrat. Détails : `docs/BALANCE.md`.
+- Testé : 60 tests, `check.sh` vert (import, données, i18n, audio, mixage, lint, tests, fuzzing, simulation, interface, démarrage) ; binaires de release sans scripts de dev, options `--dev-*` inertes.
+- Reste (humain) : sessions de playtest, écoute, Steam Deck et Windows réels.
 
 ## Rapport de phase
 Format : fait / testé / reste à faire / risques.

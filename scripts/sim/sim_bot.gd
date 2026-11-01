@@ -17,6 +17,10 @@ const MC_SPINS: int = 12
 const REROLL_RESERVE: int = 15
 ## Probabilité d'atterrissage en dessous de laquelle une case n'est pas évaluée (bot expert).
 const EXPERT_MIN_P: float = 0.004
+## Utilité plafonnée : au-delà de NEED_CAP × (reste à rembourser par tour restant), le score ne
+## compte plus qu'à OVERKILL_WEIGHT (on vise la probabilité de rembourser, pas l'espérance brute).
+const NEED_CAP: float = 1.5
+const OVERKILL_WEIGHT: float = 0.15
 const EXPERT_KINDS: Array[StringName] = [&"straight", &"split", &"street", &"corner", &"six_line", &"dozen", &"column"]
 const RARITY_VALUE: Dictionary = {"common": 1.0, "rare": 1.6, "legendary": 2.6, "cursed": 1.9}
 const TAG_VALUE: Dictionary = {
@@ -170,13 +174,16 @@ func _layout_for(ctl: RunController, pnum: Dictionary, k: StringName, filler: bo
 	return lay
 
 
-## Espérance de score d'une disposition : moteur réel sur un clone, pondéré par la distribution.
+## Utilité d'une disposition : moteur réel sur un clone, pondéré par la distribution, score plafonné
+## par le besoin de l'échéance (aversion au risque d'un joueur qui doit rembourser).
 func _expected_score(ctl: RunController, layout: Dictionary, dist: Array[float]) -> float:
 	var clone: RunController = RunController.new(ctl.db)
 	clone.load_run(RunState.from_dict(ctl.run.to_dict()))
 	var r: RunState = clone.run
 	r.slip.clear()
 	r.slip.apply_layout(layout)
+	var need: float = maxf(float(ctl.run.debt - ctl.run.deadline_score), 1.0) / float(maxi(ctl.run.spins_left, 1))
+	var cap: float = need * NEED_CAP
 	var ev: float = 0.0
 	for i: int in dist.size():
 		if dist[i] < EXPERT_MIN_P:
@@ -185,7 +192,8 @@ func _expected_score(ctl: RunController, layout: Dictionary, dist: Array[float])
 		t.target_index = target_index
 		t.landing_index = i
 		t.in_zone = true
-		ev += dist[i] * float(ScoreEngine.resolve(r, ctl.db, t).total)
+		var sc: float = float(ScoreEngine.resolve(r, ctl.db, t).total)
+		ev += dist[i] * (minf(sc, cap) + maxf(sc - cap, 0.0) * OVERKILL_WEIGHT)
 	return ev
 
 
