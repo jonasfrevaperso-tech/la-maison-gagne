@@ -1,0 +1,18 @@
+[
+  {"id": "risk_1", "level": 1, "name_fr": "Ardoise", "name_en": "Tab", "desc_fr": "Dettes +20 %.", "desc_en": "Debts +20%.",
+   "setup": {"flags": {"debt_mult": 1.2}}},
+  {"id": "risk_2", "level": 2, "name_fr": "Pressé", "name_en": "Rushed", "desc_fr": "Petites Échéances : 1 tour de moins.", "desc_en": "Small Deadlines: 1 fewer spin.",
+   "effects": [{"trigger": "on_deadline_start", "if": [{"c": "deadline_kind", "v": "small"}], "do": [{"op": "add_spins", "v": -1}]}]},
+  {"id": "risk_3", "level": 3, "name_fr": "Inflation", "name_en": "Inflation", "desc_fr": "Boutique +25 %.", "desc_en": "Shop +25%.",
+   "setup": {"flags": {"shop_price_mult": 1.25}}},
+  {"id": "risk_4", "level": 4, "name_fr": "Zéro double", "name_en": "Double Zero", "desc_fr": "Une case Zéro double est ajoutée à la roue.", "desc_en": "A Double Zero pocket is added to the wheel.",
+   "setup": {"wheel": [{"op": "add", "numbers": [0], "type": "double_zero"}]}},
+  {"id": "risk_5", "level": 5, "name_fr": "Créanciers enragés", "name_en": "Rabid Creditors", "desc_fr": "Dette des Créanciers +25 %.", "desc_en": "Creditor debts +25%.",
+   "effects": [{"trigger": "on_deadline_start", "if": [{"c": "is_creditor"}], "do": [{"op": "debt_add_pct", "v": 0.25}]}]},
+  {"id": "risk_6", "level": 6, "name_fr": "Marché noir", "name_en": "Black Market", "desc_fr": "Des grigris maudits apparaissent en boutique.", "desc_en": "Cursed charms appear in the shop.",
+   "setup": {"flags": {"cursed_weight": 10}}},
+  {"id": "risk_7", "level": 7, "name_fr": "Sans intérêt", "name_en": "No Interest", "desc_fr": "Plus d'intérêts sur l'argent économisé.", "desc_en": "No more interest on savings.",
+   "setup": {"flags": {"no_interest": true}}},
+  {"id": "risk_8", "level": 8, "name_fr": "La Maison gagne toujours", "name_en": "The House Always Wins", "desc_fr": "Mult final ×0,85.", "desc_en": "Final Mult ×0.85.",
+   "effects": [{"trigger": "on_score_calc", "do": [{"op": "mul_mult", "v": 0.85, "label": "house_edge"}]}]}
+]

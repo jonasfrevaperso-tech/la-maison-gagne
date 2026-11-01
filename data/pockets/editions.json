@@ -1,0 +1,14 @@
+[
+  {"id": "brillante", "name_fr": "Brillante", "name_en": "Foil", "desc_fr": "+50 Jetons.", "desc_en": "+50 Chips.",
+   "flavor_fr": "Ça brille. Donc ça vaut cher. Donc c'est à toi ?", "flavor_en": "It shines. So it's valuable. So it's yours?", "icon": "edition_brillante", "sfx": "shimmer", "shader": "foil",
+   "effects": [{"trigger": "on_edition", "do": [{"op": "add_chips", "v": 50}]}]},
+  {"id": "holo", "name_fr": "Holographique", "name_en": "Holographic", "desc_fr": "+10 Mult.", "desc_en": "+10 Mult.",
+   "flavor_fr": "On voit au travers. Comme les excuses du Patron.", "flavor_en": "You can see through it. Like the Boss's excuses.", "icon": "edition_holo", "sfx": "shimmer", "shader": "holo",
+   "effects": [{"trigger": "on_edition", "do": [{"op": "add_mult", "v": 10}]}]},
+  {"id": "polychrome", "name_fr": "Polychrome", "name_en": "Polychrome", "desc_fr": "×1,5 Mult.", "desc_en": "×1.5 Mult.",
+   "flavor_fr": "Toutes les couleurs. Aucune n'est la tienne.", "flavor_en": "Every colour. None of them yours.", "icon": "edition_polychrome", "sfx": "shimmer", "shader": "poly",
+   "effects": [{"trigger": "on_edition", "do": [{"op": "mul_mult", "v": 1.5}]}]},
+  {"id": "noire", "name_fr": "Noire", "name_en": "Negative", "desc_fr": "Sur un grigri : +1 emplacement. Sur une case : ×1,5 Jetons.", "desc_en": "On a charm: +1 slot. On a pocket: ×1.5 Chips.",
+   "flavor_fr": "Un trou dans la réalité, poli à la main.", "flavor_en": "A hole in reality, hand-polished.", "icon": "edition_noire", "sfx": "void", "shader": "negative",
+   "effects": [{"trigger": "on_edition", "if": [{"c": "pocket_has_edition"}], "do": [{"op": "add_chips", "v": {"var": "chips", "mul": 0.5}}]}]}
+]

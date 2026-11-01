@@ -1,0 +1,786 @@
+[
+ {
+  "id": "standard",
+  "name_fr": "Standard",
+  "name_en": "Standard",
+  "desc_fr": "Rapporte son numéro en Jetons.",
+  "desc_en": "Scores its number as Chips.",
+  "flavor_fr": "Du bois, du vernis, de l'espoir.",
+  "flavor_en": "Wood, varnish, hope.",
+  "icon": "pocket_standard",
+  "sfx": "ball_wood",
+  "rarity": "common",
+  "shop": false,
+  "tags": [],
+  "effects": []
+ },
+ {
+  "id": "golden",
+  "name_fr": "Dorée",
+  "name_en": "Golden",
+  "desc_fr": "+50 Jetons.",
+  "desc_en": "+50 Chips.",
+  "flavor_fr": "Plaquée or. Comme les promesses de La Maison.",
+  "flavor_en": "Gold-plated. Like the House's promises.",
+  "icon": "pocket_golden",
+  "sfx": "ball_metal",
+  "rarity": "common",
+  "shop": true,
+  "weight": 10,
+  "tags": [
+   "chips"
+  ],
+  "effects": [
+   {
+    "trigger": "on_pocket_score",
+    "do": [
+     {
+      "op": "add_chips",
+      "v": 50
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ruby",
+  "name_fr": "Rubis",
+  "name_en": "Ruby",
+  "desc_fr": "+4 Mult.",
+  "desc_en": "+4 Mult.",
+  "flavor_fr": "Taillé dans un regret.",
+  "flavor_en": "Cut from a regret.",
+  "icon": "pocket_ruby",
+  "sfx": "ball_glass",
+  "rarity": "common",
+  "shop": true,
+  "weight": 10,
+  "tags": [
+   "mult"
+  ],
+  "effects": [
+   {
+    "trigger": "on_pocket_score",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 4
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "glass",
+  "name_fr": "Verre",
+  "name_en": "Glass",
+  "desc_fr": "×2 Mult. 1 chance sur 4 de se briser.",
+  "desc_en": "×2 Mult. 1 in 4 chance to shatter.",
+  "flavor_fr": "Fragile, comme ton crédit.",
+  "flavor_en": "Fragile, like your credit.",
+  "icon": "pocket_glass",
+  "sfx": "glass",
+  "rarity": "rare",
+  "shop": true,
+  "weight": 6,
+  "tags": [
+   "xmult",
+   "destroy"
+  ],
+  "effects": [
+   {
+    "trigger": "on_pocket_score",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 2
+     },
+     {
+      "op": "chance_destroy_pocket",
+      "v": 0.25,
+      "label": "shatter"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "magnet",
+  "name_fr": "Aimant",
+  "name_en": "Magnet",
+  "desc_fr": "Attire la bille tombée sur une case voisine (33 %). +15 Jetons.",
+  "desc_en": "Pulls a ball landing next to it (33%). +15 Chips.",
+  "flavor_fr": "Personne ne sait d'où vient la limaille.",
+  "flavor_en": "Nobody knows where the filings come from.",
+  "icon": "pocket_magnet",
+  "sfx": "magnet",
+  "rarity": "rare",
+  "shop": true,
+  "weight": 6,
+  "attract": 0.33,
+  "tags": [
+   "ball",
+   "chips"
+  ],
+  "effects": [
+   {
+    "trigger": "on_pocket_score",
+    "do": [
+     {
+      "op": "add_chips",
+      "v": 15
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "mirror",
+  "name_fr": "Miroir",
+  "name_en": "Mirror",
+  "desc_fr": "Rejoue aussi la case diamétralement opposée. +1 Mult.",
+  "desc_en": "Also scores the pocket directly opposite. +1 Mult.",
+  "flavor_fr": "Il te renvoie l'image d'un joueur qui gagne. Menteur.",
+  "flavor_en": "It shows you a winner. Liar.",
+  "icon": "pocket_mirror",
+  "sfx": "shimmer",
+  "rarity": "rare",
+  "shop": true,
+  "weight": 5,
+  "mirror": true,
+  "tags": [
+   "copy",
+   "mult"
+  ],
+  "effects": [
+   {
+    "trigger": "on_pocket_score",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "bomb",
+  "name_fr": "Bombe",
+  "name_en": "Bomb",
+  "desc_fr": "+150 Jetons, ×1,5 Mult, puis explose (détruite).",
+  "desc_en": "+150 Chips, ×1.5 Mult, then explodes (destroyed).",
+  "flavor_fr": "La mèche est courte. Ta patience aussi.",
+  "flavor_en": "Short fuse. Like your patience.",
+  "icon": "pocket_bomb",
+  "sfx": "explosion",
+  "rarity": "rare",
+  "shop": true,
+  "weight": 5,
+  "tags": [
+   "chips",
+   "xmult",
+   "destroy"
+  ],
+  "effects": [
+   {
+    "trigger": "on_pocket_score",
+    "do": [
+     {
+      "op": "add_chips",
+      "v": 150
+     },
+     {
+      "op": "mul_mult",
+      "v": 1.5
+     },
+     {
+      "op": "destroy_pocket",
+      "label": "boom"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ghost",
+  "name_fr": "Fantôme",
+  "name_en": "Ghost",
+  "desc_fr": "Compte aussi comme le numéro de la case suivante.",
+  "desc_en": "Also counts as the next pocket's number.",
+  "flavor_fr": "Il était là avant toi. Il sera là après.",
+  "flavor_en": "It was here before you. It'll be here after.",
+  "icon": "pocket_ghost",
+  "sfx": "ghost",
+  "rarity": "rare",
+  "shop": true,
+  "weight": 5,
+  "ghost": true,
+  "tags": [
+   "bets",
+   "ghost"
+  ],
+  "effects": [
+   {
+    "trigger": "on_pocket_score",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "joker",
+  "name_fr": "Joker",
+  "name_en": "Joker",
+  "desc_fr": "Compte comme rouge ET noir.",
+  "desc_en": "Counts as both red AND black.",
+  "flavor_fr": "Il n'a pas choisi son camp. Il a choisi le tien.",
+  "flavor_en": "It didn't pick a side. It picked yours.",
+  "icon": "pocket_joker",
+  "sfx": "jingle",
+  "rarity": "rare",
+  "shop": true,
+  "weight": 5,
+  "counts_as_colors": [
+   "red",
+   "black"
+  ],
+  "tags": [
+   "color",
+   "bets"
+  ],
+  "effects": []
+ },
+ {
+  "id": "twin",
+  "name_fr": "Jumelle",
+  "name_en": "Twin",
+  "desc_fr": "La case compte deux fois.",
+  "desc_en": "This pocket scores twice.",
+  "flavor_fr": "L'autre moitié est quelque part sous la table.",
+  "flavor_en": "Its other half is somewhere under the table.",
+  "icon": "pocket_twin",
+  "sfx": "double",
+  "rarity": "rare",
+  "shop": true,
+  "weight": 5,
+  "tags": [
+   "retrigger"
+  ],
+  "effects": [
+   {
+    "trigger": "on_pocket_score",
+    "if": [
+     {
+      "c": "first_pass"
+     }
+    ],
+    "do": [
+     {
+      "op": "retrigger_pocket",
+      "v": 1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "thorn",
+  "name_fr": "Épine",
+  "name_en": "Thorn",
+  "desc_fr": "×3 Mult, mais coûte 1 $.",
+  "desc_en": "×3 Mult, but costs $1.",
+  "flavor_fr": "Ça pique. C'est bon signe.",
+  "flavor_en": "It stings. That's a good sign.",
+  "icon": "pocket_thorn",
+  "sfx": "thorn",
+  "rarity": "rare",
+  "shop": true,
+  "weight": 5,
+  "tags": [
+   "xmult",
+   "money"
+  ],
+  "effects": [
+   {
+    "trigger": "on_pocket_score",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 3
+     },
+     {
+      "op": "add_money",
+      "v": -1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "sticky",
+  "name_fr": "Collante",
+  "name_en": "Sticky",
+  "desc_fr": "+20 Jetons. Au tour suivant, 40 % de chances que la bille y revienne.",
+  "desc_en": "+20 Chips. Next spin, 40% chance the ball returns here.",
+  "flavor_fr": "Personne n'a jamais nettoyé ce coin.",
+  "flavor_en": "Nobody has ever cleaned this corner.",
+  "icon": "pocket_sticky",
+  "sfx": "sticky",
+  "rarity": "common",
+  "shop": true,
+  "weight": 7,
+  "sticky": 0.4,
+  "tags": [
+   "ball",
+   "chips"
+  ],
+  "effects": [
+   {
+    "trigger": "on_pocket_score",
+    "do": [
+     {
+      "op": "add_chips",
+      "v": 20
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "prism",
+  "name_fr": "Prisme",
+  "name_en": "Prism",
+  "desc_fr": "+2 Mult par type de pari différent posé.",
+  "desc_en": "+2 Mult per distinct bet type placed.",
+  "flavor_fr": "Une seule lumière, mille façons de perdre.",
+  "flavor_en": "One light, a thousand ways to lose.",
+  "icon": "pocket_prism",
+  "sfx": "shimmer",
+  "rarity": "common",
+  "shop": true,
+  "weight": 7,
+  "tags": [
+   "mult",
+   "bets"
+  ],
+  "effects": [
+   {
+    "trigger": "on_pocket_score",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": {
+       "var": "distinct_kinds",
+       "mul": 2
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "thief",
+  "name_fr": "Voleuse",
+  "name_en": "Thief",
+  "desc_fr": "+2 $ et vole 4 jetons à La Maison (Jetons bonus).",
+  "desc_en": "+$2 and steals 4 chips from the House (bonus Chips).",
+  "flavor_fr": "Elle a la main leste et le sourire désolé.",
+  "flavor_en": "Quick hands, apologetic smile.",
+  "icon": "pocket_thief",
+  "sfx": "coins",
+  "rarity": "common",
+  "shop": true,
+  "weight": 7,
+  "tags": [
+   "money",
+   "chips"
+  ],
+  "effects": [
+   {
+    "trigger": "on_pocket_score",
+    "do": [
+     {
+      "op": "add_money",
+      "v": 2
+     },
+     {
+      "op": "steal_chips",
+      "v": 4
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "timed",
+  "name_fr": "Chronométrée",
+  "name_en": "Timed",
+  "desc_fr": "+3 Mult par tour restant dans l'échéance.",
+  "desc_en": "+3 Mult per spin left in the deadline.",
+  "flavor_fr": "Tic. Tac. Tic. Dette.",
+  "flavor_en": "Tick. Tock. Tick. Debt.",
+  "icon": "pocket_timed",
+  "sfx": "tick",
+  "rarity": "common",
+  "shop": true,
+  "weight": 7,
+  "tags": [
+   "mult",
+   "spins"
+  ],
+  "effects": [
+   {
+    "trigger": "on_pocket_score",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": {
+       "var": "spins_left",
+       "mul": 3
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cursed",
+  "name_fr": "Maudite",
+  "name_en": "Cursed",
+  "desc_fr": "−3 Mult. Placée par La Maison.",
+  "desc_en": "−3 Mult. Placed by the House.",
+  "flavor_fr": "Elle porte le nom d'un ancêtre. Le tien.",
+  "flavor_en": "It bears an ancestor's name. Yours.",
+  "icon": "pocket_cursed",
+  "sfx": "curse",
+  "rarity": "cursed",
+  "shop": false,
+  "tags": [
+   "curse"
+  ],
+  "effects": [
+   {
+    "trigger": "on_pocket_score",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": -3
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "sacred",
+  "name_fr": "Sacrée",
+  "name_en": "Sacred",
+  "desc_fr": "+2 Mult. Rembourse les paris perdus (en Jetons).",
+  "desc_en": "+2 Mult. Refunds lost bets (as Chips).",
+  "flavor_fr": "Bénie par une sœur qui ne comptait pas.",
+  "flavor_en": "Blessed by a nun who didn't count.",
+  "icon": "pocket_sacred",
+  "sfx": "choir",
+  "rarity": "rare",
+  "shop": true,
+  "weight": 5,
+  "tags": [
+   "safety",
+   "mult"
+  ],
+  "effects": [
+   {
+    "trigger": "on_pocket_score",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 2
+     },
+     {
+      "op": "refund_lost",
+      "v": 1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "lightning",
+  "name_fr": "Éclair",
+  "name_en": "Lightning",
+  "desc_fr": "×3 Mult au premier tour d'une échéance, ×1,5 sinon.",
+  "desc_en": "×3 Mult on a deadline's first spin, ×1.5 otherwise.",
+  "flavor_fr": "Ne frappe jamais deux fois. Sauf ici.",
+  "flavor_en": "Never strikes twice. Except here.",
+  "icon": "pocket_lightning",
+  "sfx": "zap",
+  "rarity": "rare",
+  "shop": true,
+  "weight": 5,
+  "tags": [
+   "xmult",
+   "spins"
+  ],
+  "effects": [
+   {
+    "trigger": "on_pocket_score",
+    "if": [
+     {
+      "c": "first_spin"
+     }
+    ],
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 3
+     }
+    ]
+   },
+   {
+    "trigger": "on_pocket_score",
+    "if": [
+     {
+      "c": "not",
+      "x": {
+       "c": "first_spin"
+      }
+     }
+    ],
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 1.5
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "double_zero",
+  "name_fr": "Zéro double",
+  "name_en": "Double Zero",
+  "desc_fr": "Agit comme un Zéro.",
+  "desc_en": "Acts as a Zero.",
+  "flavor_fr": "Un zéro ne suffisait pas à La Maison.",
+  "flavor_en": "One zero wasn't enough for the House.",
+  "icon": "pocket_double_zero",
+  "sfx": "zero",
+  "rarity": "cursed",
+  "shop": false,
+  "zero_like": true,
+  "tags": [
+   "zero",
+   "curse"
+  ],
+  "effects": []
+ },
+ {
+  "id": "steel",
+  "name_fr": "Acier",
+  "name_en": "Steel",
+  "desc_fr": "×1,5 Mult.",
+  "desc_en": "×1.5 Mult.",
+  "flavor_fr": "La bille y sonne comme une cloche d'église.",
+  "flavor_en": "The ball rings on it like a church bell.",
+  "icon": "pocket_steel",
+  "sfx": "ball_metal",
+  "rarity": "common",
+  "shop": true,
+  "weight": 7,
+  "tags": [
+   "xmult"
+  ],
+  "effects": [
+   {
+    "trigger": "on_pocket_score",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 1.5
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "lucky",
+  "name_fr": "Chanceuse",
+  "name_en": "Lucky",
+  "desc_fr": "1 chance sur 4 : +15 Mult. 1 chance sur 10 : +10 $.",
+  "desc_en": "1 in 4: +15 Mult. 1 in 10: +$10.",
+  "flavor_fr": "Un trèfle à quatre feuilles verni dedans.",
+  "flavor_en": "A four-leaf clover varnished inside.",
+  "icon": "pocket_lucky",
+  "sfx": "chime",
+  "rarity": "common",
+  "shop": true,
+  "weight": 7,
+  "tags": [
+   "chance",
+   "mult",
+   "money"
+  ],
+  "effects": [
+   {
+    "trigger": "on_pocket_score",
+    "if": [
+     {
+      "c": "chance",
+      "v": 0.25
+     }
+    ],
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 15,
+      "label": "lucky"
+     }
+    ]
+   },
+   {
+    "trigger": "on_pocket_score",
+    "if": [
+     {
+      "c": "chance",
+      "v": 0.1
+     }
+    ],
+    "do": [
+     {
+      "op": "add_money",
+      "v": 10,
+      "label": "lucky"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "echo",
+  "name_fr": "Écho",
+  "name_en": "Echo",
+  "desc_fr": "+2 Mult par case de la même couleur d'affilée.",
+  "desc_en": "+2 Mult per same-color landing in a row.",
+  "flavor_fr": "Rouge… rouge… rouge… tu entends ?",
+  "flavor_en": "Red… red… red… hear that?",
+  "icon": "pocket_echo",
+  "sfx": "echo",
+  "rarity": "common",
+  "shop": true,
+  "weight": 7,
+  "tags": [
+   "streak",
+   "mult"
+  ],
+  "effects": [
+   {
+    "trigger": "on_pocket_score",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": {
+       "var": "color_streak",
+       "mul": 2
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "burnt",
+  "name_fr": "Brûlée",
+  "name_en": "Burnt",
+  "desc_fr": "Ne rapporte rien. −1 Mult.",
+  "desc_en": "Scores nothing. −1 Mult.",
+  "flavor_fr": "Ça sent le vernis cramé et les mauvaises décisions.",
+  "flavor_en": "Smells of scorched varnish and bad decisions.",
+  "icon": "pocket_burnt",
+  "sfx": "fire",
+  "rarity": "cursed",
+  "shop": false,
+  "tags": [
+   "curse"
+  ],
+  "effects": [
+   {
+    "trigger": "on_pocket_score",
+    "do": [
+     {
+      "op": "add_chips",
+      "v": {
+       "var": "pocket_number",
+       "mul": -1
+      }
+     },
+     {
+      "op": "add_mult",
+      "v": -1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "vault",
+  "name_fr": "Coffre",
+  "name_en": "Vault",
+  "desc_fr": "+3 $.",
+  "desc_en": "+$3.",
+  "flavor_fr": "La combinaison est ta date de naissance. Inquiétant.",
+  "flavor_en": "The combination is your birthday. Unsettling.",
+  "icon": "pocket_vault",
+  "sfx": "vault",
+  "rarity": "common",
+  "shop": true,
+  "weight": 7,
+  "tags": [
+   "money"
+  ],
+  "effects": [
+   {
+    "trigger": "on_pocket_score",
+    "do": [
+     {
+      "op": "add_money",
+      "v": 3
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "sprout",
+  "name_fr": "Germe",
+  "name_en": "Sprout",
+  "desc_fr": "Gagne un niveau (+10 Jetons) à chaque fois qu'elle est touchée.",
+  "desc_en": "Gains a level (+10 Chips) each time it is hit.",
+  "flavor_fr": "Arrose-la de jetons. Elle adore.",
+  "flavor_en": "Water it with chips. It loves that.",
+  "icon": "pocket_sprout",
+  "sfx": "grow",
+  "rarity": "common",
+  "shop": true,
+  "weight": 7,
+  "tags": [
+   "growth",
+   "chips"
+  ],
+  "effects": [
+   {
+    "trigger": "on_pocket_score",
+    "do": [
+     {
+      "op": "upgrade_pocket",
+      "v": 1,
+      "label": "grow"
+     }
+    ]
+   }
+  ]
+ }
+]

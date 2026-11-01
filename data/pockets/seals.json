@@ -1,0 +1,156 @@
+[
+ {
+  "id": "seal_gold",
+  "name_fr": "Sceau d'or",
+  "name_en": "Gold Seal",
+  "desc_fr": "+3 $ quand la bille tombe ici.",
+  "desc_en": "+$3 when the ball lands here.",
+  "flavor_fr": "Cacheté à la cire de bougie de prière.",
+  "flavor_en": "Sealed with prayer-candle wax.",
+  "icon": "seal_gold",
+  "sfx": "coins",
+  "effects": [
+   {
+    "trigger": "on_seal",
+    "do": [
+     {
+      "op": "add_money",
+      "v": 3
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "seal_red",
+  "name_fr": "Sceau rouge",
+  "name_en": "Red Seal",
+  "desc_fr": "La case compte une fois de plus.",
+  "desc_en": "The pocket scores one more time.",
+  "flavor_fr": "Rouge comme « relance ».",
+  "flavor_en": "Red as in « again ».",
+  "icon": "seal_red",
+  "sfx": "double",
+  "effects": [
+   {
+    "trigger": "on_seal",
+    "if": [
+     {
+      "c": "first_pass"
+     }
+    ],
+    "do": [
+     {
+      "op": "retrigger_pocket",
+      "v": 1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "seal_blue",
+  "name_fr": "Sceau bleu",
+  "name_en": "Blue Seal",
+  "desc_fr": "Au dernier tour d'une échéance : crée une carte Fortune.",
+  "desc_en": "On a deadline's last spin: creates a Fortune card.",
+  "flavor_fr": "L'encre a des reflets de mer lointaine.",
+  "flavor_en": "The ink shimmers like a distant sea.",
+  "icon": "seal_blue",
+  "sfx": "card",
+  "effects": [
+   {
+    "trigger": "on_seal",
+    "if": [
+     {
+      "c": "last_spin"
+     }
+    ],
+    "do": [
+     {
+      "op": "add_fortune",
+      "id": "random"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "seal_purple",
+  "name_fr": "Sceau violet",
+  "name_en": "Purple Seal",
+  "desc_fr": "1 chance sur 4 : +1 tour.",
+  "desc_en": "1 in 4: +1 spin.",
+  "flavor_fr": "Il sent la lavande et le temps volé.",
+  "flavor_en": "It smells of lavender and stolen time.",
+  "icon": "seal_purple",
+  "sfx": "clock",
+  "effects": [
+   {
+    "trigger": "on_seal",
+    "if": [
+     {
+      "c": "chance",
+      "v": 0.25
+     }
+    ],
+    "do": [
+     {
+      "op": "add_spins",
+      "v": 1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "seal_green",
+  "name_fr": "Sceau vert",
+  "name_en": "Green Seal",
+  "desc_fr": "+2 jetons de budget au tour suivant.",
+  "desc_en": "+2 bet budget next spin.",
+  "flavor_fr": "Vert comme un billet d'avant-guerre.",
+  "flavor_en": "Green as a pre-war banknote.",
+  "icon": "seal_green",
+  "sfx": "chips",
+  "effects": [
+   {
+    "trigger": "on_seal",
+    "do": [
+     {
+      "op": "temp_budget",
+      "v": 2
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "seal_black",
+  "name_fr": "Sceau noir",
+  "name_en": "Black Seal",
+  "desc_fr": "Gagne +1 Mult à chaque passage (permanent).",
+  "desc_en": "Gains +1 Mult each time it is hit (permanent).",
+  "flavor_fr": "Personne ne se souvient l'avoir posé.",
+  "flavor_en": "Nobody remembers putting it there.",
+  "icon": "seal_black",
+  "sfx": "curse",
+  "effects": [
+   {
+    "trigger": "on_seal",
+    "do": [
+     {
+      "op": "counter_add",
+      "v": 1
+     },
+     {
+      "op": "add_mult",
+      "v": {
+       "var": "counter"
+      }
+     }
+    ]
+   }
+  ]
+ }
+]
