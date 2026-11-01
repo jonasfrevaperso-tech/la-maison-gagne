@@ -21,6 +21,8 @@ class SpinOutcome:
 var run: RunState = null
 var db: ContentDB = null
 var pending_throw: ThrowResolver.ThrowResult = null
+## Premier run guidé (positionné avant new_run).
+var tutorial_run: bool = false
 var _spin_started: bool = false
 
 
@@ -44,6 +46,8 @@ func new_run(character_id: String, risk_level: int, seed_value: int, challenge_i
 	run.grigri_slots = Balance.i("slots.grigri_slots")
 	run.fortune_slots = Balance.i("slots.fortune_slots")
 	run.wheel = WheelModel.standard()
+	if tutorial_run:
+		run.flags["tutorial_run"] = true
 	_apply_setup(db.get_entry("characters", character_id))
 	if challenge_id != "" and db.get_entry("challenges", challenge_id).has("risk"):
 		run.risk_level = int(db.get_entry("challenges", challenge_id)["risk"])
@@ -174,6 +178,8 @@ func debt_for(tier: int, deadline_idx: int) -> int:
 		base = float(debts[debts.size() - 1]) * pow(Balance.f("run.endless_debt_growth"), float(tier - debts.size()))
 	var m: float = float(Balance.arr("run.deadline_multipliers")[deadline_idx])
 	m *= float(run.flags.get("debt_mult", 1.0))
+	if bool(run.flags.get("tutorial_run", false)) and tier <= Balance.i("run.tutorial_tiers"):
+		m *= Balance.f("run.tutorial_debt_mult")
 	if deadline_idx == Balance.arr("run.deadline_kinds").size() - 1 and run.creditor_id != "":
 		m *= float(db.get_entry("creditors", run.creditor_id).get("debt_mult", 1.0))
 	return int(round(base * m))

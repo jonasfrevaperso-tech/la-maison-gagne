@@ -141,6 +141,8 @@ func _game_tab() -> void:
 	_check(b, "OPT_CONFIRM", "game", "confirm_irreversible")
 	_check(b, "OPT_SHOW_PROBS", "game", "show_probabilities")
 	_check(b, "OPT_ASSIST", "game", "assist")
+	_check(b, "OPT_TUTORIAL_TIPS", "game", "tutorial_tips")
+	b.add_child(UiKit.button(tr("OPT_RESET_TUTORIAL"), _reset_tutorial))
 
 
 func _access_tab() -> void:
@@ -208,3 +210,8 @@ func _reset_input() -> void:
 	Settings.set_value("input", "bindings", {})
 	for a: String in REMAPPABLE:
 		_remap_buttons[a].text = _action_text(a)
+
+
+func _reset_tutorial() -> void:
+	TutorialDirector.reset()
+	EventBus.toast.emit(tr("TOAST_TUTORIAL_RESET"), &"success")

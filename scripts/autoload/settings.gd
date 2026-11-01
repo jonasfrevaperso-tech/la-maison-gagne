@@ -6,7 +6,16 @@ const DEFAULTS: Dictionary = {
 	"audio": {"master": 0.8, "music": 0.6, "sfx": 0.8, "ui": 0.7, "ambience": 0.5},
 	"video": {"fullscreen": false, "vsync": true, "crt": 0.5, "bloom": 0.6, "show_fps": false},
 	"juice": {"intensity": 1.0, "shake": 1.0, "flashes": true, "reduced_motion": false},
-	"game": {"speed": 1, "locale": "fr", "auto_repeat": false, "confirm_irreversible": true, "assist": false, "show_probabilities": false},
+	"game":
+	{
+		"speed": 1,
+		"locale": "fr",
+		"auto_repeat": false,
+		"confirm_irreversible": true,
+		"assist": false,
+		"show_probabilities": false,
+		"tutorial_tips": true
+	},
 	"access": {"colorblind": "off", "text_scale": 1.0, "high_contrast": false, "subtitles": true},
 	"input": {"bindings": {}},
 }

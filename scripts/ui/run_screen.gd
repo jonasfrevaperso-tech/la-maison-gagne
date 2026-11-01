@@ -48,6 +48,7 @@ var _pending_outcome: RunController.SpinOutcome = null
 var _target_fortune_slot: int = -1
 var _overlay_queue: Array[Control] = []
 var _victory_reward: Dictionary = {}
+var tutorial: TutorialDirector = null
 
 
 func setup(_params: Dictionary) -> void:
@@ -173,6 +174,9 @@ func _build() -> void:
 	presenter.table_view = table_view
 	presenter.finished.connect(_on_score_finished)
 	add_child(presenter)
+	tutorial = TutorialDirector.new()
+	tutorial.anchor_rect = _anchor_rect
+	add_child(tutorial)
 
 
 # --------------------------------------------------------------------------- rafraîchissements
@@ -307,6 +311,8 @@ func _enter_phase() -> void:
 			_set_state(UiState.BETTING)
 			AudioBus.play_music(_music_for())
 			_queue_intros()
+			if state == UiState.BETTING:
+				_tutorial_betting()
 		RunState.Phase.SHOP:
 			_open_shop()
 		RunState.Phase.PACT_OFFER:
@@ -335,8 +341,6 @@ func _queue_intros() -> void:
 		var dlg_id: String = "act%d_intro" % r.act()
 		if ctl.db.has_entry("dialogues", dlg_id):
 			_queue(DialogueOverlay.new().configure(dlg_id, r, ctl.db))
-	if r.tier == 1 and r.deadline_idx == 0 and r.total_spins == 0 and not bool(SaveSystem.profile.get("tutorial", {}).get("done", false)):
-		_queue(TutorialHint.new())
 	if r.is_creditor() and r.creditor_id != "":
 		_queue(CreditorIntro.new().configure(ctl.db.get_entry("creditors", r.creditor_id)))
 
@@ -345,6 +349,40 @@ func _exit_tree() -> void:
 	for o: Control in _overlay_queue:
 		o.free()
 	_overlay_queue.clear()
+
+
+## Rectangle global d'un élément d'interface pour ancrer les bulles d'aide.
+func _anchor_rect(anchor: String) -> Rect2:
+	var c: Control = (
+		{
+			"debt": debt_gauge,
+			"table": table_view,
+			"budget": _budget_label,
+			"spin": _spin_btn,
+			"wheel": wheel_view,
+			"score": score_panel,
+			"history": _history_box,
+			"grigris": grigri_bar,
+			"fortunes": fortune_bar,
+			"creditor": _creditor_label,
+		}
+		. get(anchor, null)
+	)
+	if c == null:
+		return Rect2(get_viewport_rect().size * Vector2(0.5, 0.15), Vector2.ZERO)
+	return c.get_global_rect()
+
+
+## Moments de jeu signalés au tutoriel une fois les surcouches fermées.
+func _tutorial_betting() -> void:
+	tutorial.notify("betting_start")
+	var r: RunState = ctl.run
+	if not r.grigris.is_empty():
+		tutorial.notify("grigri_owned")
+	if not r.fortunes.is_empty():
+		tutorial.notify("fortune_owned")
+	if r.is_creditor() and r.creditor_id != "":
+		tutorial.notify("creditor")
 
 
 func _queue(o: Control) -> void:
@@ -416,6 +454,7 @@ func _on_spot_changed(spot_id: String, delta: int) -> void:
 				_bet_rejected(res)
 				break
 			AudioBus.play("chip_place", 1.0 + 0.04 * float(ctl.run.slip.chips.get(spot_id, 0)))
+			tutorial.notify("bet_placed")
 			GameState.log_input({"t": "bet", "spot": spot_id})
 	else:
 		if ctl.run.slip.chips.has(spot_id):
@@ -486,6 +525,7 @@ func _on_spin_pressed() -> void:
 			wheel_view.start_aim()
 			AudioBus.play("wheel_spin")
 			_set_state(UiState.AIMING)
+			tutorial.notify("aiming")
 		UiState.AIMING:
 			_release_throw()
 
@@ -525,6 +565,7 @@ func _predict_near_miss(landing: int) -> bool:
 
 func _on_ball_settled(landing: int) -> void:
 	_announce_throw(ctl.pending_throw, landing)
+	tutorial.notify("ball")
 	if ctl.can_rethrow():
 		_set_state(UiState.RETHROW)
 	else:
@@ -582,6 +623,7 @@ func _commit() -> void:
 	table_view.queue_redraw()
 	state = UiState.SCORING
 	_refresh_buttons()
+	tutorial.notify("scoring")
 	presenter.play(outcome.ctx)
 
 
@@ -615,6 +657,8 @@ func _on_score_finished(_total: int) -> void:
 		return
 	GameState.autosave()
 	_set_state(UiState.BETTING)
+	tutorial.notify("scored")
+	_tutorial_betting()
 
 
 func _on_reward_closed() -> void:
@@ -661,12 +705,15 @@ func _on_overlay_closed(o: Control, on_closed: Callable) -> void:
 		on_closed.call()
 	elif ctl.run.phase == RunState.Phase.BETTING:
 		_set_state(UiState.BETTING)
+	if state == UiState.BETTING:
+		_tutorial_betting()
 
 
 func _open_shop() -> void:
 	AudioBus.play_music("shop")
 	GameState.autosave()
 	_show_overlay(ShopOverlay.new().configure(ctl), _on_shop_closed)
+	tutorial.notify("shop")
 
 
 func _on_shop_closed() -> void:
@@ -681,6 +728,7 @@ func _on_shop_closed() -> void:
 func _open_pact() -> void:
 	GameState.autosave()
 	_show_overlay(PactOverlay.new().configure(ctl), _on_pact_closed)
+	tutorial.notify("pact")
 
 
 func _on_pact_closed() -> void:
@@ -730,6 +778,8 @@ func _use_fortune(slot: int, index: int) -> void:
 		EventBus.fortune_used.emit(fid)
 		GameState.autosave()
 	_set_state(UiState.BETTING)
+	tutorial.notify("scored")
+	_tutorial_betting()
 
 
 func _on_grigris_changed() -> void:

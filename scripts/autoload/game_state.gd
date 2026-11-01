@@ -13,7 +13,7 @@ const SCREEN_ACHIEVEMENTS: StringName = &"achievements"
 const SCREEN_STATS: StringName = &"stats"
 
 ## Délai laissé au thread audio pour libérer les lectures avant de quitter.
-const QUIT_AUDIO_GRACE: float = 0.2
+const QUIT_AUDIO_GRACE: float = 0.35
 
 var controller: RunController = null
 var current_screen: StringName = &""
@@ -48,6 +48,8 @@ func start_new_run(character_id: String, risk_level: int, seed_value: int, chall
 	if challenge_id != "":
 		character_id = String(DataRegistry.db.get_entry("challenges", challenge_id).get("character", character_id))
 	controller = RunController.new(DataRegistry.db)
+	if not bool((SaveSystem.profile.get("tutorial", {}) as Dictionary).get("done", false)) and challenge_id == "" and not daily:
+		controller.tutorial_run = true
 	controller.new_run(character_id, risk_level, seed_value, challenge_id)
 	controller.run.daily = daily
 	replay_log.clear()
@@ -125,6 +127,7 @@ func end_run(victory: bool) -> void:
 	var r: RunState = controller.run
 	last_run_victory = victory
 	SaveSystem.add_stat("spins", r.total_spins)
+	(SaveSystem.profile["tutorial"] as Dictionary)["done"] = true
 	SaveSystem.add_stat("zeros", r.zeros_hit)
 	SaveSystem.max_stat("best_spin", r.best_spin)
 	if victory:

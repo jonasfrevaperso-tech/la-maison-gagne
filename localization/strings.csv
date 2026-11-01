@@ -325,3 +325,7 @@ STATS_ZEROS,Zéros vus,Zeros seen
 STATS_ACHIEVEMENTS,Succès,Achievements
 STATS_CHALLENGES,Défis réussis,Challenges done
 STATS_SEEN,Grigris vus,Charms seen
+TUTO_SKIP_ALL,Couper les conseils,Turn off tips
+OPT_TUTORIAL_TIPS,Bulles d'aide,Help bubbles
+OPT_RESET_TUTORIAL,Rejouer le tutoriel,Replay tutorial
+TOAST_TUTORIAL_RESET,Les bulles d'aide réapparaîtront.,Help bubbles will show again.

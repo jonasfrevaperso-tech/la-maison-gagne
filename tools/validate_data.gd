@@ -15,7 +15,7 @@ const REQUIRED_BY_CAT: Dictionary = {
 	"risks": ["level"],
 }
 const RARITIES: Array[String] = ["common", "rare", "legendary", "cursed"]
-const SKIP_DESC: Array[String] = ["dialogues", "achievements", "challenges", "events", "speakers"]
+const SKIP_DESC: Array[String] = ["dialogues", "achievements", "challenges", "events", "speakers", "tutorial"]
 
 var errors: Array[String] = []
 var warnings: Array[String] = []

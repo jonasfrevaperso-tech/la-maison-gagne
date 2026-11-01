@@ -40,7 +40,9 @@
     ],
     "spins_per_deadline": 4,
     "endless_debt_growth": 1.6,
-    "event_chance_per_tier": 0.4
+    "event_chance_per_tier": 0.4,
+    "tutorial_tiers": 3,
+    "tutorial_debt_mult": 0.85
   },
   "bets": {
     "bet_budget": 10,

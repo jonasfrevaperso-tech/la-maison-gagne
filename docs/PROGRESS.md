@@ -3,8 +3,8 @@
 > Reprise après coupure : lire ce fichier, `CLAUDE.md`, puis `docs/DECISIONS.md`. Lancer `tools/check.sh`.
 
 ## État courant
-- Phase en cours : **Phase 8 — Tutoriel**
-- Dernier tag : `phase-07-meta-campaign`
+- Phase en cours : **Phase 9 — Direction artistique finale**
+- Dernier tag : `phase-08-tutorial`
 
 ## Phase 0 — Reconnaissance ✅
 - Environnement : Godot 4.7.2 (MCP godot OK), Blender 5.2.2, Python 3.14 + numpy 2.4 + Pillow 12, uv, gdtoolkit 4 (installé via uv), git 2.53, 12 cœurs.
@@ -57,6 +57,10 @@
 ## Phase 7 — Méta et campagne ✅
 - Fait : Hall (personnages, Risque max, défis jouables, graine du jour, fins), Codex (collection vue/masquée, créanciers rencontrés), Succès (60, notifications), Statistiques ; campagne : intros Actes I-III, clôtures d'acte, finale à choix → 3 fins + vraie fin secrète (lettre de grand-père + aucun pacte) ; créancier secret L'Ombre du Grand-Père (déclenché par l'histoire), Croupier d'Or en mode Infini ; Fantôme débloqué par succès.
 - Testé : `check.sh` vert, captures des écrans méta.
+
+## Phase 8 — Tutoriel ✅
+- Fait : `TutorialDirector` piloté par `data/events/tutorial.json` (14 bulles : objectif, mises, paris intérieurs, budget, lancer, visée, rebond fou, score, historique, boutique, grigris, Fortune, créancier, pacte), ancrées sur l'élément concerné, non bloquantes, « Couper les conseils », rejouables (Options → Rejouer le tutoriel) ; premier run guidé (dettes de l'Acte I ×0,85) ; l'ancienne fenêtre d'aide unique est supprimée.
+- Testé : capture sur profil vierge, `check.sh` vert.
 
 ## Rapport de phase
 Format : fait / testé / reste à faire / risques.
