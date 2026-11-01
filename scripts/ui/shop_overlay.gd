@@ -6,6 +6,9 @@ const FLIP_TIME: float = 0.25
 const FLIP_STAGGER: float = 0.08
 const DISSOLVE_SHADER: String = "res://shaders/dissolve.gdshader"
 const DISSOLVE_TIME: float = 0.7
+const OWNED_PROMPTS_W: float = 1100.0
+const PACK_BTN: Vector2 = Vector2(210, 150)
+const PACK_DESC_W: float = 210.0
 const OWNED_KEYS: Array[Array] = [["@double_click", "HINT_K_SELL"], ["@drag", "HINT_K_MOVE"], ["@right_click", "HINT_K_LOCK"]]
 const OWNED_PAD: Array[Array] = [
 	["@dpad", "HINT_K_SELECT"], ["ui_accept", "HINT_K_BUY_SELL"], ["bet_repeat", "HINT_K_LOCK"], ["bet_cycle_prev", "HINT_K_MOVE"]
@@ -22,53 +25,74 @@ var _pack_box: VBoxContainer = null
 var _float: FloatLayer = null
 var _rerolls_here: int = 0
 var _owned_prompts: PromptBar = null
+var _owned_title: Label = null
+var _contract_row: HBoxContainer = null
 
 
 func configure(p_ctl: RunController) -> ShopOverlay:
 	ctl = p_ctl
-	panel_width = 1500.0
+	panel_width = 1560.0
 	return self
 
 
 func build() -> void:
+	# En-tête : nom du Bazar, bourse.
 	var head: HBoxContainer = row()
+	head.add_theme_constant_override("separation", 40)
 	head.add_child(UiKit.title(tr("SHOP_TITLE"), UiKit.SIZE_H1))
+	var purse: PanelContainer = PanelContainer.new()
+	purse.add_theme_stylebox_override("panel", UiKit.flat(Palette.INK, Palette.GOLD, 2, 20, 10))
 	_money = UiKit.label("", UiKit.SIZE_H1, Palette.GOLD_LIGHT, "mono")
-	head.add_child(_money)
-	_odds = UiKit.label("", UiKit.SIZE_SMALL, Palette.SMOKE)
+	purse.add_child(_money)
+	head.add_child(purse)
+	body.add_child(UiKit.divider(panel_width * 0.7))
+	_odds = UiKit.label("", UiKit.SIZE_SMALL, Palette.IVORY.darkened(0.2))
 	_odds.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	body.add_child(_odds)
+	# Étal : trois cartes de section.
 	var mid: HBoxContainer = row()
-	mid.add_theme_constant_override("separation", 60)
-	var gcol: VBoxContainer = VBoxContainer.new()
-	gcol.add_child(UiKit.label(tr("SHOP_GRIGRIS"), UiKit.SIZE_BODY, Palette.GOLD))
+	mid.add_theme_constant_override("separation", 28)
+	mid.alignment = BoxContainer.ALIGNMENT_CENTER
+	var gcard: PanelContainer = UiKit.section_card(tr("SHOP_GRIGRIS"), 0.0, Palette.GOLD)
 	_offers_row = HBoxContainer.new()
-	_offers_row.add_theme_constant_override("separation", 16)
-	gcol.add_child(_offers_row)
-	mid.add_child(gcol)
-	var pcol: VBoxContainer = VBoxContainer.new()
-	pcol.add_child(UiKit.label(tr("SHOP_PACKS_CONTRACT"), UiKit.SIZE_BODY, Palette.GOLD))
+	_offers_row.add_theme_constant_override("separation", 18)
+	(gcard.get_meta("body") as VBoxContainer).add_child(_offers_row)
+	mid.add_child(gcard)
+	var pcard: PanelContainer = UiKit.section_card(tr("SHOP_PACKS"))
 	_packs_row = HBoxContainer.new()
-	_packs_row.add_theme_constant_override("separation", 16)
-	pcol.add_child(_packs_row)
-	mid.add_child(pcol)
+	_packs_row.add_theme_constant_override("separation", 14)
+	(pcard.get_meta("body") as VBoxContainer).add_child(_packs_row)
+	mid.add_child(pcard)
+	var ccard: PanelContainer = UiKit.section_card(tr("SHOP_CONTRACT"), 0.0, Palette.MAGENTA.darkened(0.3))
+	_contract_row = HBoxContainer.new()
+	(ccard.get_meta("body") as VBoxContainer).add_child(_contract_row)
+	mid.add_child(ccard)
 	_pack_box = VBoxContainer.new()
 	_pack_box.alignment = BoxContainer.ALIGNMENT_CENTER
+	_pack_box.add_theme_constant_override("separation", 12)
 	body.add_child(_pack_box)
-	body.add_child(UiKit.label(tr("SHOP_OWNED"), UiKit.SIZE_BODY, Palette.GOLD))
+	# Collection du joueur.
+	var ocard: PanelContainer = UiKit.section_card("")
+	ocard.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	var obody: VBoxContainer = ocard.get_meta("body") as VBoxContainer
+	_owned_title = UiKit.label("", UiKit.SIZE_SMALL, Palette.GOLD, "display")
+	obody.add_child(_owned_title)
 	_owned = GrigriBar.new()
 	_owned.shop_mode = true
 	_owned.sell_requested.connect(_on_sell)
-	body.add_child(_owned)
+	obody.add_child(_owned)
 	_owned_prompts = PromptBar.new()
-	_owned_prompts.custom_minimum_size = Vector2(panel_width - 80.0, InputGlyphs.PROMPT_H + 4)
+	_owned_prompts.custom_minimum_size = Vector2(OWNED_PROMPTS_W, InputGlyphs.PROMPT_H + 4)
 	_owned_prompts.alignment = BoxContainer.ALIGNMENT_CENTER
-	body.add_child(_owned_prompts)
+	obody.add_child(_owned_prompts)
 	_owned_prompts.set_device_items.call_deferred(OWNED_KEYS, OWNED_PAD)
+	body.add_child(ocard)
+	# Actions.
 	var actions: HBoxContainer = row()
-	_reroll_btn = UiKit.button("", _on_reroll)
+	actions.add_theme_constant_override("separation", 24)
+	_reroll_btn = UiKit.button("", _on_reroll, Vector2(300, 60))
 	actions.add_child(_reroll_btn)
-	var leave: Button = UiKit.button(tr("SHOP_LEAVE"), close)
+	var leave: Button = UiKit.button(tr("SHOP_LEAVE"), close, Vector2(300, 60))
 	actions.add_child(leave)
 	PromptBadge.attach(leave, "pause_menu")
 	_focus_first_offer.call_deferred()
@@ -77,7 +101,6 @@ func build() -> void:
 	_refresh(true)
 
 
-## Paquet ouvert : la sélection va sur le premier choix.
 func _focus_pack() -> void:
 	var f: Control = PadNavigator.first_focusable(_pack_box)
 	if f != null:
@@ -85,6 +108,8 @@ func _focus_pack() -> void:
 
 
 func _focus_first_offer() -> void:
+	if not InputGlyphs.using_pad:
+		return
 	var f: Control = PadNavigator.first_focusable(_offers_row)
 	if f == null:
 		f = PadNavigator.first_focusable(body)
@@ -130,12 +155,20 @@ func _refresh(animate: bool = false) -> void:
 	var packs: Array = r.shop_state.get("packs", [])
 	for j: int in packs.size():
 		var pk: Dictionary = packs[j]
-		var b: Button = UiKit.button(
-			tr("PACK_" + String(pk["kind"]).to_upper()) + "\n%d $" % int(pk["price"]), _on_buy_pack.bind(j), Vector2(180, 144)
-		)
+		var kind_key: String = "PACK_" + String(pk["kind"]).to_upper()
+		var col: VBoxContainer = VBoxContainer.new()
+		col.add_theme_constant_override("separation", 6)
+		var b: Button = UiKit.button(tr(kind_key) + "\n%d $" % int(pk["price"]), _on_buy_pack.bind(j), PACK_BTN)
 		b.disabled = bool(pk["sold"]) or not (r.shop_state.get("open_pack", {}) as Dictionary).is_empty()
-		b.tooltip_text = tr("PACK_" + String(pk["kind"]).to_upper() + "_DESC")
-		_packs_row.add_child(b)
+		col.add_child(b)
+		var desc: Label = UiKit.label(tr(kind_key + "_DESC"), UiKit.SIZE_SMALL, Palette.IVORY.darkened(0.15))
+		desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		desc.custom_minimum_size = Vector2(PACK_DESC_W, 0)
+		desc.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		col.add_child(desc)
+		_packs_row.add_child(col)
+	for c3: Node in _contract_row.get_children():
+		c3.queue_free()
 	var contracts: Array = r.shop_state.get("contracts", [])
 	for k2: int in contracts.size():
 		var co: Dictionary = contracts[k2]
@@ -144,10 +177,11 @@ func _refresh(animate: bool = false) -> void:
 		cc.disabled_look = bool(co["sold"])
 		cc.draggable = false
 		cc.activated.connect(_on_buy_contract)
-		_packs_row.add_child(cc)
+		_contract_row.add_child(cc)
 	_reroll_btn.text = tr("SHOP_REROLL") % int(r.shop_state.get("reroll_cost", 0))
 	_reroll_btn.disabled = r.money < int(r.shop_state.get("reroll_cost", 0))
 	_owned.bind(r)
+	_owned_title.text = tr("SHOP_OWNED").to_upper() + "  %d / %d" % [r.grigris.size(), r.grigri_slots]
 	_refresh_pack()
 	if not refocus.is_empty():
 		_restore_focus.call_deferred(refocus)
@@ -155,7 +189,7 @@ func _refresh(animate: bool = false) -> void:
 
 ## Où était le focus (rangée, index) pour le retrouver après reconstruction des cartes.
 func _focus_path(c: Control) -> Array:
-	for row_node: Control in [_offers_row, _packs_row, _owned]:
+	for row_node: Control in [_offers_row, _packs_row, _contract_row, _owned]:
 		if c != null and row_node.is_ancestor_of(c):
 			return [row_node, c.get_index()]
 	return []
@@ -198,7 +232,7 @@ func _feedback(res: ShopModel.BuyResult, at: Vector2) -> bool:
 
 
 func _on_buy_grigri(card: GrigriCard) -> void:
-	var pos: Vector2 = card.global_position + card.size * 0.5
+	var pos: Vector2 = UiLayout.canvas_point(card, card.size * 0.5)
 	if _feedback(ShopModel.buy_grigri(ctl.run, ctl.db, card.uid), pos):
 		SaveSystem.mark_seen("grigris", card.entry_id)
 		GameState.record_shop("buy", {"rarity": card.rarity(), "id": card.entry_id})
@@ -207,7 +241,7 @@ func _on_buy_grigri(card: GrigriCard) -> void:
 
 
 func _on_buy_contract(card: GrigriCard) -> void:
-	var pos: Vector2 = card.global_position + card.size * 0.5
+	var pos: Vector2 = UiLayout.canvas_point(card, card.size * 0.5)
 	if _feedback(ShopModel.buy_contract(ctl.run, ctl.db, card.uid), pos):
 		SaveSystem.mark_seen("contracts", card.entry_id)
 		_refresh()
@@ -215,7 +249,7 @@ func _on_buy_contract(card: GrigriCard) -> void:
 
 
 func _on_buy_pack(i: int) -> void:
-	if _feedback(ShopModel.buy_pack(ctl.run, ctl.db, i), _packs_row.global_position + Vector2(90, 70)):
+	if _feedback(ShopModel.buy_pack(ctl.run, ctl.db, i), UiLayout.canvas_point(_packs_row, _packs_row.size * 0.5)):
 		AudioBus.play("pack_open")
 		_refresh()
 
@@ -272,7 +306,8 @@ func _dissolve_card(gid: String, center: Vector2) -> void:
 	m.shader = load(DISSOLVE_SHADER) as Shader
 	card.material = m
 	add_child(card)
-	card.global_position = center - GrigriCard.CARD_SIZE * 0.5
+	card.top_level = true
+	card.position = center - GrigriCard.CARD_SIZE * 0.5
 	var tw: Tween = card.create_tween()
 	tw.tween_method(func(v: float) -> void: m.set_shader_parameter("progress", v), 0.0, 1.0, DISSOLVE_TIME / maxf(Settings.speed(), 1.0))
 	tw.tween_callback(card.queue_free)
@@ -305,6 +340,7 @@ func _refresh_pack() -> void:
 				var card: GrigriCard = GrigriCard.new().configure("pocket_card", String(c2["type"]), i)
 				card.edition = StringName(String(c2.get("edition", "")))
 				card.draggable = false
+				card.activated.connect(func(_c: GrigriCard) -> void: _choose(i, "add"))
 				col.add_child(card)
 				var extra: String = "n° %d" % int(c2["number"])
 				if String(c2.get("seal", "")) != "":
@@ -315,11 +351,13 @@ func _refresh_pack() -> void:
 			"fortune":
 				var fc: GrigriCard = GrigriCard.new().configure("fortune", String(c2["fortune"]), i)
 				fc.draggable = false
+				fc.activated.connect(func(_c: GrigriCard) -> void: _choose(i, "add"))
 				col.add_child(fc)
 				col.add_child(UiKit.button(tr("PACK_TAKE"), _choose.bind(i, "add"), Vector2(150, 44)))
 			"occult":
 				var oc: GrigriCard = GrigriCard.new().configure("grigri", String(c2["grigri"]), i)
 				oc.draggable = false
+				oc.activated.connect(func(_c: GrigriCard) -> void: _choose(i, "add"))
 				col.add_child(oc)
 				col.add_child(UiKit.button(tr("PACK_TAKE"), _choose.bind(i, "add"), Vector2(150, 44)))
 		_flip_in(col, i)

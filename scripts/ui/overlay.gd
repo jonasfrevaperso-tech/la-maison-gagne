@@ -77,6 +77,7 @@ func close() -> void:
 func heading(text: String) -> Label:
 	var l: Label = UiKit.title(text, UiKit.SIZE_H1)
 	body.add_child(l)
+	body.add_child(UiKit.divider(minf(panel_width * 0.6, 640.0)))
 	return l
 
 

@@ -21,6 +21,8 @@ const TENSION_LAST_SPIN: float = 0.35
 ## Décalage vertical de la ligne d'aide sous le tapis.
 const HINT_OFFSET_Y: float = 106.0
 const HINT_ALPHA: float = 0.72
+const HUD_STRIP_H: float = 120.0
+const BAR_CAPTION_Y: float = 30.0
 ## États dont l'aide commence par une phrase d'explication.
 const HINT_SENTENCES: Array[String] = ["AIMING", "RETHROW", "TARGETING"]
 
@@ -66,6 +68,8 @@ var _heat: ColorRect = null
 ## Manette : sélection dans la barre de grigris / Fortune (View) au lieu du tapis.
 var _items_mode: bool = false
 var _prompt_bar: PromptBar = null
+var _grigri_caption: Label = null
+var _fortune_caption: Label = null
 ## Commandes (souris, clavier, manette) selon l'état : RunScreenInput.
 var _input_ctl: RunScreenInput = null
 var _bg: DecoBackground = null
@@ -106,7 +110,13 @@ func _build() -> void:
 	_content.add_child(_stage)
 	_fit_stage()
 	resized.connect(_fit_stage)
-	# Barre du haut
+	# Barre du haut, sur un bandeau.
+	var strip: Panel = Panel.new()
+	strip.position = Vector2(MARGIN * 0.4, 6)
+	strip.size = Vector2(UiLayout.DESIGN_SIZE.x - MARGIN * 0.8 - 80.0, HUD_STRIP_H)
+	strip.add_theme_stylebox_override("panel", UiKit.flat(Color(Palette.INK, 0.72), Palette.GOLD_DARK, 2, 10, 0))
+	strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_stage.add_child(strip)
 	var top: HBoxContainer = HBoxContainer.new()
 	top.position = Vector2(MARGIN, MARGIN * 0.6)
 	top.add_theme_constant_override("separation", 26)
@@ -203,10 +213,16 @@ func _build() -> void:
 	grigri_bar.position = Vector2(MARGIN, UiLayout.DESIGN_SIZE.y - GrigriCard.CARD_SIZE.y - MARGIN)
 	grigri_bar.changed.connect(_on_grigris_changed)
 	_stage.add_child(grigri_bar)
+	_grigri_caption = UiKit.label("", UiKit.SIZE_SMALL, Palette.GOLD, "display")
+	_grigri_caption.position = grigri_bar.position - Vector2(0, BAR_CAPTION_Y)
+	_stage.add_child(_grigri_caption)
 	fortune_bar = HBoxContainer.new()
 	fortune_bar.add_theme_constant_override("separation", 10)
 	fortune_bar.position = Vector2(1500, UiLayout.DESIGN_SIZE.y - GrigriCard.CARD_SIZE.y - MARGIN)
 	_stage.add_child(fortune_bar)
+	_fortune_caption = UiKit.label("", UiKit.SIZE_SMALL, Palette.CYAN, "display")
+	_fortune_caption.position = fortune_bar.position - Vector2(0, BAR_CAPTION_Y)
+	_stage.add_child(_fortune_caption)
 	# Couches d'effets
 	float_layer = FloatLayer.new()
 	add_child(float_layer)
@@ -247,7 +263,9 @@ func _refresh_all() -> void:
 	_refresh_creditor()
 	_refresh_history()
 	grigri_bar.bind(r)
+	_grigri_caption.text = tr("SHOP_OWNED").to_upper() + "  %d / %d" % [r.grigris.size(), r.grigri_slots]
 	_refresh_fortunes()
+	_fortune_caption.text = tr("HUD_FORTUNE").to_upper() + "  %d / %d" % [r.fortunes.size(), r.fortune_slots]
 	_refresh_table()
 	_refresh_probabilities()
 	_speed_btn.text = "×%d" % int(Settings.speed())

@@ -186,7 +186,6 @@ SHOP_NO_MONEY,Pas assez d'argent.,Not enough money.
 SHOP_NO_SLOT,Plus de place.,No room left.
 SHOP_ODDS,Probabilités de rareté : %s,Rarity odds: %s
 SHOP_OWNED,Tes grigris,Your charms
-SHOP_PACKS_CONTRACT,Paquets et contrat,Packs and contract
 SHOP_REROLL,Relancer l'étal (%d $),Reroll stall ($%d)
 SHOP_TITLE,Le Bazar du Sous-sol,The Basement Bazaar
 SLOT_EMPTY,Emplacement libre,Empty slot
@@ -421,3 +420,13 @@ ACTION_ITEM_PANEL,Grigris et Fortune,Charms and Fortune
 ACTION_PAUSE_MENU,Pause,Pause
 ACTION_PLAYTEST_NOTE,Note de test,Playtest note
 OPT_TEXT_SCALE_DESC,S'applique en quittant les options.,Applies when you leave the options.
+SHOP_PACKS,Paquets,Packs
+SHOP_CONTRACT,Contrat,Contract
+SUMMARY_T_DEADLINES,Échéances remboursées,Deadlines repaid
+SUMMARY_T_TIER,Palier atteint,Tier reached
+SUMMARY_T_SPINS,Tours joués,Spins played
+SUMMARY_T_BEST,Meilleur tour,Best spin
+SUMMARY_T_ZEROS,Zéros,Zeros
+SUMMARY_T_TIME,Durée,Time
+SUMMARY_BUILD,Ton build,Your build
+HUD_FORTUNE,Fortune,Fortune

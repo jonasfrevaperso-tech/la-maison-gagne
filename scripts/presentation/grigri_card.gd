@@ -75,7 +75,7 @@ func _on_focus_out() -> void:
 
 
 func _show_focus_tip() -> void:
-	if not has_focus() or _focus_tip != null:
+	if not has_focus() or _focus_tip != null or not InputGlyphs.using_pad:
 		return
 	_focus_tip = CardTooltip.build(kind, entry_id, edition, counter, price)
 	_focus_tip.top_level = true

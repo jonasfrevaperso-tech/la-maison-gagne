@@ -18,6 +18,8 @@ const RADIUS: int = 6
 const BORDER: int = 2
 const PAD: int = 14
 const BUTTON_MIN: Vector2 = Vector2(260, 56)
+const HOVER_GROW: float = 0.04
+const HOVER_TIME: float = 0.1
 const WEIGHTS: Dictionary = {"ui": 600, "mono": 600}
 
 static var _fonts: Dictionary[String, Font] = {}
@@ -145,7 +147,75 @@ static func button(text: String, callback: Callable, min_size: Vector2 = BUTTON_
 	b.pressed.connect(callback)
 	b.pressed.connect(AudioBus.ui.bind("click"))
 	b.mouse_entered.connect(AudioBus.ui.bind("hover"))
+	b.focus_entered.connect(_on_button_focus.bind(b))
+	b.pressed.connect(_press_bounce.bind(b))
+	b.mouse_entered.connect(_hover_scale.bind(b, true))
+	b.mouse_exited.connect(_hover_scale.bind(b, false))
+	b.focus_exited.connect(_hover_scale.bind(b, false))
+	b.resized.connect(func() -> void: b.pivot_offset = b.size * 0.5)
 	return b
+
+
+## Survol / sélection : le bouton grossit légèrement (jus modulé par JuiceProfile).
+static func _hover_scale(b: Button, on: bool) -> void:
+	if not is_instance_valid(b) or b.disabled:
+		return
+	var k: float = 1.0 + HOVER_GROW * JuiceProfile.intensity() if on else 1.0
+	b.create_tween().tween_property(b, "scale", Vector2(k, k), HOVER_TIME).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+
+static func _on_button_focus(b: Button) -> void:
+	if InputGlyphs.using_pad:
+		AudioBus.ui("hover")
+	_hover_scale(b, true)
+
+
+## Appui : petit rebond.
+static func _press_bounce(b: Button) -> void:
+	if not is_instance_valid(b):
+		return
+	var j: float = JuiceProfile.intensity()
+	var tw: Tween = b.create_tween()
+	tw.tween_property(b, "scale", Vector2.ONE * (1.0 - 0.06 * j), 0.05)
+	tw.tween_property(b, "scale", Vector2.ONE * (1.0 + HOVER_GROW * j), 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+
+## Séparateur art déco.
+static func divider(width: float = 600.0, color: Color = Palette.GOLD) -> DecoDivider:
+	return DecoDivider.new(width, color)
+
+
+## Tuile de statistique : grande valeur, libellé en dessous.
+static func stat_tile(caption: String, value: String, color: Color = Palette.GOLD_LIGHT, width: float = 220.0) -> PanelContainer:
+	var p: PanelContainer = PanelContainer.new()
+	p.add_theme_stylebox_override("panel", flat(Color(Palette.INK, 0.85), Palette.GOLD_DARK, 2, RADIUS, 12))
+	p.custom_minimum_size = Vector2(width, 0)
+	var v: VBoxContainer = VBoxContainer.new()
+	v.add_theme_constant_override("separation", 2)
+	p.add_child(v)
+	var val: Label = label(value, SIZE_H2, color, "mono")
+	val.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	v.add_child(val)
+	var cap: Label = label(caption, SIZE_SMALL, Palette.IVORY.darkened(0.15))
+	cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	cap.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	v.add_child(cap)
+	return p
+
+
+## Carte de section : cadre, titre doré, contenu (VBox renvoyée via `get_meta("body")`).
+static func section_card(title_text: String, min_width: float = 0.0, accent: Color = Palette.GOLD_DARK) -> PanelContainer:
+	var p: PanelContainer = PanelContainer.new()
+	p.add_theme_stylebox_override("panel", flat(Color(Palette.INK, 0.7), accent, 2, RADIUS, 16))
+	p.custom_minimum_size = Vector2(min_width, 0)
+	var v: VBoxContainer = VBoxContainer.new()
+	v.add_theme_constant_override("separation", 10)
+	p.add_child(v)
+	if title_text != "":
+		var t: Label = label(title_text.to_upper(), SIZE_SMALL, Palette.GOLD, "display")
+		v.add_child(t)
+	p.set_meta("body", v)
+	return p
 
 
 static func panel(bg: Color = Palette.VELVET_DEEP, border: Color = Palette.GOLD_DARK) -> PanelContainer:

@@ -45,13 +45,13 @@ const PAD_AXIS_GLYPH: Dictionary[int, String] = {
 }
 ## Repères qui ne sont pas des actions : souris côté clavier, croix/sticks côté manette.
 ## Touches nommées dans les repères (« #KEY_SHIFT »).
-const NAMED_KEYS: Dictionary[String, Key] = {"KEY_SHIFT": KEY_SHIFT, "KEY_UP": KEY_UP, "KEY_ARROWS": KEY_LEFT}
+const NAMED_KEYS: Dictionary[String, Key] = {"KEY_SHIFT": KEY_SHIFT, "KEY_UP": KEY_UP}
 const MARKERS_KEYS: Dictionary[String, Array] = {
 	"@click": ["mouse_left"],
 	"@shift_click": ["#KEY_SHIFT", "mouse_left"],
 	"@right_click": ["mouse_right"],
 	"@double_click": ["mouse_left", "mouse_left"],
-	"@drag": ["mouse_left", "#KEY_ARROWS"],
+	"@drag": ["mouse_left"],
 	"@wheel": ["mouse_wheel"],
 	"@arrows": ["#KEY_UP"],
 }
