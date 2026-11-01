@@ -82,6 +82,18 @@ func bump() -> void:
 	tw.parallel().tween_property(self, "rotation", 0.0, 0.18).from(0.08 * JuiceProfile.intensity())
 
 
+const EDITION_SHADER: String = "res://shaders/edition.gdshader"
+const EDITION_MODES: Dictionary = {"brillante": 0, "holo": 1, "polychrome": 2, "noire": 3}
+
+
+func _enter_tree() -> void:
+	if edition != &"" and EDITION_MODES.has(String(edition)) and JuiceProfile.intensity() > 0.0:
+		var m: ShaderMaterial = ShaderMaterial.new()
+		m.shader = load(EDITION_SHADER) as Shader
+		m.set_shader_parameter("mode", int(EDITION_MODES[String(edition)]))
+		material = m
+
+
 func _process(delta: float) -> void:
 	var target_tilt: Vector2 = Vector2.ZERO
 	if _hover and JuiceProfile.intensity() > 0.0:

@@ -3,8 +3,8 @@
 > Reprise après coupure : lire ce fichier, `CLAUDE.md`, puis `docs/DECISIONS.md`. Lancer `tools/check.sh`.
 
 ## État courant
-- Phase en cours : **Phase 9 — Direction artistique finale**
-- Dernier tag : `phase-08-tutorial`
+- Phase en cours : **Phase 10 — Audio**
+- Dernier tag : `phase-09-art`
 
 ## Phase 0 — Reconnaissance ✅
 - Environnement : Godot 4.7.2 (MCP godot OK), Blender 5.2.2, Python 3.14 + numpy 2.4 + Pillow 12, uv, gdtoolkit 4 (installé via uv), git 2.53, 12 cœurs.
@@ -61,6 +61,10 @@
 ## Phase 8 — Tutoriel ✅
 - Fait : `TutorialDirector` piloté par `data/events/tutorial.json` (14 bulles : objectif, mises, paris intérieurs, budget, lancer, visée, rebond fou, score, historique, boutique, grigris, Fortune, créancier, pacte), ancrées sur l'élément concerné, non bloquantes, « Couper les conseils », rejouables (Options → Rejouer le tutoriel) ; premier run guidé (dettes de l'Acte I ×0,85) ; l'ancienne fenêtre d'aide unique est supprimée.
 - Testé : capture sur profil vierge, `check.sh` vert.
+
+## Phase 9 — Direction artistique finale ✅
+- Fait : 24 portraits pixel art 128×128 animés (repos, clignement, parole ×2) par `tools/gen_portraits.py` ; props 3D low-poly modélisés et rendus dans Blender en CLI (`tools/blender/render_props.py` : roue 3/4 pour l'écran titre, jetons 4 couleurs, bille) ; 235 icônes ; shaders : CRT, bloom, éditions (brillante/holo/polychrome/noire), dissolution en braises (vente), distorsion de chaleur (Pyromane, La Maison phase 3, défi Brasier) ; icônes de type sur la roue ; menu titre resserré.
+- Limite : la config OCIO de Blender (Fedora) est incompatible avec la lib installée → pas de tone mapping, éclairage compensé à la main.
 
 ## Rapport de phase
 Format : fait / testé / reste à faire / risques.

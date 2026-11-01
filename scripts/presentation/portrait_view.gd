@@ -7,6 +7,10 @@ const SIZE_PX: float = 256.0
 const FRAME_SIZE: int = 128
 const FPS: float = 6.0
 const BLINK_EVERY: float = 3.2
+const BLINK_TIME: float = 0.15
+const BLINK_FRAME: int = 1
+const TALK_FRAME_A: int = 2
+const TALK_FRAME_B: int = 3
 
 var portrait_id: String = ""
 var accent: Color = Palette.GOLD
@@ -38,9 +42,11 @@ func _draw() -> void:
 	var r: Rect2 = Rect2(Vector2.ZERO, Vector2(SIZE_PX, SIZE_PX))
 	draw_rect(r, Palette.VELVET_DEEP)
 	if _tex != null:
-		var frame: int = int(_t * FPS) % _frames
-		if not talking and _frames > 1:
-			frame = 0 if fmod(_t, BLINK_EVERY) > 0.15 else mini(1, _frames - 1)
+		var frame: int = 0
+		if talking and _frames >= TALK_FRAME_B + 1:
+			frame = TALK_FRAME_A + int(_t * FPS) % 2
+		elif _frames > BLINK_FRAME and fmod(_t, BLINK_EVERY) < BLINK_TIME:
+			frame = BLINK_FRAME
 		draw_texture_rect_region(_tex, r, Rect2(float(frame * FRAME_SIZE), 0.0, float(FRAME_SIZE), float(FRAME_SIZE)))
 	else:
 		var breathe: float = sin(_t * 2.0) * 3.0

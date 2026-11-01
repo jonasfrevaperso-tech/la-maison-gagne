@@ -327,8 +327,12 @@ func _draw() -> void:
 			tc.a = 0.35 * (1.0 - float(t) / float(TRAIL_LENGTH)) * JuiceProfile.intensity()
 			draw_circle(_trail[t], r * BALL_RADIUS_RATIO * (1.0 - float(t) / float(TRAIL_LENGTH)), tc)
 		draw_circle(bp + Vector2(2, 3), r * BALL_RADIUS_RATIO, Color(0, 0, 0, 0.5))
-		draw_circle(bp, r * BALL_RADIUS_RATIO, Palette.IVORY)
-		draw_circle(bp + Vector2(-2, -2), r * BALL_RADIUS_RATIO * 0.4, Color.WHITE)
+		var btex: Texture2D = IconLibrary.sprite("ball")
+		var br: float = r * BALL_RADIUS_RATIO * 1.15
+		if btex != null:
+			draw_texture_rect(btex, Rect2(bp - Vector2(br, br), Vector2(br, br) * 2.0), false)
+		else:
+			draw_circle(bp, r * BALL_RADIUS_RATIO, Palette.IVORY)
 
 
 func _draw_number(i: int, p: Pocket, r: float) -> void:

@@ -13,6 +13,7 @@ const COLUMN_W_RATIO: float = 1.0
 const OUTSIDE_H_RATIO: float = 0.75
 const CHIP_RADIUS_RATIO: float = 0.27
 const SHIFT_AMOUNT: int = 5
+const CHIP_SPRITE: String = "chip_magenta"
 const EVEN_ORDER: Array[String] = ["low", "even", "red", "black", "odd", "high"]
 
 var slip: BetSlip = null
@@ -284,11 +285,15 @@ func _text_center(f: Font, t: String, c: Vector2, fs: int, col: Color) -> void:
 func _draw_chip(p: Vector2, count: int) -> void:
 	var rad: float = minf(_cw, _ch) * CHIP_RADIUS_RATIO
 	var stack: int = mini(count, 5)
+	var tex: Texture2D = IconLibrary.sprite(CHIP_SPRITE)
 	for k: int in stack:
 		var o: Vector2 = Vector2(0, -float(k) * 3.0)
 		draw_circle(p + o + Vector2(2, 3), rad, Color(0, 0, 0, 0.45))
-		draw_circle(p + o, rad, Palette.MAGENTA)
-		draw_arc(p + o, rad * 0.72, 0.0, TAU, 24, Palette.IVORY, 2.0, true)
+		if tex != null:
+			draw_texture_rect(tex, Rect2(p + o - Vector2(rad, rad), Vector2(rad, rad) * 2.0), false)
+		else:
+			draw_circle(p + o, rad, Palette.MAGENTA)
+			draw_arc(p + o, rad * 0.72, 0.0, TAU, 24, Palette.IVORY, 2.0, true)
 	var f: Font = UiKit.font("mono")
 	var fs: int = int(rad * 1.0)
 	var t: String = str(count)

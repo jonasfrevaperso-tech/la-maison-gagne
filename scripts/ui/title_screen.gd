@@ -3,6 +3,11 @@ extends Control
 ## Écran titre. Mention obligatoire : jeu de hasard simulé, monnaie fictive.
 
 const MENU_WIDTH: float = 420.0
+const MENU_BUTTON: Vector2 = Vector2(420, 46)
+const MENU_GAP: int = 6
+const HERO_SIZE: float = 900.0
+const HERO_POS: Vector2 = Vector2(1180, 260)
+const HERO_ALPHA: float = 0.55
 
 
 func setup(_params: Dictionary) -> void:
@@ -13,6 +18,20 @@ func _ready() -> void:
 	theme = UiKit.theme()
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(DecoBackground.new())
+	var hero_tex: Texture2D = IconLibrary.sprite("title_wheel")
+	if hero_tex != null:
+		var hero: TextureRect = TextureRect.new()
+		hero.texture = hero_tex
+		hero.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		hero.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		hero.size = Vector2(HERO_SIZE, HERO_SIZE)
+		hero.position = HERO_POS
+		hero.modulate = Color(1, 1, 1, HERO_ALPHA)
+		hero.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(hero)
+		var tw: Tween = hero.create_tween().set_loops()
+		tw.tween_property(hero, "position:y", HERO_POS.y - 14.0, 3.0).set_trans(Tween.TRANS_SINE)
+		tw.tween_property(hero, "position:y", HERO_POS.y, 3.0).set_trans(Tween.TRANS_SINE)
 	var center: VBoxContainer = VBoxContainer.new()
 	center.set_anchors_preset(Control.PRESET_CENTER)
 	center.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -25,23 +44,23 @@ func _ready() -> void:
 	var sub: Label = UiKit.label(tr("GAME_TAGLINE"), UiKit.SIZE_H2, Palette.MAGENTA, "display")
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	center.add_child(sub)
-	center.add_child(UiKit.spacer(30))
+	center.add_child(UiKit.spacer(14))
 	var menu: VBoxContainer = VBoxContainer.new()
 	menu.custom_minimum_size = Vector2(MENU_WIDTH, 0)
 	menu.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	menu.add_theme_constant_override("separation", 10)
+	menu.add_theme_constant_override("separation", MENU_GAP)
 	center.add_child(menu)
 	var first: Button = null
 	if SaveSystem.has_run():
-		first = UiKit.button(tr("MENU_CONTINUE"), _on_continue)
+		first = UiKit.button(tr("MENU_CONTINUE"), _on_continue, MENU_BUTTON)
 		menu.add_child(first)
-	var new_btn: Button = UiKit.button(tr("MENU_NEW_RUN"), _on_new)
+	var new_btn: Button = UiKit.button(tr("MENU_NEW_RUN"), _on_new, MENU_BUTTON)
 	menu.add_child(new_btn)
 	if first == null:
 		first = new_btn
 	for entry: Array in _extra_entries():
-		menu.add_child(UiKit.button(tr(String(entry[0])), entry[1] as Callable))
-	menu.add_child(UiKit.button(tr("MENU_QUIT"), _on_quit))
+		menu.add_child(UiKit.button(tr(String(entry[0])), entry[1] as Callable, MENU_BUTTON))
+	menu.add_child(UiKit.button(tr("MENU_QUIT"), _on_quit, MENU_BUTTON))
 	first.call_deferred("grab_focus")
 	var disclaimer: Label = UiKit.label(tr("DISCLAIMER_SIMULATED"), UiKit.SIZE_SMALL, Palette.SMOKE)
 	disclaimer.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)

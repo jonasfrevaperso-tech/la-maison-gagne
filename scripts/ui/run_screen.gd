@@ -12,6 +12,7 @@ const MARGIN: float = 28.0
 const HISTORY_SHOWN: int = 14
 const SHAKE_DECAY: float = 7.0
 const FLASH_DECAY: float = 3.0
+const HEAT_SHADER: String = "res://shaders/heat.gdshader"
 
 var ctl: RunController = null
 var state: UiState = UiState.BETTING
@@ -49,6 +50,7 @@ var _pending_outcome: RunController.SpinOutcome = null
 var _target_fortune_slot: int = -1
 var _overlay_queue: Array[Control] = []
 var _victory_reward: Dictionary = {}
+var _heat: ColorRect = null
 
 
 func setup(_params: Dictionary) -> void:
@@ -244,7 +246,26 @@ func _refresh_probabilities() -> void:
 	wheel_view.zone_width = ThrowResolver.zone_width_for(ctl.effective_precision(), int(r.flags.get("zone_width_override", 0)))
 
 
+func _refresh_heat() -> void:
+	var r: RunState = ctl.run
+	var hot: bool = r.is_creditor() and (r.creditor_id == "cr_pyromane" or (r.creditor_id == "cr_la_maison" and r.creditor_phase >= 2))
+	hot = hot or r.challenge_id == "ch_blaze"
+	if hot and _heat == null and JuiceProfile.intensity() > 0.0 and not Settings.b("juice", "reduced_motion"):
+		_heat = ColorRect.new()
+		_heat.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		_heat.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var m: ShaderMaterial = ShaderMaterial.new()
+		m.shader = load(HEAT_SHADER) as Shader
+		_heat.material = m
+		add_child(_heat)
+		move_child(_heat, 1)
+	elif not hot and _heat != null:
+		_heat.queue_free()
+		_heat = null
+
+
 func _refresh_creditor() -> void:
+	_refresh_heat()
 	var r: RunState = ctl.run
 	if r.creditor_id == "" or not r.is_creditor():
 		_creditor_label.text = ""

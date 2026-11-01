@@ -4,6 +4,8 @@ extends Overlay
 
 const FLIP_TIME: float = 0.25
 const FLIP_STAGGER: float = 0.08
+const DISSOLVE_SHADER: String = "res://shaders/dissolve.gdshader"
+const DISSOLVE_TIME: float = 0.7
 
 var ctl: RunController = null
 var _money: Label = null
@@ -189,13 +191,32 @@ func _on_sell(g_uid: int) -> void:
 
 
 func _do_sell(g_uid: int, pos: Vector2) -> void:
+	var ghost_id: String = ctl.run.grigri_by_uid(g_uid).id if ctl.run.grigri_by_uid(g_uid) != null else ""
 	var got: int = ShopModel.sell_grigri(ctl.run, ctl.db, g_uid)
 	if got > 0:
+		_dissolve_card(ghost_id, pos)
 		AudioBus.play("sell")
 		_float.burst("coins", pos, 26)
 		_float.pop_text("+%d $" % got, pos, Palette.GOLD_LIGHT)
 		_refresh()
 		GameState.autosave()
+
+
+## Carte fantôme qui se consume en braises à l'endroit de la vente.
+func _dissolve_card(gid: String, center: Vector2) -> void:
+	if gid == "" or JuiceProfile.intensity() <= 0.0:
+		return
+	var card: GrigriCard = GrigriCard.new().configure("grigri", gid)
+	card.draggable = false
+	card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var m: ShaderMaterial = ShaderMaterial.new()
+	m.shader = load(DISSOLVE_SHADER) as Shader
+	card.material = m
+	add_child(card)
+	card.global_position = center - GrigriCard.CARD_SIZE * 0.5
+	var tw: Tween = card.create_tween()
+	tw.tween_method(func(v: float) -> void: m.set_shader_parameter("progress", v), 0.0, 1.0, DISSOLVE_TIME / maxf(Settings.speed(), 1.0))
+	tw.tween_callback(card.queue_free)
 
 
 # --------------------------------------------------------------------------- paquet ouvert

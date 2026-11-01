@@ -5,6 +5,7 @@ extends RefCounted
 
 const DIR: String = "res://assets/icons/"
 const PORTRAIT_DIR: String = "res://assets/portraits/"
+const SPRITE_DIR: String = "res://assets/sprites/"
 
 static var _cache: Dictionary[String, Texture2D] = {}
 static var _missing: Dictionary[String, bool] = {}
@@ -12,6 +13,10 @@ static var _missing: Dictionary[String, bool] = {}
 
 static func icon(icon_id: String) -> Texture2D:
 	return _load(DIR + icon_id + ".png")
+
+
+static func sprite(sprite_id: String) -> Texture2D:
+	return _load(SPRITE_DIR + sprite_id + ".png")
 
 
 static func portrait(portrait_id: String) -> Texture2D:
