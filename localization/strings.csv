@@ -96,13 +96,10 @@ FX_POCKET_DESTROYED,Case détruite,Pocket destroyed
 FX_ZERO_PROTECTED,Zéro paré !,Zero blocked!
 FX_DEBT,Dette ajustée,Debt adjusted
 FX_BURN,Brûlée !,Burnt!
-HINT_BETTING,"Clic : +1 jeton (Maj : +5) · clic droit : −1 · bords et coins : chevaux, carrés · Espace : lancer · Manette : croix = curseur, A = miser, LB/RB = chevaux/carrés, Start = lancer","Click: +1 chip (Shift: +5) · right-click: −1 · edges/corners: splits, corners · Space: spin · Pad: d-pad = cursor, A = bet, LB/RB = splits/corners, Start = spin"
-HINT_AIMING,La roue tourne sous l'aiguille : relâche quand ta zone est en face (Espace).,The wheel turns under the needle: release when your zone lines up (Space).
-HINT_BALL,La bille court… (Entrée : passer),The ball is running… (Enter: skip)
+HINT_AIMING,Relâche quand ta zone passe sous l'aiguille.,Release when your zone passes under the needle.
 HINT_RETHROW,Relance gratuite disponible : relancer ou garder ce résultat ?,Free re-throw available: re-throw or keep this result?
-HINT_SCORING,Calcul du score… (Entrée : passer),Scoring… (Enter: skip)
 HINT_OVERLAY,…,…
-HINT_TARGETING,Choisis une case sur la roue (Échap : annuler).,Pick a pocket on the wheel (Esc: cancel).
+HINT_TARGETING,Choisis une case sur la roue.,Pick a pocket on the wheel.
 HISTORY_TIP,Numéro %d · score %s · paris gagnés : %d,Number %d · score %s · bets won: %d
 HUD_BANNED,interdit : %s,banned: %s
 HUD_BUDGET,Mises %d / %d,Bets %d / %d
@@ -117,7 +114,6 @@ OPT_COLORBLIND,Mode daltonien,Colour-blind mode
 OPT_CONFIRM,Confirmer les actions irréversibles,Confirm irreversible actions
 OPT_CRT,Effet CRT,CRT effect
 OPT_FLASHES,Flashs lumineux,Light flashes
-OPT_FULLSCREEN,Plein écran,Fullscreen
 OPT_HIGH_CONTRAST,Contraste élevé,High contrast
 OPT_JUICE,Intensité du jus,Juice intensity
 OPT_LOCALE,Langue,Language
@@ -336,3 +332,28 @@ SUB_DESTROY,verre qui se brise,glass shattering
 ACTION_BET_PLACE,Miser sous le curseur,Bet under cursor
 ACTION_BET_CYCLE_PREV,Pari intérieur précédent,Previous inside bet
 ACTION_BET_CYCLE_NEXT,Pari intérieur suivant,Next inside bet
+CONFIRM_NEW_OVER_SAVE,Un run est en cours. L'abandonner pour en commencer un nouveau ?,A run is in progress. Abandon it and start a new one?
+HINT_PAIR,%s : %s,%s: %s
+HINT_K_ADD,+1 jeton,+1 chip
+HINT_K_ADD5,+5 jetons,+5 chips
+HINT_K_REMOVE,−1 jeton,−1 chip
+HINT_K_CURSOR,curseur,cursor
+HINT_K_INSIDE,chevaux/carrés,splits/corners
+HINT_K_SKIP,passer,skip
+HINT_K_SPEED,vitesse,speed
+BTN_CANCEL_TARGET,annuler,cancel
+HINT_INPUT_CLICK,Clic,Click
+HINT_INPUT_SHIFT_CLICK,Maj+clic,Shift+click
+HINT_INPUT_RIGHT_CLICK,Clic droit,Right-click
+HINT_INPUT_DPAD,Croix/stick,D-pad/stick
+KEYNAME_SPACE,Espace,Space
+KEYNAME_ENTER,Entrée,Enter
+KEYNAME_ESCAPE,Échap,Esc
+KEYNAME_SHIFT,Maj,Shift
+OPT_WINDOW_MODE,Mode d'affichage,Display mode
+OPT_WM_WINDOWED,Fenêtré,Windowed
+OPT_WM_FULLSCREEN,Plein écran,Fullscreen
+OPT_WM_EXCLUSIVE,Plein écran exclusif,Exclusive fullscreen
+OPT_WINDOW_SIZE,Taille de la fenêtre,Window size
+OPT_FPS_CAP,Images par seconde (limite),Frame rate cap
+OPT_FPS_UNLIMITED,Illimitée,Unlimited

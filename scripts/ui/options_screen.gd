@@ -121,7 +121,15 @@ func _audio_tab() -> void:
 
 func _video_tab() -> void:
 	var b: VBoxContainer = _tab("OPT_TAB_VIDEO")
-	_check(b, "OPT_FULLSCREEN", "video", "fullscreen")
+	_choice(b, "OPT_WINDOW_MODE", "video", "window_mode", Settings.WINDOW_MODES, ["OPT_WM_WINDOWED", "OPT_WM_FULLSCREEN", "OPT_WM_EXCLUSIVE"])
+	var sizes: Array = []
+	var size_labels: Array = []
+	var usable: Vector2i = DisplayServer.screen_get_usable_rect(DisplayServer.window_get_current_screen()).size
+	for r: Vector2i in UiLayout.window_sizes_for(usable):
+		sizes.append("%dx%d" % [r.x, r.y])
+		size_labels.append("%d × %d" % [r.x, r.y])
+	_choice(b, "OPT_WINDOW_SIZE", "video", "window_size", sizes, size_labels)
+	_choice(b, "OPT_FPS_CAP", "video", "fps_cap", [0, 30, 60, 90, 120, 144], ["OPT_FPS_UNLIMITED", "30", "60", "90", "120", "144"])
 	_check(b, "OPT_VSYNC", "video", "vsync")
 	_slider(b, "OPT_CRT", "video", "crt", 0.0, 1.0, 0.05)
 	_slider(b, "OPT_BLOOM", "video", "bloom", 0.0, 1.0, 0.05)

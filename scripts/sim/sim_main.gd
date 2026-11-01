@@ -1,7 +1,7 @@
 extends SceneTree
 ## Simulateur headless : joue N runs avec un bot et exporte des CSV + docs/BALANCE.md.
 ## Usage : godot --headless --path . -s res://scripts/sim/sim_main.gd -- --runs=500 --bot=greedy
-##         [--character=lea|all] [--risk=0] [--seed=1] [--out=user://sim] [--quiet] [--report]
+##         [--character=lea|all] [--risk=0] [--seed=1] [--out=user://dev/sim] [--quiet] [--report]
 
 const SECONDS_PER_SPIN: float = 20.0
 const SECONDS_PER_SHOP: float = 35.0
@@ -9,7 +9,7 @@ const MAX_SPINS_PER_RUN: int = 400
 const MIN_OFFERS: int = 8
 
 var opts: Dictionary = {
-	"runs": "100", "bot": "greedy", "character": "all", "risk": "0", "seed": "1", "out": "user://sim", "quiet": "false", "report": "false"
+	"runs": "100", "bot": "greedy", "character": "all", "risk": "0", "seed": "1", "out": "user://dev/sim", "quiet": "false", "report": "false"
 }
 
 

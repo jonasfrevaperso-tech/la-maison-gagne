@@ -2,13 +2,14 @@ extends TestCase
 ## Sauvegardes : écriture atomique, copie de secours, corruption, migration de profil.
 
 const SAVE_SCRIPT: String = "res://scripts/autoload/save_system.gd"
-const PATH: String = "user://test_save.json"
+const PATH: String = "user://dev/test_save.json"
 
 var ss: GDScript = null
 
 
 func before_each() -> void:
 	ss = load(SAVE_SCRIPT) as GDScript
+	DirAccess.make_dir_recursive_absolute(PATH.get_base_dir())
 	for p: String in [PATH, PATH + ".bak", PATH + ".tmp"]:
 		if FileAccess.file_exists(p):
 			DirAccess.remove_absolute(p)

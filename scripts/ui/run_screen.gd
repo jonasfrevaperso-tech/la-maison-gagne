@@ -18,6 +18,11 @@ const BG_TINT_BASE: float = 0.12
 const BG_TINT_PER_PHASE: float = 0.1
 const TENSION_CREDITOR: float = 0.35
 const TENSION_LAST_SPIN: float = 0.35
+## Décalage vertical de la ligne d'aide sous le tapis.
+const HINT_OFFSET_Y: float = 106.0
+const HINT_ALPHA: float = 0.72
+## États dont l'aide commence par une phrase d'explication.
+const HINT_SENTENCES: Array[String] = ["AIMING", "RETHROW", "TARGETING", "OVERLAY"]
 
 var ctl: RunController = null
 var state: UiState = UiState.BETTING
@@ -34,6 +39,8 @@ var overlay_root: Control = null
 var tutorial: TutorialDirector = null
 
 var _content: Control = null
+## Scène de référence 1920×1080, centrée et mise à l'échelle (cf. UiLayout).
+var _stage: Control = null
 var _title_label: Label = null
 var _info_label: RichTextLabel = null
 var _money_label: Label = null
@@ -71,6 +78,7 @@ func _ready() -> void:
 	EventBus.juice_shake.connect(_on_shake)
 	EventBus.juice_flash.connect(_on_flash)
 	EventBus.juice_hitstop.connect(_on_hitstop)
+	EventBus.input_device_changed.connect(func(_pad: bool) -> void: _refresh_hint())
 	AudioBus.play_ambience("ambience_casino")
 	_enter_phase()
 
@@ -86,11 +94,16 @@ func _build() -> void:
 	_content.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_content.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_content)
+	_stage = Control.new()
+	_stage.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_content.add_child(_stage)
+	_fit_stage()
+	get_viewport().size_changed.connect(_fit_stage)
 	# Barre du haut
 	var top: HBoxContainer = HBoxContainer.new()
 	top.position = Vector2(MARGIN, MARGIN * 0.6)
 	top.add_theme_constant_override("separation", 26)
-	_content.add_child(top)
+	_stage.add_child(top)
 	_title_label = UiKit.label("", UiKit.SIZE_H2, Palette.GOLD_LIGHT, "display")
 	top.add_child(_title_label)
 	debt_gauge = DebtGauge.new()
@@ -102,11 +115,11 @@ func _build() -> void:
 	_info_label = UiKit.rich("", UiKit.SIZE_BODY - 2)
 	_info_label.position = Vector2(MARGIN, 92)
 	_info_label.custom_minimum_size = Vector2(760, 0)
-	_content.add_child(_info_label)
+	_stage.add_child(_info_label)
 	_creditor_label = UiKit.rich("", UiKit.SIZE_BODY - 2)
 	_creditor_label.position = Vector2(820, 92)
 	_creditor_label.custom_minimum_size = Vector2(1060, 0)
-	_content.add_child(_creditor_label)
+	_stage.add_child(_creditor_label)
 	# Roue
 	wheel_view = WheelView.new()
 	wheel_view.position = Vector2(MARGIN, 150)
@@ -114,27 +127,27 @@ func _build() -> void:
 	wheel_view.setup(ctl.run.wheel, ctl.db)
 	wheel_view.ball_settled.connect(_on_ball_settled)
 	wheel_view.pocket_clicked.connect(_on_pocket_clicked)
-	_content.add_child(wheel_view)
+	_stage.add_child(wheel_view)
 	_history_box = HBoxContainer.new()
 	_history_box.position = Vector2(MARGIN, 150 + WHEEL_SIZE.y + 6)
 	_history_box.add_theme_constant_override("separation", 4)
-	_content.add_child(_history_box)
+	_stage.add_child(_history_box)
 	# Score
 	score_panel = ScorePanel.new()
 	score_panel.position = Vector2(1000, 140)
-	_content.add_child(score_panel)
+	_stage.add_child(score_panel)
 	# Tapis
 	table_view = TableView.new()
 	table_view.position = Vector2(840, 360)
 	table_view.size = TABLE_SIZE
 	table_view.spot_changed.connect(_on_spot_changed)
 	table_view.spot_hovered.connect(_on_spot_hovered)
-	_content.add_child(table_view)
+	_stage.add_child(table_view)
 	# Actions
 	var actions: HBoxContainer = HBoxContainer.new()
 	actions.position = Vector2(840, 360 + TABLE_SIZE.y + 22)
 	actions.add_theme_constant_override("separation", 10)
-	_content.add_child(actions)
+	_stage.add_child(actions)
 	var small: Vector2 = Vector2(150, 54)
 	_undo_btn = UiKit.button(tr("BTN_UNDO"), _on_undo, small)
 	_repeat_btn = UiKit.button(tr("BTN_REPEAT"), _on_repeat, small)
@@ -147,24 +160,26 @@ func _build() -> void:
 	for b: Button in [_undo_btn, _repeat_btn, _clear_btn, _speed_btn, _spin_btn, _rethrow_btn, _keep_btn]:
 		actions.add_child(b)
 	var menu_btn: Button = UiKit.button("☰", _on_menu, Vector2(64, 54))
-	menu_btn.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	menu_btn.position = Vector2(-MARGIN - 64, MARGIN * 0.5)
-	add_child(menu_btn)
-	_hint_label = UiKit.label("", UiKit.SIZE_SMALL, Palette.SMOKE)
-	_hint_label.position = Vector2(840, 360 + TABLE_SIZE.y + 100)
-	_hint_label.custom_minimum_size = Vector2(TABLE_SIZE.x, 0)
+	menu_btn.position = Vector2(UiLayout.DESIGN_SIZE.x - MARGIN - 64, MARGIN * 0.5)
+	_stage.add_child(menu_btn)
+	# Aide aux commandes : une seule ligne, tronquée proprement si la place manque.
+	_hint_label = UiKit.label("", UiKit.SIZE_SMALL, Palette.IVORY)
+	_hint_label.modulate.a = HINT_ALPHA
+	_hint_label.position = Vector2(840, 360 + TABLE_SIZE.y + HINT_OFFSET_Y)
 	_hint_label.size = Vector2(TABLE_SIZE.x, 0)
-	_hint_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_content.add_child(_hint_label)
+	_hint_label.clip_text = true
+	_hint_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_hint_label.mouse_filter = Control.MOUSE_FILTER_PASS
+	_stage.add_child(_hint_label)
 	# Grigris et Fortune
 	grigri_bar = GrigriBar.new()
-	grigri_bar.position = Vector2(MARGIN, 1080 - GrigriCard.CARD_SIZE.y - MARGIN)
+	grigri_bar.position = Vector2(MARGIN, UiLayout.DESIGN_SIZE.y - GrigriCard.CARD_SIZE.y - MARGIN)
 	grigri_bar.changed.connect(_on_grigris_changed)
-	_content.add_child(grigri_bar)
+	_stage.add_child(grigri_bar)
 	fortune_bar = HBoxContainer.new()
 	fortune_bar.add_theme_constant_override("separation", 10)
-	fortune_bar.position = Vector2(1500, 1080 - GrigriCard.CARD_SIZE.y - MARGIN)
-	_content.add_child(fortune_bar)
+	fortune_bar.position = Vector2(1500, UiLayout.DESIGN_SIZE.y - GrigriCard.CARD_SIZE.y - MARGIN)
+	_stage.add_child(fortune_bar)
 	# Couches d'effets
 	float_layer = FloatLayer.new()
 	add_child(float_layer)
@@ -249,7 +264,15 @@ func _refresh_buttons() -> void:
 	_clear_btn.disabled = not betting or r.slip.is_empty()
 	_rethrow_btn.visible = state == UiState.RETHROW
 	_keep_btn.visible = state == UiState.RETHROW
-	_hint_label.text = tr("HINT_" + UiState.keys()[state])
+	_refresh_hint()
+
+
+## Ligne d'aide : phrase d'état éventuelle + commandes du périphérique courant.
+func _refresh_hint() -> void:
+	var state_name: String = UiState.keys()[state]
+	var sentence: String = tr("HINT_" + state_name) if state_name in HINT_SENTENCES else ""
+	_hint_label.text = InputHints.line(state_name, sentence)
+	_hint_label.tooltip_text = _hint_label.text
 
 
 func _refresh_probabilities() -> void:
@@ -412,7 +435,11 @@ func _anchor_rect(anchor: String) -> Rect2:
 	)
 	if c == null:
 		return Rect2(get_viewport_rect().size * Vector2(0.5, 0.15), Vector2.ZERO)
-	return c.get_global_rect()
+	return UiLayout.canvas_rect(c)
+
+
+func _fit_stage() -> void:
+	UiLayout.fit_stage(_stage, get_viewport_rect().size)
 
 
 ## Moments de jeu signalés au tutoriel une fois les surcouches fermées.
@@ -548,7 +575,8 @@ func _on_spot_hovered(spot_id: String) -> void:
 		return
 	var r: RunState = ctl.run
 	var info: String = BetInfo.describe(spot_id, table_view.hide_odds, r.wheel, r.chip_value, int(r.slip.chips.get(spot_id, 0)))
-	_hint_label.text = info.replace("\n", " · ")
+	_hint_label.text = info.replace("\n", InputHints.SEP)
+	_hint_label.tooltip_text = info
 
 
 func _on_undo() -> void:
@@ -661,7 +689,7 @@ func _announce_throw(t: ThrowResolver.ThrowResult, landing: int) -> void:
 	elif landing == t.target_index:
 		key = "THROW_PERFECT"
 		col = Palette.EMERALD
-	var pos: Vector2 = wheel_view.global_position + wheel_view.pocket_screen_pos(landing) + Vector2(0, -60)
+	var pos: Vector2 = UiLayout.canvas_point(wheel_view, wheel_view.pocket_screen_pos(landing)) + Vector2(0, -60)
 	float_layer.pop_text(tr(key), pos, col, UiKit.SIZE_BODY)
 
 
@@ -842,10 +870,8 @@ func _use_fortune(slot: int, index: int) -> void:
 	var fid: String = ctl.run.fortunes[slot]
 	if ctl.use_fortune(slot, index):
 		AudioBus.play("card_use")
-		var pos: Vector2 = (
-			wheel_view.global_position
-			+ (wheel_view.pocket_screen_pos(clampi(index, 0, ctl.run.wheel.size() - 1)) if index >= 0 else wheel_view.size * 0.5)
-		)
+		var local: Vector2 = wheel_view.pocket_screen_pos(clampi(index, 0, ctl.run.wheel.size() - 1)) if index >= 0 else wheel_view.size * 0.5
+		var pos: Vector2 = UiLayout.canvas_point(wheel_view, local)
 		float_layer.burst("sparks", pos, 24)
 		float_layer.pop_text(Localization.name_of("fortunes", fid), pos, Palette.CYAN)
 		EventBus.fortune_used.emit(fid)

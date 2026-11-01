@@ -17,7 +17,7 @@ PREFIXES = ("BET_", "BTN_", "CARD_", "CHAR_", "CONFIRM_", "CREDITOR_", "CREDITS_
             "FX_", "HINT_", "HISTORY_", "HUD_", "MENU_", "OPT_", "PACK_", "PACT_", "PAUSE_", "POCKET_", "RARITY_",
             "REJECT_", "REWARD_", "RISK_", "SHOP_", "SLOT_", "SUB_", "SUMMARY_", "TAG_", "TIP_", "TOAST_", "TUTO_",
             "WHY_", "GAME_", "DISCLAIMER_", "CELEB_", "LANG_", "SPEED_", "CB_", "ACTION_", "CODEX_", "HALL_",
-            "ACH_", "STATS_", "DLG_", "END_", "CAMPAIGN_", "CHALLENGE_", "EVENT_", "REPLAY_", "PROB_", "CALC_", "THROW_", "ACT_")
+            "ACH_", "STATS_", "DLG_", "END_", "CAMPAIGN_", "CHALLENGE_", "EVENT_", "REPLAY_", "PROB_", "CALC_", "THROW_", "ACT_", "KEYNAME_")
 PATTERN = re.compile(r'"([A-Z][A-Z0-9]*_[A-Z0-9_]*[A-Z0-9])"')
 
 TAGS = set()
@@ -37,7 +37,9 @@ DYNAMIC = {
     "DEADLINE_": ["SMALL", "BIG", "CREDITOR"],
     "RARITY_": ["COMMON", "RARE", "LEGENDARY", "CURSED"],
     "PACK_": ["POCKET", "FORTUNE", "OCCULT", "POCKET_DESC", "FORTUNE_DESC", "OCCULT_DESC"],
-    "HINT_": ["BETTING", "AIMING", "BALL", "RETHROW", "SCORING", "OVERLAY", "TARGETING"],
+    "HINT_": ["AIMING", "RETHROW", "OVERLAY", "TARGETING"],
+    "HINT_INPUT_": ["CLICK", "SHIFT_CLICK", "RIGHT_CLICK", "DPAD"],
+    "KEYNAME_": ["SPACE", "ENTER", "ESCAPE", "SHIFT"],
     "OPT_VOL_": ["MASTER", "MUSIC", "SFX", "UI", "AMBIENCE"],
     "ACTION_": ["UI_SPIN", "BET_UNDO", "BET_REPEAT", "BET_CLEAR", "SPEED_TOGGLE", "SKIP_ANIM", "BET_PLACE", "BET_CYCLE_PREV", "BET_CYCLE_NEXT"],
     "TAG_": sorted(t.upper() for t in TAGS),

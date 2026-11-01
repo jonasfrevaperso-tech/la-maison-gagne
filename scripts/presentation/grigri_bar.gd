@@ -58,8 +58,8 @@ func card_for(g_uid: int) -> GrigriCard:
 func card_center(g_uid: int) -> Vector2:
 	var c: GrigriCard = card_for(g_uid)
 	if c == null:
-		return global_position + size * 0.5
-	return c.global_position + c.size * 0.5
+		return UiLayout.canvas_point(self, size * 0.5)
+	return UiLayout.canvas_point(c, c.size * 0.5)
 
 
 func bump(g_uid: int) -> void:

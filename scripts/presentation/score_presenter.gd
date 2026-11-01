@@ -47,15 +47,15 @@ func _wait(t: float) -> void:
 func _source_pos(e: ScoreEvent, ctx: ScoreContext) -> Vector2:
 	match e.source_kind:
 		ScoreEvent.SRC_BET:
-			return table_view.global_position + table_view.spot_anchor(e.source_id)
+			return UiLayout.canvas_point(table_view, table_view.spot_anchor(e.source_id))
 		ScoreEvent.SRC_GRIGRI:
 			return grigri_bar.card_center(e.source_uid)
 		ScoreEvent.SRC_EDITION:
 			if grigri_bar.card_for(e.source_uid) != null:
 				return grigri_bar.card_center(e.source_uid)
 	if ctx.landing_index >= 0 and wheel_view.wheel != null and ctx.landing_index < wheel_view.wheel.size():
-		return wheel_view.global_position + wheel_view.pocket_screen_pos(ctx.landing_index)
-	return wheel_view.global_position + wheel_view.size * 0.5
+		return UiLayout.canvas_point(wheel_view, wheel_view.pocket_screen_pos(ctx.landing_index))
+	return UiLayout.canvas_point(wheel_view, wheel_view.size * 0.5)
 
 
 func _play_event(e: ScoreEvent, ctx: ScoreContext) -> void:
@@ -103,7 +103,7 @@ func _play_event(e: ScoreEvent, ctx: ScoreContext) -> void:
 			EventBus.money_changed.emit(GameState.run().money if GameState.has_active_run() else 0)
 			await _wait(step * 0.8)
 		ScoreEvent.ZERO:
-			float_layer.pop_text(tr("FX_ZERO"), wheel_view.global_position + wheel_view.size * 0.5, Palette.EMERALD, UiKit.SIZE_TITLE)
+			float_layer.pop_text(tr("FX_ZERO"), UiLayout.canvas_point(wheel_view, wheel_view.size * 0.5), Palette.EMERALD, UiKit.SIZE_TITLE)
 			EventBus.juice_flash.emit(Palette.ZERO_GREEN, 0.5)
 			EventBus.juice_shake.emit(0.6)
 			AudioBus.play("zero")
@@ -168,7 +168,7 @@ func _play_total(total: int) -> void:
 			tier = i
 	await _wait(count_time)
 	if tier >= 0:
-		var center: Vector2 = score_panel.global_position + score_panel.size * 0.5 + Vector2(0, 120)
+		var center: Vector2 = UiLayout.canvas_point(score_panel, score_panel.size * 0.5) + Vector2(0, 120)
 		var sizes: Array[int] = [UiKit.SIZE_H2, UiKit.SIZE_H1, UiKit.SIZE_TITLE, UiKit.SIZE_TITLE]
 		float_layer.pop_text(
 			tr(JuiceProfile.CELEBRATION_KEYS[tier]),

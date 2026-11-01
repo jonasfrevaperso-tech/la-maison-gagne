@@ -101,7 +101,19 @@ func _on_continue() -> void:
 		EventBus.toast.emit(tr("TOAST_SAVE_CORRUPT"), &"error")
 
 
+## Nouvelle partie : si un run est sauvegardé, il est abandonné (et compté) après confirmation.
 func _on_new() -> void:
+	if not SaveSystem.has_run():
+		GameState.goto(GameState.SCREEN_CHARACTER)
+		return
+	var dlg: ConfirmBox = ConfirmBox.new().configure(tr("CONFIRM_NEW_OVER_SAVE"))
+	dlg.confirmed.connect(_abandon_saved_and_new)
+	add_child(dlg)
+
+
+func _abandon_saved_and_new() -> void:
+	SaveSystem.clear_run()
+	GameState.controller = null
 	GameState.goto(GameState.SCREEN_CHARACTER)
 
 

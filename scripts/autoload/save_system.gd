@@ -2,8 +2,8 @@ extends Node
 ## Sauvegardes versionnées dans user:// : écriture atomique (fichier temporaire + renommage),
 ## copie de secours (.bak) et migrations. Deux fichiers : profil (méta) et run en cours.
 
-const PROFILE_PATH: String = "user://profile.json"
-const RUN_PATH: String = "user://run.json"
+const PROFILE_FILE: String = "profile.json"
+const RUN_FILE: String = "run.json"
 const PROFILE_VERSION: int = 1
 const TMP_SUFFIX: String = ".tmp"
 const BAK_SUFFIX: String = ".bak"
@@ -12,9 +12,14 @@ const BAK_SUFFIX: String = ".bak"
 static var corrupted_files: Array[String] = []
 
 var profile: Dictionary = {}
+var profile_path: String = ""
+var run_path: String = ""
 
 
 func _ready() -> void:
+	var dir: String = DevMode.save_dir()
+	profile_path = dir + PROFILE_FILE
+	run_path = dir + RUN_FILE
 	profile = load_profile()
 
 
@@ -80,7 +85,7 @@ func default_profile() -> Dictionary:
 
 
 func load_profile() -> Dictionary:
-	var d: Dictionary = read_with_backup(PROFILE_PATH)
+	var d: Dictionary = read_with_backup(profile_path)
 	if d.is_empty():
 		return default_profile()
 	return migrate_profile(d)
@@ -101,7 +106,7 @@ func migrate_profile(d: Dictionary) -> Dictionary:
 
 
 func save_profile() -> void:
-	write_atomic(PROFILE_PATH, profile)
+	write_atomic(profile_path, profile)
 
 
 func mark_seen(cat: String, entry_id: String) -> void:
@@ -127,15 +132,15 @@ func max_stat(key: String, value: int) -> void:
 
 
 func has_run() -> bool:
-	return not read_with_backup(RUN_PATH).is_empty()
+	return not read_with_backup(run_path).is_empty()
 
 
 func save_run(run: RunState) -> void:
-	write_atomic(RUN_PATH, run.to_dict())
+	write_atomic(run_path, run.to_dict())
 
 
 func load_run() -> RunState:
-	var d: Dictionary = read_with_backup(RUN_PATH)
+	var d: Dictionary = read_with_backup(run_path)
 	if d.is_empty():
 		return null
 	if int(d.get("version", 0)) > RunState.SAVE_VERSION:
@@ -145,6 +150,6 @@ func load_run() -> RunState:
 
 
 func clear_run() -> void:
-	for p: String in [RUN_PATH, RUN_PATH + BAK_SUFFIX]:
+	for p: String in [run_path, run_path + BAK_SUFFIX]:
 		if FileAccess.file_exists(p):
 			DirAccess.remove_absolute(p)
