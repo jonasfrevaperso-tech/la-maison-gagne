@@ -18,13 +18,15 @@ func build() -> void:
 	t.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body.add_child(t)
 	var choices: Array = e.get("choices", [])
+	var focused: bool = false
 	for i: int in choices.size():
 		var ch: Dictionary = choices[i]
 		var b: Button = UiKit.button(Localization.t(ch, "text"), _pick.bind(i), Vector2(1000, 56))
 		b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		b.disabled = not ctl.event_choice_available(ch)
 		body.add_child(b)
-		if i == 0:
+		if not focused and not b.disabled:
+			focused = true
 			b.call_deferred("grab_focus")
 	if choices.is_empty():
 		body.add_child(UiKit.button(tr("BTN_CONTINUE"), _pick.bind(-1)))

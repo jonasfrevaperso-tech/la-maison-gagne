@@ -62,9 +62,10 @@ step "Interface (focus manette, débordements, 3 résolutions)"
 grep -E "^UI :|Interface :" "$LOG_DIR/ui.log"
 scan "$LOG_DIR/ui.log" || status=1
 
-step "Partie complète à la manette seule"
+step "Campagne complète à la manette seule (dettes réduites)"
 if [ "${SKIP_PAD_RUN:-0}" = "1" ]; then echo "(ignorée : SKIP_PAD_RUN=1)"; else
-"$GODOT" --headless --path . -- --dev-pad-run=6 >"$LOG_DIR/pad.log" 2>&1 || status=1
+rm -f "$HOME/.local/share/godot/app_userdata/La Maison Gagne/dev/run.json" "$HOME/.local/share/godot/app_userdata/La Maison Gagne/dev/run.json.bak"
+"$GODOT" --headless --path . -- --dev-pad-run=500 --dev-debt-mult=0.01 >"$LOG_DIR/pad.log" 2>&1 || status=1
 grep -E "Partie à la manette|traversés" "$LOG_DIR/pad.log"
 scan "$LOG_DIR/pad.log" || status=1
 fi

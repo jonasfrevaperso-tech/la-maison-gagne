@@ -12,6 +12,8 @@ const STALL_SECONDS: float = 25.0
 const MAX_SECONDS: float = 900.0
 
 var spins_wanted: int = 10
+## Multiplicateur de dette (0 = normal) : traverser toute la campagne rapidement.
+var debt_mult: float = 0.0
 var shot_dir: String = ""
 var _log: Array[String] = []
 var _last_progress: float = 0.0
@@ -169,7 +171,10 @@ func _act() -> void:
 		await _press("UP")
 		await _press("B")
 	elif root is RunSummary:
-		_finish(false, "run terminé avant l'objectif (résumé atteint)")
+		if GameState.last_run_victory:
+			_finish(true, "campagne gagnée à la manette (%d tours)" % _spins_seen())
+		else:
+			_finish(false, "run terminé avant l'objectif (résumé atteint)")
 	elif root is ConfirmBox or root is VirtualKeyboard:
 		await _press("A")
 	else:
@@ -229,9 +234,18 @@ func _focus_text(text: String) -> bool:
 
 func _run(rs: RunScreen) -> void:
 	var r: RunState = rs.ctl.run
+	if debt_mult > 0.0 and not r.flags.has("debt_mult"):
+		r.flags["debt_mult"] = debt_mult
+		r.debt = rs.ctl.debt_for(r.tier, r.deadline_idx)
 	match rs.state:
 		RunScreen.UiState.BETTING:
 			if rs.get("_items_mode"):
+				if not r.fortunes.is_empty() and not _visited.has("fortune_used"):
+					_visited["fortune_used"] = true
+					for _k: int in 8:
+						await _press("RIGHT")
+					await _press("A")  # utiliser la carte Fortune sélectionnée
+					return
 				await _press("Y")
 				await _press("RB")
 				await _press("B")
@@ -247,6 +261,9 @@ func _run(rs: RunScreen) -> void:
 				return
 			if r.total_spins == 2 and not _visited.has("items_mode") and not r.grigris.is_empty():
 				_visited["items_mode"] = true
+				await _press("BACK")
+				return
+			if not r.fortunes.is_empty() and not _visited.has("fortune_used"):
 				await _press("BACK")
 				return
 			if r.total_spins == 1 and not _visited.has("pause"):
@@ -277,7 +294,15 @@ func _shop(shop: ShopOverlay) -> void:
 	if f == null:
 		_finish(false, "boutique : aucun élément sélectionné à la manette")
 		return
-	match _shop_actions % 6:
+	if not (shop.ctl.run.shop_state.get("open_pack", {}) as Dictionary).is_empty():
+		_visited["pack_opened"] = true
+		await _press("A")  # choisir dans le paquet ouvert
+		return
+	match _shop_actions % 7:
+		6:
+			for _k: int in 4:
+				await _press("RIGHT")
+			await _press("A")  # acheter un paquet
 		1:
 			await _press("A")  # acheter l'offre sélectionnée
 		2:
@@ -291,6 +316,7 @@ func _shop(shop: ShopOverlay) -> void:
 			await _press("UP")
 		0:
 			await _press("START")  # retour à la table
+			_visited["shop_left"] = true
 	if not is_instance_valid(shop) or shop.is_queued_for_deletion():
 		_shop_actions = 0
 
@@ -317,3 +343,8 @@ func _finish(ok: bool, why: String) -> void:
 	Settings.speed_override = 0.0
 	Settings.set_value("game", "input_mode", "auto")
 	GameState.quit_game(0 if ok else 1)
+
+
+func _spins_seen() -> int:
+	var ctl: RunController = GameState.controller
+	return ctl.run.total_spins if ctl != null and ctl.run != null else -1

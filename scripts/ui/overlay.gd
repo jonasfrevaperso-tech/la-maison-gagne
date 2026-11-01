@@ -5,7 +5,7 @@ extends Control
 signal closed
 
 const DIM: Color = Color(0.02, 0.01, 0.03, 0.78)
-const POP_TIME: float = 0.22
+const POP_TIME: float = 0.18
 ## Part de la fenêtre que peut occuper un panneau.
 const FIT_MARGIN: float = 0.96
 

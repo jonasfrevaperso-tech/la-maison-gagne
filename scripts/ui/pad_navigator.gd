@@ -174,7 +174,8 @@ func ensure_focus() -> void:
 	if root == null or (root.has_method("wants_pad_focus") and not bool(root.call("wants_pad_focus"))):
 		return
 	var focused: Control = get_viewport().gui_get_focus_owner()
-	if focused != null and focused.is_visible_in_tree() and root.is_ancestor_of(focused):
+	var stale: bool = focused is BaseButton and (focused as BaseButton).disabled
+	if focused != null and focused.is_visible_in_tree() and root.is_ancestor_of(focused) and not stale:
 		return
 	var first: Control = first_focusable(root)
 	if first != null:

@@ -54,7 +54,8 @@ func build() -> void:
 	var save: Button = UiKit.button(tr("NOTE_SAVE"), _save)
 	h.add_child(save)
 	h.add_child(UiKit.button(tr("MENU_BACK"), close))
-	_text.call_deferred("grab_focus")
+	# Manette : on commence par l'humeur (le texte s'ouvre au clavier virtuel avec A).
+	(_mood_buttons[MOODS.find(_mood)] if InputGlyphs.using_pad else _text).call_deferred("grab_focus")
 	closed.connect(queue_free)
 
 

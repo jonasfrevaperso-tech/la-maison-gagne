@@ -15,6 +15,8 @@ var debt_remaining: int = 1
 var _skip: bool = false
 var _playing: bool = false
 var _pitch: float = 1.0
+## Rang de l'événement joué (accélération du décompte).
+var _index: int = 0
 
 
 func is_playing() -> bool:
@@ -29,9 +31,11 @@ func play(ctx: ScoreContext) -> void:
 	_playing = true
 	_skip = false
 	_pitch = 1.0
+	_index = 0
 	score_panel.reset()
 	for e: ScoreEvent in ctx.events:
 		await _play_event(e, ctx)
+		_index += 1
 		if not is_inside_tree():
 			return
 	_playing = false
@@ -59,7 +63,8 @@ func _source_pos(e: ScoreEvent, ctx: ScoreContext) -> Vector2:
 
 
 func _play_event(e: ScoreEvent, ctx: ScoreContext) -> void:
-	var step: float = JuiceProfile.step_time()
+	# Le décompte s'emballe : chaque événement est un peu plus rapide que le précédent.
+	var step: float = JuiceProfile.step_time(_index)
 	var pos: Vector2 = _source_pos(e, ctx)
 	if e.source_kind == ScoreEvent.SRC_GRIGRI or e.source_kind == ScoreEvent.SRC_EDITION:
 		grigri_bar.bump(e.source_uid)

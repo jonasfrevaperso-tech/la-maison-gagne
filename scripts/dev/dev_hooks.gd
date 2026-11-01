@@ -26,6 +26,7 @@ func start() -> bool:
 		var pr: DevPadRun = DevPadRun.new()
 		pr.spins_wanted = int(args["dev-pad-run"])
 		pr.shot_dir = String(args.get("shot-dir", ""))
+		pr.debt_mult = float(String(args.get("dev-debt-mult", "0")))
 		add_child(pr)
 		GameState.goto(&"title")
 		return true

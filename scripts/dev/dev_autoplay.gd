@@ -83,6 +83,7 @@ func _shot(tag: String) -> void:
 	await RenderingServer.frame_post_draw
 	var img: Image = get_viewport().get_texture().get_image()
 	_shots += 1
+	DirAccess.make_dir_recursive_absolute(shot_dir)
 	img.save_png(shot_dir.path_join("%02d_%s.png" % [_shots, tag]))
 
 

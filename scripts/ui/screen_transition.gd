@@ -2,8 +2,8 @@ class_name ScreenTransition
 extends Control
 ## Transition « rideaux de casino » : deux pans de velours se ferment puis s'ouvrent.
 
-const CLOSE_TIME: float = 0.28
-const OPEN_TIME: float = 0.34
+const CLOSE_TIME: float = 0.22
+const OPEN_TIME: float = 0.28
 const FRINGE_HEIGHT: float = 14.0
 
 ## "curtains" (rideaux) ou "crt" (écran qui s'éteint en ligne).
