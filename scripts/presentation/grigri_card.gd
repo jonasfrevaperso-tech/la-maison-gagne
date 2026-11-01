@@ -12,6 +12,8 @@ const CARD_SIZE: Vector2 = Vector2(112, 144)
 const ICON_SIZE: float = 80.0
 const TILT_MAX: float = 0.12
 const HOVER_LIFT: float = 10.0
+const EDITION_SHADER: String = "res://shaders/edition.gdshader"
+const EDITION_MODES: Dictionary = {"brillante": 0, "holo": 1, "polychrome": 2, "noire": 3}
 
 var kind: String = "grigri"  # grigri | fortune | contract | pocket_card
 var entry_id: String = ""
@@ -82,8 +84,6 @@ func bump() -> void:
 	tw.parallel().tween_property(self, "rotation", 0.0, 0.18).from(0.08 * JuiceProfile.intensity())
 
 
-const EDITION_SHADER: String = "res://shaders/edition.gdshader"
-const EDITION_MODES: Dictionary = {"brillante": 0, "holo": 1, "polychrome": 2, "noire": 3}
 
 
 func _enter_tree() -> void:
