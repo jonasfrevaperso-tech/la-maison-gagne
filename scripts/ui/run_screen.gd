@@ -152,6 +152,9 @@ func _build() -> void:
 	add_child(menu_btn)
 	_hint_label = UiKit.label("", UiKit.SIZE_SMALL, Palette.SMOKE)
 	_hint_label.position = Vector2(840, 360 + TABLE_SIZE.y + 100)
+	_hint_label.custom_minimum_size = Vector2(TABLE_SIZE.x, 0)
+	_hint_label.size = Vector2(TABLE_SIZE.x, 0)
+	_hint_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_content.add_child(_hint_label)
 	# Grigris et Fortune
 	grigri_bar = GrigriBar.new()
@@ -455,6 +458,9 @@ func _set_state(s: UiState) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if state == UiState.OVERLAY:
 		return
+	if state == UiState.BETTING and _gamepad_table(event):
+		get_viewport().set_input_as_handled()
+		return
 	if event.is_action_pressed("ui_spin"):
 		_on_spin_pressed()
 		get_viewport().set_input_as_handled()
@@ -474,6 +480,27 @@ func _unhandled_input(event: InputEvent) -> void:
 			_set_state(UiState.BETTING)
 		else:
 			_on_menu()
+
+
+## Jeu au tapis sans souris (manette, Steam Deck, clavier) : renvoie true si l'événement est consommé.
+func _gamepad_table(event: InputEvent) -> bool:
+	var dirs: Dictionary = {"ui_left": Vector2i(-1, 0), "ui_right": Vector2i(1, 0), "ui_up": Vector2i(0, -1), "ui_down": Vector2i(0, 1)}
+	for a: String in dirs.keys():
+		if event.is_action_pressed(a, true):
+			var d: Vector2i = dirs[a]
+			table_view.move_cursor(d.x, d.y)
+			AudioBus.ui("hover")
+			return true
+	if event.is_action_pressed("bet_cycle_prev"):
+		table_view.cycle_cursor(-1)
+		return true
+	if event.is_action_pressed("bet_cycle_next"):
+		table_view.cycle_cursor(1)
+		return true
+	if event.is_action_pressed("bet_place") and table_view.cursor_active:
+		_on_spot_changed(table_view.cursor_spot(), 1)
+		return true
+	return false
 
 
 func _skip_animations() -> void:
@@ -516,8 +543,12 @@ func _bet_rejected(res: BetSlip.PlaceResult) -> void:
 	AudioBus.ui("error")
 
 
-func _on_spot_hovered(_spot_id: String) -> void:
-	pass
+func _on_spot_hovered(spot_id: String) -> void:
+	if not table_view.cursor_active or spot_id == "":
+		return
+	var r: RunState = ctl.run
+	var info: String = BetInfo.describe(spot_id, table_view.hide_odds, r.wheel, r.chip_value, int(r.slip.chips.get(spot_id, 0)))
+	_hint_label.text = info.replace("\n", " · ")
 
 
 func _on_undo() -> void:

@@ -53,6 +53,7 @@ func _dev_hooks() -> bool:
 		var ap: DevAutoplay = DevAutoplay.new()
 		ap.spins_wanted = int(args["dev-autoplay"])
 		ap.shot_dir = String(args.get("shot-dir", ""))
+		ap.perf = args.has("perf")
 		add_child(ap)
 	if args.has("quit-frames"):
 		_quit_later(int(args["quit-frames"]))

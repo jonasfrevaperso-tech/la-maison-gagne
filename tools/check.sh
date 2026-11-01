@@ -44,6 +44,11 @@ step "Tests"
 grep -E "ÉCHEC|Tests :" "$LOG_DIR/tests.log"
 scan "$LOG_DIR/tests.log" || status=1
 
+step "Fuzzing de graines"
+"$GODOT" --headless --path . -s res://tools/fuzz.gd -- --runs=150 --seed=$RANDOM >"$LOG_DIR/fuzz.log" 2>&1 || status=1
+grep -E "Fuzz|INVARIANT" "$LOG_DIR/fuzz.log"
+scan "$LOG_DIR/fuzz.log" || status=1
+
 step "Simulation rapide"
 "$GODOT" --headless --path . -s res://scripts/sim/sim_main.gd -- --runs=40 --bot=greedy --quiet >"$LOG_DIR/sim.log" 2>&1 || status=1
 tail -4 "$LOG_DIR/sim.log"

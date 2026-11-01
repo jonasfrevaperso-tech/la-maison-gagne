@@ -57,6 +57,7 @@ func _ready() -> void:
 
 ## Arrête et détache tous les flux (évite des lectures orphelines à la fermeture).
 func shutdown() -> void:
+	_silent = true  # plus aucun son ne doit démarrer pendant la fermeture
 	_music_id = ""
 	for t: Tween in _music_tweens:
 		if t != null and t.is_valid():

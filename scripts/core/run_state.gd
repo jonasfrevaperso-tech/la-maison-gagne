@@ -192,13 +192,30 @@ func to_dict() -> Dictionary:
 		"rerolls_since_rare": rerolls_since_rare,
 		"sold": sold_count,
 		"bought": bought_ids.duplicate(),
-		"flags": flags.duplicate(true),
+		"flags": floatify(flags),
 		"phase": int(phase),
 		"defeat": defeat_reason,
 		"deadline_log": deadline_log.duplicate(true),
 		"pending_event": pending_event_id,
 		"shop_state": shop_state.duplicate(true),
 	}
+
+
+## Les drapeaux mélangent entiers et flottants : on les écrit tous en flottants (relecture JSON exacte).
+static func floatify(v: Variant) -> Variant:
+	if v is int:
+		return float(v)
+	if v is Dictionary:
+		var out: Dictionary = {}
+		for k: Variant in (v as Dictionary).keys():
+			out[k] = floatify((v as Dictionary)[k])
+		return out
+	if v is Array:
+		var arr: Array = []
+		for item: Variant in v:
+			arr.append(floatify(item))
+		return arr
+	return v
 
 
 ## JSON relit les entiers comme des flottants : on les restaure (déterminisme exact).
@@ -287,6 +304,11 @@ static func from_dict(d: Dictionary) -> RunState:
 		s.deadline_log.append(dl as Dictionary)
 	s.pending_event_id = String(d.get("pending_event", ""))
 	s.shop_state = intify(d.get("shop_state", {}))
-	s.slip.budget = s.bet_budget
-	s.slip.apply_layout(d.get("slip", {}))
+	# Reconfigure le bulletin exactement comme en jeu avant de reposer les mises.
+	s.slip.budget = maxi(s.bet_budget + s.temp_budget_bonus, 1)
+	s.slip.table_limit_bonus = s.table_limit_bonus
+	s.slip.allowed_kinds = s.allowed_kinds.duplicate()
+	if s.banned_color != &"":
+		s.slip.banned_spots.append(String(s.banned_color))
+	s.slip.apply_layout(intify(d.get("slip", {})))
 	return s

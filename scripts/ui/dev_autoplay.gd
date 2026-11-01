@@ -8,11 +8,46 @@ const POLL: float = 0.1
 
 var spins_wanted: int = 3
 var shot_dir: String = ""
+var perf: bool = false
 var _shots: int = 0
+var _frames: Array[float] = []
+var _draw_calls: int = 0
 
 
 func _ready() -> void:
 	_drive()
+
+
+func _process(delta: float) -> void:
+	if perf:
+		_frames.append(delta * 1000.0)
+		_draw_calls = maxi(_draw_calls, int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)))
+
+
+func _perf_report() -> void:
+	if _frames.size() < 10:
+		return
+	var sorted: Array[float] = _frames.duplicate()
+	sorted.sort()
+	var avg: float = 0.0
+	for f: float in sorted:
+		avg += f
+	avg /= float(sorted.size())
+	var p99: float = sorted[int(float(sorted.size()) * 0.99)]
+	print(
+		(
+			"Perf : %d frames · moyenne %.2f ms (%.0f FPS) · 1 %% lent %.2f ms · pire %.2f ms · draw calls max %d · mémoire %.0f Mo"
+			% [
+				sorted.size(),
+				avg,
+				1000.0 / avg,
+				p99,
+				sorted[sorted.size() - 1],
+				_draw_calls,
+				Performance.get_monitor(Performance.MEMORY_STATIC) / 1048576.0
+			]
+		)
+	)
 
 
 func _screen() -> RunScreen:
@@ -100,4 +135,5 @@ func _drive() -> void:
 			_:
 				await _wait(POLL)
 	print("Autoplay terminé : %d tours" % done)
+	_perf_report()
 	GameState.quit_game()

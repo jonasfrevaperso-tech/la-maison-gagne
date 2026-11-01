@@ -221,6 +221,8 @@ func start_deadline() -> void:
 		for k2: Variant in run.flags.get("allowed_kinds_always", []):
 			run.allowed_kinds.append(StringName(String(k2)))
 	EffectRunner.fire(&"on_deadline_start", run, null, db)
+	# Les malus cumulés (risque, créancier, défi) ne peuvent pas supprimer le dernier tour.
+	run.spins_left = maxi(run.spins_left, Balance.i("run.min_spins"))
 	begin_betting()
 
 
@@ -242,8 +244,24 @@ func _configure_slip(clear: bool) -> void:
 	run.slip.banned_spots.clear()
 	if run.banned_color != &"":
 		run.slip.banned_spots.append(String(run.banned_color))
+	# Garde-fou anti-blocage : des règles cumulées ne doivent jamais interdire tout pari.
+	if not _any_bet_possible():
+		run.slip.banned_spots.clear()
+		run.banned_color = &""
+	if not _any_bet_possible():
+		run.slip.allowed_kinds.clear()
 	if not clear:
 		run.slip.apply_layout(keep)
+
+
+func _any_bet_possible() -> bool:
+	if run.slip.budget <= 0:
+		return false
+	for spot: BetSpot in BetCatalog.all():
+		if run.slip.allowed_kinds.is_empty() or run.slip.allowed_kinds.has(spot.kind):
+			if not run.slip.banned_spots.has(spot.id):
+				return true
+	return false
 
 
 ## Les créanciers qui interdisent une couleur le font au début de chaque tour (effet on_bet_phase).
@@ -365,7 +383,7 @@ func _finish_spin(ctx: ScoreContext, out: SpinOutcome) -> void:
 		run.losses_forgiven_tier = run.tier
 		out.forgiven = true
 	else:
-		run.spins_left -= 1
+		run.spins_left = maxi(run.spins_left - 1, 0)
 	run.last_layout = ctx.slip.duplicate()
 	var landed: Pocket = ctx.landing
 	run.last_landing_index = ctx.landing_index

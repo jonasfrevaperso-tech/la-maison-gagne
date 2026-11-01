@@ -15,6 +15,7 @@ const CHIP_RADIUS_RATIO: float = 0.27
 const SHIFT_AMOUNT: int = 5
 const CHIP_SPRITE: String = "chip_magenta"
 const CHIP_POP_TIME: float = 0.18
+const CURSOR_ROWS: int = 5
 const CHIP_POP_HEIGHT: float = 14.0
 const EVEN_ORDER: Array[String] = ["low", "even", "red", "black", "odd", "high"]
 
@@ -26,7 +27,12 @@ var hide_odds: bool = false
 var show_probabilities: bool = false
 var wheel: WheelModel = null
 var chip_value: int = 1
+## Curseur manette/clavier : (colonne, rangée) dans une grille virtuelle du tapis.
+var cursor_active: bool = false
 var _pops: Dictionary = {}  # spot_id -> temps restant de l'animation de pose
+var _cx: int = 1
+var _cy: int = 2
+var _cycle: int = 0
 
 var _cw: float = 0.0
 var _ch: float = 0.0
@@ -205,6 +211,71 @@ func _process(delta: float) -> void:
 		queue_redraw()
 
 
+# --------------------------------------------------------------------------- curseur manette
+# Rangées 0-2 : numéros (0 = haut), 3 : douzaines, 4 : chances simples.
+# Colonnes 0 : zéro, 1-12 : numéros, 13 : colonnes 2:1.
+
+
+func move_cursor(dx: int, dy: int) -> void:
+	cursor_active = true
+	_cy = clampi(_cy + dy, 0, CURSOR_ROWS - 1)
+	var max_x: int = WheelLayout.TABLE_COLS + 1 if _cy < WheelLayout.TABLE_ROWS else WheelLayout.TABLE_COLS
+	var min_x: int = 0 if _cy < WheelLayout.TABLE_ROWS else 1
+	_cx = clampi(_cx + dx, min_x, max_x)
+	_cycle = 0
+	_update_cursor()
+
+
+func cycle_cursor(direction: int) -> void:
+	cursor_active = true
+	var options: Array[String] = _cursor_options()
+	_cycle = posmod(_cycle + direction, options.size())
+	_update_cursor()
+
+
+func cursor_spot() -> String:
+	var options: Array[String] = _cursor_options()
+	return options[posmod(_cycle, options.size())]
+
+
+## Emplacement de base sous le curseur, puis paris intérieurs qui couvrent ce numéro.
+func _cursor_options() -> Array[String]:
+	var base: String
+	if _cy < WheelLayout.TABLE_ROWS:
+		var row: int = WheelLayout.TABLE_ROWS - 1 - _cy
+		if _cx == 0:
+			base = "straight:0"
+		elif _cx > WheelLayout.TABLE_COLS:
+			base = "column:%d" % row
+		else:
+			base = "straight:%d" % WheelLayout.number_on_table(_cx - 1, row)
+	elif _cy == WheelLayout.TABLE_ROWS:
+		base = "dozen:%d" % ((_cx - 1) / 4)
+	else:
+		base = EVEN_ORDER[clampi((_cx - 1) / 2, 0, EVEN_ORDER.size() - 1)]
+	var out: Array[String] = [base]
+	var spot: BetSpot = BetCatalog.get_spot(base)
+	if spot != null and spot.kind == &"straight":
+		var n: int = spot.numbers[0]
+		var extra: Array[BetSpot] = []
+		for s: BetSpot in BetCatalog.all():
+			if not s.outside and s.kind != &"straight" and s.covers(n):
+				extra.append(s)
+		extra.sort_custom(
+			func(a: BetSpot, b: BetSpot) -> bool:
+				return a.numbers.size() < b.numbers.size() or (a.numbers.size() == b.numbers.size() and a.id < b.id)
+		)
+		for e: BetSpot in extra:
+			out.append(e.id)
+	return out
+
+
+func _update_cursor() -> void:
+	hover_spot = cursor_spot()
+	spot_hovered.emit(hover_spot)
+	queue_redraw()
+
+
 func pop_chip(spot_id: String) -> void:
 	_pops[spot_id] = CHIP_POP_TIME
 
@@ -276,6 +347,9 @@ func _draw() -> void:
 			var pop: float = float(_pops.get(spot_id, 0.0)) / CHIP_POP_TIME
 			var lift: float = sin(pop * PI) * CHIP_POP_HEIGHT * JuiceProfile.intensity()
 			_draw_chip(spot_anchor(spot_id) - Vector2(0, lift), int(slip.chips[spot_id]))
+	if cursor_active and hover_spot != "":
+		var cp: Vector2 = spot_anchor(hover_spot)
+		draw_arc(cp, minf(_cw, _ch) * 0.42, 0.0, TAU, 32, Palette.CYAN, 4.0, true)
 	if hover_spot != "" and slip != null and slip.check(hover_spot) == BetSlip.PlaceResult.OK:
 		var ghost: Color = Palette.GOLD_LIGHT
 		ghost.a = 0.35

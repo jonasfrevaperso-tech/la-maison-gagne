@@ -2,7 +2,9 @@ class_name OptionsScreen
 extends Control
 ## Options complètes : audio, vidéo, jus, jeu, accessibilité, commandes (remappage).
 
-const REMAPPABLE: Array[String] = ["ui_spin", "bet_undo", "bet_repeat", "bet_clear", "speed_toggle", "skip_anim"]
+const REMAPPABLE: Array[String] = [
+	"ui_spin", "bet_undo", "bet_repeat", "bet_clear", "speed_toggle", "skip_anim", "bet_place", "bet_cycle_prev", "bet_cycle_next"
+]
 const ROW_W: float = 900.0
 
 var _tabs: TabContainer = null
