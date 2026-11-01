@@ -13,6 +13,9 @@ const HISTORY_SHOWN: int = 14
 const SHAKE_DECAY: float = 7.0
 const FLASH_DECAY: float = 3.0
 const HEAT_SHADER: String = "res://shaders/heat.gdshader"
+const TENSION_FROM_DEBT: float = 0.6
+const TENSION_CREDITOR: float = 0.35
+const TENSION_LAST_SPIN: float = 0.35
 
 var ctl: RunController = null
 var state: UiState = UiState.BETTING
@@ -200,6 +203,13 @@ func _refresh_all() -> void:
 	_refresh_table()
 	_refresh_probabilities()
 	_speed_btn.text = "×%d" % int(Settings.speed())
+	# Musique adaptative : la tension monte avec la dette remboursée et face aux créanciers.
+	var tension: float = clampf(float(r.deadline_score) / maxf(float(r.debt), 1.0), 0.0, 1.0) * TENSION_FROM_DEBT
+	if r.is_creditor() and r.creditor_id != "":
+		tension += TENSION_CREDITOR
+	if r.spins_left <= 1:
+		tension += TENSION_LAST_SPIN
+	AudioBus.set_intensity(tension)
 
 
 func _refresh_budget() -> void:
@@ -661,6 +671,7 @@ func _on_score_finished(_total: int) -> void:
 		return
 	if out.deadline_won:
 		AudioBus.play("deadline_won")
+		EventBus.subtitle.emit(tr("SUB_DEADLINE_WON"))
 		if bool(ctl.run.flags.get("act_changed", false)):
 			var outro: String = "act%d_creditor_won" % (ctl.run.act() - 1)
 			if ctl.db.has_entry("dialogues", outro):
@@ -671,6 +682,7 @@ func _on_score_finished(_total: int) -> void:
 		return
 	if out.deadline_failed:
 		AudioBus.play("deadline_failed")
+		EventBus.subtitle.emit(tr("SUB_DEADLINE_FAILED"))
 		if ctl.run.phase == RunState.Phase.PACT_OFFER:
 			_open_pact()
 		else:

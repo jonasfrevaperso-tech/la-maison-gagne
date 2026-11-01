@@ -84,8 +84,6 @@ func bump() -> void:
 	tw.parallel().tween_property(self, "rotation", 0.0, 0.18).from(0.08 * JuiceProfile.intensity())
 
 
-
-
 func _enter_tree() -> void:
 	if edition != &"" and EDITION_MODES.has(String(edition)) and JuiceProfile.intensity() > 0.0:
 		var m: ShaderMaterial = ShaderMaterial.new()

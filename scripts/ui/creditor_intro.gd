@@ -36,6 +36,7 @@ func build() -> void:
 	body.add_child(b)
 	b.call_deferred("grab_focus")
 	AudioBus.play("boss_enter")
+	EventBus.subtitle.emit(tr("SUB_CREDITOR"))
 	SaveSystem.mark_seen("creditors", String(creditor.get("id", "")))
 	EventBus.juice_shake.emit(0.5)
 	portrait.position.x = -400.0

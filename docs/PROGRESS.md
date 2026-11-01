@@ -3,8 +3,8 @@
 > Reprise après coupure : lire ce fichier, `CLAUDE.md`, puis `docs/DECISIONS.md`. Lancer `tools/check.sh`.
 
 ## État courant
-- Phase en cours : **Phase 10 — Audio**
-- Dernier tag : `phase-09-art`
+- Phase en cours : **Phase 11 — Jus et polish**
+- Dernier tag : `phase-10-audio`
 
 ## Phase 0 — Reconnaissance ✅
 - Environnement : Godot 4.7.2 (MCP godot OK), Blender 5.2.2, Python 3.14 + numpy 2.4 + Pillow 12, uv, gdtoolkit 4 (installé via uv), git 2.53, 12 cœurs.
@@ -65,6 +65,10 @@
 ## Phase 9 — Direction artistique finale ✅
 - Fait : 24 portraits pixel art 128×128 animés (repos, clignement, parole ×2) par `tools/gen_portraits.py` ; props 3D low-poly modélisés et rendus dans Blender en CLI (`tools/blender/render_props.py` : roue 3/4 pour l'écran titre, jetons 4 couleurs, bille) ; 235 icônes ; shaders : CRT, bloom, éditions (brillante/holo/polychrome/noire), dissolution en braises (vente), distorsion de chaleur (Pyromane, La Maison phase 3, défi Brasier) ; icônes de type sur la roue ; menu titre resserré.
 - Limite : la config OCIO de Blender (Fedora) est incompatible avec la lib installée → pas de tone mapping, éclairage compensé à la main.
+
+## Phase 10 — Audio ✅
+- Fait : table de mixage par son (`audio/sfx_mix.json`) qui ramène les sons à onde carrée (Mult, blips, erreurs) au niveau des autres ; musique adaptative pilotée par la tension (progression de la dette, créancier, dernier tour) en plus du Mult pendant le score ; sous-titres supplémentaires (remboursement, échec, créancier, destruction) ; rapport objectif `tools/audio_report.py` → `docs/AUDIO.md` (crête, RMS, silence, raccord des boucles) intégré à `check.sh`.
+- Limite : aucune écoute humaine ; seules des mesures objectives valident le son.
 
 ## Rapport de phase
 Format : fait / testé / reste à faire / risques.

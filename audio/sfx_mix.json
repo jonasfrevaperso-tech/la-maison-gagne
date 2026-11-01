@@ -1,0 +1,7 @@
+{
+  "_doc": "Décalage de volume (dB) par effet sonore, appliqué par AudioBus.play. Ajuste le mixage sans régénérer les sons.",
+  "mult": -9, "zap": -8, "error": -6, "click": -6, "hover": -10, "card_hover": -10, "thorn": -6,
+  "blip_lea": -8, "blip_vic": -8, "blip_odile": -8, "blip_barnabe": -8, "blip_marthe": -8, "blip_ghost": -8, "blip_house": -6, "blip_boss": -7, "blip_npc": -8,
+  "chips": -3, "chips_win": -2, "xmult": -4, "coin": -4, "coins": -4, "chip_place": -2, "chip_remove": -3, "ball_bounce": -4,
+  "ball_roll": 3, "reroll": 3, "chip_sweep": 3, "dice": 2, "count_up": -2, "jackpot": 1, "panel_open": -6, "panel_close": -6, "quack": -6, "meow": -4
+}

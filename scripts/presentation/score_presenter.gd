@@ -113,6 +113,7 @@ func _play_event(e: ScoreEvent, ctx: ScoreContext) -> void:
 			float_layer.burst("smoke", pos, 20)
 			float_layer.pop_text(_info_text(e), pos, Palette.DANGER)
 			AudioBus.play("shatter")
+			EventBus.subtitle.emit(tr("SUB_DESTROY"))
 			EventBus.juice_shake.emit(0.35)
 			await _wait(step)
 		ScoreEvent.TRANSFORM:

@@ -6,6 +6,7 @@ extends Node
 const BUSES: Array[String] = ["Music", "SFX", "UI", "Ambience"]
 const SFX_DIR: String = "res://audio/sfx/"
 const MUSIC_DIR: String = "res://audio/music/"
+const MIX_PATH: String = "res://audio/sfx_mix.json"
 const POOL_SIZE: int = 24
 const MAX_VARIANTS: int = 5
 const PITCH_JITTER: float = 0.06
@@ -27,10 +28,14 @@ var _ambience: AudioStreamPlayer = null
 ## En headless (tests, simulation, CI), le pilote audio factice ne libère jamais les lectures.
 var _silent: bool = false
 var _music_tweens: Array[Tween] = []
+var _mix: Dictionary = {}
 
 
 func _ready() -> void:
 	_silent = DisplayServer.get_name() == "headless"
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(MIX_PATH)) if FileAccess.file_exists(MIX_PATH) else null
+	if parsed is Dictionary:
+		_mix = parsed as Dictionary
 	_ensure_buses()
 	for i: int in POOL_SIZE:
 		var p: AudioStreamPlayer = AudioStreamPlayer.new()
@@ -133,7 +138,7 @@ func play(sfx_id: String, pitch: float = 1.0, volume_db: float = 0.0, bus: Strin
 	_pool_next = (_pool_next + 1) % _pool.size()
 	p.stream = v[rng.randi_range(0, v.size() - 1)] as AudioStream
 	p.pitch_scale = maxf(pitch * (1.0 + rng.randf_range(-PITCH_JITTER, PITCH_JITTER)), 0.05)
-	p.volume_db = volume_db
+	p.volume_db = volume_db + float(_mix.get(sfx_id, 0.0))
 	p.bus = bus
 	p.play()
 
