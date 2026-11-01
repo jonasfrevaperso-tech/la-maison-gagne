@@ -20,13 +20,13 @@
     ],
     "tier_debts": [
       240,
-      700,
-      1600,
-      3800,
-      8000,
-      15000,
-      26000,
-      40000
+      600,
+      1200,
+      2500,
+      4800,
+      8500,
+      14000,
+      21000
     ],
     "deadline_kinds": [
       "small",
@@ -42,7 +42,8 @@
     "endless_debt_growth": 1.6,
     "event_chance_per_tier": 0.4,
     "tutorial_tiers": 3,
-    "tutorial_debt_mult": 0.85
+    "tutorial_debt_mult": 0.85,
+    "min_spins": 1
   },
   "bets": {
     "bet_budget": 10,
@@ -111,16 +112,16 @@
     "near_miss_count": 2
   },
   "economy": {
-    "start_money": 4,
+    "start_money": 8,
     "deadline_rewards": [
-      3,
-      4,
-      5
+      5,
+      6,
+      8
     ],
     "money_per_unused_spin": 1,
     "interest_step": 5,
     "interest_per_step": 1,
-    "interest_cap": 5,
+    "interest_cap": 6,
     "sell_ratio": 0.5,
     "zero_tax_money": 2
   },

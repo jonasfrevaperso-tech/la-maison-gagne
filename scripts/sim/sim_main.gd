@@ -6,6 +6,7 @@ extends SceneTree
 const SECONDS_PER_SPIN: float = 20.0
 const SECONDS_PER_SHOP: float = 35.0
 const MAX_SPINS_PER_RUN: int = 400
+const MIN_OFFERS: int = 8
 
 var opts: Dictionary = {
 	"runs": "100", "bot": "greedy", "character": "all", "risk": "0", "seed": "1", "out": "user://sim", "quiet": "false", "report": "false"
@@ -17,6 +18,7 @@ func _initialize() -> void:
 		if a.begins_with("--"):
 			var kv: PackedStringArray = a.substr(2).split("=", true, 1)
 			opts[kv[0]] = kv[1] if kv.size() > 1 else "true"
+	_apply_overrides()
 	var db: ContentDB = ContentDB.shared()
 	var n: int = int(opts["runs"])
 	var chars: Array[String] = db.ids("characters") if opts["character"] == "all" else [String(opts["character"])]
@@ -46,6 +48,22 @@ func _initialize() -> void:
 		)
 	)
 	quit(0)
+
+
+## Surcharges de tuning pour les balayages : --set=run.tier_debts=[...];economy.start_money=6
+func _apply_overrides() -> void:
+	if not opts.has("set"):
+		return
+	for assign: String in String(opts["set"]).split(";"):
+		var kv: PackedStringArray = assign.split("=", true, 1)
+		if kv.size() != 2:
+			continue
+		var parts: PackedStringArray = kv[0].split(".")
+		var node: Dictionary = Balance.data()
+		for i: int in parts.size() - 1:
+			node = node[parts[i]]
+		node[parts[parts.size() - 1]] = JSON.parse_string(kv[1])
+	print("Surcharges : ", opts["set"])
 
 
 func play_run(db: ContentDB, cid: String, risk: int, seed_value: int, bot_kind: String) -> Dictionary:
@@ -91,6 +109,7 @@ func play_run(db: ContentDB, cid: String, risk: int, seed_value: int, bot_kind: 
 		"best_spin": best,
 		"minutes": (float(spins) * SECONDS_PER_SPIN + float(shops) * SECONDS_PER_SHOP) / 60.0,
 		"picks": bot.picks.duplicate(),
+		"offers": bot.offers.duplicate(),
 		"final": final_grigris,
 		"money": r.money,
 		"fail_score": r.deadline_score,
@@ -109,6 +128,7 @@ func summarize(db: ContentDB, results: Array[Dictionary]) -> Dictionary:
 	reach.fill(0)
 	var by_char: Dictionary = {}
 	var picks: Dictionary = {}
+	var offers: Dictionary = {}
 	var fail_ratio: Array[float] = []
 	for r: Dictionary in results:
 		if bool(r["won"]):
@@ -127,6 +147,9 @@ func summarize(db: ContentDB, results: Array[Dictionary]) -> Dictionary:
 		by_char[c]["tier"] += float(r["tier"])
 		for gid: Variant in r["picks"]:
 			picks[String(gid)] = int(picks.get(String(gid), 0)) + 1
+		var ro: Dictionary = r["offers"]
+		for gk: Variant in ro.keys():
+			offers[String(gk)] = int(offers.get(String(gk), 0)) + int(ro[gk])
 		if not bool(r["won"]):
 			fail_ratio.append(float(r["fail_score"]) / maxf(float(r["fail_debt"]), 1.0))
 	var total_picks: int = 0
@@ -151,6 +174,7 @@ func summarize(db: ContentDB, results: Array[Dictionary]) -> Dictionary:
 		"picks": picks,
 		"mean_pick": mean_pick,
 		"avg_fail_ratio": avg_fail,
+		"offers": offers,
 	}
 
 
@@ -202,6 +226,13 @@ func write_report(s: Dictionary) -> void:
 	lines.append("- Durée estimée d'un run : %.1f min (objectif 35–50 min pour un run gagnant)" % s["avg_minutes"])
 	lines.append("- Progression moyenne de la dette au moment de l'échec : %.0f %%" % (float(s["avg_fail_ratio"]) * 100.0))
 	lines.append("")
+	lines.append(
+		"Limites : les bots visent mieux ou moins bien qu'un humain (erreur de ±1 case dans 35 % des lancers) et le bot « synergy »"
+	)
+	lines.append("estime chaque offre sur 12 tours simulés, ce qui sous-évalue les grigris à croissance lente (ex. Ouroboros, Tirelire).")
+	lines.append("Il compare la valeur au prix (les légendaires à 10 $ en pâtissent), ne joue ni transversales ni sixains, et ne voit")
+	lines.append("ni la valeur d'un tour supplémentaire ni celle des améliorations économiques : ces « délaissés » relèvent du bot.")
+	lines.append("")
 	lines.append("## Courbe de survie par palier")
 	lines.append("")
 	lines.append("| Palier | Runs l'atteignant |")
@@ -225,17 +256,39 @@ func write_report(s: Dictionary) -> void:
 			)
 		)
 	lines.append("")
-	lines.append("## Grigris (taux de choix, moyenne = %.2f)" % s["mean_pick"])
-	lines.append("")
 	var picks: Dictionary = s["picks"]
-	var keys: Array = picks.keys()
-	keys.sort_custom(func(a: Variant, b: Variant) -> bool: return int(picks[a]) > int(picks[b]))
-	lines.append("| Grigri | Choix | × moyenne | Statut |")
-	lines.append("|---|---|---|---|")
+	var offers: Dictionary = s["offers"]
+	var rates: Dictionary = {}
+	var rate_sum: float = 0.0
+	for k: Variant in offers.keys():
+		if int(offers[k]) >= MIN_OFFERS:
+			rates[k] = float(picks.get(k, 0)) / float(offers[k])
+			rate_sum += float(rates[k])
+	var mean_rate: float = rate_sum / maxf(float(rates.size()), 1.0)
+	lines.append(
+		(
+			"## Grigris — taux de choix quand proposé (moyenne %.1f %%, %d grigris proposés ≥ %d fois)"
+			% [mean_rate * 100.0, rates.size(), MIN_OFFERS]
+		)
+	)
+	lines.append("")
+	lines.append(
+		"Dominant : > 2× la moyenne. Délaissé : < 0,25× la moyenne. Le taux brut dépend de la rareté, d'où cette mesure conditionnelle."
+	)
+	lines.append("")
+	var keys: Array = rates.keys()
+	keys.sort_custom(func(a: Variant, b: Variant) -> bool: return float(rates[a]) > float(rates[b]))
+	lines.append("| Grigri | Proposé | Choisi | Taux | × moyenne | Statut |")
+	lines.append("|---|---|---|---|---|---|")
+	var dominant: int = 0
+	var weak: int = 0
 	for k: Variant in keys:
-		var ratio: float = float(picks[k]) / maxf(float(s["mean_pick"]), 0.001)
-		var status: String = "dominant" if ratio > 2.0 else ("faible" if ratio < 0.25 else "ok")
-		lines.append("| %s | %d | %.2f | %s |" % [k, picks[k], ratio, status])
+		var ratio: float = float(rates[k]) / maxf(mean_rate, 0.0001)
+		var status: String = "dominant" if ratio > 2.0 else ("délaissé" if ratio < 0.25 else "ok")
+		dominant += 1 if status == "dominant" else 0
+		weak += 1 if status == "délaissé" else 0
+		lines.append("| %s | %d | %d | %.0f %% | %.2f | %s |" % [k, offers[k], picks.get(k, 0), float(rates[k]) * 100.0, ratio, status])
+	lines.insert(8, "- Grigris dominants : %d · délaissés : %d (sur %d mesurés)" % [dominant, weak, rates.size()])
 	var f: FileAccess = FileAccess.open("res://docs/BALANCE.md", FileAccess.WRITE)
 	if f != null:
 		f.store_string("\n".join(lines) + "\n")

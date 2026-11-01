@@ -486,8 +486,8 @@
   "sfx": "stone",
   "name_fr": "Cendrier",
   "name_en": "Ashtray",
-  "desc_fr": "+15 Jetons par pari perdu.",
-  "desc_en": "+15 Chips per losing bet.",
+  "desc_fr": "+10 Jetons par pari perdu.",
+  "desc_en": "+10 Chips per lost bet.",
   "flavor_fr": "Plein des cendres de paris consumés.",
   "flavor_en": "Full of the ashes of burnt bets.",
   "effects": [
@@ -496,7 +496,7 @@
     "do": [
      {
       "op": "add_chips",
-      "v": 15
+      "v": 10
      }
     ]
    }
@@ -740,8 +740,8 @@
   "sfx": "click",
   "name_fr": "Visière verte",
   "name_en": "Green Visor",
-  "desc_fr": "+4 Mult si 5 emplacements de pari ou plus sont joués.",
-  "desc_en": "+4 Mult if 5 or more bet spots are played.",
+  "desc_fr": "+3 Mult si 5 emplacements de pari ou plus sont joués.",
+  "desc_en": "+3 Mult if 5+ bet spots are played.",
   "flavor_fr": "Le comptable voit tout. Surtout en vert.",
   "flavor_en": "The accountant sees all. Mostly in green.",
   "effects": [
@@ -757,7 +757,7 @@
     "do": [
      {
       "op": "add_mult",
-      "v": 4
+      "v": 3
      }
     ]
    }
@@ -774,8 +774,8 @@
   "sfx": "cloth",
   "name_fr": "Cireur",
   "name_en": "Shoe Shiner",
-  "desc_fr": "+2 Mult par grigri vendu durant ce run.",
-  "desc_en": "+2 Mult per charm sold this run.",
+  "desc_fr": "+1 Mult par grigri vendu durant ce run.",
+  "desc_en": "+1 Mult per charm sold this run.",
   "flavor_fr": "Il fait briller ce que vous lâchez.",
   "flavor_en": "He shines whatever you let go.",
   "effects": [
@@ -786,7 +786,7 @@
       "op": "add_mult",
       "v": {
        "var": "sold_count",
-       "mul": 2
+       "mul": 1
       }
      }
     ]
@@ -834,8 +834,8 @@
   "sfx": "dice",
   "name_fr": "Cornet à dés",
   "name_en": "Dice Cup",
-  "desc_fr": "1 chance sur 2 : +5 Mult.",
-  "desc_en": "1 in 2: +5 Mult.",
+  "desc_fr": "1 chance sur 2 : +4 Mult.",
+  "desc_en": "1 in 2: +4 Mult.",
   "flavor_fr": "Secouez. Priez. Renversez.",
   "flavor_en": "Shake. Pray. Spill.",
   "effects": [
@@ -850,7 +850,7 @@
     "do": [
      {
       "op": "add_mult",
-      "v": 5
+      "v": 4
      }
     ]
    }
@@ -970,8 +970,8 @@
   "sfx": "paper",
   "name_fr": "Règlement intérieur",
   "name_en": "House Rules",
-  "desc_fr": "+3 Mult par Contrat signé.",
-  "desc_en": "+3 Mult per Contract signed.",
+  "desc_fr": "+2 Mult par Contrat signé.",
+  "desc_en": "+2 Mult per Contract signed.",
   "flavor_fr": "Article 1 : La Maison a raison. Article 2 : voir article 1.",
   "flavor_en": "Article 1: the House is right. Article 2: see article 1.",
   "effects": [
@@ -982,7 +982,7 @@
       "op": "add_mult",
       "v": {
        "var": "contract_count",
-       "mul": 3
+       "mul": 2
       }
      }
     ]
@@ -1271,8 +1271,8 @@
   "sfx": "cloth",
   "name_fr": "Craie de billard",
   "name_en": "Billiard Chalk",
-  "desc_fr": "+2 Mult par point de Précision.",
-  "desc_en": "+2 Mult per point of Precision.",
+  "desc_fr": "+1,5 Mult par point de Précision.",
+  "desc_en": "+1.5 Mult per Precision point.",
   "flavor_fr": "Mauvais jeu, bon geste.",
   "flavor_en": "Wrong game, right gesture.",
   "effects": [
@@ -1283,7 +1283,7 @@
       "op": "add_mult",
       "v": {
        "var": "precision",
-       "mul": 2
+       "mul": 1.5
       }
      }
     ]
@@ -1372,8 +1372,8 @@
   "sfx": "choir",
   "name_fr": "L'Évêque",
   "name_en": "The Bishop",
-  "desc_fr": "Gagne +1 Mult (permanent) par carré gagnant.",
-  "desc_en": "Gains +1 Mult (permanent) per winning corner.",
+  "desc_fr": "Gagne +2 Mult (permanent) par carré gagnant.",
+  "desc_en": "Gains +2 Mult (permanent) per winning corner.",
   "flavor_fr": "Il ne bouge qu'en diagonale. Comme la morale.",
   "flavor_en": "Moves only diagonally. Like morals.",
   "effects": [
@@ -1388,7 +1388,7 @@
     "do": [
      {
       "op": "counter_add",
-      "v": 1
+      "v": 2
      }
     ]
    },
@@ -1509,8 +1509,8 @@
   "sfx": "paper",
   "name_fr": "Grand Livre",
   "name_en": "The Ledger",
-  "desc_fr": "+5 % du score déjà marqué dans l'échéance en Jetons (max 300).",
-  "desc_en": "+5% of the score already made this deadline as Chips (max 300).",
+  "desc_fr": "+4 % du score déjà marqué dans l'échéance en Jetons (max 200).",
+  "desc_en": "+4% of the deadline's score so far as Chips (max 200).",
   "flavor_fr": "Chaque ligne est une promesse. Aucune n'est tenue.",
   "flavor_en": "Every line a promise. None kept.",
   "effects": [
@@ -1521,8 +1521,8 @@
       "op": "add_chips",
       "v": {
        "var": "deadline_score",
-       "mul": 0.05,
-       "max": 300
+       "mul": 0.04,
+       "max": 200
       }
      }
     ]
@@ -1540,8 +1540,8 @@
   "sfx": "tick",
   "name_fr": "Sablier",
   "name_en": "Hourglass",
-  "desc_fr": "×Mult = 1 + 0,25 par tour restant.",
-  "desc_en": "×Mult = 1 + 0.25 per spin left.",
+  "desc_fr": "×Mult = 1 + 0,15 par tour restant.",
+  "desc_en": "×Mult = 1 + 0.15 per spin left.",
   "flavor_fr": "Le sable tombe. La dette monte.",
   "flavor_en": "Sand falls. Debt rises.",
   "effects": [
@@ -1552,7 +1552,7 @@
       "op": "mul_mult",
       "v": {
        "var": "spins_left",
-       "mul": 0.25,
+       "mul": 0.15,
        "add": 1
       }
      }
@@ -1770,8 +1770,8 @@
   "sfx": "double",
   "name_fr": "Faussaire",
   "name_en": "Forger",
-  "desc_fr": "1 chance sur 10 : la case touchée est dupliquée (la roue grandit).",
-  "desc_en": "1 in 10: the hit pocket is duplicated (the wheel grows).",
+  "desc_fr": "1 chance sur 5 : la case touchée est dupliquée (la roue grandit).",
+  "desc_en": "1 in 5: the hit pocket is duplicated (the wheel grows).",
   "flavor_fr": "Signature parfaite. Encre encore fraîche.",
   "flavor_en": "Perfect signature. Ink still wet.",
   "effects": [
@@ -1780,7 +1780,7 @@
     "if": [
      {
       "c": "chance",
-      "v": 0.1
+      "v": 0.2
      }
     ],
     "do": [
@@ -1886,8 +1886,8 @@
   "sfx": "stamp",
   "name_fr": "Tampon du notaire",
   "name_en": "Notary Stamp",
-  "desc_fr": "1 chance sur 10 à chaque tour : appose un sceau aléatoire sur une case au hasard.",
-  "desc_en": "1 in 10 each spin: puts a random seal on a random pocket.",
+  "desc_fr": "1 chance sur 4 à chaque tour : appose un sceau aléatoire sur une case au hasard.",
+  "desc_en": "1 in 4 each spin: puts a random seal on a random pocket.",
   "flavor_fr": "Lu et approuvé. Surtout approuvé.",
   "flavor_en": "Read and approved. Mostly approved.",
   "effects": [
@@ -1896,7 +1896,7 @@
     "if": [
      {
       "c": "chance",
-      "v": 0.1
+      "v": 0.25
      }
     ],
     "do": [
@@ -2018,8 +2018,8 @@
   "sfx": "paper",
   "name_fr": "Le Bookmaker",
   "name_en": "The Bookie",
-  "desc_fr": "+2 Mult par pari perdu.",
-  "desc_en": "+2 Mult per losing bet.",
+  "desc_fr": "+1,5 Mult par pari perdu.",
+  "desc_en": "+1.5 Mult per lost bet.",
   "flavor_fr": "Il note vos pertes avec tendresse.",
   "flavor_en": "He logs your losses tenderly.",
   "effects": [
@@ -2028,7 +2028,7 @@
     "do": [
      {
       "op": "add_mult",
-      "v": 2
+      "v": 1.5
      }
     ]
    }
@@ -2192,8 +2192,8 @@
   "sfx": "zero",
   "name_fr": "Dîme du Zéro",
   "name_en": "Zero's Tithe",
-  "desc_fr": "+5 $ quand la bille tombe sur le Zéro.",
-  "desc_en": "+$5 when the ball lands on Zero.",
+  "desc_fr": "Sur un Zéro : +8 $ et +40 Jetons.",
+  "desc_en": "On Zero: +$8 and +40 Chips.",
   "flavor_fr": "Le Zéro prend. Le Zéro rend, parfois.",
   "flavor_en": "Zero takes. Zero gives, sometimes.",
   "effects": [
@@ -2202,7 +2202,11 @@
     "do": [
      {
       "op": "add_money",
-      "v": 5
+      "v": 8
+     },
+     {
+      "op": "add_chips",
+      "v": 40
      }
     ]
    }
@@ -2310,8 +2314,8 @@
   "sfx": "stamp",
   "name_fr": "Commissaire-priseur",
   "name_en": "Auctioneer",
-  "desc_fr": "×Mult = 1 + 0,25 par grigri vendu durant ce run.",
-  "desc_en": "×Mult = 1 + 0.25 per charm sold this run.",
+  "desc_fr": "×Mult = 1 + 0,15 par grigri vendu durant ce run.",
+  "desc_en": "×Mult = 1 + 0.15 per charm sold this run.",
   "flavor_fr": "Adjugé ! À vous. Hélas.",
   "flavor_en": "Sold! To you. Alas.",
   "effects": [
@@ -2322,7 +2326,7 @@
       "op": "mul_mult",
       "v": {
        "var": "sold_count",
-       "mul": 0.25,
+       "mul": 0.15,
        "add": 1
       }
      }
@@ -2973,8 +2977,8 @@
   "sfx": "celebrate",
   "name_fr": "Salle de bal",
   "name_en": "Ballroom",
-  "desc_fr": "×Mult = 0,5 × nombre de types de paris posés (min ×1).",
-  "desc_en": "×Mult = 0.5 × number of distinct bet types placed (min ×1).",
+  "desc_fr": "×Mult = 0,75 × nombre de types de paris posés (min ×1).",
+  "desc_en": "×Mult = 0.75 × number of bet types placed (min ×1).",
   "flavor_fr": "Chaque pari danse avec un autre.",
   "flavor_en": "Every bet dances with another.",
   "effects": [
@@ -2985,7 +2989,7 @@
       "op": "mul_mult",
       "v": {
        "var": "distinct_kinds",
-       "mul": 0.5,
+       "mul": 0.75,
        "min": 1
       }
      }
@@ -3089,8 +3093,8 @@
   "sfx": "boss_enter",
   "name_fr": "La Revanche",
   "name_en": "Revenge",
-  "desc_fr": "×4 Mult si aucun pari ne gagne.",
-  "desc_en": "×4 Mult if no bet wins.",
+  "desc_fr": "Si aucun pari ne gagne : +60 Jetons et ×6 Mult.",
+  "desc_en": "If no bet wins: +60 Chips and ×6 Mult.",
   "flavor_fr": "Perdre, c'est juste gagner en différé.",
   "flavor_en": "Losing is just winning, deferred.",
   "effects": [
@@ -3103,8 +3107,12 @@
     ],
     "do": [
      {
+      "op": "add_chips",
+      "v": 60
+     },
+     {
       "op": "mul_mult",
-      "v": 4
+      "v": 6
      }
     ]
    }
@@ -3122,8 +3130,8 @@
   "sfx": "shimmer",
   "name_fr": "Joyaux de la couronne",
   "name_en": "Crown Jewels",
-  "desc_fr": "×Mult = 1 + 0,5 par case éditée sur la roue.",
-  "desc_en": "×Mult = 1 + 0.5 per edition pocket on the wheel.",
+  "desc_fr": "×Mult = 1 + 0,75 par case éditée sur la roue.",
+  "desc_en": "×Mult = 1 + 0.75 per edition pocket on the wheel.",
   "flavor_fr": "Volés à un roi qui les avait mis en gage.",
   "flavor_en": "Stolen from a king who had pawned them.",
   "effects": [
@@ -3134,7 +3142,7 @@
       "op": "mul_mult",
       "v": {
        "var": "edition_pockets",
-       "mul": 0.5,
+       "mul": 0.75,
        "add": 1
       }
      }
@@ -3295,8 +3303,8 @@
   "sfx": "vault",
   "name_fr": "Salle des coffres",
   "name_en": "Bank Vault",
-  "desc_fr": "Plafond des intérêts +10 $ et +1 $ à chaque tour.",
-  "desc_en": "Interest cap +$10 and +$1 every spin.",
+  "desc_fr": "Plafond des intérêts +10 $ et +2 $ à chaque tour.",
+  "desc_en": "Interest cap +$10 and +$2 every spin.",
   "flavor_fr": "La combinaison est gravée sur votre pierre tombale.",
   "flavor_en": "The combination is carved on your tombstone.",
   "effects": [
@@ -3323,7 +3331,7 @@
     "do": [
      {
       "op": "add_money",
-      "v": 1
+      "v": 2
      }
     ]
    }
@@ -3341,8 +3349,8 @@
   "sfx": "fire",
   "name_fr": "Phénix",
   "name_en": "Phoenix",
-  "desc_fr": "Gagne ×1 Mult (permanent) à chaque Zéro ; ×Mult = 1 + nombre de Zéros vécus avec lui.",
-  "desc_en": "Gains ×1 Mult (permanent) on each Zero; ×Mult = 1 + Zeros seen with it.",
+  "desc_fr": "Protège du Zéro. Gagne ×1 Mult (permanent) à chaque Zéro ; ×Mult = 1 + nombre de Zéros vécus avec lui.",
+  "desc_en": "Protects from Zero. Gains ×1 Mult (permanent) per Zero; ×Mult = 1 + Zeros survived with it.",
   "flavor_fr": "Il renaît de vos cendres. Pas des siennes.",
   "flavor_en": "It rises from your ashes. Not its own.",
   "effects": [
@@ -3364,6 +3372,14 @@
        "var": "counter",
        "add": 1
       }
+     }
+    ]
+   },
+   {
+    "trigger": "on_zero",
+    "do": [
+     {
+      "op": "protect_zero"
      }
     ]
    }

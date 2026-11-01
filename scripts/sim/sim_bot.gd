@@ -8,7 +8,8 @@ extends RefCounted
 
 const AIM_ERROR: float = 0.35
 const SAVE_FOR_INTEREST: int = 10
-const MC_SPINS: int = 24
+const MC_SPINS: int = 12
+const REROLL_RESERVE: int = 15
 const RARITY_VALUE: Dictionary = {"common": 1.0, "rare": 1.6, "legendary": 2.6, "cursed": 1.9}
 const TAG_VALUE: Dictionary = {
 	"xmult": 2.0, "mult": 1.2, "chips": 0.8, "retrigger": 1.8, "copy": 1.4, "growth": 1.2, "economy": 0.6, "safety": 0.5
@@ -40,6 +41,7 @@ const SPECIAL_TYPE_VALUE: Dictionary = {
 var kind: String = "greedy"
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var picks: Array[String] = []
+var offers: Dictionary = {}  # grigri -> nombre de fois proposé
 var target_index: int = 0
 
 
@@ -145,6 +147,7 @@ func shop(ctl: RunController) -> void:
 			if ShopModel.buy_grigri(run, ctl.db, idx) == ShopModel.BuyResult.OK:
 				picks.append(String((offers[idx] as Dictionary)["id"]))
 		return
+	_note_offers(run)
 	# 1. Contrats (améliorations permanentes) si on reste au-dessus de la réserve.
 	var contracts: Array = run.shop_state.get("contracts", [])
 	for i: int in contracts.size():
@@ -176,6 +179,25 @@ func shop(ctl: RunController) -> void:
 		var gid: String = String((offers2[best_i] as Dictionary)["id"])
 		if ShopModel.buy_grigri(run, ctl.db, best_i) == ShopModel.BuyResult.OK:
 			picks.append(gid)
+	# 2 bis. Un reroll si l'on a de la marge et de la place, puis nouvel essai d'achat.
+	if run.money - int(run.shop_state.get("reroll_cost", 99)) >= REROLL_RESERVE and run.empty_grigri_slots() > 0:
+		if ShopModel.reroll(run, ctl.db):
+			_note_offers(run)
+			var offers2b: Array = run.shop_state.get("grigris", [])
+			var bi: int = -1
+			var bv: float = 0.0
+			for i: int in offers2b.size():
+				var o2: Dictionary = offers2b[i]
+				if bool(o2["sold"]) or int(o2["price"]) > run.money:
+					continue
+				var v2: float = _value_of(ctl, String(o2["id"])) / maxf(float(o2["price"]), 1.0)
+				if v2 > bv:
+					bv = v2
+					bi = i
+			if bi >= 0:
+				var gid2: String = String((offers2b[bi] as Dictionary)["id"])
+				if ShopModel.buy_grigri(run, ctl.db, bi) == ShopModel.BuyResult.OK:
+					picks.append(gid2)
 	# 3. Paquets si l'argent dépasse la réserve.
 	var packs: Array = run.shop_state.get("packs", [])
 	for i: int in packs.size():
@@ -186,6 +208,12 @@ func shop(ctl: RunController) -> void:
 			_choose_in_pack(ctl)
 	# 4. Utiliser les Fortunes ciblées sur la meilleure zone.
 	use_fortunes(ctl)
+
+
+func _note_offers(run: RunState) -> void:
+	for o: Variant in run.shop_state.get("grigris", []):
+		var gid: String = String((o as Dictionary)["id"])
+		offers[gid] = int(offers.get(gid, 0)) + 1
 
 
 func _choose_in_pack(ctl: RunController) -> void:
