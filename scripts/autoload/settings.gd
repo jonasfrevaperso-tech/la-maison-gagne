@@ -8,7 +8,7 @@ const DEFAULTS: Dictionary = {
 	"juice": {"intensity": 1.0, "shake": 1.0, "flashes": true, "reduced_motion": false},
 	"game": {"speed": 1, "locale": "fr", "auto_repeat": false, "confirm_irreversible": true, "assist": false, "show_probabilities": false},
 	"access": {"colorblind": "off", "text_scale": 1.0, "high_contrast": false, "subtitles": true},
-	"input": {},
+	"input": {"bindings": {}},
 }
 
 var _cfg: ConfigFile = ConfigFile.new()
@@ -16,7 +16,29 @@ var _cfg: ConfigFile = ConfigFile.new()
 
 func _ready() -> void:
 	load_settings()
+	apply_bindings()
 	apply()
+
+
+## Remappage clavier persistant : remplace les touches clavier des actions concernées.
+func apply_bindings() -> void:
+	var saved: Variant = get_value("input", "bindings")
+	if not (saved is Dictionary):
+		return
+	for action: Variant in (saved as Dictionary).keys():
+		var a: StringName = StringName(String(action))
+		if not InputMap.has_action(a):
+			continue
+		var keep: Array[InputEvent] = []
+		for e: InputEvent in InputMap.action_get_events(a):
+			if not (e is InputEventKey):
+				keep.append(e)
+		InputMap.action_erase_events(a)
+		var k: InputEventKey = InputEventKey.new()
+		k.physical_keycode = int((saved as Dictionary)[action]) as Key
+		InputMap.action_add_event(a, k)
+		for e2: InputEvent in keep:
+			InputMap.action_add_event(a, e2)
 
 
 func load_settings() -> void:

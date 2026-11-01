@@ -8,6 +8,9 @@ const PROFILE_VERSION: int = 1
 const TMP_SUFFIX: String = ".tmp"
 const BAK_SUFFIX: String = ".bak"
 
+## Fichiers corrompus rencontrés (la copie de secours a pris le relais) : signalés à l'écran titre.
+static var corrupted_files: Array[String] = []
+
 var profile: Dictionary = {}
 
 
@@ -28,7 +31,7 @@ static func write_atomic(path: String, data: Dictionary) -> bool:
 	f.store_string(text)
 	f.close()
 	# Vérifie la relecture avant de remplacer.
-	var check: Variant = JSON.parse_string(FileAccess.get_file_as_string(tmp))
+	var check: Variant = parse_quiet(FileAccess.get_file_as_string(tmp))
 	if not (check is Dictionary):
 		push_error("SaveSystem : vérification échouée %s" % tmp)
 		return false
@@ -42,11 +45,19 @@ static func read_with_backup(path: String) -> Dictionary:
 	for candidate: String in [path, path + BAK_SUFFIX]:
 		if not FileAccess.file_exists(candidate):
 			continue
-		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(candidate))
+		var parsed: Variant = parse_quiet(FileAccess.get_file_as_string(candidate))
 		if parsed is Dictionary:
 			return parsed as Dictionary
-		push_warning("SaveSystem : fichier corrompu ignoré %s" % candidate)
+		corrupted_files.append(candidate)
 	return {}
+
+
+## Analyse JSON sans journaliser d'erreur moteur (un fichier corrompu est un cas prévu).
+static func parse_quiet(text: String) -> Variant:
+	var j: JSON = JSON.new()
+	if j.parse(text) != OK:
+		return null
+	return j.data
 
 
 # --------------------------------------------------------------------------- profil

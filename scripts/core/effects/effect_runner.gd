@@ -591,6 +591,7 @@ static func apply(a: Dictionary, env: EffectEnv) -> void:
 			run.extra_spins_per_deadline += int(v)
 		&"temp_budget":
 			run.temp_budget_bonus += int(v)
+			_emit(env, ScoreEvent.INFO, v, label if label != "" else "budget_up")
 		&"perm_budget":
 			run.bet_budget += int(v)
 		&"perm_chip_value":
@@ -599,6 +600,7 @@ static func apply(a: Dictionary, env: EffectEnv) -> void:
 			run.precision = clampi(run.precision + int(v), 1, Balance.i("throw.max_precision"))
 		&"temp_precision":
 			run.temp_precision_bonus += int(v)
+			_emit(env, ScoreEvent.INFO, v, label if label != "" else ("precision_up" if v > 0.0 else "precision_down"))
 		&"perm_control":
 			run.control_bonus += v
 		&"add_slot":
@@ -618,6 +620,7 @@ static func apply(a: Dictionary, env: EffectEnv) -> void:
 		&"retrigger_bets":
 			if ctx != null:
 				ctx.bet_retriggers += int(v)
+				_emit(env, ScoreEvent.INFO, v, label if label != "" else "retrigger")
 		&"multiply_win":
 			if ctx != null and ctx.current_bet != "":
 				var extra_chips: float = ctx.current_bet_win * (v - 1.0)

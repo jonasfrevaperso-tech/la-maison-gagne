@@ -3,8 +3,8 @@
 > Reprise après coupure : lire ce fichier, `CLAUDE.md`, puis `docs/DECISIONS.md`. Lancer `tools/check.sh`.
 
 ## État courant
-- Phase en cours : **Phase 4 — Systèmes de contenu**
-- Dernier tag : `phase-03-core-loop`
+- Phase en cours : **Phase 5 — Tranche verticale (Acte I)**
+- Dernier tag : `phase-04-content-systems`
 
 ## Phase 0 — Reconnaissance ✅
 - Environnement : Godot 4.7.2 (MCP godot OK), Blender 5.2.2, Python 3.14 + numpy 2.4 + Pillow 12, uv, gdtoolkit 4 (installé via uv), git 2.53, 12 cœurs.
@@ -33,6 +33,13 @@
 - Testé : 34 tests (dont victoire→Infini en logique pure), `check.sh` vert.
 - Reste : contenu (phase 4+), équilibrage.
 - Risques : difficulté actuelle trop élevée pour un humain moyen (simulation 0 %) → ajustement avant la tranche verticale.
+
+## Phase 4 — Systèmes de contenu ✅
+- Plan : tests de couverture pilotés par les données (chaque entrée doit avoir un effet observable), sauvegarde robuste, lisibilité des effets.
+- Fait : test de couverture sur les 42 grigris, 24 cases spéciales, 4 éditions, 6 sceaux, 13 Fortune, 20 contrats (chaînes vérifiées), 16 créanciers ; événements visibles pour re-déclenchements de paris, budget/précision temporaires ; sauvegarde : relecture silencieuse des fichiers corrompus + bascule sur .bak + avertissement à l'écran titre ; remappage clavier persistant.
+- Testé : 44 tests, `check.sh` vert (zéro erreur/warning dans tous les journaux).
+- Reste : contenu complet (phase 6).
+- Risques : aucun bloquant.
 
 ## Rapport de phase
 Format : fait / testé / reste à faire / risques.

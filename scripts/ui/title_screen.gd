@@ -54,6 +54,9 @@ func _ready() -> void:
 	ver.position += Vector2(-110, -40)
 	add_child(ver)
 	AudioBus.play_music("menu")
+	if not SaveSystem.corrupted_files.is_empty():
+		EventBus.toast.emit.call_deferred(tr("TOAST_BACKUP_USED"), &"info")
+		SaveSystem.corrupted_files.clear()
 
 
 ## Entrées optionnelles : n'apparaissent que si l'écran existe (développement incrémental).
