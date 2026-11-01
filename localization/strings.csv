@@ -31,3 +31,244 @@ CELEB_GOOD,Bien !,Nice!
 CELEB_HUGE,Énorme !,Huge!
 CELEB_JACKPOT,JACKPOT !,JACKPOT!
 CELEB_BANK,CASSE-LA-BANQUE !,BREAK THE BANK!
+ACTION_UI_SPIN,Lancer / relâcher,Spin / release
+ACTION_BET_UNDO,Annuler la dernière mise,Undo last bet
+ACTION_BET_REPEAT,Répéter le dernier pari,Repeat last bet
+ACTION_BET_CLEAR,Effacer les mises,Clear bets
+ACTION_SPEED_TOGGLE,Vitesse des animations,Animation speed
+ACTION_SKIP_ANIM,Passer l'animation,Skip animation
+BET_LIMIT,Limite de table : %d jetons,Table limit: %d chips
+BET_ODDS,Cote %d:1 · gain par jeton : %d,Pays %d:1 · win per chip: %d
+BET_ODDS_HIDDEN,Cote : ??? (le Croupier Muet se tait),Odds: ??? (the Mute Dealer says nothing)
+BET_PLACED,Jetons posés : %d,Chips placed: %d
+BET_RAW_CHANCE,Chance brute (sans visée) : %.1f %%,Raw chance (no aiming): %.1f%%
+BET_ZERO_WARNING,Perd sur le Zéro.,Loses on Zero.
+BTN_CLEAR,Effacer,Clear
+BTN_CONTINUE,Continuer,Continue
+BTN_KEEP,Garder,Keep
+BTN_NO,Non,No
+BTN_RELEASE,RELÂCHER !,RELEASE!
+BTN_REPEAT,Répéter,Repeat
+BTN_RETHROW,Relancer (gratuit),Re-throw (free)
+BTN_SPIN,LANCER,SPIN
+BTN_UNDERSTOOD,Compris,Got it
+BTN_UNDO,Annuler,Undo
+BTN_YES,Oui,Yes
+CARD_COUNTER,Valeur actuelle : %s,Current value: %s
+CARD_PRICE,Prix : %d $,Price: $%d
+CB_OFF,Désactivé,Off
+CB_PROTAN,Protanopie,Protanopia
+CB_DEUTAN,Deutéranopie,Deuteranopia
+CB_TRITAN,Tritanopie,Tritanopia
+CHAR_SEED,Graine :,Seed:
+CHAR_SEED_PLACEHOLDER,aléatoire,random
+CHAR_START,Entrer dans La Maison,Enter the House
+CHAR_TITLE,Qui rembourse ce soir ?,Who pays tonight?
+CONFIRM_ABANDON,"Abandonner ce run ? La dette, elle, restera.",Abandon this run? The debt will remain.
+CONFIRM_SELL,Vendre %s pour %d $ ?,Sell %s for $%d?
+CREDITOR_ACCEPT,Payer ce qu'on doit,Pay what's owed
+CREDITOR_ARRIVES,UN CRÉANCIER S'INSTALLE À LA TABLE,A CREDITOR TAKES A SEAT
+CREDITS_1,"Conception, code, sons et images : générés avec Claude Code pour jonasfreva.","Design, code, sound and art: generated with Claude Code for jonasfreva."
+CREDITS_2,Moteur : Godot Engine 4.7 (MIT).,Engine: Godot Engine 4.7 (MIT).
+CREDITS_3,"Outils : Blender, Python, numpy, Pillow, gdtoolkit.","Tools: Blender, Python, numpy, Pillow, gdtoolkit."
+CREDITS_4,"Tous les sons, musiques et icônes sont originaux, générés par script.","All sounds, music and icons are original and script-generated."
+CREDITS_5,"Inspirations mécaniques : Balatro, Clover Pit, Raccoin.","Mechanical inspirations: Balatro, Clover Pit, Raccoin."
+CREDITS_6,Merci à toutes les familles qui ont toujours perdu.,Thanks to every family that always lost.
+DAILY_TITLE,Graine du jour,Daily seed
+DEADLINE_SMALL,Petite Échéance,Small Deadline
+DEADLINE_BIG,Grande Échéance,Big Deadline
+DEADLINE_CREDITOR,Créancier,Creditor
+FX_SPINS,+%d tour,+%d spin
+FX_ZERO,ZÉRO,ZERO
+FX_SHATTER,BRISÉE !,SHATTERED!
+FX_BOOM,BOUM !,BOOM!
+FX_LUCKY,Chanceux !,Lucky!
+FX_GROW,+1 niveau,+1 level
+FX_BURNT_OUT,Consumé,Burnt out
+FX_TAX,Taxe,Tax
+FX_INTEREST,Intérêts !,Interest!
+FX_TRICK,Tour de passe-passe !,Sleight of hand!
+FX_UNSTABLE,Roue instable,Unstable wheel
+FX_HOUSE_EDGE,Avantage de La Maison,House edge
+FX_RETRIGGER,Encore !,Again!
+FX_STEAL,Volé !,Stolen!
+FX_POCKET_DESTROYED,Case détruite,Pocket destroyed
+FX_ZERO_PROTECTED,Zéro paré !,Zero blocked!
+FX_DEBT,Dette ajustée,Debt adjusted
+FX_BURN,Brûlée !,Burnt!
+HINT_BETTING,"Clic : +1 jeton (Maj : +5) · clic droit : −1 · bords et coins : chevaux, carrés · Espace : lancer","Click: +1 chip (Shift: +5) · right-click: −1 · edges/corners: splits, corners · Space: spin"
+HINT_AIMING,La roue tourne sous l'aiguille : relâche quand ta zone est en face (Espace).,The wheel turns under the needle: release when your zone lines up (Space).
+HINT_BALL,La bille court… (Entrée : passer),The ball is running… (Enter: skip)
+HINT_RETHROW,Relance gratuite disponible : relancer ou garder ce résultat ?,Free re-throw available: re-throw or keep this result?
+HINT_SCORING,Calcul du score… (Entrée : passer),Scoring… (Enter: skip)
+HINT_OVERLAY,…,…
+HINT_TARGETING,Choisis une case sur la roue (Échap : annuler).,Pick a pocket on the wheel (Esc: cancel).
+HISTORY_TIP,Numéro %d · score %s · paris gagnés : %d,Number %d · score %s · bets won: %d
+HUD_BANNED,interdit : %s,banned: %s
+HUD_BUDGET,Mises %d / %d,Bets %d / %d
+HUD_INFO,Tours [b]%d[/b]/%d · Jeton [b]%d[/b] · Précision [b]%d[/b] · Acte %d,Spins [b]%d[/b]/%d · Chip [b]%d[/b] · Precision [b]%d[/b] · Act %d
+HUD_PHASE,phase %d/%d : %s,phase %d/%d: %s
+HUD_TIER,Palier %d · %s,Tier %d · %s
+LANG_FR,Français,French
+LANG_EN,Anglais,English
+OPT_ASSIST,Assistance (visée plus lente),Assist (slower aiming)
+OPT_BLOOM,Bloom,Bloom
+OPT_COLORBLIND,Mode daltonien,Colour-blind mode
+OPT_CONFIRM,Confirmer les actions irréversibles,Confirm irreversible actions
+OPT_CRT,Effet CRT,CRT effect
+OPT_FLASHES,Flashs lumineux,Light flashes
+OPT_FULLSCREEN,Plein écran,Fullscreen
+OPT_HIGH_CONTRAST,Contraste élevé,High contrast
+OPT_JUICE,Intensité du jus,Juice intensity
+OPT_LOCALE,Langue,Language
+OPT_PRESS_KEY,Appuie sur une touche…,Press a key…
+OPT_REDUCED_MOTION,Mouvements réduits,Reduced motion
+OPT_RESET_INPUT,Touches par défaut,Default keys
+OPT_SHAKE,Secousses d'écran,Screen shake
+OPT_SHOW_FPS,Afficher les FPS,Show FPS
+OPT_SHOW_PROBS,Afficher les probabilités,Show probabilities
+OPT_SPEED,Vitesse des animations,Animation speed
+OPT_SUBTITLES,Sous-titres des sons,Sound captions
+OPT_TAB_ACCESS,Accessibilité,Accessibility
+OPT_TAB_AUDIO,Audio,Audio
+OPT_TAB_GAME,Jeu,Game
+OPT_TAB_INPUT,Commandes,Controls
+OPT_TAB_JUICE,Jus,Juice
+OPT_TAB_VIDEO,Vidéo,Video
+OPT_TEXT_SCALE,Taille de l'interface,Interface size
+OPT_VOL_AMBIENCE,Ambiance,Ambience
+OPT_VOL_MASTER,Volume général,Master volume
+OPT_VOL_MUSIC,Musique,Music
+OPT_VOL_SFX,Effets,Effects
+OPT_VOL_UI,Interface,Interface
+OPT_VSYNC,Synchronisation verticale,V-Sync
+PACK_ADD,Ajouter,Add
+PACK_CHOOSE,Choisis dans le %s,Choose from the %s
+PACK_FORTUNE,Paquet Fortune,Fortune Pack
+PACK_FORTUNE_DESC,"3 cartes Fortune, garde-en une.","3 Fortune cards, keep one."
+PACK_OCCULT,Paquet occulte,Occult Pack
+PACK_OCCULT_DESC,"2 grigris rares ou légendaires, garde-en un.","2 rare or legendary charms, keep one."
+PACK_POCKET,Paquet de cases,Pocket Pack
+PACK_POCKET_DESC,3 cases spéciales : ajoute-en une à la roue ou remplace la case de même numéro.,3 special pockets: add one to the wheel or replace the pocket with that number.
+PACK_REPLACE,Remplacer,Replace
+PACK_SKIP,Passer,Skip
+PACK_TAKE,Prendre,Take
+PACT_BUDGET,"Céder %d jetons de budget, pour toujours","Give up %d bet budget, forever"
+PACT_DECLINE,Refuser. Partir la tête haute (et vide).,Refuse. Leave head held high (and empty).
+PACT_GRIGRI,Sacrifier %s,Sacrifice %s
+PACT_POCKET,Laisser La Maison prendre ta plus belle case,Let the House take your finest pocket
+PACT_TEXT,"Tu as réuni %s sur %s. La Maison, magnanime, t'offre %d tour de plus. Contre un petit quelque chose.","You gathered %s of %s. The House, magnanimous, offers %d more spin. For a small something."
+PACT_TITLE,Un Pacte ?,A Pact?
+PAUSE_ABANDON,Abandonner le run,Abandon run
+PAUSE_COPY_SEED,Copier la graine,Copy seed
+PAUSE_RESUME,Reprendre,Resume
+PAUSE_SAVE_QUIT,Sauvegarder et quitter,Save and quit
+PAUSE_SEED,Graine : %s,Seed: %s
+PAUSE_TITLE,Pause,Pause
+POCKET_LEVEL,Niveau %d (+%d Jetons),Level %d (+%d Chips)
+POCKET_PROBABILITY,Probabilité d'arrêt : %.1f %%,Landing chance: %.1f%%
+RARITY_COMMON,Commun,Common
+RARITY_RARE,Rare,Rare
+RARITY_LEGENDARY,Légendaire,Legendary
+RARITY_CURSED,Maudit,Cursed
+REJECT_BUDGET,Budget de mises épuisé.,Bet budget exhausted.
+REJECT_FORBIDDEN,Ce pari est interdit ici.,This bet is forbidden here.
+REJECT_LIMIT,Limite de table atteinte sur cet emplacement.,Table limit reached on this spot.
+REJECT_NO_BET,Pose au moins un jeton avant de lancer.,Place at least one chip before spinning.
+REJECT_UNKNOWN,Pari impossible.,Bet not possible.
+REWARD_BASE,Échéance remboursée,Deadline repaid
+REWARD_INTEREST,Intérêts,Interest
+REWARD_SPINS,Tours non utilisés,Unused spins
+REWARD_TITLE,Remboursé !,Repaid!
+REWARD_TOTAL,+%d $,+$%d
+REWARD_VICTORY,La dette est soldée.,The debt is settled.
+RISK_LEVEL,Risque %d,Risk %d
+RISK_NONE,Aucun risque supplémentaire. (Haha.),No extra risk. (Haha.)
+SHOP_GRIGRIS,Grigris,Charms
+SHOP_LEAVE,Retour à la table,Back to the table
+SHOP_LOCKED,Ce grigri est verrouillé (clic droit pour déverrouiller).,This charm is locked (right-click to unlock).
+SHOP_NO_MONEY,Pas assez d'argent.,Not enough money.
+SHOP_NO_SLOT,Plus de place.,No room left.
+SHOP_ODDS,Probabilités de rareté : %s,Rarity odds: %s
+SHOP_OWNED,Tes grigris (double-clic : vendre · glisser : réordonner · clic droit : verrouiller),Your charms (double-click: sell · drag: reorder · right-click: lock)
+SHOP_PACKS_CONTRACT,Paquets et contrat,Packs and contract
+SHOP_REROLL,Relancer l'étal (%d $),Reroll stall ($%d)
+SHOP_TITLE,Le Bazar du Sous-sol,The Basement Bazaar
+SLOT_EMPTY,Emplacement libre,Empty slot
+SPEED_1,Normale ×1,Normal ×1
+SPEED_2,Rapide ×2,Fast ×2
+SPEED_4,Très rapide ×4,Very fast ×4
+SUB_BET_WIN,tintement de jetons,chips clinking
+SUB_JACKPOT,cloche du jackpot,jackpot bell
+SUB_ZERO,gong du Zéro,Zero gong
+SUMMARY_AGAIN,Rejouer (5 s),Play again
+SUMMARY_DEFEAT,La Maison gagne.,The House wins.
+SUMMARY_ENDLESS,Mode Infini,Endless mode
+SUMMARY_STATS,"[center]%s · Risque %d · Palier %d (%s)
+Échéances remboursées : %d · Tours joués : %d · Meilleur tour : %s · Zéros : %d
+Graine : [code]%s[/code][/center]","[center]%s · Risk %d · Tier %d (%s)
+Deadlines repaid: %d · Spins played: %d · Best spin: %s · Zeros: %d
+Seed: [code]%s[/code][/center]"
+SUMMARY_VICTORY,Tu as battu La Maison.,You beat the House.
+TIP_COLOR,Tes grigris de couleur adorent les cases Joker et les séries : vise des zones d'une seule couleur.,Your colour charms love Joker pockets and streaks: aim at single-colour zones.
+TIP_COPY,Place tes copieurs juste à gauche de ton meilleur grigri.,Put copiers just left of your best charm.
+TIP_ECONOMY,Garde 25 $ en poche pour maximiser les intérêts.,Keep $25 to max out interest.
+TIP_NEED_XMULT,"Il te manque un multiplicateur ×Mult : cherche Acier, Verre, Polychrome ou un grigri ×.","You lack a ×Mult source: look for Steel, Glass, Polychrome or a × charm."
+TIP_OUTSIDE,Les paris extérieurs sont sûrs mais craignent le Zéro : un Bouclier du Zéro les protège.,Outside bets are safe but fear Zero: a Zero Shield protects them.
+TIP_PRECISION,"Avec une meilleure Précision, les pleins voisins deviennent redoutables.","With more Precision, neighbouring straights become deadly."
+TIP_RETRIGGER,Les re-déclenchements multiplient tout ce qui est sur la case : améliore-la !,Retriggers multiply everything on the pocket: upgrade it!
+TIP_STRAIGHT,Tes grigris de pleins veulent de la Précision et des cases voisines bien choisies.,Your straight charms want Precision and well-chosen neighbours.
+TIP_STREAK,Les séries récompensent la constance : parie toujours sur la même couleur.,Streaks reward consistency: always bet the same colour.
+TIP_TITLE,Pistes pour la prochaine fois,Ideas for next time
+TIP_ZERO,"Avec tes grigris du Zéro, une Gomme sur une autre case rend le 0 plus probable.","With Zero charms, Erasing other pockets makes 0 likelier."
+TOAST_FORGIVEN,Sœur Marthe a prié : ce tour ne compte pas.,Sister Marthe prayed: this spin doesn't count.
+TOAST_PICK_POCKET,Clique une case de la roue.,Click a pocket on the wheel.
+TOAST_SEED_COPIED,Graine copiée.,Seed copied.
+TUTO_WELCOME_TITLE,Bienvenue au Grand Zéro,Welcome to the Grand Zero
+TUTO_WELCOME_1,"1. Pose tes jetons sur le tapis (10 par tour). Plein, cheval, carré, rouge… plus c'est risqué, plus ça paie.","1. Place your chips on the felt (10 per spin). Straight, split, corner, red… riskier pays more."
+TUTO_WELCOME_2,2. Lance : une aiguille balaie la roue. Relâche quand la zone visée couvre tes numéros. La Précision réduit les rebonds fous.,2. Spin: a needle sweeps the wheel. Release when your zone covers your numbers. Precision reduces wild bounces.
+TUTO_WELCOME_3,"3. Score = Jetons × Mult. Les grigris, les cases spéciales et les éditions font grimper l'un ou l'autre.","3. Score = Chips × Mult. Charms, special pockets and editions raise one or the other."
+TUTO_WELCOME_4,"4. Atteins la Dette avant la fin des tours, puis dépense ton argent au Bazar. Bonne chance. Vraiment.","4. Reach the Debt before you run out of spins, then spend at the Bazaar. Good luck. Really."
+WHY_CLOSE,Tu étais tout près : un grigri de plus aurait suffi.,So close: one more charm would have done it.
+WHY_CREDITOR,La règle de %s a pesé lourd.,%s's rule weighed heavily.
+WHY_LOST_SPINS,%d tour(s) sans aucun pari gagnant.,%d spin(s) with no winning bet.
+WHY_LOW_MULT,Très peu de sources de Mult : les Jetons seuls ne suffisent pas plus loin.,Very few Mult sources: Chips alone won't cut it later.
+WHY_MISSING,Il manquait %.0f %% de la dette (%s).,You were %.0f%% short (%s).
+WHY_TITLE,Pourquoi La Maison a gagné,Why the House won
+WHY_ZEROS,Le Zéro est sorti %d fois pendant cette échéance.,Zero hit %d time(s) during this deadline.
+TAG_BALL,Bille,Ball
+TAG_BETS,Paris,Bets
+TAG_BUDGET,Budget,Budget
+TAG_CHANCE,Hasard,Chance
+TAG_CHIPS,Jetons,Chips
+TAG_COLOR,Couleur,Colour
+TAG_COLUMN,Colonne,Column
+TAG_CONTROL,Contrôle,Control
+TAG_COPY,Copie,Copy
+TAG_CURSE,Malédiction,Curse
+TAG_DEBT,Dette,Debt
+TAG_DECAY,Déclin,Decay
+TAG_DESTROY,Destruction,Destroy
+TAG_DOZEN,Douzaine,Dozen
+TAG_ECONOMY,Économie,Economy
+TAG_GHOST,Fantôme,Ghost
+TAG_GLASS,Verre,Glass
+TAG_GOLDEN,Dorée,Golden
+TAG_GROWTH,Évolutif,Growth
+TAG_INTEREST,Intérêts,Interest
+TAG_MONEY,Argent,Money
+TAG_MULT,+Mult,+Mult
+TAG_OUTSIDE,Extérieur,Outside
+TAG_PARITY,Parité,Parity
+TAG_POCKETS,Cases,Pockets
+TAG_PRECISION,Précision,Precision
+TAG_REPEAT,Répétition,Repeat
+TAG_RETRIGGER,Re-déclenchement,Retrigger
+TAG_SAFETY,Sécurité,Safety
+TAG_SLOTS,Emplacements,Slots
+TAG_SPINS,Tours,Spins
+TAG_SPLIT,Cheval,Split
+TAG_STRAIGHT,Plein,Straight
+TAG_STREAK,Série,Streak
+TAG_XMULT,×Mult,×Mult
+TAG_ZERO,Zéro,Zero

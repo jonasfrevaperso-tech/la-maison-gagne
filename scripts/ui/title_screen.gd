@@ -11,7 +11,7 @@ func setup(_params: Dictionary) -> void:
 
 func _ready() -> void:
 	theme = UiKit.theme()
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(DecoBackground.new())
 	var center: VBoxContainer = VBoxContainer.new()
 	center.set_anchors_preset(Control.PRESET_CENTER)

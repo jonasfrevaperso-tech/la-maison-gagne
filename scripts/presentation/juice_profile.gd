@@ -19,7 +19,7 @@ const CARD_TILT_DEG: float = 9.0
 const BALL_SPIN_TIME: float = 3.6
 const BALL_SLOWMO_FACTOR: float = 0.35
 const PARTICLE_COUNT_MAX: int = 90
-const CELEBRATION_TIERS: Array[float] = [1.0, 2.0, 5.0, 12.0]  # multiples de la dette restante / tour
+const CELEBRATION_TIERS: Array[float] = [0.25, 0.5, 1.0, 3.0]  # fraction de la dette restante
 const CELEBRATION_KEYS: Array[String] = ["CELEB_GOOD", "CELEB_HUGE", "CELEB_JACKPOT", "CELEB_BANK"]
 
 

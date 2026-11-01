@@ -15,13 +15,13 @@ signal score_event_played(event: ScoreEvent)
 signal score_presentation_finished(total: int)
 signal deadline_started(tier: int, deadline_idx: int)
 signal deadline_won(reward: Dictionary)
-signal deadline_failed()
-signal shop_changed()
-signal grigris_changed()
-signal wheel_changed()
+signal deadline_failed
+signal shop_changed
+signal grigris_changed
+signal wheel_changed
 signal money_changed(money: int)
 signal fortune_used(fortune_id: String)
-signal settings_changed()
+signal settings_changed
 signal achievement_unlocked(achievement_id: String)
 signal toast(text: String, kind: StringName)
 signal juice_shake(intensity: float)

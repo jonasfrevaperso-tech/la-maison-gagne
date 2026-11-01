@@ -20,11 +20,11 @@ const CATEGORIES: Dictionary[String, Array] = {
 	"dialogues": ["res://data/events", "dialogues"],
 }
 
+static var _shared: ContentDB = null
+
+var errors: Array[String] = []
 var _data: Dictionary[String, Dictionary] = {}
 var _order: Dictionary[String, Array] = {}
-var errors: Array[String] = []
-
-static var _shared: ContentDB = null
 
 
 ## Instance partagée (lecture seule) : le contenu ne change pas pendant l'exécution.

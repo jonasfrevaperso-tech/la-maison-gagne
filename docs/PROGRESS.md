@@ -3,8 +3,8 @@
 > Reprise après coupure : lire ce fichier, `CLAUDE.md`, puis `docs/DECISIONS.md`. Lancer `tools/check.sh`.
 
 ## État courant
-- Phase en cours : **Phase 1 — Conception**
-- Dernier tag : `phase-00-recon`
+- Phase en cours : **Phase 3 — Boucle centrale**
+- Dernier tag : `phase-02-greybox`
 
 ## Phase 0 — Reconnaissance ✅
 - Environnement : Godot 4.7.2 (MCP godot OK), Blender 5.2.2, Python 3.14 + numpy 2.4 + Pillow 12, uv, gdtoolkit 4 (installé via uv), git 2.53, 12 cœurs.
@@ -12,6 +12,20 @@
 - Socle logique pur écrit dès la Phase 0 (roue, RNG à flux, paris, lancer, moteur d'effets, score, run, boutique) pour que la Phase 2 se concentre sur la présentation.
 - 8 autoloads (EventBus, Settings, Localization, RngService, DataRegistry, SaveSystem, AudioBus, GameState), écran titre, transitions rideaux, CRT + bloom.
 - Sortie : le projet s'importe et démarre sans erreur ni warning.
+
+## Phase 1 — Conception ✅
+- Plan : GDD complet avec formules → bible artistique → données initiales (data-driven) → validateur.
+- Fait : `docs/GDD.md` (structure, formules de score/lancer/économie, langage d'effets), `docs/ART_BIBLE.md` (palette hex, typos OFL, shaders), données : 25 types de cases, 4 éditions, 6 sceaux, 42 grigris, 13 Fortune, 20 contrats (10 chaînes), 16 créanciers (dont 2 secrets, Patron, La Maison en 3 phases), 6 personnages, 8 risques.
+- Testé : `tools/validate_data.gd` (ids, champs, vocabulaire d'effets, références croisées) → 0 erreur.
+- Reste : tables complètes en docs/content/ (générées depuis data en phase 6), événements, succès, défis.
+- Risques : équilibrage initial très dur (0–1 % de victoires simulées) → traité en phase 12, ajusté légèrement avant la tranche verticale.
+
+## Phase 2 — Prototype ✅
+- Plan : vues roue/tapis/score → machine à états d'interface → surcouches → pilote automatique QA.
+- Fait : `WheelView` (roue 2.5D vectorielle à taille variable, visée par aiguille, bille qui raconte un résultat déjà tiré, ralenti sur quasi-raté), `TableView` (tapis européen complet, détection fine plein/cheval/carré/transversale/sixain), `ScorePanel`, `ScorePresenter` (rejoue les ScoreEvent un à un), `DebtGauge`, grigris (glisser-déposer, verrouillage, infobulles riches), boutique, pacte, récompense, intro de créancier, pause, sélection perso/risque/graine, résumé de défaite, options complètes, crédits. 269 chaînes FR/EN.
+- Testé : 33 tests unitaires/intégration verts, lint propre, pilote automatique : 6 tours réels joués à l'écran avec passage par récompense et boutique, captures vérifiées.
+- Reste : icônes définitives, audio, tutoriel.
+- Risques : perfs du rendu vectoriel de la roue (à profiler phase 13).
 
 ## Rapport de phase
 Format : fait / testé / reste à faire / risques.

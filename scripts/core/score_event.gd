@@ -39,6 +39,12 @@ var mult_after: float = 0.0
 
 func to_dict() -> Dictionary:
 	return {
-		"kind": String(kind), "src": String(source_kind), "id": source_id, "uid": source_uid,
-		"amount": amount, "text": text, "chips": chips_after, "mult": mult_after,
+		"kind": String(kind),
+		"src": String(source_kind),
+		"id": source_id,
+		"uid": source_uid,
+		"amount": amount,
+		"text": text,
+		"chips": chips_after,
+		"mult": mult_after,
 	}

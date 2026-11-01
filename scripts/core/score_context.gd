@@ -22,6 +22,7 @@ var bets_won: Array[String] = []
 var bets_lost: Array[String] = []
 var win_chips_by_bet: Dictionary[String, float] = {}
 var pocket_retriggers: int = 0
+var pocket_pass: int = 0
 var bet_retriggers: int = 0
 var near_miss: bool = false
 var throw_result: ThrowResolver.ThrowResult = null

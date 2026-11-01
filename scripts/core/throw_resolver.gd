@@ -31,8 +31,11 @@ class ThrowResult:
 
 	func to_dict() -> Dictionary:
 		return {
-			"target": target_index, "landing": landing_index, "in_zone": in_zone,
-			"attracted_from": attracted_from, "stuck": stuck,
+			"target": target_index,
+			"landing": landing_index,
+			"in_zone": in_zone,
+			"attracted_from": attracted_from,
+			"stuck": stuck,
 		}
 
 

@@ -15,7 +15,7 @@ var _env: WorldEnvironment = null
 func _ready() -> void:
 	layer = LAYER
 	_rect = ColorRect.new()
-	_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var mat: ShaderMaterial = ShaderMaterial.new()
 	mat.shader = load(CRT_SHADER) as Shader

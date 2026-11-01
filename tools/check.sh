@@ -26,6 +26,9 @@ step "Validation des données"
 tail -5 "$LOG_DIR/validate.log"
 scan "$LOG_DIR/validate.log" || status=1
 
+step "Traductions"
+python3 tools/i18n_check.py | tail -3 || status=1
+
 step "Lint (gdlint)"
 if command -v gdlint >/dev/null; then
   gdlint scripts tests tools 2>&1 | tail -20 || status=1

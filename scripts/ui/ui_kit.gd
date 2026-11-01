@@ -28,7 +28,11 @@ static func font(kind: String) -> Font:
 		f = load(path) as Font
 	if f == null:
 		var sf: SystemFont = SystemFont.new()
-		sf.font_names = PackedStringArray(["DejaVu Sans Mono"]) if kind == "mono" else PackedStringArray(["DejaVu Serif", "Serif"]) if kind == "display" else PackedStringArray(["DejaVu Sans", "Sans"])
+		sf.font_names = (
+			PackedStringArray(["DejaVu Sans Mono"])
+			if kind == "mono"
+			else PackedStringArray(["DejaVu Serif", "Serif"]) if kind == "display" else PackedStringArray(["DejaVu Sans", "Sans"])
+		)
 		f = sf
 	_fonts[kind] = f
 	return f
@@ -134,14 +138,14 @@ static func rich(bbcode: String, size: int = SIZE_BODY) -> RichTextLabel:
 
 
 static func full_rect(c: Control) -> Control:
-	c.set_anchors_preset(Control.PRESET_FULL_RECT)
+	c.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	return c
 
 
 static func background(color: Color = Palette.INK) -> ColorRect:
 	var r: ColorRect = ColorRect.new()
 	r.color = color
-	r.set_anchors_preset(Control.PRESET_FULL_RECT)
+	r.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return r
 

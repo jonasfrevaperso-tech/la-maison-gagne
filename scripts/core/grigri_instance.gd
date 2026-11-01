@@ -18,8 +18,13 @@ func _init(p_id: String = "", p_uid: int = 0) -> void:
 
 func to_dict() -> Dictionary:
 	return {
-		"id": id, "uid": uid, "edition": String(edition), "counter": counter,
-		"locked": locked, "disabled": disabled, "sell_bonus": sell_bonus,
+		"id": id,
+		"uid": uid,
+		"edition": String(edition),
+		"counter": counter,
+		"locked": locked,
+		"disabled": disabled,
+		"sell_bonus": sell_bonus,
 	}
 
 

@@ -17,14 +17,17 @@ const MAGENTA: Color = Color("ff2e88")
 const CYAN: Color = Color("29e0ff")
 const EMERALD: Color = Color("2ee6a8")
 const ROULETTE_RED: Color = Color("c8102e")
-const ROULETTE_BLACK: Color = Color("16141a")
+const ROULETTE_BLACK: Color = Color("2a2532")
 const ZERO_GREEN: Color = Color("0f8a4f")
 const DANGER: Color = Color("ff4d3d")
 const CHIPS_BLUE: Color = Color("3d8bff")
 const MULT_RED: Color = Color("ff3b5c")
 
 const RARITY: Dictionary = {
-	"common": Color("b8b2c2"), "rare": Color("29e0ff"), "legendary": Color("f2d27a"), "cursed": Color("b03aff"),
+	"common": Color("b8b2c2"),
+	"rare": Color("29e0ff"),
+	"legendary": Color("f2d27a"),
+	"cursed": Color("b03aff"),
 }
 
 ## Variantes daltoniennes : rouge/noir distinguables par luminance + motif.

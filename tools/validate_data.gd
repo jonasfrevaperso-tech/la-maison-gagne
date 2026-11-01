@@ -104,7 +104,11 @@ func _validate_effects(db: ContentDB, eid: String, effects: Array) -> void:
 			if not EffectRunner.OPS.has(op):
 				errors.append("%s : action inconnue '%s'" % [eid, op])
 			_validate_value(eid, ad.get("v", 0))
-			if ad.has("type") and op in [&"transform_pocket", &"burn_random_pocket"] and not db.has_entry("pocket_types", String(ad["type"])):
+			if (
+				ad.has("type")
+				and op in [&"transform_pocket", &"burn_random_pocket"]
+				and not db.has_entry("pocket_types", String(ad["type"]))
+			):
 				errors.append("%s : type de case inconnu '%s'" % [eid, ad["type"]])
 			if ad.has("edition") and String(ad["edition"]) != "" and not db.has_entry("editions", String(ad["edition"])):
 				errors.append("%s : édition inconnue '%s'" % [eid, ad["edition"]])

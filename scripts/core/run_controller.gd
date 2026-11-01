@@ -3,6 +3,10 @@ extends RefCounted
 ## Orchestration pure d'un run (aucun Node) : utilisée par le jeu ET par le simulateur.
 ## Paliers → Échéances (Petite, Grande, Créancier) → Tours (paris, lancer, score).
 
+## Drapeaux posés par les créanciers, remis à zéro à chaque nouvelle échéance.
+const CREDITOR_FLAGS: Array[String] = ["hide_odds", "control_temp", "zone_width_override"]
+
+
 class SpinOutcome:
 	extends RefCounted
 	var throw_result: ThrowResolver.ThrowResult = null
@@ -12,6 +16,7 @@ class SpinOutcome:
 	var forgiven: bool = false
 	var reward: Dictionary = {}
 	var victory: bool = false
+
 
 var run: RunState = null
 var db: ContentDB = null
@@ -24,6 +29,7 @@ func _init(p_db: ContentDB = null) -> void:
 
 
 # --------------------------------------------------------------------------- création
+
 
 func new_run(character_id: String, risk_level: int, seed_value: int, challenge_id: String = "") -> RunState:
 	run = RunState.new()
@@ -147,6 +153,7 @@ func _plan_creditors() -> void:
 
 # --------------------------------------------------------------------------- échéances
 
+
 func debt_for(tier: int, deadline_idx: int) -> int:
 	var debts: Array = Balance.arr("run.tier_debts")
 	var base: float
@@ -162,6 +169,8 @@ func debt_for(tier: int, deadline_idx: int) -> int:
 
 
 func start_deadline() -> void:
+	for f: String in CREDITOR_FLAGS:
+		run.flags.erase(f)
 	run.creditor_id = ""
 	run.creditor_phase = 0
 	if run.is_creditor():
@@ -216,6 +225,7 @@ func refresh_bans() -> void:
 
 # --------------------------------------------------------------------------- paris
 
+
 func place_bet(spot_id: String, amount: int = 1) -> BetSlip.PlaceResult:
 	if run.phase != RunState.Phase.BETTING or pending_throw != null:
 		return BetSlip.PlaceResult.FORBIDDEN
@@ -232,11 +242,22 @@ func repeat_last() -> int:
 	return run.slip.apply_layout(run.last_layout)
 
 
+## Pose au moins un jeton sur le premier emplacement autorisé (bots, filet de sécurité).
+func ensure_some_bet() -> bool:
+	if not run.slip.is_empty():
+		return true
+	for spot: BetSpot in BetCatalog.all():
+		if run.slip.check(spot.id) == BetSlip.PlaceResult.OK:
+			return place_bet(spot.id) == BetSlip.PlaceResult.OK
+	return false
+
+
 func can_spin() -> bool:
 	return run.phase == RunState.Phase.BETTING and not run.slip.is_empty()
 
 
 # --------------------------------------------------------------------------- lancer
+
 
 func effective_precision() -> int:
 	return clampi(run.precision + run.temp_precision_bonus, 1, Balance.i("throw.max_precision"))
@@ -293,6 +314,9 @@ func commit_spin() -> SpinOutcome:
 	assert(pending_throw != null, "commit_spin sans lancer")
 	var out: SpinOutcome = SpinOutcome.new()
 	out.throw_result = pending_throw
+	# Les bonus temporaires ont été consommés (budget à la pose, précision au lancer).
+	run.temp_budget_bonus = 0
+	run.temp_precision_bonus = 0
 	var ctx: ScoreContext = ScoreEngine.resolve(run, db, pending_throw)
 	out.ctx = ctx
 	pending_throw = null
@@ -314,18 +338,26 @@ func _finish_spin(ctx: ScoreContext, out: SpinOutcome) -> void:
 		out.forgiven = true
 	else:
 		run.spins_left -= 1
-	run.temp_budget_bonus = 0
-	run.temp_precision_bonus = 0
 	run.last_layout = ctx.slip.duplicate()
 	var landed: Pocket = ctx.landing
 	run.last_landing_index = ctx.landing_index
 	var ldef: Dictionary = db.get_entry("pocket_types", String(landed.type_id))
 	run.sticky_index = ctx.landing_index if ldef.has("sticky") else -1
-	run.push_history({
-		"n": landed.number, "c": String(ctx.landing_colors[0]), "score": ctx.total,
-		"won": ctx.bets_won.size(), "lost": ctx.bets_lost.size(), "tier": run.tier,
-		"deadline": run.deadline_idx, "type": String(landed.type_id),
-	})
+	(
+		run
+		. push_history(
+			{
+				"n": landed.number,
+				"c": String(ctx.landing_colors[0]),
+				"score": ctx.total,
+				"won": ctx.bets_won.size(),
+				"lost": ctx.bets_lost.size(),
+				"tier": run.tier,
+				"deadline": run.deadline_idx,
+				"type": String(landed.type_id),
+			}
+		)
+	)
 	_update_creditor_phase()
 	if run.deadline_score >= run.debt:
 		out.deadline_won = true
@@ -353,10 +385,20 @@ func _deadline_won() -> Dictionary:
 	var reward: Dictionary = compute_reward()
 	run.money += int(reward["total"])
 	run.deadlines_cleared += 1
-	run.deadline_log.append({
-		"tier": run.tier, "deadline": run.deadline_idx, "score": run.deadline_score,
-		"debt": run.debt, "spins_used": run.spins_total - run.spins_left, "won": true,
-	})
+	(
+		run
+		. deadline_log
+		. append(
+			{
+				"tier": run.tier,
+				"deadline": run.deadline_idx,
+				"score": run.deadline_score,
+				"debt": run.debt,
+				"spins_used": run.spins_total - run.spins_left,
+				"won": true,
+			}
+		)
+	)
 	var prev_act: int = run.act()
 	run.deadline_idx += 1
 	if run.deadline_idx >= Balance.arr("run.deadline_kinds").size():
@@ -391,14 +433,25 @@ func _deadline_failed() -> void:
 
 func _game_over() -> void:
 	run.phase = RunState.Phase.GAME_OVER
-	run.deadline_log.append({
-		"tier": run.tier, "deadline": run.deadline_idx, "score": run.deadline_score,
-		"debt": run.debt, "spins_used": run.spins_total, "won": false,
-	})
+	(
+		run
+		. deadline_log
+		. append(
+			{
+				"tier": run.tier,
+				"deadline": run.deadline_idx,
+				"score": run.deadline_score,
+				"debt": run.debt,
+				"spins_used": run.spins_total,
+				"won": false,
+			}
+		)
+	)
 	run.defeat_reason = "debt_missed"
 
 
 # --------------------------------------------------------------------------- pacte
+
 
 ## Options de sacrifice proposées par La Maison.
 func pact_options() -> Array[Dictionary]:
@@ -454,6 +507,7 @@ func decline_pact() -> void:
 
 # --------------------------------------------------------------------------- boutique
 
+
 func leave_shop() -> void:
 	if run.phase != RunState.Phase.SHOP:
 		return
@@ -503,6 +557,7 @@ func resolve_event(choice_index: int) -> void:
 
 # --------------------------------------------------------------------------- fortune
 
+
 func fortune_needs_target(fid: String) -> bool:
 	return String(db.get_entry("fortunes", fid).get("target", "none")) == "pocket"
 
@@ -534,6 +589,7 @@ func use_fortune(slot: int, pocket_index: int = -1) -> bool:
 
 
 # --------------------------------------------------------------------------- endless
+
 
 func continue_endless() -> void:
 	if run.phase != RunState.Phase.VICTORY:

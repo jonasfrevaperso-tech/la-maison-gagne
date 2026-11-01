@@ -12,8 +12,19 @@ const KIND_DOZEN: StringName = &"dozen"
 const KIND_COLUMN: StringName = &"column"
 const EVEN_MONEY: Array[StringName] = [&"red", &"black", &"even", &"odd", &"low", &"high"]
 const ALL_KINDS: Array[StringName] = [
-	&"straight", &"split", &"street", &"corner", &"six_line", &"dozen", &"column",
-	&"red", &"black", &"even", &"odd", &"low", &"high",
+	&"straight",
+	&"split",
+	&"street",
+	&"corner",
+	&"six_line",
+	&"dozen",
+	&"column",
+	&"red",
+	&"black",
+	&"even",
+	&"odd",
+	&"low",
+	&"high",
 ]
 
 static var _spots: Dictionary[String, BetSpot] = {}
@@ -98,7 +109,12 @@ static func _build() -> void:
 				cn.append(n)
 		_add("column:%d" % r, KIND_COLUMN, cn)
 	var em: Dictionary[StringName, Array] = {
-		&"red": [], &"black": [], &"even": [], &"odd": [], &"low": [], &"high": [],
+		&"red": [],
+		&"black": [],
+		&"even": [],
+		&"odd": [],
+		&"low": [],
+		&"high": [],
 	}
 	for n: int in range(1, WheelLayout.POCKET_COUNT):
 		em[WheelLayout.color_of(n)].append(n)

@@ -36,14 +36,15 @@ static func resolve(run: RunState, db: ContentDB, throw_result: ThrowResolver.Th
 	_resolve_bets(run, db, ctx)
 
 	var passes: int = 0
-	var remaining: int = 1
+	var remaining: int = 1 + ctx.pocket_retriggers
+	ctx.pocket_retriggers = 0
 	while remaining > 0 and passes < MAX_POCKET_PASSES and ctx.landing_index >= 0:
 		remaining -= 1
 		passes += 1
-		var before: int = ctx.pocket_retriggers
+		ctx.pocket_pass = passes
 		_score_pocket(run, db, ctx, ctx.landing, ctx.landing_index, 0)
-		remaining += ctx.pocket_retriggers - before
-		ctx.pocket_retriggers = before
+		remaining += ctx.pocket_retriggers
+		ctx.pocket_retriggers = 0
 
 	EffectRunner.fire(&"on_score_calc", run, ctx, db)
 	ctx.total = ctx.compute_total()

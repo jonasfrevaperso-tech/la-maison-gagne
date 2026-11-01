@@ -7,47 +7,167 @@ extends RefCounted
 ## Expression: nombre, ou {"var": nom, "mul": m, "add": a, "min": x, "max": y}.
 
 const TRIGGERS: Array[StringName] = [
-	&"on_run_start", &"on_deadline_start", &"on_bet_placed", &"on_spin_start", &"on_ball_land",
-	&"on_zero", &"on_bet_win", &"on_bet_lose", &"on_pocket_score", &"on_edition", &"on_seal",
-	&"on_score_calc", &"on_round_end", &"on_deadline_end", &"on_shop_enter", &"on_reroll",
-	&"on_buy", &"on_sell", &"on_fortune_used", &"on_pocket_destroyed", &"passive",
-	&"on_acquire", &"on_remove", &"on_use", &"on_bet_phase",
+	&"on_run_start",
+	&"on_deadline_start",
+	&"on_bet_placed",
+	&"on_spin_start",
+	&"on_ball_land",
+	&"on_zero",
+	&"on_bet_win",
+	&"on_bet_lose",
+	&"on_pocket_score",
+	&"on_edition",
+	&"on_seal",
+	&"on_score_calc",
+	&"on_round_end",
+	&"on_deadline_end",
+	&"on_shop_enter",
+	&"on_reroll",
+	&"on_buy",
+	&"on_sell",
+	&"on_fortune_used",
+	&"on_pocket_destroyed",
+	&"passive",
+	&"on_acquire",
+	&"on_remove",
+	&"on_use",
+	&"on_bet_phase",
 ]
 const PREDICATES: Array[StringName] = [
-	&"color", &"number_in", &"parity", &"range", &"dozen", &"is_zero", &"pocket_type",
-	&"pocket_has_edition", &"pocket_edition", &"pocket_has_seal", &"bet_kind", &"bet_outside",
-	&"bet_inside", &"chance", &"deadline_kind", &"won_nothing", &"number_repeat", &"near_miss",
-	&"neighbor_type", &"not", &"any", &"last_spin", &"first_spin", &"has_grigri", &"is_creditor",
-	&"in_zone", &"attracted", &"bet_covers_landing_neighbor", &"grigri_position",
+	&"color",
+	&"number_in",
+	&"parity",
+	&"range",
+	&"dozen",
+	&"is_zero",
+	&"pocket_type",
+	&"pocket_has_edition",
+	&"pocket_edition",
+	&"pocket_has_seal",
+	&"bet_kind",
+	&"bet_outside",
+	&"bet_inside",
+	&"chance",
+	&"deadline_kind",
+	&"won_nothing",
+	&"number_repeat",
+	&"near_miss",
+	&"neighbor_type",
+	&"not",
+	&"any",
+	&"last_spin",
+	&"first_spin",
+	&"has_grigri",
+	&"is_creditor",
+	&"in_zone",
+	&"attracted",
+	&"bet_covers_landing_neighbor",
+	&"grigri_position",
+	&"first_pass",
 ]
 const VARIABLES: Array[StringName] = [
-	&"counter", &"money", &"grigri_count", &"empty_slots", &"spins_left", &"spin_index",
-	&"pocket_number", &"color_streak", &"bets_won", &"bets_lost", &"bets_placed", &"distinct_kinds",
-	&"chips_staked", &"tier", &"act", &"deadline_index", &"wheel_size", &"cursed_count",
-	&"fortune_count", &"contract_count", &"chip_value", &"bet_budget", &"precision", &"chips",
-	&"mult", &"win_chips", &"bet_chips", &"rerolls", &"sold_count", &"zero_count",
-	&"deadline_score", &"debt", &"edition_pockets", &"pocket_level", &"total_spins",
-	&"unused_budget", &"rare_count", &"common_count", &"legendary_count", &"number_count",
-	&"debt_progress", &"type_count",
+	&"counter",
+	&"money",
+	&"grigri_count",
+	&"empty_slots",
+	&"spins_left",
+	&"spin_index",
+	&"pocket_number",
+	&"color_streak",
+	&"bets_won",
+	&"bets_lost",
+	&"bets_placed",
+	&"distinct_kinds",
+	&"chips_staked",
+	&"tier",
+	&"act",
+	&"deadline_index",
+	&"wheel_size",
+	&"cursed_count",
+	&"fortune_count",
+	&"contract_count",
+	&"chip_value",
+	&"bet_budget",
+	&"precision",
+	&"chips",
+	&"mult",
+	&"win_chips",
+	&"bet_chips",
+	&"rerolls",
+	&"sold_count",
+	&"zero_count",
+	&"deadline_score",
+	&"debt",
+	&"edition_pockets",
+	&"pocket_level",
+	&"total_spins",
+	&"unused_budget",
+	&"rare_count",
+	&"common_count",
+	&"legendary_count",
+	&"number_count",
+	&"debt_progress",
+	&"type_count",
 ]
 const OPS: Array[StringName] = [
-	&"add_chips", &"add_mult", &"mul_mult", &"add_money", &"counter_add", &"counter_set",
-	&"counter_mul", &"add_spins", &"temp_budget", &"perm_budget", &"perm_chip_value",
-	&"perm_precision", &"temp_precision", &"perm_control", &"add_slot", &"retrigger_pocket",
-	&"retrigger_bets", &"multiply_win", &"self_destroy", &"chance_destroy_pocket",
-	&"destroy_pocket", &"transform_pocket", &"set_pocket_edition", &"set_pocket_seal",
-	&"upgrade_pocket", &"add_fortune", &"add_grigri", &"debt_add_pct", &"protect_zero",
-	&"copy_right", &"copy_left", &"message", &"house_tax_add", &"add_pocket_copy",
-	&"set_flag", &"ban_random_color", &"refund_lost", &"sell_bonus", &"disable_random_grigri",
-	&"burn_random_pocket", &"debt_add", &"shop_discount", &"interest_cap", &"table_limit",
-	&"add_rethrow", &"steal_chips", &"randomize_pocket", &"destroy_random_grigri",
-	&"add_extra_spins", &"add_random_seal", &"add_random_edition_grigri",
+	&"add_chips",
+	&"add_mult",
+	&"mul_mult",
+	&"add_money",
+	&"counter_add",
+	&"counter_set",
+	&"counter_mul",
+	&"add_spins",
+	&"temp_budget",
+	&"perm_budget",
+	&"perm_chip_value",
+	&"perm_precision",
+	&"temp_precision",
+	&"perm_control",
+	&"add_slot",
+	&"retrigger_pocket",
+	&"retrigger_bets",
+	&"multiply_win",
+	&"self_destroy",
+	&"chance_destroy_pocket",
+	&"destroy_pocket",
+	&"transform_pocket",
+	&"set_pocket_edition",
+	&"set_pocket_seal",
+	&"upgrade_pocket",
+	&"add_fortune",
+	&"add_grigri",
+	&"debt_add_pct",
+	&"protect_zero",
+	&"copy_right",
+	&"copy_left",
+	&"message",
+	&"house_tax_add",
+	&"add_pocket_copy",
+	&"set_flag",
+	&"ban_random_color",
+	&"refund_lost",
+	&"sell_bonus",
+	&"disable_random_grigri",
+	&"burn_random_pocket",
+	&"debt_add",
+	&"shop_discount",
+	&"interest_cap",
+	&"table_limit",
+	&"add_rethrow",
+	&"steal_chips",
+	&"randomize_pocket",
+	&"destroy_random_grigri",
+	&"add_extra_spins",
+	&"add_random_seal",
+	&"add_random_edition_grigri",
+	&"add_fortune_slot",
 ]
 const MAX_DEPTH: int = 3
 const CMP_DEFAULT: String = ">="
 
-
 # --------------------------------------------------------------------------- déclencheurs
+
 
 ## Exécute un déclencheur sur toutes les sources globales, dans l'ordre :
 ## personnage, contrats, créancier, puis grigris dans l'ordre des emplacements.
@@ -98,12 +218,24 @@ static func fire_pocket(trigger: StringName, pocket: Pocket, index: int, run: Ru
 	_fire_entry(trigger, tdef, base, ScoreEvent.SRC_POCKET, String(pocket.type_id), pocket.uid, null)
 	if trigger == &"on_pocket_score":
 		if pocket.edition != &"":
-			_fire_entry(&"on_edition", db.get_entry("editions", String(pocket.edition)), base, ScoreEvent.SRC_EDITION, String(pocket.edition), pocket.uid, null)
+			_fire_entry(
+				&"on_edition",
+				db.get_entry("editions", String(pocket.edition)),
+				base,
+				ScoreEvent.SRC_EDITION,
+				String(pocket.edition),
+				pocket.uid,
+				null
+			)
 		if pocket.seal != &"":
-			_fire_entry(&"on_seal", db.get_entry("seals", String(pocket.seal)), base, ScoreEvent.SRC_SEAL, String(pocket.seal), pocket.uid, null)
+			_fire_entry(
+				&"on_seal", db.get_entry("seals", String(pocket.seal)), base, ScoreEvent.SRC_SEAL, String(pocket.seal), pocket.uid, null
+			)
 
 
-static func _fire_entry(trigger: StringName, def: Dictionary, base: EffectEnv, src_kind: StringName, src_id: String, src_uid: int, g: GrigriInstance) -> void:
+static func _fire_entry(
+	trigger: StringName, def: Dictionary, base: EffectEnv, src_kind: StringName, src_id: String, src_uid: int, g: GrigriInstance
+) -> void:
 	if def.is_empty() or not def.has("effects"):
 		return
 	for eff_v: Variant in def["effects"]:
@@ -133,6 +265,7 @@ static func run_effect(eff: Dictionary, env: EffectEnv) -> bool:
 
 
 # --------------------------------------------------------------------------- conditions
+
 
 static func check_all(conds: Array, env: EffectEnv) -> bool:
 	for c: Variant in conds:
@@ -192,6 +325,8 @@ static func check(cond: Dictionary, env: EffectEnv) -> bool:
 			return p != null and env.run.last_number == p.number
 		&"near_miss":
 			return ctx != null and ctx.near_miss
+		&"first_pass":
+			return ctx != null and ctx.pocket_pass <= 1
 		&"in_zone":
 			return ctx != null and ctx.throw_result != null and ctx.throw_result.in_zone
 		&"attracted":
@@ -286,6 +421,7 @@ static func _luck_factor(env: EffectEnv) -> float:
 
 
 # --------------------------------------------------------------------------- valeurs
+
 
 static func value(v: Variant, env: EffectEnv) -> float:
 	if v is float or v is int:
@@ -411,6 +547,7 @@ static func _count_rarity(env: EffectEnv, rarity: String) -> int:
 
 # --------------------------------------------------------------------------- actions
 
+
 static func apply(a: Dictionary, env: EffectEnv) -> void:
 	var op: StringName = StringName(String(a.get("op", "")))
 	var run: RunState = env.run
@@ -431,10 +568,12 @@ static func apply(a: Dictionary, env: EffectEnv) -> void:
 				ctx.mult_mul *= v
 				_emit(env, ScoreEvent.MULT_MUL, v, label)
 		&"add_money":
-			run.money += int(v)
+			var delta: int = maxi(int(v), -run.money)
+			run.money += delta
 			if ctx != null:
-				ctx.money_delta += int(v)
-			_emit(env, ScoreEvent.MONEY, v, label)
+				ctx.money_delta += delta
+			if delta != 0:
+				_emit(env, ScoreEvent.MONEY, float(delta), label)
 		&"counter_add":
 			_set_counter(env, _get_counter(env) + v)
 			_emit(env, ScoreEvent.COUNTER, _get_counter(env), label)
@@ -446,6 +585,8 @@ static func apply(a: Dictionary, env: EffectEnv) -> void:
 		&"add_spins":
 			run.spins_left = maxi(run.spins_left + int(v), 0)
 			_emit(env, ScoreEvent.SPINS, v, label)
+		&"add_fortune_slot":
+			run.fortune_slots = maxi(run.fortune_slots + int(v), 0)
 		&"add_extra_spins":
 			run.extra_spins_per_deadline += int(v)
 		&"temp_budget":

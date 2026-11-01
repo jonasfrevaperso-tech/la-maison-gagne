@@ -3,13 +3,13 @@ extends RefCounted
 ## Boutique entre les échéances. Tout l'état vit dans run.shop_state (sauvegardable).
 ## Offres : grigris, paquets (cases / fortune / occulte), un contrat ; reroll croissant.
 
+enum BuyResult { OK, NO_MONEY, NO_SLOT, SOLD_OUT, INVALID }
+
 const TYPE_GRIGRI: String = "grigri"
 const TYPE_PACK: String = "pack"
 const TYPE_CONTRACT: String = "contract"
 const PACK_KINDS: Array[String] = ["pocket", "fortune", "occult"]
 const RARITIES: Array[String] = ["common", "rare", "legendary", "cursed"]
-
-enum BuyResult { OK, NO_MONEY, NO_SLOT, SOLD_OUT, INVALID }
 
 
 static func enter(run: RunState, db: ContentDB) -> void:
@@ -17,7 +17,7 @@ static func enter(run: RunState, db: ContentDB) -> void:
 		"grigris": _roll_grigris(run, db),
 		"packs": _roll_packs(run),
 		"contracts": _roll_contracts(run, db),
-		"reroll_cost": maxi(Balance.i("shop.reroll_base_cost") - run.reroll_discount, 0),
+		"reroll_cost": maxi(Balance.i("shop.reroll_base_cost") - run.reroll_discount - int(run.flags.get("reroll_discount", 0)), 0),
 		"open_pack": {},
 	}
 	run.phase = RunState.Phase.SHOP
@@ -183,7 +183,7 @@ static func acquire_grigri(run: RunState, db: ContentDB, gid: String, edition: S
 	return g
 
 
-static func sell_value(run: RunState, db: ContentDB, g: GrigriInstance) -> int:
+static func sell_value(_run: RunState, db: ContentDB, g: GrigriInstance) -> int:
 	var base: int = grigri_cost(db, g.id)
 	return maxi(int(floor(float(base) * Balance.f("economy.sell_ratio"))) + g.sell_bonus, 1)
 
@@ -264,7 +264,8 @@ static func roll_pack_choices(run: RunState, db: ContentDB, kind: String) -> Arr
 				var choice: Dictionary = {
 					"type": types[t_idx],
 					"number": run.rng.randi_range_in(RngStreams.SHOP, 1, WheelLayout.POCKET_COUNT - 1),
-					"edition": "", "seal": "",
+					"edition": "",
+					"seal": "",
 				}
 				if run.rng.chance(RngStreams.SHOP, Balance.f("shop.pocket_pack_edition_chance")):
 					var eds: Array[String] = db.ids("editions")

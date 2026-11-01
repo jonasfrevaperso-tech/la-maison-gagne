@@ -17,6 +17,7 @@ func _ready() -> void:
 
 # --------------------------------------------------------------------------- bas niveau
 
+
 static func write_atomic(path: String, data: Dictionary) -> bool:
 	var text: String = JSON.stringify(data, "\t")
 	var tmp: String = path + TMP_SUFFIX
@@ -49,6 +50,7 @@ static func read_with_backup(path: String) -> Dictionary:
 
 
 # --------------------------------------------------------------------------- profil
+
 
 func default_profile() -> Dictionary:
 	return {
@@ -111,6 +113,7 @@ func max_stat(key: String, value: int) -> void:
 
 
 # --------------------------------------------------------------------------- run
+
 
 func has_run() -> bool:
 	return not read_with_backup(RUN_PATH).is_empty()

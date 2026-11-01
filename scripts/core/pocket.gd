@@ -42,8 +42,14 @@ func duplicate_pocket(new_uid: int) -> Pocket:
 
 func to_dict() -> Dictionary:
 	return {
-		"uid": uid, "number": number, "type": String(type_id), "edition": String(edition),
-		"seal": String(seal), "color": String(color_override), "level": level, "counter": counter,
+		"uid": uid,
+		"number": number,
+		"type": String(type_id),
+		"edition": String(edition),
+		"seal": String(seal),
+		"color": String(color_override),
+		"level": level,
+		"counter": counter,
 	}
 
 

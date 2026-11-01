@@ -80,8 +80,9 @@ var shop_state: Dictionary = {}
 func act() -> int:
 	var acts: Array = Balance.arr("run.acts")
 	for a: int in acts.size():
-		if (acts[a] as Array).has(tier):
-			return a + 1
+		for t: Variant in acts[a]:
+			if int(t) == tier:
+				return a + 1
 	return acts.size()
 
 
@@ -134,30 +135,87 @@ func to_dict() -> Dictionary:
 		allowed.append(String(k))
 	return {
 		"version": SAVE_VERSION,
-		"rng": rng.to_dict(), "character": character_id, "risk": risk_level,
-		"challenge": challenge_id, "daily": daily, "endless": endless,
-		"tier": tier, "deadline_idx": deadline_idx, "spins_left": spins_left, "spins_total": spins_total,
-		"spin_index": spin_index, "deadline_score": deadline_score, "debt": debt,
-		"creditor": creditor_id, "creditor_phase": creditor_phase, "money": money,
-		"wheel": wheel.to_dict(), "grigris": gl, "grigri_slots": grigri_slots,
-		"next_grigri_uid": next_grigri_uid, "fortunes": fortunes.duplicate(), "fortune_slots": fortune_slots,
-		"contracts": contracts.duplicate(), "bet_budget": bet_budget, "chip_value": chip_value,
-		"precision": precision, "control_bonus": control_bonus, "table_limit_bonus": table_limit_bonus,
-		"temp_budget_bonus": temp_budget_bonus, "temp_precision_bonus": temp_precision_bonus,
-		"interest_cap_bonus": interest_cap_bonus, "shop_discount": shop_discount,
-		"extra_spins": extra_spins_per_deadline, "reroll_discount": reroll_discount,
-		"slip": slip.snapshot(), "last_layout": last_layout.duplicate(), "favorites": favorites.duplicate(true),
-		"banned_color": String(banned_color), "allowed_kinds": allowed,
-		"history": history.duplicate(true), "streak_color": String(color_streak_color),
-		"streak": color_streak, "last_number": last_number, "last_landing": last_landing_index,
-		"sticky": sticky_index, "zeros": zeros_hit, "total_spins": total_spins, "best_spin": best_spin,
-		"cleared": deadlines_cleared, "pacts": pacts_used.duplicate(), "forgiven_tier": losses_forgiven_tier,
-		"free_rethrows": free_rethrows, "rethrow_available": rethrow_available,
-		"shop_rerolls": shop_rerolls, "rerolls_since_rare": rerolls_since_rare,
-		"sold": sold_count, "bought": bought_ids.duplicate(), "flags": flags.duplicate(true),
-		"phase": int(phase), "defeat": defeat_reason, "deadline_log": deadline_log.duplicate(true),
-		"pending_event": pending_event_id, "shop_state": shop_state.duplicate(true),
+		"rng": rng.to_dict(),
+		"character": character_id,
+		"risk": risk_level,
+		"challenge": challenge_id,
+		"daily": daily,
+		"endless": endless,
+		"tier": tier,
+		"deadline_idx": deadline_idx,
+		"spins_left": spins_left,
+		"spins_total": spins_total,
+		"spin_index": spin_index,
+		"deadline_score": deadline_score,
+		"debt": debt,
+		"creditor": creditor_id,
+		"creditor_phase": creditor_phase,
+		"money": money,
+		"wheel": wheel.to_dict(),
+		"grigris": gl,
+		"grigri_slots": grigri_slots,
+		"next_grigri_uid": next_grigri_uid,
+		"fortunes": fortunes.duplicate(),
+		"fortune_slots": fortune_slots,
+		"contracts": contracts.duplicate(),
+		"bet_budget": bet_budget,
+		"chip_value": chip_value,
+		"precision": precision,
+		"control_bonus": control_bonus,
+		"table_limit_bonus": table_limit_bonus,
+		"temp_budget_bonus": temp_budget_bonus,
+		"temp_precision_bonus": temp_precision_bonus,
+		"interest_cap_bonus": interest_cap_bonus,
+		"shop_discount": shop_discount,
+		"extra_spins": extra_spins_per_deadline,
+		"reroll_discount": reroll_discount,
+		"slip": slip.snapshot(),
+		"last_layout": last_layout.duplicate(),
+		"favorites": favorites.duplicate(true),
+		"banned_color": String(banned_color),
+		"allowed_kinds": allowed,
+		"history": history.duplicate(true),
+		"streak_color": String(color_streak_color),
+		"streak": color_streak,
+		"last_number": last_number,
+		"last_landing": last_landing_index,
+		"sticky": sticky_index,
+		"zeros": zeros_hit,
+		"total_spins": total_spins,
+		"best_spin": best_spin,
+		"cleared": deadlines_cleared,
+		"pacts": pacts_used.duplicate(),
+		"forgiven_tier": losses_forgiven_tier,
+		"free_rethrows": free_rethrows,
+		"rethrow_available": rethrow_available,
+		"shop_rerolls": shop_rerolls,
+		"rerolls_since_rare": rerolls_since_rare,
+		"sold": sold_count,
+		"bought": bought_ids.duplicate(),
+		"flags": flags.duplicate(true),
+		"phase": int(phase),
+		"defeat": defeat_reason,
+		"deadline_log": deadline_log.duplicate(true),
+		"pending_event": pending_event_id,
+		"shop_state": shop_state.duplicate(true),
 	}
+
+
+## JSON relit les entiers comme des flottants : on les restaure (déterminisme exact).
+static func intify(v: Variant) -> Variant:
+	if v is float and is_equal_approx(v, round(v)) and absf(v) < 9.0e15:
+		return int(v)
+	if v is Dictionary:
+		var out: Dictionary = {}
+		for k: Variant in (v as Dictionary).keys():
+			out[k] = intify((v as Dictionary)[k])
+		return out
+	if v is Array:
+		var arr: Array = []
+		for item: Variant in v:
+			arr.append(intify(item))
+		return arr
+	return v
 
 
 static func from_dict(d: Dictionary) -> RunState:
@@ -197,13 +255,13 @@ static func from_dict(d: Dictionary) -> RunState:
 	s.shop_discount = int(d.get("shop_discount", 0))
 	s.extra_spins_per_deadline = int(d.get("extra_spins", 0))
 	s.reroll_discount = int(d.get("reroll_discount", 0))
-	s.last_layout = d.get("last_layout", {})
-	for fav: Variant in d.get("favorites", []):
+	s.last_layout = intify(d.get("last_layout", {}))
+	for fav: Variant in intify(d.get("favorites", [])):
 		s.favorites.append(fav as Dictionary)
 	s.banned_color = StringName(String(d.get("banned_color", "")))
 	for k: Variant in d.get("allowed_kinds", []):
 		s.allowed_kinds.append(StringName(String(k)))
-	for h: Variant in d.get("history", []):
+	for h: Variant in intify(d.get("history", [])):
 		s.history.append(h as Dictionary)
 	s.color_streak_color = StringName(String(d.get("streak_color", "")))
 	s.color_streak = int(d.get("streak", 0))
@@ -214,7 +272,7 @@ static func from_dict(d: Dictionary) -> RunState:
 	s.total_spins = int(d.get("total_spins", 0))
 	s.best_spin = int(d.get("best_spin", 0))
 	s.deadlines_cleared = int(d.get("cleared", 0))
-	s.pacts_used = d.get("pacts", {})
+	s.pacts_used = intify(d.get("pacts", {}))
 	s.losses_forgiven_tier = int(d.get("forgiven_tier", 0))
 	s.free_rethrows = int(d.get("free_rethrows", 0))
 	s.rethrow_available = bool(d.get("rethrow_available", false))
@@ -225,10 +283,10 @@ static func from_dict(d: Dictionary) -> RunState:
 	s.flags = d.get("flags", {})
 	s.phase = int(d.get("phase", 0)) as Phase
 	s.defeat_reason = String(d.get("defeat", ""))
-	for dl: Variant in d.get("deadline_log", []):
+	for dl: Variant in intify(d.get("deadline_log", [])):
 		s.deadline_log.append(dl as Dictionary)
 	s.pending_event_id = String(d.get("pending_event", ""))
-	s.shop_state = d.get("shop_state", {})
+	s.shop_state = intify(d.get("shop_state", {}))
 	s.slip.budget = s.bet_budget
 	s.slip.apply_layout(d.get("slip", {}))
 	return s

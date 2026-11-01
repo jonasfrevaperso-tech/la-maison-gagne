@@ -36,7 +36,70 @@ func _ready() -> void:
 	var post: PostFx = PostFx.new()
 	add_child(post)
 	EventBus.screen_requested.connect(_on_screen_requested)
-	GameState.goto(&"title")
+	if not _dev_hooks():
+		GameState.goto(&"title")
+
+
+## Options de développement (captures d'écran automatisées, accès direct) :
+## -- --dev-run=lea [--dev-phase=shop|pact|summary|creditor] [--shot=user://shot.png] [--frames=120]
+##    --dev-screen=options
+func _dev_hooks() -> bool:
+	var args: Dictionary = {}
+	for a: String in OS.get_cmdline_user_args():
+		if a.begins_with("--"):
+			var kv: PackedStringArray = a.substr(2).split("=", true, 1)
+			args[kv[0]] = kv[1] if kv.size() > 1 else "true"
+	if args.has("dev-autoplay"):
+		var ap: DevAutoplay = DevAutoplay.new()
+		ap.spins_wanted = int(args["dev-autoplay"])
+		ap.shot_dir = String(args.get("shot-dir", ""))
+		add_child(ap)
+	if args.has("shot"):
+		_capture_later(String(args["shot"]), int(args.get("frames", "120")))
+	if args.has("dev-screen"):
+		GameState.goto(StringName(String(args["dev-screen"])))
+		return true
+	if not args.has("dev-run"):
+		return false
+	GameState.controller = RunController.new(DataRegistry.db)
+	GameState.controller.new_run(String(args["dev-run"]), int(args.get("dev-risk", "0")), int(args.get("dev-seed", "1")))
+	var r: RunState = GameState.controller.run
+	match String(args.get("dev-phase", "")):
+		"shop":
+			r.money = 30
+			ShopModel.enter(r, DataRegistry.db)
+		"pact":
+			r.phase = RunState.Phase.PACT_OFFER
+		"creditor":
+			r.deadline_idx = 2
+			GameState.controller.start_deadline()
+		"grigris":
+			r.total_spins = 1
+			for gid: String in ["g_red_ribbon", "g_blueprint", "g_house_key", "g_ouroboros", "g_iou"]:
+				ShopModel.acquire_grigri(r, DataRegistry.db, gid, &"holo" if gid == "g_house_key" else &"")
+			r.fortunes = ["f_gild", "f_focus"]
+			r.wheel.at(3).type_id = &"golden"
+			r.wheel.at(4).type_id = &"glass"
+			r.wheel.at(5).edition = &"polychrome"
+			r.wheel.at(6).seal = &"seal_red"
+			r.slip.place("red", 4)
+			r.slip.place("straight:19", 2)
+			r.slip.place("split:17-20", 1)
+			r.slip.place("corner:1", 1)
+	if String(args.get("dev-phase", "")) == "summary":
+		GameState.end_run(false)
+	else:
+		GameState.goto(&"run")
+	return true
+
+
+func _capture_later(path: String, frames: int) -> void:
+	for _i: int in frames:
+		await get_tree().process_frame
+	var img: Image = get_viewport().get_texture().get_image()
+	img.save_png(path)
+	print("Capture : ", ProjectSettings.globalize_path(path))
+	get_tree().quit()
 
 
 func _on_screen_requested(screen_id: StringName, params: Dictionary) -> void:
