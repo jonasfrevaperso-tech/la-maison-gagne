@@ -8,7 +8,9 @@ extends RefCounted
 const DEV_DIR: String = "user://dev/"
 const HOOKS_SCRIPT: String = "res://scripts/dev/dev_hooks.gd"
 ## Arguments qui font d'un lancement une session de développement.
-const DEV_ARGS: Array[String] = ["dev-run", "dev-screen", "dev-autoplay", "dev-hover", "dev-ui-check", "shot", "quit-frames", "perf"]
+const DEV_ARGS: Array[String] = [
+	"dev-run", "dev-screen", "dev-autoplay", "dev-hover", "dev-ui-check", "dev-pad-run", "shot", "quit-frames", "perf"
+]
 
 static var _args_cache: Dictionary = {}
 static var _parsed: bool = false
@@ -30,10 +32,14 @@ static func available() -> bool:
 	return OS.has_feature("editor") and ResourceLoader.exists(HOOKS_SCRIPT)
 
 
-## Vrai si ce lancement est une session de développement.
+## Vrai si ce lancement est une session de développement (crochets, ou script de test /
+## d'outillage / de simulation lancé avec `-s`).
 static func active() -> bool:
 	if not available():
 		return false
+	for a: String in OS.get_cmdline_args():
+		if a.ends_with(".gd") and (a.contains("tests/") or a.contains("tools/") or a.contains("scripts/sim/")):
+			return true
 	for k: String in DEV_ARGS:
 		if args().has(k):
 			return true

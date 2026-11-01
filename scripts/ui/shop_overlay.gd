@@ -6,6 +6,10 @@ const FLIP_TIME: float = 0.25
 const FLIP_STAGGER: float = 0.08
 const DISSOLVE_SHADER: String = "res://shaders/dissolve.gdshader"
 const DISSOLVE_TIME: float = 0.7
+const OWNED_KEYS: Array[Array] = [["@double_click", "HINT_K_SELL"], ["@drag", "HINT_K_MOVE"], ["@right_click", "HINT_K_LOCK"]]
+const OWNED_PAD: Array[Array] = [
+	["@dpad", "HINT_K_SELECT"], ["ui_accept", "HINT_K_BUY_SELL"], ["bet_repeat", "HINT_K_LOCK"], ["bet_cycle_prev", "HINT_K_MOVE"]
+]
 
 var ctl: RunController = null
 var _money: Label = null
@@ -17,6 +21,7 @@ var _owned: GrigriBar = null
 var _pack_box: VBoxContainer = null
 var _float: FloatLayer = null
 var _rerolls_here: int = 0
+var _owned_prompts: PromptBar = null
 
 
 func configure(p_ctl: RunController) -> ShopOverlay:
@@ -55,19 +60,49 @@ func build() -> void:
 	_owned.shop_mode = true
 	_owned.sell_requested.connect(_on_sell)
 	body.add_child(_owned)
+	_owned_prompts = PromptBar.new()
+	_owned_prompts.custom_minimum_size = Vector2(panel_width - 80.0, InputGlyphs.PROMPT_H + 4)
+	_owned_prompts.alignment = BoxContainer.ALIGNMENT_CENTER
+	body.add_child(_owned_prompts)
+	_owned_prompts.set_device_items.call_deferred(OWNED_KEYS, OWNED_PAD)
 	var actions: HBoxContainer = row()
 	_reroll_btn = UiKit.button("", _on_reroll)
 	actions.add_child(_reroll_btn)
 	var leave: Button = UiKit.button(tr("SHOP_LEAVE"), close)
 	actions.add_child(leave)
-	leave.call_deferred("grab_focus")
+	PromptBadge.attach(leave, "pause_menu")
+	_focus_first_offer.call_deferred()
 	_float = FloatLayer.new()
 	add_child(_float)
 	_refresh(true)
 
 
+## Paquet ouvert : la sélection va sur le premier choix.
+func _focus_pack() -> void:
+	var f: Control = PadNavigator.first_focusable(_pack_box)
+	if f != null:
+		f.grab_focus()
+
+
+func _focus_first_offer() -> void:
+	var f: Control = PadNavigator.first_focusable(_offers_row)
+	if f == null:
+		f = PadNavigator.first_focusable(body)
+	if f != null:
+		f.grab_focus()
+
+
+## Menu (Start) / Échap : retour à la table.
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("pause_menu") and (_pack_box.get_child_count() == 0):
+		close()
+		get_viewport().set_input_as_handled()
+
+
 func _refresh(animate: bool = false) -> void:
 	var r: RunState = ctl.run
+	var focused: Control = get_viewport().gui_get_focus_owner()
+	var refocus: Array = _focus_path(focused)
 	_money.text = "%d $" % r.money
 	var probs: Dictionary = ShopModel.rarity_probabilities(r)
 	var parts: PackedStringArray = []
@@ -114,6 +149,28 @@ func _refresh(animate: bool = false) -> void:
 	_reroll_btn.disabled = r.money < int(r.shop_state.get("reroll_cost", 0))
 	_owned.bind(r)
 	_refresh_pack()
+	if not refocus.is_empty():
+		_restore_focus.call_deferred(refocus)
+
+
+## Où était le focus (rangée, index) pour le retrouver après reconstruction des cartes.
+func _focus_path(c: Control) -> Array:
+	for row_node: Control in [_offers_row, _packs_row, _owned]:
+		if c != null and row_node.is_ancestor_of(c):
+			return [row_node, c.get_index()]
+	return []
+
+
+func _restore_focus(path: Array) -> void:
+	var row_node: Control = path[0] as Control
+	var kids: Array[Node] = row_node.get_children().filter(func(n: Node) -> bool: return not n.is_queued_for_deletion())
+	var idx: int = mini(int(path[1]), kids.size() - 1)
+	for k: int in range(idx, -1, -1):
+		var node_c: Control = kids[k] as Control
+		if node_c != null and node_c.focus_mode == Control.FOCUS_ALL and not (node_c is BaseButton and (node_c as BaseButton).disabled):
+			node_c.grab_focus()
+			return
+	_focus_first_offer()
 
 
 func _flip_in(card: Control, i: int) -> void:
@@ -230,6 +287,7 @@ func _refresh_pack() -> void:
 	var pack: Dictionary = ctl.run.shop_state.get("open_pack", {})
 	if pack.is_empty():
 		return
+	_focus_pack.call_deferred()
 	var kind: String = String(pack["kind"])
 	_pack_box.add_child(UiKit.label(tr("PACK_CHOOSE") % tr("PACK_" + kind.to_upper()), UiKit.SIZE_H2, Palette.CYAN, "display"))
 	var h: HBoxContainer = HBoxContainer.new()

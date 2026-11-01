@@ -22,6 +22,13 @@ func start() -> bool:
 		_hover_later(String(args["dev-hover"]))
 	if args.has("shot"):
 		_capture_later(String(args["shot"]), int(args.get("frames", "120")))
+	if args.has("dev-pad-run"):
+		var pr: DevPadRun = DevPadRun.new()
+		pr.spins_wanted = int(args["dev-pad-run"])
+		pr.shot_dir = String(args.get("shot-dir", ""))
+		add_child(pr)
+		GameState.goto(&"title")
+		return true
 	if args.has("dev-ui-check"):
 		add_child(DevUiCheck.new())
 		return true

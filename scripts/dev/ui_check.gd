@@ -7,7 +7,16 @@ extends Node
 ## Usage : godot --headless --path . -- --dev-ui-check
 ## Code de sortie 1 au moindre défaut.
 
-const SIZES: Array[Vector2i] = [Vector2i(1920, 1080), Vector2i(1920, 1200), Vector2i(1600, 900)]
+## [taille logique, taille du texte] : 16:9, Steam Deck (16:10), petite fenêtre, Steam Deck texte max.
+const CONFIGS: Array[Array] = [
+	[Vector2i(1920, 1080), 1.0],
+	[Vector2i(1920, 1200), 1.0],
+	[Vector2i(1600, 900), 1.0],
+	[Vector2i(1920, 1200), 1.3],
+]
+## Lisibilité Steam Deck : taille minimale d'un texte rendu en 1280×800 (critère Valve : 9 px).
+const DECK_MIN_PX: float = 9.0
+const DECK_HEIGHT: float = 800.0
 const SETTLE_FRAMES: int = 6
 const EDGE_TOLERANCE: float = 2.0
 ## Écrans pilotés à la manette sans focus d'interface (curseur du tapis, cf. RunScreen._gamepad_table) :
@@ -32,7 +41,12 @@ func _ready() -> void:
 
 func _run() -> void:
 	var db: ContentDB = ContentDB.shared()
-	for sz: Vector2i in SIZES:
+	Settings.set_value("game", "input_mode", "gamepad")
+	InputGlyphs.apply_mode()
+	for cfg: Array in CONFIGS:
+		var sz: Vector2i = cfg[0]
+		Settings.set_value("access", "text_scale", float(cfg[1]))
+		UiKit.clear_cache()
 		root.size = sz
 		root.content_scale_size = sz
 		UiLayout.fit_frame(frame, Vector2(sz))
@@ -42,14 +56,16 @@ func _run() -> void:
 			var node: Control = packed.instantiate() as Control
 			if node.has_method("setup"):
 				node.call("setup", {"victory": false})
-			await _check(node, "%s @%dx%d" % [screen_id, sz.x, sz.y], not NO_FOCUS_OK.has(screen_id))
+			await _check(node, "%s @%dx%d×%.1f" % [screen_id, sz.x, sz.y, float(cfg[1])], not NO_FOCUS_OK.has(screen_id))
 		# États de l'écran de run qui changent la rangée d'actions.
 		for st: RunScreen.UiState in [RunScreen.UiState.RETHROW, RunScreen.UiState.TARGETING]:
 			_prepare_run(db)
 			var rs: RunScreen = (load(Main.SCREENS[&"run"]) as PackedScene).instantiate() as RunScreen
-			await _check(rs, "run/%s @%dx%d" % [RunScreen.UiState.keys()[st], sz.x, sz.y], false, rs._set_state.bind(st))
+			await _check(rs, "run/%s @%dx%d×%.1f" % [RunScreen.UiState.keys()[st], sz.x, sz.y, float(cfg[1])], false, rs._set_state.bind(st))
 		for o: Array in _overlays(db):
-			await _check(o[1] as Control, "%s @%dx%d" % [o[0], sz.x, sz.y])
+			await _check(o[1] as Control, "%s @%dx%d×%.1f" % [o[0], sz.x, sz.y, float(cfg[1])])
+	Settings.set_value("access", "text_scale", 1.0)
+	Settings.set_value("game", "input_mode", "auto")
 	for p: String in problems:
 		printerr("UI : " + p)
 	print("Interface : %d vues contrôlées, %d problème(s)" % [checked, problems.size()])
@@ -109,6 +125,7 @@ func _check(node: Control, label: String, need_focus: bool = true, prep: Callabl
 		var r: Rect2 = btn.get_global_transform_with_canvas() * Rect2(Vector2.ZERO, btn.size)
 		if not view.encloses(r):
 			problems.append("%s : bouton « %s » hors de l'écran %s" % [label, _name(btn), r])
+	_check_fonts(node, label)
 	frame.remove_child(node)
 	node.queue_free()
 	await get_tree().process_frame
@@ -131,3 +148,34 @@ func _cleanup() -> void:
 	GameState.controller = null
 	UiKit.clear_cache()
 	IconLibrary.clear_cache()
+
+
+## Plus petit texte visible, ramené à l'écran du Steam Deck (la fenêtre logique la plus haute
+## correspond à 800 px physiques).
+func _check_fonts(node: Control, label: String) -> void:
+	var to_deck: float = DECK_HEIGHT / maxf(float(root.size.y), 1.0)
+	var worst: float = 1e9
+	var worst_name: String = ""
+	for c: Node in node.find_children("*", "Control", true, false):
+		var ctl: Control = c as Control
+		if not ctl.is_visible_in_tree():
+			continue
+		var size_px: int = 0
+		var txt: String = ""
+		if ctl is Label:
+			size_px = ctl.get_theme_font_size("font_size")
+			txt = (ctl as Label).text
+		elif ctl is Button:
+			size_px = ctl.get_theme_font_size("font_size")
+			txt = (ctl as Button).text
+		elif ctl is RichTextLabel:
+			size_px = ctl.get_theme_font_size("normal_font_size")
+			txt = (ctl as RichTextLabel).get_parsed_text()
+		if txt.strip_edges() == "" or size_px <= 0:
+			continue
+		var px: float = float(size_px) * ctl.get_global_transform_with_canvas().get_scale().y * to_deck
+		if px < worst:
+			worst = px
+			worst_name = txt.substr(0, 24)
+	if worst < DECK_MIN_PX:
+		problems.append("%s : texte de %.1f px sur Steam Deck (« %s »), minimum %.0f px" % [label, worst, worst_name, DECK_MIN_PX])

@@ -57,3 +57,7 @@ func grid(columns: int) -> GridContainer:
 	g.add_theme_constant_override("v_separation", 12)
 	content.add_child(g)
 	return g
+
+
+func go_back() -> void:
+	GameState.goto(GameState.SCREEN_TITLE)

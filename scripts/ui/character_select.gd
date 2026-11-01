@@ -62,6 +62,7 @@ func _ready() -> void:
 	_seed_edit.placeholder_text = tr("CHAR_SEED_PLACEHOLDER")
 	_seed_edit.custom_minimum_size = Vector2(300, 48)
 	_seed_edit.editable = not daily
+	_seed_edit.set_meta("osk_upper", true)
 	if daily:
 		_seed_edit.text = RngService.seed_to_code(RngService.daily_seed())
 	seed_row.add_child(_seed_edit)
@@ -161,3 +162,7 @@ func _start() -> void:
 	else:
 		seed_value = RngService.new_seed()
 	GameState.start_new_run(_selected, _risk, seed_value, "", daily)
+
+
+func go_back() -> void:
+	GameState.goto(GameState.SCREEN_TITLE)

@@ -10,6 +10,10 @@ const SIZE_H1: int = 54
 const SIZE_H2: int = 36
 const SIZE_BODY: int = 24
 const SIZE_SMALL: int = 18
+## Plancher de lisibilité : 14 px logiques = 9,3 px à 1280×800 (minimum Steam Deck : 9 px).
+const MIN_FONT: int = 14
+const TEXT_SCALE_MIN: float = 1.0
+const TEXT_SCALE_MAX: float = 1.3
 const RADIUS: int = 6
 const BORDER: int = 2
 const PAD: int = 14
@@ -70,7 +74,7 @@ static func theme() -> Theme:
 		return _theme
 	var t: Theme = Theme.new()
 	t.default_font = font("ui")
-	t.default_font_size = SIZE_BODY
+	t.default_font_size = fs(SIZE_BODY)
 	t.set_color("font_color", "Label", Palette.IVORY)
 	t.set_color("font_color", "Button", Palette.IVORY)
 	t.set_color("font_hover_color", "Button", Palette.GOLD_LIGHT)
@@ -111,9 +115,18 @@ static func label(text: String, size: int = SIZE_BODY, color: Color = Palette.IV
 	var l: Label = Label.new()
 	l.text = text
 	l.add_theme_font_override("font", font(kind))
-	l.add_theme_font_size_override("font_size", size)
+	l.add_theme_font_size_override("font_size", fs(size))
 	l.add_theme_color_override("font_color", color)
 	return l
+
+
+## Taille de police à l'écran : option « Taille du texte » appliquée, plancher de lisibilité.
+static func fs(size: int) -> int:
+	return maxi(roundi(float(size) * text_scale()), MIN_FONT)
+
+
+static func text_scale() -> float:
+	return clampf(Settings.f("access", "text_scale"), TEXT_SCALE_MIN, TEXT_SCALE_MAX)
 
 
 static func title(text: String, size: int = SIZE_H1) -> Label:
@@ -147,9 +160,10 @@ static func rich(bbcode: String, size: int = SIZE_BODY) -> RichTextLabel:
 	r.fit_content = true
 	r.scroll_active = false
 	r.text = bbcode
-	r.add_theme_font_size_override("normal_font_size", size)
-	r.add_theme_font_size_override("bold_font_size", size)
-	r.add_theme_font_size_override("mono_font_size", size)
+	r.add_theme_font_size_override("normal_font_size", fs(size))
+	r.add_theme_font_size_override("bold_font_size", fs(size))
+	r.add_theme_font_size_override("italics_font_size", fs(size))
+	r.add_theme_font_size_override("mono_font_size", fs(size))
 	return r
 
 

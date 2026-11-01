@@ -13,6 +13,7 @@ var _rows: Dictionary[String, Array] = {}
 
 
 func build() -> void:
+	cancel_closes = true
 	panel_width = 980.0
 	heading(tr("SOUNDBOARD_TITLE"))
 	var intro: Label = UiKit.label(tr("SOUNDBOARD_INTRO"), UiKit.SIZE_SMALL, Palette.SMOKE)
@@ -79,9 +80,3 @@ func _load() -> Dictionary:
 
 func _save() -> void:
 	SaveSystem.write_atomic(path(), _review)
-
-
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel"):
-		close()
-		get_viewport().set_input_as_handled()

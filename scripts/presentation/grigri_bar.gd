@@ -41,6 +41,7 @@ func refresh() -> void:
 		card.lock_toggled.connect(_on_lock)
 		card.reorder_requested.connect(_on_reorder)
 		card.activated.connect(_on_activated)
+		card.move_requested.connect(_on_move)
 		add_child(card)
 		_cards[g.uid] = card
 	for _i: int in run.empty_grigri_slots():
@@ -74,8 +75,11 @@ func _on_lock(card: GrigriCard) -> void:
 		return
 	g.locked = not g.locked
 	AudioBus.ui("lock")
+	var had_focus: bool = card.has_focus()
 	refresh()
 	changed.emit()
+	if had_focus:
+		_focus_uid.call_deferred(card.uid)
 
 
 func _on_reorder(from_uid: int, to_uid: int) -> void:
@@ -89,6 +93,25 @@ func _on_reorder(from_uid: int, to_uid: int) -> void:
 	AudioBus.ui("card_place")
 	refresh()
 	changed.emit()
+
+
+## Manette : échange avec le voisin, puis garde la sélection sur la carte déplacée.
+func _on_move(card: GrigriCard, direction: int) -> void:
+	var g: GrigriInstance = run.grigri_by_uid(card.uid)
+	if g == null:
+		return
+	var i: int = run.grigris.find(g)
+	var j: int = i + direction
+	if j < 0 or j >= run.grigris.size():
+		return
+	_on_reorder(card.uid, run.grigris[j].uid)
+	_focus_uid.call_deferred(card.uid)
+
+
+func _focus_uid(g_uid: int) -> void:
+	var c: GrigriCard = card_for(g_uid)
+	if c != null:
+		c.grab_focus()
 
 
 func _on_activated(card: GrigriCard) -> void:

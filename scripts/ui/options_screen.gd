@@ -3,13 +3,26 @@ extends Control
 ## Options complètes : audio, vidéo, jus, jeu, accessibilité, commandes (remappage).
 
 const REMAPPABLE: Array[String] = [
-	"ui_spin", "bet_undo", "bet_repeat", "bet_clear", "speed_toggle", "skip_anim", "bet_place", "bet_cycle_prev", "bet_cycle_next"
+	"ui_spin",
+	"bet_place",
+	"bet_remove",
+	"bet_undo",
+	"bet_repeat",
+	"bet_clear",
+	"bet_cycle_prev",
+	"bet_cycle_next",
+	"item_panel",
+	"speed_toggle",
+	"skip_anim",
+	"pause_menu",
+	"playtest_note",
 ]
 const ROW_W: float = 900.0
 
 var _tabs: TabContainer = null
 var _waiting_action: String = ""
 var _remap_buttons: Dictionary[String, Button] = {}
+var _remap_box: VBoxContainer = null
 
 
 func setup(_params: Dictionary) -> void:
@@ -45,6 +58,7 @@ func _ready() -> void:
 
 
 func _back() -> void:
+	UiKit.clear_cache()  # la taille du texte est prise en compte au prochain écran
 	if GameState.has_active_run() and GameState.run().phase != RunState.Phase.GAME_OVER:
 		GameState.goto(GameState.SCREEN_RUN)
 	else:
@@ -80,15 +94,20 @@ func _slider(box: VBoxContainer, label_key: String, section: String, key: String
 	s.step = step
 	s.value = Settings.f(section, key)
 	s.custom_minimum_size = Vector2(380, 32)
-	var val: Label = UiKit.label("%d %%" % int(s.value * 100.0 / maxf(max_v, 0.001)), UiKit.SIZE_BODY, Palette.GOLD_LIGHT, "mono")
+	var val: Label = UiKit.label(_pct(s.value, max_v), UiKit.SIZE_BODY, Palette.GOLD_LIGHT, "mono")
 	s.value_changed.connect(_on_slider.bind(section, key, val, max_v))
 	h.add_child(s)
 	h.add_child(val)
 
 
+## Pourcentage affiché : part du maximum (volumes), ou valeur réelle pour une échelle > 1.
+static func _pct(v: float, max_v: float) -> String:
+	return "%d %%" % roundi(v * 100.0 if max_v > 1.0 else v * 100.0 / maxf(max_v, 0.001))
+
+
 func _on_slider(v: float, section: String, key: String, val: Label, max_v: float) -> void:
 	Settings.set_value(section, key, v)
-	val.text = "%d %%" % int(v * 100.0 / maxf(max_v, 0.001))
+	val.text = _pct(v, max_v)
 	if section == "audio":
 		AudioBus.ui("click")
 
@@ -170,61 +189,86 @@ func _access_tab() -> void:
 		["off", "protan", "deutan", "tritan"],
 		["CB_OFF", "CB_PROTAN", "CB_DEUTAN", "CB_TRITAN"]
 	)
-	_slider(b, "OPT_TEXT_SCALE", "access", "text_scale", 0.8, 1.4, 0.05)
+	_slider(b, "OPT_TEXT_SCALE", "access", "text_scale", UiKit.TEXT_SCALE_MIN, UiKit.TEXT_SCALE_MAX, 0.05)
+	b.add_child(UiKit.label(tr("OPT_TEXT_SCALE_DESC"), UiKit.SIZE_SMALL, Palette.SMOKE))
 	_check(b, "OPT_HIGH_CONTRAST", "access", "high_contrast")
 	_check(b, "OPT_SUBTITLES", "access", "subtitles")
 
 
 func _input_tab() -> void:
 	var b: VBoxContainer = _tab("OPT_TAB_INPUT")
+	_choice(b, "OPT_INPUT_MODE", "game", "input_mode", InputGlyphs.MODES, ["OPT_IM_AUTO", "OPT_IM_KEYBOARD", "OPT_IM_GAMEPAD"])
+	b.add_child(UiKit.label(tr("OPT_INPUT_MODE_DESC"), UiKit.SIZE_SMALL, Palette.SMOKE))
+	_remap_box = VBoxContainer.new()
+	_remap_box.add_theme_constant_override("separation", 12)
+	b.add_child(_remap_box)
+	_build_remap_rows()
+	b.add_child(UiKit.button(tr("OPT_RESET_INPUT"), _reset_input))
+	EventBus.input_device_changed.connect(func(_pad: bool) -> void: _build_remap_rows())
+
+
+## Une ligne par action remappable ; montre (et remappe) la commande du périphérique actif.
+func _build_remap_rows() -> void:
+	if not is_instance_valid(_remap_box):
+		return
+	for c: Node in _remap_box.get_children():
+		_remap_box.remove_child(c)
+		c.queue_free()
+	_remap_buttons.clear()
+	var device: String = "OPT_REMAP_PAD" if InputGlyphs.using_pad else "OPT_REMAP_KEYS"
+	_remap_box.add_child(UiKit.label(tr(device), UiKit.SIZE_BODY, Palette.GOLD))
 	for action: String in REMAPPABLE:
-		var h: HBoxContainer = _row(b, "ACTION_" + action.to_upper())
-		var btn: Button = UiKit.button(_action_text(action), _start_remap.bind(action), Vector2(320, 48))
+		var h: HBoxContainer = _row(_remap_box, "ACTION_" + action.to_upper())
+		var btn: Button = UiKit.button("", _start_remap.bind(action), Vector2(220, 48))
 		h.add_child(btn)
 		_remap_buttons[action] = btn
-	b.add_child(UiKit.button(tr("OPT_RESET_INPUT"), _reset_input))
+		_paint_remap(action)
 
 
-func _action_text(action: String) -> String:
-	var parts: PackedStringArray = []
-	for e: InputEvent in InputMap.action_get_events(action):
-		parts.append(e.as_text().replace(" - Physical", ""))
-	return " / ".join(parts)
+func _paint_remap(action: String) -> void:
+	var btn: Button = _remap_buttons[action]
+	for c: Node in btn.get_children():
+		if c is PromptBar or c is HBoxContainer:
+			c.queue_free()
+	btn.text = ""
+	var p: Control = InputGlyphs.prompt(action, 32)
+	if p == null:
+		btn.text = "—"
+		return
+	p.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	p.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	p.grow_vertical = Control.GROW_DIRECTION_BOTH
+	btn.add_child(p)
 
 
 func _start_remap(action: String) -> void:
 	_waiting_action = action
-	_remap_buttons[action].text = tr("OPT_PRESS_KEY")
+	var btn: Button = _remap_buttons[action]
+	for c: Node in btn.get_children():
+		c.queue_free()
+	btn.text = tr("OPT_PRESS_BUTTON") if InputGlyphs.using_pad else tr("OPT_PRESS_KEY")
 
 
 func _input(event: InputEvent) -> void:
 	if _waiting_action == "":
 		return
-	if event is InputEventKey and event.is_pressed():
-		var k: InputEventKey = event as InputEventKey
-		var keep: Array[InputEvent] = []
-		for e: InputEvent in InputMap.action_get_events(_waiting_action):
-			if not (e is InputEventKey):
-				keep.append(e)
-		InputMap.action_erase_events(_waiting_action)
-		var ne: InputEventKey = InputEventKey.new()
-		ne.physical_keycode = k.physical_keycode
-		InputMap.action_add_event(_waiting_action, ne)
-		for e2: InputEvent in keep:
-			InputMap.action_add_event(_waiting_action, e2)
-		var saved: Dictionary = Settings.get_value("input", "bindings") if Settings.get_value("input", "bindings") is Dictionary else {}
-		saved[_waiting_action] = k.physical_keycode
-		Settings.set_value("input", "bindings", saved)
-		_remap_buttons[_waiting_action].text = _action_text(_waiting_action)
-		_waiting_action = ""
-		get_viewport().set_input_as_handled()
+	var key_ev: InputEventKey = event as InputEventKey
+	var pad_ev: InputEventJoypadButton = event as InputEventJoypadButton
+	if key_ev != null and key_ev.pressed and not key_ev.echo and not InputGlyphs.using_pad:
+		Settings.bind_key(_waiting_action, key_ev.physical_keycode)
+	elif pad_ev != null and pad_ev.pressed and InputGlyphs.using_pad:
+		Settings.bind_pad_button(_waiting_action, pad_ev.button_index)
+	else:
+		return
+	var done: String = _waiting_action
+	_waiting_action = ""
+	_paint_remap(done)
+	get_viewport().set_input_as_handled()
 
 
 func _reset_input() -> void:
-	InputMap.load_from_project_settings()
-	Settings.set_value("input", "bindings", {})
-	for a: String in REMAPPABLE:
-		_remap_buttons[a].text = _action_text(a)
+	Settings.reset_bindings()
+	_build_remap_rows()
 
 
 func _eco_preset() -> void:
@@ -245,3 +289,7 @@ func _open_data_dir() -> void:
 func _reset_tutorial() -> void:
 	TutorialDirector.reset()
 	EventBus.toast.emit(tr("TOAST_TUTORIAL_RESET"), &"success")
+
+
+func go_back() -> void:
+	_back()

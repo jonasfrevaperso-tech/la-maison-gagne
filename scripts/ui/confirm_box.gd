@@ -35,3 +35,7 @@ func _yes() -> void:
 func _no() -> void:
 	declined.emit()
 	close()
+
+
+func go_back() -> void:
+	_no()

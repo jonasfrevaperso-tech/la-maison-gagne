@@ -348,14 +348,14 @@ func _draw() -> void:
 
 func _draw_number(i: int, p: Pocket, r: float) -> void:
 	var f: Font = UiKit.font("mono")
-	var fs: int = int(maxf(r * FONT_SIZE_RATIO * 37.0 / maxf(float(wheel.size()), 20.0), 9.0))
+	var fs: int = UiKit.fs(int(r * FONT_SIZE_RATIO * 37.0 / maxf(float(wheel.size()), 20.0)))
 	var pos: Vector2 = to_screen(pocket_angle(i), r * LABEL_RATIO)
 	var txt: String = str(p.number)
 	var w: float = f.get_string_size(txt, HORIZONTAL_ALIGNMENT_CENTER, -1, fs).x
 	draw_string(f, pos + Vector2(-w * 0.5, fs * 0.35), txt, HORIZONTAL_ALIGNMENT_CENTER, -1, fs, Palette.IVORY)
 	if p.level > 0:
 		draw_string(
-			f, pos + Vector2(-w * 0.5, fs * 1.3), "+" + str(p.level), HORIZONTAL_ALIGNMENT_CENTER, -1, int(fs * 0.7), Palette.GOLD_LIGHT
+			f, pos + Vector2(-w * 0.5, fs * 1.3), "+" + str(p.level), HORIZONTAL_ALIGNMENT_CENTER, -1, UiKit.fs(int(fs * 0.7)), Palette.GOLD_LIGHT
 		)
 
 

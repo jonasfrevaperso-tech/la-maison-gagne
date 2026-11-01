@@ -7,6 +7,8 @@ extends Control
 signal activated(card: GrigriCard)
 signal lock_toggled(card: GrigriCard)
 signal reorder_requested(from_uid: int, to_uid: int)
+## Manette : déplacer d'un cran à gauche (−1) ou à droite (+1).
+signal move_requested(card: GrigriCard, direction: int)
 
 const CARD_SIZE: Vector2 = Vector2(112, 144)
 const ICON_SIZE: float = 80.0
@@ -14,6 +16,9 @@ const TILT_MAX: float = 0.12
 const HOVER_LIFT: float = 10.0
 const EDITION_SHADER: String = "res://shaders/edition.gdshader"
 const EDITION_MODES: Dictionary = {"brillante": 0, "holo": 1, "polychrome": 2, "noire": 3}
+const FOCUS_RING_W: float = 3.0
+const NAME_FONT: int = 15
+const FOCUS_TIP_GAP: float = 10.0
 
 var kind: String = "grigri"  # grigri | fortune | contract | pocket_card
 var entry_id: String = ""
@@ -29,6 +34,7 @@ var draggable: bool = true
 var _hover: bool = false
 var _tilt: Vector2 = Vector2.ZERO
 var _lift: float = 0.0
+var _focus_tip: Control = null
 
 
 func _ready() -> void:
@@ -38,6 +44,9 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	mouse_entered.connect(_on_enter)
 	mouse_exited.connect(_on_exit)
+	focus_mode = Control.FOCUS_ALL
+	focus_entered.connect(_on_focus_in)
+	focus_exited.connect(_on_focus_out)
 	tooltip_text = " "
 
 
@@ -48,6 +57,46 @@ func _on_enter() -> void:
 
 func _on_exit() -> void:
 	_hover = false
+
+
+## Sélection à la manette ou au clavier : la carte se soulève et son infobulle s'ouvre
+## (l'infobulle native de Godot ne suit que la souris).
+func _on_focus_in() -> void:
+	_hover = true
+	AudioBus.ui("card_hover")
+	_show_focus_tip.call_deferred()
+
+
+func _on_focus_out() -> void:
+	_hover = false
+	if _focus_tip != null:
+		_focus_tip.queue_free()
+		_focus_tip = null
+
+
+func _show_focus_tip() -> void:
+	if not has_focus() or _focus_tip != null:
+		return
+	_focus_tip = CardTooltip.build(kind, entry_id, edition, counter, price)
+	_focus_tip.top_level = true
+	_focus_tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_focus_tip.z_index = 50
+	add_child(_focus_tip)
+	await get_tree().process_frame
+	if _focus_tip == null:
+		return
+	var me: Rect2 = UiLayout.canvas_rect(self)
+	var sz: Vector2 = _focus_tip.get_combined_minimum_size()
+	var vp: Vector2 = get_viewport_rect().size
+	var pos: Vector2 = Vector2(me.get_center().x - sz.x * 0.5, me.position.y - sz.y - FOCUS_TIP_GAP)
+	if pos.y < 0.0:
+		pos.y = me.end.y + FOCUS_TIP_GAP
+	pos.x = clampf(pos.x, 8.0, vp.x - sz.x - 8.0)
+	_focus_tip.position = pos
+
+
+func _exit_tree() -> void:
+	_focus_tip = null
 
 
 func configure(p_kind: String, p_id: String, p_uid: int = 0) -> GrigriCard:
@@ -113,6 +162,13 @@ func _gui_input(event: InputEvent) -> void:
 			accept_event()
 	elif event.is_action_pressed("ui_accept"):
 		activated.emit(self)
+		accept_event()
+	elif kind == "grigri" and event.is_action_pressed("bet_repeat"):
+		lock_toggled.emit(self)
+		accept_event()
+	elif kind == "grigri" and draggable and (event.is_action_pressed("bet_cycle_prev") or event.is_action_pressed("bet_cycle_next")):
+		move_requested.emit(self, -1 if event.is_action_pressed("bet_cycle_prev") else 1)
+		accept_event()
 
 
 func _get_drag_data(_at_position: Vector2) -> Variant:
@@ -148,6 +204,8 @@ func _draw() -> void:
 	var off: Vector2 = Vector2(_tilt.x * 18.0, -_lift + _tilt.y * 10.0)
 	var skew: float = _tilt.x * 14.0
 	var r: Rect2 = Rect2(Vector2(4, 4) + off, CARD_SIZE - Vector2(8, 8))
+	if has_focus():
+		draw_rect(r.grow(5.0), Palette.CYAN, false, FOCUS_RING_W)
 	# Ombre
 	draw_rect(Rect2(r.position + Vector2(5, 7 + _lift * 0.5), r.size), Color(0, 0, 0, 0.5))
 	# Corps (légère déformation pseudo-3D par trapèze)
@@ -185,7 +243,7 @@ func _draw() -> void:
 		draw_line(Vector2(sx, r.position.y + 4), Vector2(sx - 30, r.end.y - 4), shine, 8.0)
 	# Nom
 	var f: Font = UiKit.font("ui")
-	var fs: int = 14
+	var fs: int = UiKit.fs(NAME_FONT)
 	var name_txt: String = Localization.t(e, "name")
 	var lines: PackedStringArray = _wrap(name_txt, f, fs, r.size.x - 10)
 	var y: float = icon_rect.end.y + 14.0
@@ -195,10 +253,10 @@ func _draw() -> void:
 		y += float(fs) + 2.0
 	if show_counter and absf(counter) > 0.001:
 		var ct: String = ("×%.2f" % counter) if counter < 10.0 and not is_equal_approx(counter, round(counter)) else str(int(counter))
-		draw_string(UiKit.font("mono"), r.position + Vector2(6, 22), ct, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Palette.EMERALD)
+		draw_string(UiKit.font("mono"), r.position + Vector2(6, 22), ct, HORIZONTAL_ALIGNMENT_LEFT, -1, UiKit.fs(16), Palette.EMERALD)
 	if locked:
 		draw_string(
-			UiKit.font("mono"), Vector2(r.end.x - 22, r.position.y + 22), "🔒", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Palette.GOLD_LIGHT
+			UiKit.font("mono"), Vector2(r.end.x - 22, r.position.y + 22), "🔒", HORIZONTAL_ALIGNMENT_LEFT, -1, UiKit.fs(16), Palette.GOLD_LIGHT
 		)
 		draw_rect(r, Palette.GOLD_LIGHT, false, 2.0)
 	if price >= 0:

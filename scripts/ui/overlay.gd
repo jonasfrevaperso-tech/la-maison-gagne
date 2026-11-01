@@ -12,6 +12,9 @@ const FIT_MARGIN: float = 0.96
 var panel: PanelContainer = null
 var body: VBoxContainer = null
 var panel_width: float = 900.0
+## B / Échap ferme la surcouche (surcouches d'information) ; sinon le retour est ignoré
+## (choix obligatoires : pacte, événement, boutique).
+var cancel_closes: bool = false
 
 
 func _ready() -> void:
@@ -83,3 +86,9 @@ func row() -> HBoxContainer:
 	h.add_theme_constant_override("separation", 16)
 	body.add_child(h)
 	return h
+
+
+## Retour (B / Échap), appelé par PadNavigator.
+func go_back() -> void:
+	if cancel_closes:
+		close()

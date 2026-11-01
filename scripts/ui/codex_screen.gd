@@ -38,6 +38,7 @@ func build() -> void:
 				var unknown: Panel = Panel.new()
 				unknown.custom_minimum_size = GrigriCard.CARD_SIZE
 				unknown.tooltip_text = tr("CODEX_UNKNOWN")
+				unknown.focus_mode = Control.FOCUS_ALL
 				var q: Label = UiKit.title("?", UiKit.SIZE_H1)
 				q.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 				q.vertical_alignment = VERTICAL_ALIGNMENT_CENTER

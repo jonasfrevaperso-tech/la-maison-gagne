@@ -338,7 +338,7 @@ func _draw() -> void:
 			var h: float = er.size.y * 0.32
 			draw_colored_polygon(PackedVector2Array([cc + Vector2(0, -h), cc + Vector2(w, 0), cc + Vector2(0, h), cc + Vector2(-w, 0)]), dc)
 		else:
-			_text_center(f, tr("BET_" + k.to_upper()), er.get_center(), int(fs * 0.62), Palette.IVORY)
+			_text_center(f, tr("BET_" + k.to_upper()), er.get_center(), UiKit.fs(int(fs * 0.62)), Palette.IVORY)
 		if slip != null and slip.banned_spots.has(k):
 			draw_line(er.position, er.end, Palette.DANGER, 4.0)
 			draw_line(Vector2(er.position.x, er.end.y), Vector2(er.end.x, er.position.y), Palette.DANGER, 4.0)
@@ -384,7 +384,7 @@ func _draw_chip(p: Vector2, count: int) -> void:
 			draw_circle(p + o, rad, Palette.MAGENTA)
 			draw_arc(p + o, rad * 0.72, 0.0, TAU, 24, Palette.IVORY, 2.0, true)
 	var f: Font = UiKit.font("mono")
-	var fs: int = int(rad * 1.0)
+	var fs: int = UiKit.fs(int(rad))
 	var t: String = str(count)
 	var sz: Vector2 = f.get_string_size(t, HORIZONTAL_ALIGNMENT_CENTER, -1, fs)
 	var top: Vector2 = p + Vector2(0, -float(stack - 1) * 3.0)

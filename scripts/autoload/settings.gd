@@ -24,11 +24,12 @@ const DEFAULTS: Dictionary = {
 		"assist": false,
 		"show_probabilities": false,
 		"tutorial_tips": true,
+		"input_mode": "auto",
 		"telemetry": false,
 		"telemetry_asked": false
 	},
 	"access": {"colorblind": "off", "text_scale": 1.0, "high_contrast": false, "subtitles": true},
-	"input": {"bindings": {}},
+	"input": {"bindings": {}, "pad_bindings": {}},
 }
 
 ## Échelle de texte par défaut sur Steam Deck (écran 7 pouces, 1280×800).
@@ -51,25 +52,64 @@ func _ready() -> void:
 	apply()
 
 
-## Remappage clavier persistant : remplace les touches clavier des actions concernées.
+## Remappage persistant : `input/bindings` (action → touche physique) et
+## `input/pad_bindings` (action → bouton de manette). Remplace la commande du même type.
 func apply_bindings() -> void:
-	var saved: Variant = get_value("input", "bindings")
-	if not (saved is Dictionary):
+	var keys: Variant = get_value("input", "bindings")
+	if keys is Dictionary:
+		for action: Variant in (keys as Dictionary).keys():
+			var k: InputEventKey = InputEventKey.new()
+			k.physical_keycode = int((keys as Dictionary)[action]) as Key
+			_replace_event(StringName(String(action)), k)
+	var pads: Variant = get_value("input", "pad_bindings")
+	if pads is Dictionary:
+		for action2: Variant in (pads as Dictionary).keys():
+			var j: InputEventJoypadButton = InputEventJoypadButton.new()
+			j.button_index = int((pads as Dictionary)[action2]) as JoyButton
+			_replace_event(StringName(String(action2)), j)
+
+
+## Remplace les événements du même type (touche, ou bouton/axe de manette) d'une action.
+static func _replace_event(a: StringName, ev: InputEvent) -> void:
+	if not InputMap.has_action(a):
 		return
-	for action: Variant in (saved as Dictionary).keys():
-		var a: StringName = StringName(String(action))
-		if not InputMap.has_action(a):
-			continue
-		var keep: Array[InputEvent] = []
-		for e: InputEvent in InputMap.action_get_events(a):
-			if not (e is InputEventKey):
-				keep.append(e)
-		InputMap.action_erase_events(a)
-		var k: InputEventKey = InputEventKey.new()
-		k.physical_keycode = int((saved as Dictionary)[action]) as Key
-		InputMap.action_add_event(a, k)
-		for e2: InputEvent in keep:
-			InputMap.action_add_event(a, e2)
+	var pad: bool = ev is InputEventJoypadButton
+	var keep: Array[InputEvent] = []
+	for e: InputEvent in InputMap.action_get_events(a):
+		var e_pad: bool = e is InputEventJoypadButton or e is InputEventJoypadMotion
+		var same: bool = (pad and e_pad) or (not pad and e is InputEventKey)
+		if not same:
+			keep.append(e)
+	InputMap.action_erase_events(a)
+	InputMap.action_add_event(a, ev)
+	for e2: InputEvent in keep:
+		InputMap.action_add_event(a, e2)
+
+
+func bind_key(action: String, physical: Key) -> void:
+	var saved: Dictionary = get_value("input", "bindings") if get_value("input", "bindings") is Dictionary else {}
+	saved[action] = physical
+	var k: InputEventKey = InputEventKey.new()
+	k.physical_keycode = physical
+	_replace_event(StringName(action), k)
+	set_value("input", "bindings", saved)
+
+
+func bind_pad_button(action: String, button: JoyButton) -> void:
+	var saved: Dictionary = get_value("input", "pad_bindings") if get_value("input", "pad_bindings") is Dictionary else {}
+	saved[action] = button
+	var j: InputEventJoypadButton = InputEventJoypadButton.new()
+	j.button_index = button
+	_replace_event(StringName(action), j)
+	set_value("input", "pad_bindings", saved)
+
+
+func reset_bindings() -> void:
+	InputMap.load_from_project_settings()
+	_cfg.set_value("input", "bindings", {})
+	_cfg.set_value("input", "pad_bindings", {})
+	save_settings()
+	EventBus.settings_changed.emit()
 
 
 func load_settings() -> void:
@@ -161,7 +201,7 @@ func apply() -> void:
 	TranslationServer.set_locale(s("game", "locale"))
 	var tree: SceneTree = get_tree()
 	if tree != null and tree.root != null:
-		tree.root.content_scale_factor = f("access", "text_scale")
+		tree.root.content_scale_factor = 1.0  # la taille du texte agit sur les polices (UiKit.fs)
 
 
 ## Mode d'affichage et taille de fenêtre (appliqués seulement s'ils changent, pour ne pas

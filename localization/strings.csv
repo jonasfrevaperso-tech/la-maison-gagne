@@ -98,7 +98,6 @@ FX_DEBT,Dette ajustée,Debt adjusted
 FX_BURN,Brûlée !,Burnt!
 HINT_AIMING,Relâche quand ta zone passe sous l'aiguille.,Release when your zone passes under the needle.
 HINT_RETHROW,Relance gratuite disponible : relancer ou garder ce résultat ?,Free re-throw available: re-throw or keep this result?
-HINT_OVERLAY,…,…
 HINT_TARGETING,Choisis une case sur la roue.,Pick a pocket on the wheel.
 HISTORY_TIP,Numéro %d · score %s · paris gagnés : %d,Number %d · score %s · bets won: %d
 HUD_BANNED,interdit : %s,banned: %s
@@ -182,11 +181,11 @@ RISK_LEVEL,Risque %d,Risk %d
 RISK_NONE,Aucun risque supplémentaire. (Haha.),No extra risk. (Haha.)
 SHOP_GRIGRIS,Grigris,Charms
 SHOP_LEAVE,Retour à la table,Back to the table
-SHOP_LOCKED,Ce grigri est verrouillé (clic droit pour déverrouiller).,This charm is locked (right-click to unlock).
+SHOP_LOCKED,Ce grigri est verrouillé : déverrouille-le avant de le vendre.,This charm is locked: unlock it before selling.
 SHOP_NO_MONEY,Pas assez d'argent.,Not enough money.
 SHOP_NO_SLOT,Plus de place.,No room left.
 SHOP_ODDS,Probabilités de rareté : %s,Rarity odds: %s
-SHOP_OWNED,Tes grigris (double-clic : vendre · glisser : réordonner · clic droit : verrouiller),Your charms (double-click: sell · drag: reorder · right-click: lock)
+SHOP_OWNED,Tes grigris,Your charms
 SHOP_PACKS_CONTRACT,Paquets et contrat,Packs and contract
 SHOP_REROLL,Relancer l'étal (%d $),Reroll stall ($%d)
 SHOP_TITLE,Le Bazar du Sous-sol,The Basement Bazaar
@@ -218,7 +217,7 @@ TIP_STREAK,Les séries récompensent la constance : parie toujours sur la même 
 TIP_TITLE,Pistes pour la prochaine fois,Ideas for next time
 TIP_ZERO,"Avec tes grigris du Zéro, une Gomme sur une autre case rend le 0 plus probable.","With Zero charms, Erasing other pockets makes 0 likelier."
 TOAST_FORGIVEN,Sœur Marthe a prié : ce tour ne compte pas.,Sister Marthe prayed: this spin doesn't count.
-TOAST_PICK_POCKET,Clique une case de la roue.,Click a pocket on the wheel.
+TOAST_PICK_POCKET,Choisis une case de la roue.,Pick a pocket on the wheel.
 TOAST_SEED_COPIED,Graine copiée.,Seed copied.
 TUTO_WELCOME_TITLE,Bienvenue au Grand Zéro,Welcome to the Grand Zero
 TUTO_WELCOME_1,"1. Pose tes jetons sur le tapis (10 par tour). Plein, cheval, carré, rouge… plus c'est risqué, plus ça paie.","1. Place your chips on the felt (10 per spin). Straight, split, corner, red… riskier pays more."
@@ -333,7 +332,6 @@ ACTION_BET_PLACE,Miser sous le curseur,Bet under cursor
 ACTION_BET_CYCLE_PREV,Pari intérieur précédent,Previous inside bet
 ACTION_BET_CYCLE_NEXT,Pari intérieur suivant,Next inside bet
 CONFIRM_NEW_OVER_SAVE,Un run est en cours. L'abandonner pour en commencer un nouveau ?,A run is in progress. Abandon it and start a new one?
-HINT_PAIR,%s : %s,%s: %s
 HINT_K_ADD,+1 jeton,+1 chip
 HINT_K_ADD5,+5 jetons,+5 chips
 HINT_K_REMOVE,−1 jeton,−1 chip
@@ -342,10 +340,6 @@ HINT_K_INSIDE,chevaux/carrés,splits/corners
 HINT_K_SKIP,passer,skip
 HINT_K_SPEED,vitesse,speed
 BTN_CANCEL_TARGET,annuler,cancel
-HINT_INPUT_CLICK,Clic,Click
-HINT_INPUT_SHIFT_CLICK,Maj+clic,Shift+click
-HINT_INPUT_RIGHT_CLICK,Clic droit,Right-click
-HINT_INPUT_DPAD,Croix/stick,D-pad/stick
 KEYNAME_SPACE,Espace,Space
 KEYNAME_ENTER,Entrée,Enter
 KEYNAME_ESCAPE,Échap,Esc
@@ -359,9 +353,9 @@ OPT_FPS_CAP,Images par seconde (limite),Frame rate cap
 OPT_FPS_UNLIMITED,Illimitée,Unlimited
 CONFIRM_TELEMETRY,"Enregistrer des statistiques de jeu sur cet ordinateur (tours, boutique, durée) pour aider à équilibrer le jeu ? Rien n'est envoyé sur Internet. Modifiable dans les options.","Record gameplay statistics on this computer (spins, shop, play time) to help balance the game? Nothing is sent over the Internet. You can change this in the options."
 OPT_TELEMETRY,Statistiques de jeu locales,Local gameplay statistics
-OPT_TELEMETRY_DESC,"Fichiers dans le dossier des données (télémétrie), jamais envoyés. F8 : noter un moment de jeu.","Files in the data folder (telemetry), never sent. F8: write a playtest note."
+OPT_TELEMETRY_DESC,"Fichiers dans le dossier des données (télémétrie), jamais envoyés. La note de test se prend à tout moment (voir Commandes).","Files in the data folder (telemetry), never sent. Playtest notes can be taken at any time (see Controls)."
 OPT_OPEN_DATA,Ouvrir le dossier des données,Open the data folder
-PAUSE_NOTE,Noter ce moment (F8),Note this moment (F8)
+PAUSE_NOTE,Noter ce moment,Note this moment
 NOTE_TITLE,Note de test,Playtest note
 NOTE_INTRO,"Qu'as-tu ressenti ? Une incompréhension, un ennui, un bug, un grand moment : tout aide. La capture montre l'écran au moment de la note.","How did that feel? Confusion, boredom, a bug, a great moment: everything helps. The screenshot shows the screen when you opened this note."
 NOTE_MOOD_GREAT,Génial,Great
@@ -396,3 +390,34 @@ SOUNDBOARD_GOOD,Bien,Good
 SOUNDBOARD_BAD,À revoir,Needs work
 OPT_ECO_PRESET,"Préréglage économie (Steam Deck, portable)","Battery saver preset (Steam Deck, laptop)"
 TOAST_ECO_PRESET,"Préréglage économie appliqué : bloom coupé, 60 images/s.","Battery saver applied: bloom off, 60 FPS cap."
+HINT_K_ITEMS,grigris et Fortune,charms and Fortune
+HINT_K_SELECT,choisir,select
+HINT_K_USE,utiliser,use
+HINT_K_LOCK,verrouiller,lock
+HINT_K_MOVE,déplacer,move
+HINT_K_BACK,retour,back
+HINT_K_CONFIRM,valider,confirm
+TOAST_NO_ITEMS,Aucun grigri ni carte Fortune pour le moment.,No charms or Fortune cards yet.
+KEYNAME_BACKSPACE,Retour arr.,Backspace
+KEYNAME_UP,↑,↑
+KEYNAME_TAB,Tab,Tab
+OSK_TITLE,Saisie,Text entry
+OSK_SHIFT,Maj,Shift
+OSK_SPACE,Espace,Space
+OSK_BACKSPACE,Effacer,Delete
+OSK_OK,Valider,OK
+HINT_K_SELL,vendre,sell
+HINT_K_BUY_SELL,acheter / vendre,buy / sell
+OPT_INPUT_MODE,Mode manette,Controller mode
+OPT_IM_AUTO,Automatique,Automatic
+OPT_IM_KEYBOARD,Désactivé (clavier et souris),Off (keyboard and mouse)
+OPT_IM_GAMEPAD,Activé,On
+OPT_INPUT_MODE_DESC,"Automatique : les indications suivent le dernier appareil utilisé. Activé : tout se joue à la manette, curseur de souris masqué. Désactivé : indications clavier et souris uniquement.","Automatic: prompts follow the last device used. On: everything is played with a controller, mouse cursor hidden. Off: keyboard and mouse prompts only."
+OPT_REMAP_KEYS,Touches du clavier,Keyboard keys
+OPT_REMAP_PAD,Boutons de la manette,Controller buttons
+OPT_PRESS_BUTTON,Appuie sur un bouton…,Press a button…
+ACTION_BET_REMOVE,Retirer un jeton,Remove a chip
+ACTION_ITEM_PANEL,Grigris et Fortune,Charms and Fortune
+ACTION_PAUSE_MENU,Pause,Pause
+ACTION_PLAYTEST_NOTE,Note de test,Playtest note
+OPT_TEXT_SCALE_DESC,S'applique en quittant les options.,Applies when you leave the options.

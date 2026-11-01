@@ -81,3 +81,7 @@ func _endless() -> void:
 func _back() -> void:
 	GameState.controller = null
 	GameState.goto(GameState.SCREEN_TITLE)
+
+
+func go_back() -> void:
+	_back()

@@ -62,6 +62,13 @@ step "Interface (focus manette, débordements, 3 résolutions)"
 grep -E "^UI :|Interface :" "$LOG_DIR/ui.log"
 scan "$LOG_DIR/ui.log" || status=1
 
+step "Partie complète à la manette seule"
+if [ "${SKIP_PAD_RUN:-0}" = "1" ]; then echo "(ignorée : SKIP_PAD_RUN=1)"; else
+"$GODOT" --headless --path . -- --dev-pad-run=6 >"$LOG_DIR/pad.log" 2>&1 || status=1
+grep -E "Partie à la manette|traversés" "$LOG_DIR/pad.log"
+scan "$LOG_DIR/pad.log" || status=1
+fi
+
 step "Démarrage du jeu (headless, 120 frames)"
 "$GODOT" --headless --path . -- --quit-frames=120 >"$LOG_DIR/boot.log" 2>&1
 scan "$LOG_DIR/boot.log" || status=1

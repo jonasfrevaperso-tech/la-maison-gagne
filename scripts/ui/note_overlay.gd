@@ -24,6 +24,7 @@ func configure(shot: Image, screen: String) -> NoteOverlay:
 
 
 func build() -> void:
+	cancel_closes = true
 	heading(tr("NOTE_TITLE"))
 	var intro: Label = UiKit.label(tr("NOTE_INTRO"), UiKit.SIZE_SMALL, Palette.SMOKE)
 	intro.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -66,9 +67,3 @@ func _save() -> void:
 	Telemetry.note(GameState.run(), _mood, _text.text.strip_edges(), _screen, shot)
 	EventBus.toast.emit(tr("TOAST_NOTE_SAVED"), &"success")
 	close()
-
-
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel"):
-		close()
-		get_viewport().set_input_as_handled()

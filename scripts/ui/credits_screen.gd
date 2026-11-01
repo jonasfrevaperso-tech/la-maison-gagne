@@ -39,3 +39,7 @@ func _process(delta: float) -> void:
 	_box.position.y -= SCROLL_SPEED * delta
 	if _box.position.y < -_box.size.y:
 		_box.position.y = 1080.0
+
+
+func go_back() -> void:
+	GameState.goto(GameState.SCREEN_TITLE)

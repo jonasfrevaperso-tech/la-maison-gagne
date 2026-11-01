@@ -16,6 +16,9 @@ const SCREENS: Dictionary[StringName, String] = {
 	&"stats": "res://scenes/meta/stats_screen.tscn",
 }
 
+## Surcouches modales qui reçoivent la navigation manette à la place de l'écran.
+const MODAL_CLASSES: Array[String] = ["Overlay", "DialogueOverlay", "ActTitle"]
+
 var _screen_layer: CanvasLayer = null
 ## Cadre des écrans (cf. UiLayout.fit_frame).
 var _frame: Control = null
@@ -44,6 +47,11 @@ func _ready() -> void:
 	add_child(post)
 	EventBus.screen_requested.connect(_on_screen_requested)
 	EventBus.note_requested.connect(_open_note)
+	var nav: PadNavigator = PadNavigator.new()
+	nav.active_root = _active_root
+	nav.frame_layer = _overlay_layer
+	add_child(nav)
+	move_child(nav, 0)  # reçoit les entrées non consommées en dernier
 	if not _dev_hooks():
 		GameState.goto(&"title")
 
@@ -57,16 +65,29 @@ func _dev_hooks() -> bool:
 	return bool(hooks.call("start"))
 
 
-## Périphérique courant (aides contextuelles) et bascule plein écran (F11, Alt+Entrée).
+## Zone qui reçoit la navigation manette : la surcouche visible la plus récente, sinon l'écran.
+func _active_root() -> Control:
+	var best: Control = null
+	for layer: Node in [_current, _overlay_layer]:
+		if layer == null:
+			continue
+		for cls: String in MODAL_CLASSES:
+			for o: Node in layer.find_children("*", cls, true, false):
+				if (o as Control).is_visible_in_tree() and not o.is_queued_for_deletion():
+					best = o as Control
+	return best if best != null else _current as Control
+
+
+## Périphérique courant (invites), note de test (F8 / R3), plein écran (F11, Alt+Entrée).
 func _input(event: InputEvent) -> void:
-	if InputHints.note_event(event):
-		EventBus.input_device_changed.emit(InputHints.using_pad)
-	var k: InputEventKey = event as InputEventKey
-	if k == null or not k.pressed or k.echo:
-		return
-	if k.keycode == KEY_F8:
+	if InputGlyphs.note_event(event):
+		EventBus.input_device_changed.emit(InputGlyphs.using_pad)
+	if event.is_action_pressed("playtest_note"):
 		_open_note()
 		get_viewport().set_input_as_handled()
+		return
+	var k: InputEventKey = event as InputEventKey
+	if k == null or not k.pressed or k.echo:
 		return
 	if k.keycode == KEY_F11 or (k.keycode == KEY_ENTER and k.alt_pressed):
 		var windowed: bool = Settings.s("video", "window_mode") == "windowed"
@@ -89,6 +110,7 @@ func _open_note() -> void:
 
 
 func _exit_tree() -> void:
+	InputGlyphs.clear_cache()
 	UiKit.clear_cache()
 	IconLibrary.clear_cache()
 

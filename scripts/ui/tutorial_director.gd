@@ -5,7 +5,8 @@ extends Control
 
 signal skipped
 
-const BUBBLE_W: float = 520.0
+const BUBBLE_W: float = 560.0
+const TEXT_GLYPH_H: int = 28
 const OFFSET: float = 18.0
 ## Hauteur (part de l'écran) des bulles placées dans la marge gauche (surcouches).
 const SIDE_BUBBLE_Y: float = 0.3
@@ -20,6 +21,36 @@ var _bubble: PanelContainer = null
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	EventBus.input_device_changed.connect(func(_pad: bool) -> void: _rebuild_current())
+
+
+func _rebuild_current() -> void:
+	if not _current.is_empty() and _bubble != null:
+		_build_bubble()
+
+
+## Texte de l'astuce pour le périphérique actif (variante manette si elle existe), avec les
+## jetons {action} remplacés par les invites (glyphes ou touches).
+static func tip_text(entry: Dictionary) -> String:
+	var lang: String = TranslationServer.get_locale().substr(0, 2)
+	var raw: String = ""
+	if InputGlyphs.using_pad:
+		raw = String(entry.get("text_pad_" + lang, entry.get("text_pad_fr", "")))
+	if raw == "":
+		raw = Localization.t(entry, "text")
+	return InputGlyphs.expand(raw, TEXT_GLYPH_H)
+
+
+## Astuce affichée : A / Entrée = compris, X / M = couper les conseils (avant le tapis).
+func _input(event: InputEvent) -> void:
+	if _bubble == null or _current.is_empty():
+		return
+	if event.is_action_pressed("tip_mute"):
+		_skip_all()
+		get_viewport().set_input_as_handled()
+	elif not _current.has("until") and (event.is_action_pressed("ui_accept") or event.is_action_pressed("bet_place")):
+		_close_current()
+		get_viewport().set_input_as_handled()
 
 
 static func enabled() -> bool:
@@ -80,17 +111,22 @@ func _build_bubble() -> void:
 	var v: VBoxContainer = VBoxContainer.new()
 	v.add_theme_constant_override("separation", 8)
 	_bubble.add_child(v)
-	var l: Label = UiKit.label(Localization.t(_current, "text"), UiKit.SIZE_BODY - 2)
-	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var l: RichTextLabel = UiKit.rich(tip_text(_current), UiKit.SIZE_BODY - 2)
 	l.custom_minimum_size = Vector2(BUBBLE_W - 30, 0)
 	v.add_child(l)
 	var h: HBoxContainer = HBoxContainer.new()
 	h.alignment = BoxContainer.ALIGNMENT_END
 	h.add_theme_constant_override("separation", 10)
 	v.add_child(h)
-	h.add_child(UiKit.button(tr("TUTO_SKIP_ALL"), _skip_all, Vector2(200, 40)))
+	var mute: Button = UiKit.button(tr("TUTO_SKIP_ALL"), _skip_all, Vector2(220, 44))
+	mute.focus_mode = Control.FOCUS_NONE
+	PromptBadge.attach(mute, "tip_mute")
+	h.add_child(mute)
 	if not _current.has("until"):
-		h.add_child(UiKit.button(tr("BTN_UNDERSTOOD"), _close_current, Vector2(140, 40)))
+		var ok: Button = UiKit.button(tr("BTN_UNDERSTOOD"), _close_current, Vector2(150, 44))
+		ok.focus_mode = Control.FOCUS_NONE
+		PromptBadge.attach(ok, "ui_accept")
+		h.add_child(ok)
 	add_child(_bubble)
 	_place.call_deferred()
 	_bubble.modulate.a = 0.0
@@ -114,7 +150,7 @@ func _place() -> void:
 		pos.y = target.position.y - sz.y - OFFSET
 	pos.x = clampf(pos.x, 10.0, vp.x - sz.x - 10.0)
 	pos.y = clampf(pos.y, 10.0, vp.y - sz.y - 10.0)
-	_bubble.position = pos
+	_bubble.position = get_global_transform().affine_inverse() * pos
 
 
 func _close_current() -> void:

@@ -22,7 +22,7 @@ const TENSION_LAST_SPIN: float = 0.35
 const HINT_OFFSET_Y: float = 106.0
 const HINT_ALPHA: float = 0.72
 ## États dont l'aide commence par une phrase d'explication.
-const HINT_SENTENCES: Array[String] = ["AIMING", "RETHROW", "TARGETING", "OVERLAY"]
+const HINT_SENTENCES: Array[String] = ["AIMING", "RETHROW", "TARGETING"]
 
 var ctl: RunController = null
 var state: UiState = UiState.BETTING
@@ -63,6 +63,11 @@ var _target_fortune_slot: int = -1
 var _overlay_queue: Array[Control] = []
 var _victory_reward: Dictionary = {}
 var _heat: ColorRect = null
+## Manette : sélection dans la barre de grigris / Fortune (View) au lieu du tapis.
+var _items_mode: bool = false
+var _prompt_bar: PromptBar = null
+## Commandes (souris, clavier, manette) selon l'état : RunScreenInput.
+var _input_ctl: RunScreenInput = null
 var _bg: DecoBackground = null
 
 
@@ -74,12 +79,14 @@ func _ready() -> void:
 	theme = UiKit.theme()
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	ctl = GameState.controller
+	_input_ctl = RunScreenInput.new(self)
 	_build()
 	EventBus.juice_shake.connect(_on_shake)
 	EventBus.juice_flash.connect(_on_flash)
 	EventBus.juice_hitstop.connect(_on_hitstop)
-	EventBus.input_device_changed.connect(func(_pad: bool) -> void: _refresh_hint())
+	EventBus.input_device_changed.connect(_on_device_changed)
 	AudioBus.play_ambience("ambience_casino")
+	table_view.cursor_active = InputGlyphs.using_pad
 	_enter_phase()
 
 
@@ -161,17 +168,35 @@ func _build() -> void:
 		actions.add_child(b)
 	_rethrow_btn.visible = false
 	_keep_btn.visible = false
+	# Boutons actionnés par raccourci : jamais de focus (sinon A / Espace les déclencheraient en double).
+	var badges: Dictionary = {
+		_undo_btn: "bet_undo",
+		_repeat_btn: "bet_repeat",
+		_clear_btn: "bet_clear",
+		_speed_btn: "speed_toggle",
+		_spin_btn: "ui_spin",
+		_rethrow_btn: "ui_spin",
+		_keep_btn: "skip_anim",
+	}
+	for b: Button in badges.keys():
+		b.focus_mode = Control.FOCUS_NONE
+		PromptBadge.attach(b, String(badges[b]))
 	var menu_btn: Button = UiKit.button("☰", _on_menu, Vector2(64, 54))
+	menu_btn.focus_mode = Control.FOCUS_NONE
+	PromptBadge.attach(menu_btn, "pause_menu")
 	menu_btn.position = Vector2(UiLayout.DESIGN_SIZE.x - MARGIN - 64, MARGIN * 0.5)
 	_stage.add_child(menu_btn)
-	# Aide aux commandes : une seule ligne, tronquée proprement si la place manque.
+	# Aide aux commandes : invites du périphérique actif (glyphes manette ou touches), sans débordement.
+	_prompt_bar = PromptBar.new()
+	_prompt_bar.position = Vector2(840, 360 + TABLE_SIZE.y + HINT_OFFSET_Y)
+	_prompt_bar.size = Vector2(TABLE_SIZE.x, InputGlyphs.PROMPT_H + 6)
+	_stage.add_child(_prompt_bar)
 	_hint_label = UiKit.label("", UiKit.SIZE_SMALL, Palette.IVORY)
 	_hint_label.modulate.a = HINT_ALPHA
-	_hint_label.position = Vector2(840, 360 + TABLE_SIZE.y + HINT_OFFSET_Y)
+	_hint_label.position = Vector2(840, 360 + TABLE_SIZE.y + HINT_OFFSET_Y + InputGlyphs.PROMPT_H + 10)
 	_hint_label.size = Vector2(TABLE_SIZE.x, 0)
 	_hint_label.clip_text = true
 	_hint_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	_hint_label.mouse_filter = Control.MOUSE_FILTER_PASS
 	_stage.add_child(_hint_label)
 	# Grigris et Fortune
 	grigri_bar = GrigriBar.new()
@@ -273,12 +298,16 @@ func _refresh_buttons() -> void:
 	_refresh_hint()
 
 
-## Ligne d'aide : phrase d'état éventuelle + commandes du périphérique courant.
+## Invites de l'état courant (périphérique actif seulement) et phrase d'explication éventuelle.
 func _refresh_hint() -> void:
 	var state_name: String = UiState.keys()[state]
-	var sentence: String = tr("HINT_" + state_name) if state_name in HINT_SENTENCES else ""
-	_hint_label.text = InputHints.line(state_name, sentence)
-	_hint_label.tooltip_text = _hint_label.text
+	var key: String = "ITEMS" if _items_mode else state_name
+	if key == "BETTING":
+		key = "BETTING_PAD" if InputGlyphs.using_pad else "BETTING_KEYS"
+	var items: Array[Array] = []
+	items.assign(RunScreenInput.PROMPTS.get(key, []))
+	_prompt_bar.set_items(items)
+	_hint_label.text = tr("HINT_" + state_name) if state_name in HINT_SENTENCES else ""
 
 
 func _refresh_probabilities() -> void:
@@ -494,49 +523,25 @@ func _set_state(s: UiState) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if state == UiState.OVERLAY:
 		return
-	if state == UiState.BETTING and _gamepad_table(event):
+	if _input_ctl.handle(event):
 		get_viewport().set_input_as_handled()
-		return
-	if event.is_action_pressed("ui_spin"):
-		_on_spin_pressed()
-		get_viewport().set_input_as_handled()
-	elif event.is_action_pressed("bet_undo"):
-		_on_undo()
-	elif event.is_action_pressed("bet_repeat"):
-		_on_repeat()
-	elif event.is_action_pressed("bet_clear"):
-		_on_clear()
-	elif event.is_action_pressed("speed_toggle"):
-		_on_speed()
-	elif event.is_action_pressed("skip_anim"):
-		_skip_animations()
-	elif event.is_action_pressed("ui_cancel"):
-		if state == UiState.TARGETING:
-			_target_fortune_slot = -1
-			_set_state(UiState.BETTING)
-		else:
-			_on_menu()
 
 
-## Jeu au tapis sans souris (manette, Steam Deck, clavier) : renvoie true si l'événement est consommé.
-func _gamepad_table(event: InputEvent) -> bool:
-	var dirs: Dictionary = {"ui_left": Vector2i(-1, 0), "ui_right": Vector2i(1, 0), "ui_up": Vector2i(0, -1), "ui_down": Vector2i(0, 1)}
-	for a: String in dirs.keys():
-		if event.is_action_pressed(a, true):
-			var d: Vector2i = dirs[a]
-			table_view.move_cursor(d.x, d.y)
-			AudioBus.ui("hover")
-			return true
-	if event.is_action_pressed("bet_cycle_prev"):
-		table_view.cycle_cursor(-1)
-		return true
-	if event.is_action_pressed("bet_cycle_next"):
-		table_view.cycle_cursor(1)
-		return true
-	if event.is_action_pressed("bet_place") and table_view.cursor_active:
-		_on_spot_changed(table_view.cursor_spot(), 1)
-		return true
-	return false
+## Manette : le curseur du tapis est toujours visible ; clavier/souris : il disparaît.
+func _on_device_changed(pad: bool) -> void:
+	if pad:
+		table_view.cursor_active = true
+	else:
+		table_view.cursor_active = false
+	table_view.queue_redraw()
+	if not pad and _items_mode:
+		_input_ctl.set_items_mode(false)
+	_refresh_hint()
+
+
+## Le navigateur manette ne force le focus que dans le mode « objets » (le tapis a son curseur).
+func wants_pad_focus() -> bool:
+	return _items_mode
 
 
 func _skip_animations() -> void:
@@ -584,8 +589,7 @@ func _on_spot_hovered(spot_id: String) -> void:
 		return
 	var r: RunState = ctl.run
 	var info: String = BetInfo.describe(spot_id, table_view.hide_odds, r.wheel, r.chip_value, int(r.slip.chips.get(spot_id, 0)))
-	_hint_label.text = info.replace("\n", InputHints.SEP)
-	_hint_label.tooltip_text = info
+	_hint_label.text = info.replace("\n", InputGlyphs.SEP)
 
 
 func _on_undo() -> void:
@@ -865,9 +869,13 @@ func _on_fortune_activated(card: GrigriCard) -> void:
 		return
 	var slot: int = card.uid
 	var fid: String = ctl.run.fortunes[slot]
+	if _items_mode:
+		_input_ctl.set_items_mode(false)
 	if ctl.fortune_needs_target(fid):
 		_target_fortune_slot = slot
 		_set_state(UiState.TARGETING)
+		if InputGlyphs.using_pad:
+			_input_ctl.move_target(0, ctl.run.wheel.size())
 		EventBus.toast.emit(tr("TOAST_PICK_POCKET"), &"info")
 	else:
 		_use_fortune(slot, -1)
@@ -877,6 +885,7 @@ func _on_pocket_clicked(index: int) -> void:
 	if state == UiState.TARGETING and _target_fortune_slot >= 0:
 		_use_fortune(_target_fortune_slot, index)
 		_target_fortune_slot = -1
+		wheel_view.hover_index = -1
 
 
 func _use_fortune(slot: int, index: int) -> void:

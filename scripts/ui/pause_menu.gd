@@ -5,6 +5,7 @@ extends Overlay
 
 func build() -> void:
 	panel_width = 620.0
+	cancel_closes = true
 	heading(tr("PAUSE_TITLE"))
 	var r: RunState = GameState.run()
 	var seed_l: Label = UiKit.label(tr("PAUSE_SEED") % RngService.seed_to_code(r.rng.seed_value), UiKit.SIZE_BODY, Palette.CYAN, "mono")
@@ -17,6 +18,7 @@ func build() -> void:
 	copy.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	body.add_child(copy)
 	var note_btn: Button = UiKit.button(tr("PAUSE_NOTE"), _note)
+	PromptBadge.attach(note_btn, "playtest_note")
 	note_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	body.add_child(note_btn)
 	var quit_btn: Button = UiKit.button(tr("PAUSE_SAVE_QUIT"), _save_quit)

@@ -36,12 +36,12 @@ func _notification(what: int) -> void:
 
 
 ## Sortie propre : sauvegarde, coupe l'audio, laisse deux frames au thread audio, puis quitte.
-func quit_game() -> void:
+func quit_game(exit_code: int = 0) -> void:
 	autosave()
 	SaveSystem.save_profile()
 	AudioBus.shutdown()
 	await get_tree().create_timer(QUIT_AUDIO_GRACE, true, false, true).timeout
-	get_tree().quit()
+	get_tree().quit(exit_code)
 
 
 func goto(screen_id: StringName, params: Dictionary = {}) -> void:
