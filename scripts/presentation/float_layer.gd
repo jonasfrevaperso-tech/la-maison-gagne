@@ -14,7 +14,10 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
+## `at` est en coordonnées de canevas (cf. UiLayout.canvas_point) : converti en local, le
+## calque pouvant être mis à l'échelle par le cadre des écrans.
 func pop_text(text: String, at: Vector2, color: Color, size_px: int = UiKit.SIZE_H2) -> void:
+	at = get_global_transform().affine_inverse() * at
 	var l: Label = UiKit.label(text, size_px, color, "mono")
 	l.add_theme_color_override("font_outline_color", Palette.INK)
 	l.add_theme_constant_override("outline_size", 8)
@@ -35,6 +38,7 @@ func pop_text(text: String, at: Vector2, color: Color, size_px: int = UiKit.SIZE
 
 ## kind : "coins", "sparks", "confetti", "smoke"
 func burst(kind: String, at: Vector2, amount: int) -> void:
+	at = get_global_transform().affine_inverse() * at
 	var n: int = int(float(mini(amount, JuiceProfile.PARTICLE_COUNT_MAX)) * JuiceProfile.intensity())
 	var rng: RandomNumberGenerator = RngService.cosmetic()
 	for _i: int in n:

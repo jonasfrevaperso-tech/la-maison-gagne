@@ -22,6 +22,9 @@ func start() -> bool:
 		_hover_later(String(args["dev-hover"]))
 	if args.has("shot"):
 		_capture_later(String(args["shot"]), int(args.get("frames", "120")))
+	if args.has("dev-ui-check"):
+		add_child(DevUiCheck.new())
+		return true
 	if args.has("dev-screen"):
 		GameState.goto(StringName(String(args["dev-screen"])))
 		return true

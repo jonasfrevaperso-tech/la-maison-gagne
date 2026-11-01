@@ -33,6 +33,7 @@ const DEFAULTS: Dictionary = {
 
 ## Échelle de texte par défaut sur Steam Deck (écran 7 pouces, 1280×800).
 const HANDHELD_TEXT_SCALE: float = 1.15
+const ECO_PRESET: Dictionary = {"bloom": 0.0, "fps_cap": 60}
 const WINDOW_MODES: Array[String] = ["windowed", "fullscreen", "exclusive"]
 
 ## Surcharge de vitesse non persistée (QA automatisée) ; 0 = utiliser l'option du joueur.
@@ -92,10 +93,22 @@ func _migrate() -> void:
 		_cfg.erase_section_key("video", "fullscreen")
 
 
-## Premier lancement sur console portable (Steam Deck) : texte un peu plus grand.
+## Premier lancement sur console portable (Steam Deck) : texte un peu plus grand et
+## préréglage économie (autonomie, 60 images/s tenues).
 func _detect_handheld() -> void:
 	if OS.get_environment("SteamDeck") == "1" or OS.has_feature("steamdeck"):
 		_cfg.set_value("access", "text_scale", HANDHELD_TEXT_SCALE)
+		for key: String in ECO_PRESET.keys():
+			_cfg.set_value("video", key, ECO_PRESET[key])
+
+
+## Préréglage économie : le bloom est l'effet le plus coûteux (≈ 35 % du GPU mesuré).
+func apply_eco_preset() -> void:
+	for key: String in ECO_PRESET.keys():
+		_cfg.set_value("video", key, ECO_PRESET[key])
+	save_settings()
+	apply()
+	EventBus.settings_changed.emit()
 
 
 func save_settings() -> void:

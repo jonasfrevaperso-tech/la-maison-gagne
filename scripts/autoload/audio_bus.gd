@@ -144,6 +144,16 @@ func play(sfx_id: String, pitch: float = 1.0, volume_db: float = 0.0, bus: Strin
 	p.play()
 
 
+## Identifiants de tous les effets sonores mixés (table d'écoute des options).
+func sfx_ids() -> Array[String]:
+	var out: Array[String] = []
+	for k: Variant in _mix.keys():
+		if not String(k).begins_with("_"):
+			out.append(String(k))
+	out.sort()
+	return out
+
+
 func ui(sfx_id: String) -> void:
 	play(sfx_id, 1.0, 0.0, "UI")
 

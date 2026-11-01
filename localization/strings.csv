@@ -388,3 +388,11 @@ STATS_COL_BEST,Meilleur tour,Best spin
 STATS_COL_SEED,Graine,Seed
 STATS_RESULT_WIN,Victoire,Victory
 STATS_RESULT_TIER,Palier %d,Tier %d
+SOUNDBOARD_OPEN,Écouter les sons…,Listen to the sounds…
+SOUNDBOARD_TITLE,Écoute des sons,Sound review
+SOUNDBOARD_INTRO,Chaque son est joué au volume du jeu (une variante au hasard). Marque ceux qui sonnent faux ou trop fort : la liste aide à les remplacer.,Each sound plays at in-game volume (a random variant). Flag the ones that sound wrong or too loud: the list helps replace them.
+SOUNDBOARD_PLAY,Écouter,Play
+SOUNDBOARD_GOOD,Bien,Good
+SOUNDBOARD_BAD,À revoir,Needs work
+OPT_ECO_PRESET,"Préréglage économie (Steam Deck, portable)","Battery saver preset (Steam Deck, laptop)"
+TOAST_ECO_PRESET,"Préréglage économie appliqué : bloom coupé, 60 images/s.","Battery saver applied: bloom off, 60 FPS cap."

@@ -17,6 +17,8 @@ const SCREENS: Dictionary[StringName, String] = {
 }
 
 var _screen_layer: CanvasLayer = null
+## Cadre des écrans (cf. UiLayout.fit_frame).
+var _frame: Control = null
 var _overlay_layer: CanvasLayer = null
 var _current: Node = null
 var _transition: ScreenTransition = null
@@ -26,6 +28,11 @@ func _ready() -> void:
 	_screen_layer = CanvasLayer.new()
 	_screen_layer.layer = 0
 	add_child(_screen_layer)
+	_frame = Control.new()
+	_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_screen_layer.add_child(_frame)
+	_fit_frame()
+	get_viewport().size_changed.connect(_fit_frame)
 	_overlay_layer = CanvasLayer.new()
 	_overlay_layer.layer = 50
 	add_child(_overlay_layer)
@@ -67,6 +74,10 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
+func _fit_frame() -> void:
+	UiLayout.fit_frame(_frame, get_viewport().get_visible_rect().size)
+
+
 ## Note de test : capture l'écran tel quel, puis ouvre le formulaire par-dessus.
 func _open_note() -> void:
 	if _overlay_layer.get_children().any(func(c: Node) -> bool: return c is NoteOverlay):
@@ -95,5 +106,5 @@ func _on_screen_requested(screen_id: StringName, params: Dictionary) -> void:
 	_current = packed.instantiate()
 	if _current.has_method("setup"):
 		_current.call("setup", params)
-	_screen_layer.add_child(_current)
+	_frame.add_child(_current)
 	await _transition.open()

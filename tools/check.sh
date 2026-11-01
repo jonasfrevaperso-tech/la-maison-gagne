@@ -30,7 +30,10 @@ step "Traductions"
 python3 tools/i18n_check.py | tail -3 || status=1
 
 step "Audio (mesures objectives)"
-python3 tools/audio_report.py | tail -3 || status=1
+python3 tools/audio_report.py >"$LOG_DIR/audio.log" 2>&1 || status=1
+tail -1 "$LOG_DIR/audio.log"
+python3 tools/audio_mix.py --check >"$LOG_DIR/audio_mix.log" 2>&1 || status=1
+tail -1 "$LOG_DIR/audio_mix.log"
 
 step "Lint (gdlint)"
 if command -v gdlint >/dev/null; then
@@ -53,6 +56,11 @@ step "Simulation rapide"
 "$GODOT" --headless --path . -s res://scripts/sim/sim_main.gd -- --runs=40 --bot=greedy --quiet >"$LOG_DIR/sim.log" 2>&1 || status=1
 tail -4 "$LOG_DIR/sim.log"
 scan "$LOG_DIR/sim.log" || status=1
+
+step "Interface (focus manette, débordements, 3 résolutions)"
+"$GODOT" --headless --path . -- --dev-ui-check >"$LOG_DIR/ui.log" 2>&1 || status=1
+grep -E "^UI :|Interface :" "$LOG_DIR/ui.log"
+scan "$LOG_DIR/ui.log" || status=1
 
 step "Démarrage du jeu (headless, 120 frames)"
 "$GODOT" --headless --path . -- --quit-frames=120 >"$LOG_DIR/boot.log" 2>&1

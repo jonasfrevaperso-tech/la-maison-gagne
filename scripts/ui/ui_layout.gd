@@ -34,6 +34,16 @@ static func fit_stage(stage: Control, viewport: Vector2) -> void:
 	stage.position = ((viewport - DESIGN_SIZE * s) * 0.5).floor()
 
 
+## Cadre plein écran des écrans : au moins DESIGN_SIZE dans chaque dimension (les écrans
+## n'ont jamais moins de place que prévu), réduit uniformément si la fenêtre logique est plus
+## petite (texte agrandi, petite fenêtre). Les fenêtres plus grandes gardent toute leur place.
+static func fit_frame(frame: Control, viewport: Vector2) -> void:
+	var s: float = stage_scale(viewport)
+	frame.scale = Vector2(s, s)
+	frame.position = Vector2.ZERO
+	frame.size = viewport / s
+
+
 ## Rectangle d'un contrôle en coordonnées de canevas (tient compte des échelles parentes).
 static func canvas_rect(c: Control) -> Rect2:
 	return c.get_global_transform() * Rect2(Vector2.ZERO, c.size)

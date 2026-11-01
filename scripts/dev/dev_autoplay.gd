@@ -11,22 +11,39 @@ var shot_dir: String = ""
 var perf: bool = false
 var _shots: int = 0
 var _frames: Array[float] = []
+var _gpu: Array[float] = []
+var _cpu: Array[float] = []
 var _draw_calls: int = 0
 
 
 func _ready() -> void:
+	if perf:
+		RenderingServer.viewport_set_measure_render_time(get_viewport().get_viewport_rid(), true)
 	_drive()
 
 
 func _process(delta: float) -> void:
 	if perf:
 		_frames.append(delta * 1000.0)
+		var rid: RID = get_viewport().get_viewport_rid()
+		var gpu: float = RenderingServer.viewport_get_measured_render_time_gpu(rid)
+		var cpu: float = RenderingServer.viewport_get_measured_render_time_cpu(rid) + RenderingServer.get_frame_setup_time_cpu()
+		if gpu > 0.0:
+			_gpu.append(gpu)
+			_cpu.append(cpu)
 		_draw_calls = maxi(_draw_calls, int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)))
 
 
 func _perf_report() -> void:
 	if _frames.size() < 10:
 		return
+	if not _gpu.is_empty():
+		_gpu.sort()
+		_cpu.sort()
+		print(
+			"Rendu : GPU médian %.2f ms (99e centile %.2f ms) · CPU de rendu médian %.2f ms"
+			% [_gpu[_gpu.size() / 2], _gpu[int(float(_gpu.size()) * 0.99)], _cpu[_cpu.size() / 2]]
+		)
 	var sorted: Array[float] = _frames.duplicate()
 	sorted.sort()
 	var avg: float = 0.0

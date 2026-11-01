@@ -98,7 +98,7 @@ func _build() -> void:
 	_stage.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_content.add_child(_stage)
 	_fit_stage()
-	get_viewport().size_changed.connect(_fit_stage)
+	resized.connect(_fit_stage)
 	# Barre du haut
 	var top: HBoxContainer = HBoxContainer.new()
 	top.position = Vector2(MARGIN, MARGIN * 0.6)
@@ -434,12 +434,13 @@ func _anchor_rect(anchor: String) -> Rect2:
 		. get(anchor, null)
 	)
 	if c == null:
-		return Rect2(get_viewport_rect().size * Vector2(0.5, 0.15), Vector2.ZERO)
+		var me: Rect2 = UiLayout.canvas_rect(self)
+		return Rect2(me.position + me.size * Vector2(0.5, 0.15), Vector2.ZERO)
 	return UiLayout.canvas_rect(c)
 
 
 func _fit_stage() -> void:
-	UiLayout.fit_stage(_stage, get_viewport_rect().size)
+	UiLayout.fit_stage(_stage, size)
 
 
 ## Moments de jeu signalés au tutoriel une fois les surcouches fermées.

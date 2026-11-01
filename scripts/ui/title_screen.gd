@@ -58,8 +58,18 @@ func _ready() -> void:
 	menu.add_child(new_btn)
 	if first == null:
 		first = new_btn
-	for entry: Array in _extra_entries():
-		menu.add_child(UiKit.button(tr(String(entry[0])), entry[1] as Callable, MENU_BUTTON))
+	# Entrées secondaires sur deux colonnes : le menu tient en 16:9 même avec le texte agrandi.
+	var extras: Array[Array] = _extra_entries()
+	if not extras.is_empty():
+		menu.add_child(UiKit.button(tr(String(extras[0][0])), extras[0][1] as Callable, MENU_BUTTON))
+		var cols: GridContainer = GridContainer.new()
+		cols.columns = 2
+		cols.add_theme_constant_override("h_separation", MENU_GAP)
+		cols.add_theme_constant_override("v_separation", MENU_GAP)
+		menu.add_child(cols)
+		var half: Vector2 = Vector2((MENU_BUTTON.x - float(MENU_GAP)) * 0.5, MENU_BUTTON.y)
+		for i: int in range(1, extras.size()):
+			cols.add_child(UiKit.button(tr(String(extras[i][0])), extras[i][1] as Callable, half))
 	menu.add_child(UiKit.button(tr("MENU_QUIT"), _on_quit, MENU_BUTTON))
 	first.call_deferred("grab_focus")
 	var disclaimer: Label = UiKit.label(tr("DISCLAIMER_SIMULATED"), UiKit.SIZE_SMALL, Palette.SMOKE)

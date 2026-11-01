@@ -261,6 +261,142 @@ def mix_at(buf: np.ndarray, x: np.ndarray, start: int, gain: float = 1.0, wrap: 
 
 # --------------------------------------------------------------------------- SFX
 
+# --------------------------------------------------------------------------- modèles physiques (1.1)
+# Synthèse modale : chaque objet = quelques modes de vibration inharmoniques amortis, excités
+# par une courte impulsion de bruit. Générateur aléatoire propre à chaque son (variantes
+# reproductibles sans perturber les autres sons).
+
+def modal(rng, freqs, decays, amps, dur, exc_ms=1.5, exc_band=(1500, 9000), exc_gain=0.6):
+    t = t_axis(dur)
+    x = np.zeros(len(t))
+    for f, d, a in zip(freqs, decays, amps):
+        f = f * (1 + rng.uniform(-0.015, 0.015))
+        x += a * np.sin(2 * np.pi * f * t + rng.uniform(0, 2 * np.pi)) * np.exp(-t / d)
+    n_exc = max(int(exc_ms / 1000 * SR), 8)
+    exc = fft_filter(rng.standard_normal(n_exc), *exc_band) * np.linspace(1, 0, n_exc) ** 2
+    x[:n_exc] += exc * exc_gain
+    att = min(int(0.0008 * SR), len(x))
+    x[:att] *= np.linspace(0, 1, att)
+    rel = min(int(0.012 * SR), len(x) // 3)
+    x[-rel:] *= np.linspace(1, 0, rel) ** 2
+    return x
+
+
+def felt_thud(rng, dur=0.05, f=170.0):
+    t = t_axis(dur)
+    return np.sin(2 * np.pi * f * (1 + rng.uniform(-0.05, 0.05)) * t) * np.exp(-t / 0.012) * 0.5 + \
+        fft_filter(rng.standard_normal(len(t)), 80, 900) * np.exp(-t / 0.006) * 0.4
+
+
+def chip_click(rng, f0=2400.0, dur=0.07, gain=1.0):
+    """Jeton en argile composite contre un autre jeton : clic sec, modes aigus inharmoniques."""
+    ratios = [1.0, 1.47, 2.09, 2.83, 3.71]
+    decays = [0.018, 0.012, 0.009, 0.006, 0.004]
+    amps = [0.55, 0.35, 0.25, 0.15, 0.1]
+    return modal(rng, [f0 * r for r in ratios], decays, amps, dur, 1.2, (2500, 12000), 0.9) * gain
+
+
+def chip_place_v(seed):
+    """Pose d'un jeton : petit choc mat sur le tapis puis un ou deux clics jeton contre jeton."""
+    rng = np.random.default_rng(seed)
+    buf = np.zeros(int(0.16 * SR))
+    mix_at(buf, felt_thud(rng), 0, 0.8, wrap=False)
+    hits = 1 + int(rng.integers(0, 2))
+    at = 0.004
+    for h in range(hits):
+        mix_at(buf, chip_click(rng, rng.uniform(2100, 2900), 0.07, 1.0 / (1 + h * 0.8)), int(at * SR), 1.0, wrap=False)
+        at += rng.uniform(0.012, 0.028)
+    return buf
+
+
+def chip_remove_v(seed):
+    """Retrait : glissé bref sur le feutre puis clic léger."""
+    rng = np.random.default_rng(seed)
+    n = int(0.09 * SR)
+    slide = fft_filter(rng.standard_normal(n), 1200, 6000) * env_adsr(n, 0.01, 0.02, 0.5, 0.04) * 0.25
+    buf = np.zeros(int(0.14 * SR))
+    mix_at(buf, slide, 0, 1.0, wrap=False)
+    mix_at(buf, chip_click(rng, rng.uniform(2600, 3200), 0.05, 0.6), int(0.05 * SR), 1.0, wrap=False)
+    return buf
+
+
+def chip_stack_v(seed, count, spacing, gain_decay=0.12):
+    """Pile de jetons qui s'entrechoquent (gains, balayage)."""
+    rng = np.random.default_rng(seed)
+    total = int((spacing * count + 0.15) * SR)
+    buf = np.zeros(total)
+    at = 0.0
+    for i in range(count):
+        mix_at(buf, chip_click(rng, rng.uniform(2000, 3300), 0.06, 1.0 / (1 + i * gain_decay)), int(at * SR), 1.0, wrap=False)
+        at += spacing * rng.uniform(0.6, 1.4)
+    return buf
+
+
+def ball_roll_v(seed, dur=3.6):
+    """Bille sur la piste : roulement dont la hauteur et le volume suivent la vitesse,
+    souffle de rotation, puis cliquetis sur les frettes quand elle ralentit."""
+    rng = np.random.default_rng(seed)
+    n = int(dur * SR)
+    t = np.arange(n) / SR
+    v = np.exp(-t / (dur * 0.55))
+    # Roulement : deux bandes de bruit, l'aiguë domine quand la bille va vite.
+    low = fft_filter(rng.standard_normal(n), 250, 1100)
+    high = fft_filter(rng.standard_normal(n), 1100, 5200)
+    roll = low * (0.35 + 0.65 * (1 - v)) + high * v
+    rot = np.cumsum(1.2 + 3.0 * v) / SR
+    swirl = 0.7 + 0.3 * np.sin(2 * np.pi * rot)
+    x = roll * (0.15 + 0.85 * v ** 0.7) * swirl * 0.6
+    # Frettes : tic dont la cadence suit la vitesse, audibles surtout en fin de course.
+    fret_rate = 37 * (0.4 + 2.0 * v)
+    ph = np.cumsum(fret_rate) / SR
+    ticks = np.flatnonzero(np.diff(np.floor(ph)) > 0)
+    for i in ticks:
+        weight = (1 - v[i]) ** 1.5
+        if weight < 0.05 or rng.random() > 0.55:
+            continue
+        click = modal(rng, [3100, 4700, 6900], [0.006, 0.004, 0.003], [0.5, 0.3, 0.2], 0.02, 0.5, (3000, 12000), 0.3)
+        mix_at(x, click, int(i), 0.12 * weight, wrap=False)
+    return x * env_adsr(n, 0.04, 0.1, 0.95, 0.35)
+
+
+def ball_bounce_v(seed):
+    """Choc sur un losange déflecteur (laiton) : tintement bref + corps de la bille."""
+    rng = np.random.default_rng(seed)
+    metal = modal(rng, [2750, 4130, 6280, 8900], [0.05, 0.035, 0.02, 0.012], [0.5, 0.35, 0.2, 0.1], 0.12, 0.8, (3000, 14000), 0.5)
+    body = modal(rng, [880, 1730], [0.012, 0.008], [0.5, 0.25], 0.05, 1.0, (800, 5000), 0.4)
+    buf = np.zeros(int(0.13 * SR))
+    mix_at(buf, metal, 0, 0.7, wrap=False)
+    mix_at(buf, body, 0, 0.8, wrap=False)
+    return buf
+
+
+def ball_land_v(seed):
+    """Arrivée dans une case : rebonds de plus en plus rapprochés puis petit cliquetis."""
+    rng = np.random.default_rng(seed)
+    buf = np.zeros(int(0.7 * SR))
+    at, gap, amp = 0.0, rng.uniform(0.09, 0.12), 1.0
+    for _ in range(7):
+        hit = modal(rng, [rng.uniform(950, 1150), 1900, 3300], [0.03, 0.018, 0.01], [0.6, 0.3, 0.15], 0.08, 1.2, (1200, 8000), 0.6)
+        mix_at(buf, hit, int(at * SR), amp, wrap=False)
+        at += gap
+        gap *= rng.uniform(0.55, 0.65)
+        amp *= 0.62
+        if at > 0.6:
+            break
+    return buf
+
+
+def wheel_spin_v(seed, dur=1.2):
+    """Lancement du cylindre : grondement du roulement et souffle des cases."""
+    rng = np.random.default_rng(seed)
+    n = int(dur * SR)
+    t = np.arange(n) / SR
+    rumble = fft_filter(rng.standard_normal(n), 40, 220) * 0.8
+    bearing = (np.sin(2 * np.pi * 92 * t) * 0.4 + np.sin(2 * np.pi * 184 * t) * 0.2) * (0.7 + 0.3 * np.sin(2 * np.pi * 6 * t))
+    air = fft_filter(rng.standard_normal(n), 500, 2500) * (0.5 + 0.5 * np.sin(2 * np.pi * 14 * t)) * 0.35
+    return (rumble + bearing * 0.5 + air) * env_adsr(n, 0.15, 0.1, 0.7, 0.45) * 0.6
+
+
 def sfx_defs():
     """id -> (fonction(variante) -> signal, nombre de variantes)."""
     def v(k, spread=0.06):
@@ -278,12 +414,12 @@ def sfx_defs():
     d["panel_open"] = (lambda k: sweep(300, 1200 * v(k), 0.18) * 0.4, 3)
     d["panel_close"] = (lambda k: sweep(1200 * v(k), 300, 0.15) * 0.4, 3)
     d["curtain"] = (lambda k: fft_filter(noise(int(0.35 * SR)), 300, 3000) * env_adsr(int(0.35 * SR), 0.1, 0.1, 0.6, 0.15) * 0.5, 3)
-    d["chip_place"] = (lambda k: inst_clack(1700 * v(k, 0.05)), 5)
-    d["chip_remove"] = (lambda k: inst_clack(1300 * v(k, 0.05)) * 0.7, 4)
-    d["chip_sweep"] = (lambda k: cluster(inst_clack, 6, 0.03, 1500), 3)
+    d["chip_place"] = (lambda k: chip_place_v(100 + k), 5)
+    d["chip_remove"] = (lambda k: chip_remove_v(200 + k), 4)
+    d["chip_sweep"] = (lambda k: chip_stack_v(300 + k, 9, 0.022), 3)
     d["chip_lose"] = (lambda k: inst_bass(70 * v(k), 0.15) * 0.6, 3)
-    d["chips"] = (lambda k: cluster(inst_coin, 3, 0.025, 2400 * v(k)) * 0.6, 5)
-    d["chips_win"] = (lambda k: cluster(inst_coin, 5, 0.03, 2600 * v(k)) * 0.7, 5)
+    d["chips"] = (lambda k: chip_stack_v(400 + k, 3, 0.03), 5)
+    d["chips_win"] = (lambda k: addpad(chip_stack_v(500 + k, 6, 0.028) * 0.8, inst_coin(2600 * v(k), 0.3) * 0.25), 5)
     d["mult"] = (lambda k: sweep(400 * v(k), 1400 * v(k), 0.16, "square") * 0.35, 4)
     d["xmult"] = (lambda k: (sweep(200 * v(k), 1800, 0.3, "saw") * 0.35 + inst_kick(0.3) * 0.6), 4)
     d["coins"] = (lambda k: cluster(inst_coin, 8, 0.04, 2500 * v(k)) * 0.6, 4)
@@ -297,14 +433,14 @@ def sfx_defs():
     d["count_up"] = (lambda k: cluster(inst_click, 10, 0.035, 2600) * 0.5, 3)
     d["celebrate"] = (lambda k: chord_hit([60, 64, 67, 72], inst_ep, 0.8) * 0.7, 3)
     d["jackpot"] = (lambda k: reverb(np.concatenate([arpeggio([72, 76, 79, 84, 88], 0.06, inst_bell), np.zeros(int(0.2 * SR))]), 1.2, 0.3) * 0.8, 3)
-    d["ball_roll"] = (lambda k: ball_roll(3.6), 3)
-    d["ball_bounce"] = (lambda k: inst_clack(1100 * v(k, 0.08), 0.05) * 0.6, 5)
-    d["ball_land"] = (lambda k: np.concatenate([inst_clack(950 * v(k), 0.06), inst_clack(1050, 0.05) * 0.5, inst_clack(1000, 0.04) * 0.25]), 4)
+    d["ball_roll"] = (lambda k: ball_roll_v(600 + k, 3.6), 3)
+    d["ball_bounce"] = (lambda k: ball_bounce_v(700 + k), 5)
+    d["ball_land"] = (lambda k: ball_land_v(800 + k), 4)
     d["ball_launch"] = (lambda k: sweep(200, 900 * v(k), 0.25, "noise") * 0.5, 3)
     d["ball_wood"] = d["ball_land"]
     d["ball_metal"] = (lambda k: inst_coin(1800 * v(k), 0.4) * 0.7, 3)
     d["ball_glass"] = (lambda k: inst_bell(1900 * v(k), 0.6, 2, 3.5) * 0.5, 3)
-    d["wheel_spin"] = (lambda k: wheel_whir(1.2), 3)
+    d["wheel_spin"] = (lambda k: wheel_spin_v(900 + k, 1.2), 3)
     d["deadline_won"] = (lambda k: reverb(fanfare([60, 64, 67, 72, 76]), 1.0, 0.25) * 0.8, 3)
     d["deadline_failed"] = (lambda k: reverb(trombone_down(), 1.0, 0.25) * 0.7, 3)
     d["buy"] = (lambda k: np.concatenate([inst_coin(2200, 0.1), inst_bell(1760 * v(k), 0.6, 1.5, 2)]) * 0.7, 3)
@@ -414,24 +550,6 @@ def trombone_down(slow=False):
         x = fft_filter(saw(f, t), 0, 900) * env_adsr(len(t), 0.03, 0.05, 0.8, 0.1)
         mix_at(buf, x, int(i * step * SR), 0.5, wrap=False)
     return buf
-
-
-def ball_roll(dur):
-    n = int(dur * SR)
-    t = np.arange(n) / SR
-    rate = 30 * np.exp(-t / (dur * 0.6)) + 4
-    ph = np.cumsum(rate) / SR
-    rattle = (np.sin(2 * np.pi * ph) > 0.92).astype(float)
-    x = fft_filter(noise(n), 400, 3500) * 0.25 * np.exp(-t / dur)
-    x += fft_filter(rattle * noise(n), 1500, 7000) * 0.6
-    return x * env_adsr(n, 0.05, 0.1, 0.9, 0.3)
-
-
-def wheel_whir(dur):
-    n = int(dur * SR)
-    t = np.arange(n) / SR
-    am = 0.5 + 0.5 * np.sin(2 * np.pi * 18 * t)
-    return fft_filter(noise(n), 200, 1800) * am * env_adsr(n, 0.2, 0.1, 0.7, 0.4) * 0.35
 
 
 def blip(m):

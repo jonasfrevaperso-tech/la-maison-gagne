@@ -32,22 +32,30 @@ func _ready() -> void:
 	body.add_theme_constant_override("separation", 14)
 	panel.add_child(body)
 	build()
-	var fit: float = fit_scale()
-	panel.pivot_offset = panel.get_combined_minimum_size() * 0.5
-	panel.scale = Vector2(0.85, 0.85) * fit
 	panel.modulate.a = 0.0
+	AudioBus.ui("panel_open")
+	_pop.call_deferred()
+
+
+## Apparition une fois la mise en page faite (la taille réelle du panneau est connue).
+func _pop() -> void:
+	await get_tree().process_frame
+	if not is_inside_tree():
+		return
+	var fit: float = fit_scale()
+	panel.pivot_offset = panel.size * 0.5
+	panel.scale = Vector2(0.85, 0.85) * fit
 	var tw: Tween = panel.create_tween().set_parallel(true)
 	tw.tween_property(panel, "scale", Vector2(fit, fit), POP_TIME / maxf(Settings.speed(), 1.0)).set_trans(Tween.TRANS_BACK).set_ease(
 		Tween.EASE_OUT
 	)
 	tw.tween_property(panel, "modulate:a", 1.0, POP_TIME * 0.6)
-	AudioBus.ui("panel_open")
 
 
 ## Échelle qui fait tenir le panneau dans la fenêtre logique (petites fenêtres, grande police).
 func fit_scale() -> float:
-	var need: Vector2 = panel.get_combined_minimum_size()
-	var room: Vector2 = get_viewport_rect().size * FIT_MARGIN
+	var need: Vector2 = panel.size
+	var room: Vector2 = size * FIT_MARGIN
 	if need.x <= 0.0 or need.y <= 0.0:
 		return 1.0
 	return minf(1.0, minf(room.x / need.x, room.y / need.y))

@@ -117,6 +117,7 @@ func _audio_tab() -> void:
 	var b: VBoxContainer = _tab("OPT_TAB_AUDIO")
 	for k: String in ["master", "music", "sfx", "ui", "ambience"]:
 		_slider(b, "OPT_VOL_" + k.to_upper(), "audio", k, 0.0, 1.0, 0.05)
+	b.add_child(UiKit.button(tr("SOUNDBOARD_OPEN"), _open_soundboard))
 
 
 func _video_tab() -> void:
@@ -134,6 +135,7 @@ func _video_tab() -> void:
 	_slider(b, "OPT_CRT", "video", "crt", 0.0, 1.0, 0.05)
 	_slider(b, "OPT_BLOOM", "video", "bloom", 0.0, 1.0, 0.05)
 	_check(b, "OPT_SHOW_FPS", "video", "show_fps")
+	b.add_child(UiKit.button(tr("OPT_ECO_PRESET"), _eco_preset))
 
 
 func _juice_tab() -> void:
@@ -223,6 +225,16 @@ func _reset_input() -> void:
 	Settings.set_value("input", "bindings", {})
 	for a: String in REMAPPABLE:
 		_remap_buttons[a].text = _action_text(a)
+
+
+func _eco_preset() -> void:
+	Settings.apply_eco_preset()
+	EventBus.toast.emit(tr("TOAST_ECO_PRESET"), &"success")
+	GameState.goto(GameState.SCREEN_OPTIONS)
+
+
+func _open_soundboard() -> void:
+	add_child(SoundboardOverlay.new())
 
 
 ## Dossier des données (sauvegardes, journaux, télémétrie, captures des notes de test).

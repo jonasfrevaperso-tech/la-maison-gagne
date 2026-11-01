@@ -26,8 +26,13 @@ func _ready() -> void:
 
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_WM_CLOSE_REQUEST:
-		quit_game()
+	match what:
+		NOTIFICATION_WM_CLOSE_REQUEST:
+			quit_game()
+		NOTIFICATION_APPLICATION_FOCUS_OUT, NOTIFICATION_APPLICATION_PAUSED:
+			# Mise en veille (Steam Deck), changement de fenêtre : rien ne doit se perdre.
+			autosave()
+			SaveSystem.save_profile()
 
 
 ## Sortie propre : sauvegarde, coupe l'audio, laisse deux frames au thread audio, puis quitte.
