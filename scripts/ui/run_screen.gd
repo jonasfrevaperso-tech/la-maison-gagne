@@ -159,6 +159,8 @@ func _build() -> void:
 	_keep_btn = UiKit.button(tr("BTN_KEEP"), _on_keep, Vector2(180, 64))
 	for b: Button in [_undo_btn, _repeat_btn, _clear_btn, _speed_btn, _spin_btn, _rethrow_btn, _keep_btn]:
 		actions.add_child(b)
+	_rethrow_btn.visible = false
+	_keep_btn.visible = false
 	var menu_btn: Button = UiKit.button("☰", _on_menu, Vector2(64, 54))
 	menu_btn.position = Vector2(UiLayout.DESIGN_SIZE.x - MARGIN - 64, MARGIN * 0.5)
 	_stage.add_child(menu_btn)
@@ -262,8 +264,12 @@ func _refresh_buttons() -> void:
 	_undo_btn.disabled = not betting or r.slip.history.is_empty()
 	_repeat_btn.disabled = not betting or r.last_layout.is_empty()
 	_clear_btn.disabled = not betting or r.slip.is_empty()
-	_rethrow_btn.visible = state == UiState.RETHROW
-	_keep_btn.visible = state == UiState.RETHROW
+	var rethrow: bool = state == UiState.RETHROW
+	_rethrow_btn.visible = rethrow
+	_keep_btn.visible = rethrow
+	# La rangée d'actions tient dans le tapis : pendant une relance, les boutons de mise s'effacent.
+	for b: Button in [_undo_btn, _repeat_btn, _clear_btn]:
+		b.visible = not rethrow
 	_refresh_hint()
 
 

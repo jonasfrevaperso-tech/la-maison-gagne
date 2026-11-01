@@ -4,12 +4,20 @@ extends RefCounted
 ## - random   : paris et achats aléatoires (plancher).
 ## - greedy   : stratégie de voisinage + extérieurs, achats par heuristique de tags/rareté.
 ## - synergy  : comme greedy, mais évalue chaque offre par Monte-Carlo (score moyen simulé).
+## - expert   : choisit sa disposition de paris parmi des candidates de chaque type (pleins,
+##              chevaux, transversales, carrés, sixains, douzaines, colonnes), évaluées avec le
+##              vrai moteur de score sur la distribution d'atterrissage (synergies de grigris
+##              comprises) ; en boutique, valeur Monte-Carlo sur une échéance entière (un tour
+##              de plus compte enfin).
 ## Les bots ont une visée « humaine » : erreur de ±1 case avec probabilité AIM_ERROR.
 
 const AIM_ERROR: float = 0.35
 const SAVE_FOR_INTEREST: int = 10
 const MC_SPINS: int = 12
 const REROLL_RESERVE: int = 15
+## Probabilité d'atterrissage en dessous de laquelle une case n'est pas évaluée (bot expert).
+const EXPERT_MIN_P: float = 0.004
+const EXPERT_KINDS: Array[StringName] = [&"straight", &"split", &"street", &"corner", &"six_line", &"dozen", &"column"]
 const RARITY_VALUE: Dictionary = {"common": 1.0, "rare": 1.6, "legendary": 2.6, "cursed": 1.9}
 const TAG_VALUE: Dictionary = {
 	"xmult": 2.0, "mult": 1.2, "chips": 0.8, "retrigger": 1.8, "copy": 1.4, "growth": 1.2, "economy": 0.6, "safety": 0.5
@@ -62,6 +70,14 @@ func place_bets(ctl: RunController) -> void:
 		target_index = rng.randi_range(0, run.wheel.size() - 1)
 		ctl.ensure_some_bet()
 		return
+	if kind == "expert":
+		_expert_bets(ctl)
+		return
+	_greedy_bets(ctl)
+
+
+func _greedy_bets(ctl: RunController) -> void:
+	var run: RunState = ctl.run
 	target_index = _best_target(ctl)
 	var half: int = ThrowResolver.zone_width_for(ctl.effective_precision(), int(run.flags.get("zone_width_override", 0))) / 2
 	# Pleins sur la cible et ses voisins immédiats, puis le reste en extérieur.
@@ -80,6 +96,97 @@ func place_bets(ctl: RunController) -> void:
 				break
 	ctl.ensure_some_bet()
 	_fill_allowed(ctl)
+
+
+## Bot expert : meilleure disposition par espérance de score (moteur réel, clone du run).
+func _expert_bets(ctl: RunController) -> void:
+	var run: RunState = ctl.run
+	_greedy_bets(ctl)
+	var candidates: Array[Dictionary] = [run.slip.snapshot()]
+	run.slip.clear()
+	var dist: Array[float] = ctl.landing_distribution(target_index)
+	var pnum: Dictionary = {}
+	for i: int in dist.size():
+		if dist[i] > 0.0:
+			var n: int = run.wheel.at(i).number
+			pnum[n] = float(pnum.get(n, 0.0)) + dist[i]
+	for k: StringName in EXPERT_KINDS:
+		for filler: bool in [true, false]:
+			var lay: Dictionary = _layout_for(ctl, pnum, k, filler)
+			run.slip.clear()
+			if not lay.is_empty() and not candidates.has(lay):
+				candidates.append(lay)
+	var best: Dictionary = candidates[0]
+	var best_ev: float = -1.0
+	for lay: Dictionary in candidates:
+		var ev: float = _expected_score(ctl, lay, dist)
+		if ev > best_ev:
+			best_ev = ev
+			best = lay
+	run.slip.clear()
+	for spot_id: Variant in best.keys():
+		for _i: int in int(best[spot_id]):
+			ctl.place_bet(String(spot_id))
+	ctl.ensure_some_bet()
+	_fill_allowed(ctl)
+
+
+## Disposition centrée sur un type de pari : les emplacements qui couvrent le plus de
+## probabilité d'atterrissage d'abord ; `filler` : la moitié du budget seulement, le reste en couleur.
+func _layout_for(ctl: RunController, pnum: Dictionary, k: StringName, filler: bool) -> Dictionary:
+	var run: RunState = ctl.run
+	run.slip.clear()
+	var scored: Array[Array] = []
+	for spot: BetSpot in BetCatalog.all():
+		if spot.kind != k:
+			continue
+		var cover: float = 0.0
+		for n: int in spot.numbers:
+			cover += float(pnum.get(n, 0.0))
+		if cover > 0.0:
+			scored.append([cover, spot.id])
+	if scored.is_empty():
+		return {}
+	scored.sort_custom(func(a: Array, b: Array) -> bool: return float(a[0]) > float(b[0]))
+	var quota: int = run.slip.budget / 2 if filler else run.slip.budget
+	var placed: int = 0
+	var stuck: int = 0
+	var i: int = 0
+	while placed < quota and stuck < scored.size():
+		if run.slip.place(String(scored[i % scored.size()][1])) == BetSlip.PlaceResult.OK:
+			placed += 1
+			stuck = 0
+		else:
+			stuck += 1
+		i += 1
+		if i >= scored.size() * 4:
+			break
+	if filler:
+		var color: String = _zone_majority_color(ctl, target_index, 1)
+		while run.slip.remaining() > 0 and run.slip.place(color) == BetSlip.PlaceResult.OK:
+			pass
+	var lay: Dictionary = run.slip.snapshot()
+	run.slip.clear()
+	return lay
+
+
+## Espérance de score d'une disposition : moteur réel sur un clone, pondéré par la distribution.
+func _expected_score(ctl: RunController, layout: Dictionary, dist: Array[float]) -> float:
+	var clone: RunController = RunController.new(ctl.db)
+	clone.load_run(RunState.from_dict(ctl.run.to_dict()))
+	var r: RunState = clone.run
+	r.slip.clear()
+	r.slip.apply_layout(layout)
+	var ev: float = 0.0
+	for i: int in dist.size():
+		if dist[i] < EXPERT_MIN_P:
+			continue
+		var t: ThrowResolver.ThrowResult = ThrowResolver.ThrowResult.new()
+		t.target_index = target_index
+		t.landing_index = i
+		t.in_zone = true
+		ev += dist[i] * float(ScoreEngine.resolve(r, ctl.db, t).total)
+	return ev
 
 
 ## Créanciers restrictifs : remplit avec ce qui est autorisé, au plus près de la cible.
@@ -279,6 +386,8 @@ func _weakest(ctl: RunController) -> GrigriInstance:
 func _value_of(ctl: RunController, gid: String) -> float:
 	if kind == "synergy":
 		return _mc_value(ctl, gid)
+	if kind == "expert":
+		return _mc_deadline_value(ctl, gid)
 	var def: Dictionary = ctl.db.get_entry("grigris", gid)
 	var v: float = float(RARITY_VALUE.get(String(def.get("rarity", "common")), 1.0))
 	for t: Variant in def.get("tags", []):
@@ -307,6 +416,30 @@ func _mc_value(ctl: RunController, gid: String) -> float:
 		var out: RunController.SpinOutcome = clone.spin(probe.aim(clone))
 		total += float(out.ctx.total)
 	return total / float(MC_SPINS)
+
+
+## Valeur Monte-Carlo sur une échéance entière : score total des tours d'une échéance (les
+## grigris qui donnent des tours ou du budget sont crédités de leur vrai apport).
+func _mc_deadline_value(ctl: RunController, gid: String) -> float:
+	var clone: RunController = RunController.new(ctl.db)
+	clone.load_run(RunState.from_dict(ctl.run.to_dict()))
+	var r: RunState = clone.run
+	r.rng.reseed(rng.randi())
+	if gid != "" and not r.has_grigri(gid):
+		ShopModel.acquire_grigri(r, ctl.db, gid, &"")
+	var spins: int = maxi(Balance.i("run.spins_per_deadline") + r.extra_spins_per_deadline + int(r.flags.get("spins_mod", 0)), 1)
+	r.debt = 1 << 40
+	r.spins_left = spins + 1
+	r.phase = RunState.Phase.BETTING
+	clone.begin_betting()
+	var total: float = 0.0
+	var probe: SimBot = SimBot.new("greedy", rng.randi())
+	for _i: int in spins:
+		if r.phase != RunState.Phase.BETTING:
+			break
+		probe.place_bets(clone)
+		total += float(clone.spin(probe.aim(clone)).ctx.total)
+	return total
 
 
 func pact(ctl: RunController) -> void:

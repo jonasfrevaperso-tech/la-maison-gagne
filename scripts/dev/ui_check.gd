@@ -43,6 +43,11 @@ func _run() -> void:
 			if node.has_method("setup"):
 				node.call("setup", {"victory": false})
 			await _check(node, "%s @%dx%d" % [screen_id, sz.x, sz.y], not NO_FOCUS_OK.has(screen_id))
+		# États de l'écran de run qui changent la rangée d'actions.
+		for st: RunScreen.UiState in [RunScreen.UiState.RETHROW, RunScreen.UiState.TARGETING]:
+			_prepare_run(db)
+			var rs: RunScreen = (load(Main.SCREENS[&"run"]) as PackedScene).instantiate() as RunScreen
+			await _check(rs, "run/%s @%dx%d" % [RunScreen.UiState.keys()[st], sz.x, sz.y], false, rs._set_state.bind(st))
 		for o: Array in _overlays(db):
 			await _check(o[1] as Control, "%s @%dx%d" % [o[0], sz.x, sz.y])
 	for p: String in problems:
@@ -84,10 +89,14 @@ func _overlays(db: ContentDB) -> Array[Array]:
 	return out
 
 
-func _check(node: Control, label: String, need_focus: bool = true) -> void:
+func _check(node: Control, label: String, need_focus: bool = true, prep: Callable = Callable()) -> void:
 	frame.add_child(node)
 	for _i: int in SETTLE_FRAMES:
 		await get_tree().process_frame
+	if prep.is_valid():
+		prep.call()
+		for _i: int in SETTLE_FRAMES:
+			await get_tree().process_frame
 	checked += 1
 	var focus: Control = root.gui_get_focus_owner()
 	if need_focus and (focus == null or not node.is_ancestor_of(focus)):

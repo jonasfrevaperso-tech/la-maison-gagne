@@ -1,10 +1,16 @@
 # Feuille de route post-lancement
 
-## 1.1 — Retours de joueurs (priorité)
-- Session de test humaine : temps de compréhension du lancer, lisibilité du score, difficulté réelle des Actes II–III.
-- Réajuster `data/balance.json` avec la télémétrie locale optionnelle (taux de victoire par palier, grigris choisis).
-- Réécoute et mixage audio ; remplacer les sons les moins convaincants.
-- Test sur Steam Deck réel et sous Windows.
+## 1.1 — Retours de joueurs ✅ (outillage livré, sessions humaines à mener)
+- ✅ Outillage de session humaine : télémétrie locale sur consentement, notes F8 avec capture, protocole `docs/PLAYTEST.md`.
+- ✅ Réajustement guidé de `data/balance.json` : `tools/telemetry_report.py` (joueurs vs bot expert, propositions relues à la main).
+- ✅ Audio : sons de table refaits en synthèse physique, mixage par loudness, table d'écoute pour la réécoute humaine.
+- ✅ Steam Deck / Windows : multi-résolution, préréglage économie, sauvegarde à la mise en veille, contrôle automatique de l'interface ; Windows exporté.
+- ⏳ **Reste humain** : mener les sessions (`docs/PLAYTEST.md`), écouter les sons, lancer le jeu sur un vrai Steam Deck et sous Windows, puis appliquer les propositions du rapport.
+
+## 1.1.x — Après les premières sessions
+- Appliquer les propositions de `docs/balance_proposal.json` validées, refaire la référence bot.
+- Remplacer les sons marqués « À revoir » (`python3 tools/audio_mix.py` les liste).
+- Bulles du tutoriel ancrées hors des surcouches (elles masquent parfois le titre d'un pacte).
 
 ## 1.2 — Contenu
 - 30 grigris supplémentaires autour des mécaniques peu exploitées (sixains, sceaux, Infini).

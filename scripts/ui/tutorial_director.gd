@@ -7,6 +7,8 @@ signal skipped
 
 const BUBBLE_W: float = 520.0
 const OFFSET: float = 18.0
+## Hauteur (part de l'écran) des bulles placées dans la marge gauche (surcouches).
+const SIDE_BUBBLE_Y: float = 0.3
 
 ## Fonction fournie par l'écran : nom d'ancre -> rectangle global.
 var anchor_rect: Callable = Callable()
@@ -105,6 +107,9 @@ func _place() -> void:
 		target = anchor_rect.call(String(_current.get("anchor", "center")))
 	var sz: Vector2 = _bubble.get_combined_minimum_size()
 	var pos: Vector2 = Vector2(target.get_center().x - sz.x * 0.5, target.end.y + OFFSET)
+	if String(_current.get("anchor", "center")) == "center":
+		# Bulle d'une surcouche (boutique, pacte) : dans la marge gauche, hors du panneau centré.
+		pos = Vector2(OFFSET, vp.y * SIDE_BUBBLE_Y)
 	if pos.y + sz.y > vp.y - 10.0:
 		pos.y = target.position.y - sz.y - OFFSET
 	pos.x = clampf(pos.x, 10.0, vp.x - sz.x - 10.0)
