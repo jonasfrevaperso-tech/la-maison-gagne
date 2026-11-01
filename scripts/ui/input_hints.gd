@@ -87,7 +87,9 @@ static func key_for(action: String) -> String:
 			var k: InputEventKey = e as InputEventKey
 			var code: Key = k.keycode
 			if k.physical_keycode != KEY_NONE:
-				code = DisplayServer.keyboard_get_label_from_physical(k.physical_keycode)
+				code = k.physical_keycode
+				if DisplayServer.get_name() != "headless":
+					code = DisplayServer.keyboard_get_label_from_physical(k.physical_keycode)
 			return key_name(code) + ("/" + second if second != "" else "")
 	return "—"
 
