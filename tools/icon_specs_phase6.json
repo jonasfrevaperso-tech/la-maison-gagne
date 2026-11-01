@@ -1,0 +1,627 @@
+{
+ "g_neon_sign": {
+  "motif": "bolt",
+  "a": "magenta",
+  "b": "ivory"
+ },
+ "g_first_drink": {
+  "motif": "bottle",
+  "a": "emerald",
+  "b": "gold"
+ },
+ "g_low_lamp": {
+  "motif": "bell",
+  "a": "gold_light",
+  "b": "ink"
+ },
+ "g_high_heels": {
+  "motif": "umbrella",
+  "a": "red",
+  "b": "ivory"
+ },
+ "g_lucky_seven": {
+  "motif": "star",
+  "a": "gold_light",
+  "b": "ink"
+ },
+ "g_baker": {
+  "motif": "eggs",
+  "a": "gold",
+  "b": "ivory"
+ },
+ "g_column_drummer": {
+  "motif": "metronome",
+  "a": "red",
+  "b": "gold_light"
+ },
+ "g_geometer": {
+  "motif": "scale",
+  "a": "cyan",
+  "b": "ivory"
+ },
+ "g_tramway": {
+  "motif": "bars",
+  "a": "orange",
+  "b": "ink"
+ },
+ "g_odd_pair": {
+  "motif": "sock",
+  "a": "purple",
+  "b": "emerald"
+ },
+ "g_half_moon": {
+  "motif": "moon",
+  "a": "gold_light",
+  "b": "ink"
+ },
+ "g_sugar_cube": {
+  "motif": "dot",
+  "a": "ivory",
+  "b": "gold"
+ },
+ "g_paper_crown": {
+  "motif": "crown",
+  "a": "gold_light",
+  "b": "red"
+ },
+ "g_spare_change": {
+  "motif": "coin",
+  "a": "steel",
+  "b": "ink"
+ },
+ "g_ashtray": {
+  "motif": "stack",
+  "a": "smoke",
+  "b": "ivory"
+ },
+ "g_umbrella": {
+  "motif": "umbrella",
+  "a": "emerald",
+  "b": "ivory"
+ },
+ "g_bellhop": {
+  "motif": "hat",
+  "a": "red",
+  "b": "gold"
+ },
+ "g_metro_ticket": {
+  "motif": "card",
+  "a": "cyan",
+  "b": "ink"
+ },
+ "g_rubber_ball": {
+  "motif": "dot",
+  "a": "magenta",
+  "b": "ivory"
+ },
+ "g_magnifier": {
+  "motif": "monocle",
+  "a": "glass",
+  "b": "gold"
+ },
+ "g_lipstick": {
+  "motif": "heart",
+  "a": "red",
+  "b": "ivory"
+ },
+ "g_india_ink": {
+  "motif": "feather",
+  "a": "black",
+  "b": "ivory"
+ },
+ "g_green_visor": {
+  "motif": "hat",
+  "a": "green",
+  "b": "gold"
+ },
+ "g_shoe_shine": {
+  "motif": "sock",
+  "a": "brown",
+  "b": "gold"
+ },
+ "g_coat_check": {
+  "motif": "card",
+  "a": "purple",
+  "b": "gold_light"
+ },
+ "g_dice_cup": {
+  "motif": "die",
+  "a": "brown",
+  "b": "ivory"
+ },
+ "g_cracked_chip": {
+  "motif": "chip",
+  "a": "orange",
+  "b": "ink"
+ },
+ "g_patience": {
+  "motif": "clock",
+  "a": "steel",
+  "b": "ink"
+ },
+ "g_house_rules": {
+  "motif": "scroll",
+  "a": "ivory",
+  "b": "red"
+ },
+ "g_brass_knuckles": {
+  "motif": "hand",
+  "a": "gold",
+  "b": "ink"
+ },
+ "g_slow_waltz": {
+  "motif": "metronome",
+  "a": "purple",
+  "b": "ivory"
+ },
+ "g_cufflinks": {
+  "motif": "gem",
+  "a": "steel",
+  "b": "blue"
+ },
+ "g_ruby_brooch": {
+  "motif": "gem",
+  "a": "mult",
+  "b": "gold_light"
+ },
+ "g_steel_toes": {
+  "motif": "shield",
+  "a": "steel",
+  "b": "ink"
+ },
+ "g_tip_jar": {
+  "motif": "flask",
+  "a": "glass",
+  "b": "gold"
+ },
+ "g_matchbox": {
+  "motif": "flames",
+  "a": "orange",
+  "b": "gold_light"
+ },
+ "g_billiard_chalk": {
+  "motif": "dot",
+  "a": "blue",
+  "b": "ivory"
+ },
+ "g_folding_fan": {
+  "motif": "feather",
+  "a": "magenta",
+  "b": "gold"
+ },
+ "g_tram_conductor": {
+  "motif": "bars",
+  "a": "gold",
+  "b": "red"
+ },
+ "g_bishop": {
+  "motif": "crown",
+  "a": "purple",
+  "b": "gold_light"
+ },
+ "g_neighbours": {
+  "motif": "sector",
+  "a": "emerald",
+  "b": "ivory"
+ },
+ "g_marksman": {
+  "motif": "eye",
+  "a": "red",
+  "b": "ivory"
+ },
+ "g_pickpocket": {
+  "motif": "glove",
+  "a": "smoke",
+  "b": "gold"
+ },
+ "g_ledger": {
+  "motif": "scroll",
+  "a": "gold_light",
+  "b": "ink"
+ },
+ "g_hourglass": {
+  "motif": "clock",
+  "a": "gold",
+  "b": "glass"
+ },
+ "g_last_call": {
+  "motif": "bell",
+  "a": "gold_light",
+  "b": "red"
+ },
+ "g_twin_flame": {
+  "motif": "flames",
+  "a": "magenta",
+  "b": "cyan"
+ },
+ "g_rainmaker": {
+  "motif": "umbrella",
+  "a": "blue",
+  "b": "gold"
+ },
+ "g_glass_cutter": {
+  "motif": "gem",
+  "a": "glass",
+  "b": "ink"
+ },
+ "g_gilded_cage": {
+  "motif": "pocket",
+  "a": "gold",
+  "b": "ink"
+ },
+ "g_ruby_slipper": {
+  "motif": "heart",
+  "a": "mult",
+  "b": "ivory"
+ },
+ "g_forger": {
+  "motif": "blueprint",
+  "a": "steel",
+  "b": "ivory"
+ },
+ "g_alchemist": {
+  "motif": "flask",
+  "a": "gold",
+  "b": "emerald"
+ },
+ "g_jeweller": {
+  "motif": "gem",
+  "a": "ivory",
+  "b": "cyan"
+ },
+ "g_notary_stamp": {
+  "motif": "seal",
+  "a": "red",
+  "b": "gold_light"
+ },
+ "g_gardener": {
+  "motif": "rose",
+  "a": "emerald",
+  "b": "red"
+ },
+ "g_night_owl": {
+  "motif": "eye",
+  "a": "gold_light",
+  "b": "ink"
+ },
+ "g_metro_map": {
+  "motif": "wheel",
+  "a": "blue",
+  "b": "orange"
+ },
+ "g_bookie": {
+  "motif": "scroll",
+  "a": "smoke",
+  "b": "red"
+ },
+ "g_insurance": {
+  "motif": "shield",
+  "a": "blue",
+  "b": "ivory"
+ },
+ "g_compass": {
+  "motif": "monocle",
+  "a": "gold",
+  "b": "red"
+ },
+ "g_cartographer": {
+  "motif": "arrow_near",
+  "a": "cyan",
+  "b": "gold"
+ },
+ "g_accordion": {
+  "motif": "bars",
+  "a": "red",
+  "b": "ivory"
+ },
+ "g_zero_tithe": {
+  "motif": "zero",
+  "a": "green",
+  "b": "gold_light"
+ },
+ "g_double_or_nothing": {
+  "motif": "die",
+  "a": "gold",
+  "b": "red"
+ },
+ "g_stockbroker": {
+  "motif": "bag",
+  "a": "emerald",
+  "b": "gold"
+ },
+ "g_auctioneer": {
+  "motif": "hand",
+  "a": "gold",
+  "b": "ink"
+ },
+ "g_window_shopper": {
+  "motif": "eye",
+  "a": "magenta",
+  "b": "ivory"
+ },
+ "g_coupon_book": {
+  "motif": "scroll",
+  "a": "orange",
+  "b": "ink"
+ },
+ "g_landlord": {
+  "motif": "key",
+  "a": "gold",
+  "b": "ink"
+ },
+ "g_salon_echo": {
+  "motif": "mirror",
+  "a": "purple",
+  "b": "ivory"
+ },
+ "g_seven_sisters": {
+  "motif": "star",
+  "a": "cyan",
+  "b": "ivory"
+ },
+ "g_fortune_teller": {
+  "motif": "card",
+  "a": "purple",
+  "b": "cyan"
+ },
+ "g_trapdoor": {
+  "motif": "pocket",
+  "a": "brown",
+  "b": "gold"
+ },
+ "g_overtime": {
+  "motif": "clock",
+  "a": "red",
+  "b": "ivory"
+ },
+ "g_pearl_necklace": {
+  "motif": "snake_ring",
+  "a": "ivory",
+  "b": "glass"
+ },
+ "g_bow_tie": {
+  "motif": "ribbon",
+  "a": "black",
+  "b": "magenta"
+ },
+ "g_monogram": {
+  "motif": "seal",
+  "a": "gold",
+  "b": "ivory"
+ },
+ "g_sommelier": {
+  "motif": "bottle",
+  "a": "red",
+  "b": "gold"
+ },
+ "g_spiderweb": {
+  "motif": "spider",
+  "a": "black",
+  "b": "ivory"
+ },
+ "g_red_carpet": {
+  "motif": "ribbon",
+  "a": "red",
+  "b": "gold_light"
+ },
+ "g_grand_zero": {
+  "motif": "zero",
+  "a": "gold_light",
+  "b": "green"
+ },
+ "g_golden_rake": {
+  "motif": "hand",
+  "a": "gold_light",
+  "b": "red"
+ },
+ "g_perpetual_motion": {
+  "motif": "wheel",
+  "a": "cyan",
+  "b": "gold"
+ },
+ "g_silver_tongue": {
+  "motif": "tooth",
+  "a": "steel",
+  "b": "gold_light"
+ },
+ "g_ballroom": {
+  "motif": "chandelier",
+  "a": "magenta",
+  "b": "gold_light"
+ },
+ "g_metropolis": {
+  "motif": "column",
+  "a": "gold",
+  "b": "cyan"
+ },
+ "g_oracle": {
+  "motif": "eye",
+  "a": "purple",
+  "b": "gold_light"
+ },
+ "g_revenge": {
+  "motif": "skull",
+  "a": "red",
+  "b": "ivory"
+ },
+ "g_crown_jewels": {
+  "motif": "crown",
+  "a": "gold_light",
+  "b": "purple"
+ },
+ "g_house_of_cards": {
+  "motif": "card",
+  "a": "ivory",
+  "b": "red"
+ },
+ "g_philosophers_stone": {
+  "motif": "gem",
+  "a": "gold_light",
+  "b": "emerald"
+ },
+ "g_infinite_chip": {
+  "motif": "chip",
+  "a": "purple",
+  "b": "gold_light"
+ },
+ "g_maestro": {
+  "motif": "metronome",
+  "a": "gold",
+  "b": "magenta"
+ },
+ "g_bank_vault": {
+  "motif": "bag",
+  "a": "gold_light",
+  "b": "ink"
+ },
+ "g_phoenix": {
+  "motif": "flames",
+  "a": "orange",
+  "b": "gold_light"
+ },
+ "g_grandmaster": {
+  "motif": "crown",
+  "a": "purple",
+  "b": "gold"
+ },
+ "g_loan_shark": {
+  "motif": "fangs",
+  "a": "danger",
+  "b": "ivory"
+ },
+ "g_black_hole": {
+  "motif": "moon",
+  "a": "black",
+  "b": "purple"
+ },
+ "g_glass_jaw": {
+  "motif": "tooth",
+  "a": "glass",
+  "b": "danger"
+ },
+ "g_leech": {
+  "motif": "fangs",
+  "a": "red",
+  "b": "black"
+ },
+ "g_cursed_idol": {
+  "motif": "mask",
+  "a": "purple",
+  "b": "gold"
+ },
+ "g_dead_mans_hand": {
+  "motif": "hand",
+  "a": "black",
+  "b": "ivory"
+ },
+ "g_hex_bag": {
+  "motif": "bag",
+  "a": "purple",
+  "b": "red"
+ },
+ "g_blood_pact": {
+  "motif": "seal",
+  "a": "danger",
+  "b": "ink"
+ },
+ "g_imp": {
+  "motif": "fangs",
+  "a": "orange",
+  "b": "ink"
+ },
+ "g_broken_clock": {
+  "motif": "clock",
+  "a": "smoke",
+  "b": "danger"
+ },
+ "g_eclipse": {
+  "motif": "moon",
+  "a": "black",
+  "b": "gold_light"
+ },
+ "f_lodestone_dust": {
+  "motif": "magnet",
+  "a": "red",
+  "b": "ink"
+ },
+ "f_mirror_polish": {
+  "motif": "mirror",
+  "a": "steel",
+  "b": "ink"
+ },
+ "f_gunpowder": {
+  "motif": "dot",
+  "a": "orange",
+  "b": "ink"
+ },
+ "f_ectoplasm": {
+  "motif": "mask",
+  "a": "ivory",
+  "b": "ink"
+ },
+ "f_jester": {
+  "motif": "mask",
+  "a": "magenta",
+  "b": "ink"
+ },
+ "f_twin_birth": {
+  "motif": "die",
+  "a": "cyan",
+  "b": "ink"
+ },
+ "f_lightning_rod": {
+  "motif": "bolt",
+  "a": "gold_light",
+  "b": "ink"
+ },
+ "f_four_leaf": {
+  "motif": "star",
+  "a": "emerald",
+  "b": "ink"
+ },
+ "f_seed_packet": {
+  "motif": "rose",
+  "a": "emerald",
+  "b": "ink"
+ },
+ "f_lacquer": {
+  "motif": "star",
+  "a": "ivory",
+  "b": "ink"
+ },
+ "f_kaleidoscope": {
+  "motif": "gem",
+  "a": "magenta",
+  "b": "ink"
+ },
+ "f_void_ink": {
+  "motif": "moon",
+  "a": "black",
+  "b": "ink"
+ },
+ "f_gold_wax": {
+  "motif": "seal",
+  "a": "gold",
+  "b": "ink"
+ },
+ "f_violet_wax": {
+  "motif": "seal",
+  "a": "purple",
+  "b": "ink"
+ },
+ "f_charm_box": {
+  "motif": "bag",
+  "a": "gold_light",
+  "b": "ink"
+ },
+ "f_shuffle": {
+  "motif": "card",
+  "a": "cyan",
+  "b": "ink"
+ },
+ "f_artisan": {
+  "motif": "glove",
+  "a": "gold",
+  "b": "ink"
+ }
+}

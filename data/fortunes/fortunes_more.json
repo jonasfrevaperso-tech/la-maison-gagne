@@ -1,0 +1,416 @@
+[
+ {
+  "id": "f_lodestone_dust",
+  "target": "pocket",
+  "cost": 3,
+  "icon": "f_lodestone_dust",
+  "sfx": "magnet",
+  "name_fr": "Limaille",
+  "name_en": "Iron Filings",
+  "desc_fr": "Transforme une case en Aimant.",
+  "desc_en": "Turns a pocket into a Magnet.",
+  "flavor_fr": "Ça colle aux doigts et aux billes.",
+  "flavor_en": "Sticks to fingers and balls.",
+  "effects": [
+   {
+    "trigger": "on_use",
+    "do": [
+     {
+      "op": "transform_pocket",
+      "type": "magnet"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "f_mirror_polish",
+  "target": "pocket",
+  "cost": 3,
+  "icon": "f_mirror_polish",
+  "sfx": "shimmer",
+  "name_fr": "Tain neuf",
+  "name_en": "Fresh Silvering",
+  "desc_fr": "Transforme une case en Miroir.",
+  "desc_en": "Turns a pocket into a Mirror.",
+  "flavor_fr": "Le reflet a l'air plus riche que vous.",
+  "flavor_en": "The reflection looks richer than you.",
+  "effects": [
+   {
+    "trigger": "on_use",
+    "do": [
+     {
+      "op": "transform_pocket",
+      "type": "mirror"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "f_gunpowder",
+  "target": "pocket",
+  "cost": 3,
+  "icon": "f_gunpowder",
+  "sfx": "explosion",
+  "name_fr": "Poudre noire",
+  "name_en": "Gunpowder",
+  "desc_fr": "Transforme une case en Bombe.",
+  "desc_en": "Turns a pocket into a Bomb.",
+  "flavor_fr": "Ne fumez pas près de la roue.",
+  "flavor_en": "No smoking near the wheel.",
+  "effects": [
+   {
+    "trigger": "on_use",
+    "do": [
+     {
+      "op": "transform_pocket",
+      "type": "bomb"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "f_ectoplasm",
+  "target": "pocket",
+  "cost": 4,
+  "icon": "f_ectoplasm",
+  "sfx": "ghost",
+  "name_fr": "Ectoplasme",
+  "name_en": "Ectoplasm",
+  "desc_fr": "Transforme une case en Fantôme.",
+  "desc_en": "Turns a pocket into a Ghost.",
+  "flavor_fr": "Froid, gluant, et étrangement familier.",
+  "flavor_en": "Cold, sticky, oddly familiar.",
+  "effects": [
+   {
+    "trigger": "on_use",
+    "do": [
+     {
+      "op": "transform_pocket",
+      "type": "ghost"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "f_jester",
+  "target": "pocket",
+  "cost": 4,
+  "icon": "f_jester",
+  "sfx": "jingle",
+  "name_fr": "Le Bouffon",
+  "name_en": "The Jester",
+  "desc_fr": "Transforme une case en Joker.",
+  "desc_en": "Turns a pocket into a Joker.",
+  "flavor_fr": "Il rit de vos paris. Puis il les rejoint.",
+  "flavor_en": "He laughs at your bets. Then joins them.",
+  "effects": [
+   {
+    "trigger": "on_use",
+    "do": [
+     {
+      "op": "transform_pocket",
+      "type": "joker"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "f_twin_birth",
+  "target": "pocket",
+  "cost": 4,
+  "icon": "f_twin_birth",
+  "sfx": "double",
+  "name_fr": "Naissance gémellaire",
+  "name_en": "Twin Birth",
+  "desc_fr": "Transforme une case en Jumelle.",
+  "desc_en": "Turns a pocket into a Twin.",
+  "flavor_fr": "Deux pour le prix d'une. Deux dettes aussi.",
+  "flavor_en": "Two for one. Two debts too.",
+  "effects": [
+   {
+    "trigger": "on_use",
+    "do": [
+     {
+      "op": "transform_pocket",
+      "type": "twin"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "f_lightning_rod",
+  "target": "pocket",
+  "cost": 3,
+  "icon": "f_lightning_rod",
+  "sfx": "zap",
+  "name_fr": "Paratonnerre",
+  "name_en": "Lightning Rod",
+  "desc_fr": "Transforme une case en Éclair.",
+  "desc_en": "Turns a pocket into Lightning.",
+  "flavor_fr": "Attire la foudre. Et les regards.",
+  "flavor_en": "Draws lightning. And stares.",
+  "effects": [
+   {
+    "trigger": "on_use",
+    "do": [
+     {
+      "op": "transform_pocket",
+      "type": "lightning"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "f_four_leaf",
+  "target": "pocket",
+  "cost": 3,
+  "icon": "f_four_leaf",
+  "sfx": "chime",
+  "name_fr": "Trèfle à quatre feuilles",
+  "name_en": "Four-Leaf Clover",
+  "desc_fr": "Transforme une case en Chanceuse.",
+  "desc_en": "Turns a pocket Lucky.",
+  "flavor_fr": "Trouvé entre deux pavés du sous-sol.",
+  "flavor_en": "Found between two basement cobbles.",
+  "effects": [
+   {
+    "trigger": "on_use",
+    "do": [
+     {
+      "op": "transform_pocket",
+      "type": "lucky"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "f_seed_packet",
+  "target": "pocket",
+  "cost": 3,
+  "icon": "f_seed_packet",
+  "sfx": "grow",
+  "name_fr": "Sachet de graines",
+  "name_en": "Seed Packet",
+  "desc_fr": "Transforme une case en Germe.",
+  "desc_en": "Turns a pocket into a Sprout.",
+  "flavor_fr": "Pousse sans lumière. Comme vous.",
+  "flavor_en": "Grows without light. Like you.",
+  "effects": [
+   {
+    "trigger": "on_use",
+    "do": [
+     {
+      "op": "transform_pocket",
+      "type": "sprout"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "f_lacquer",
+  "target": "pocket",
+  "cost": 3,
+  "icon": "f_lacquer",
+  "sfx": "shimmer",
+  "name_fr": "Laque",
+  "name_en": "Lacquer",
+  "desc_fr": "Donne l'édition Brillante à une case.",
+  "desc_en": "Gives a pocket the Foil edition.",
+  "flavor_fr": "Trois couches, aucun remords.",
+  "flavor_en": "Three coats, no regrets.",
+  "effects": [
+   {
+    "trigger": "on_use",
+    "do": [
+     {
+      "op": "set_pocket_edition",
+      "edition": "brillante"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "f_kaleidoscope",
+  "target": "pocket",
+  "cost": 5,
+  "icon": "f_kaleidoscope",
+  "sfx": "shimmer",
+  "name_fr": "Kaléidoscope",
+  "name_en": "Kaleidoscope",
+  "desc_fr": "Donne l'édition Polychrome à une case.",
+  "desc_en": "Gives a pocket the Polychrome edition.",
+  "flavor_fr": "Tournez-le : la ruine change de couleur.",
+  "flavor_en": "Turn it: ruin changes colour.",
+  "effects": [
+   {
+    "trigger": "on_use",
+    "do": [
+     {
+      "op": "set_pocket_edition",
+      "edition": "polychrome"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "f_void_ink",
+  "target": "pocket",
+  "cost": 5,
+  "icon": "f_void_ink",
+  "sfx": "void",
+  "name_fr": "Encre du néant",
+  "name_en": "Void Ink",
+  "desc_fr": "Donne l'édition Noire à une case.",
+  "desc_en": "Gives a pocket the Negative edition.",
+  "flavor_fr": "Écrit en noir sur un trou.",
+  "flavor_en": "Written in black on a hole.",
+  "effects": [
+   {
+    "trigger": "on_use",
+    "do": [
+     {
+      "op": "set_pocket_edition",
+      "edition": "noire"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "f_gold_wax",
+  "target": "pocket",
+  "cost": 4,
+  "icon": "f_gold_wax",
+  "sfx": "stamp",
+  "name_fr": "Cire dorée",
+  "name_en": "Golden Wax",
+  "desc_fr": "Appose un Sceau d'or sur une case.",
+  "desc_en": "Puts a Gold Seal on a pocket.",
+  "flavor_fr": "Elle fond à la chaleur des gains.",
+  "flavor_en": "It melts in the heat of winnings.",
+  "effects": [
+   {
+    "trigger": "on_use",
+    "do": [
+     {
+      "op": "set_pocket_seal",
+      "seal": "seal_gold"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "f_violet_wax",
+  "target": "pocket",
+  "cost": 4,
+  "icon": "f_violet_wax",
+  "sfx": "stamp",
+  "name_fr": "Cire violette",
+  "name_en": "Violet Wax",
+  "desc_fr": "Appose un Sceau violet sur une case.",
+  "desc_en": "Puts a Purple Seal on a pocket.",
+  "flavor_fr": "Couleur des évêques et des huissiers.",
+  "flavor_en": "The colour of bishops and bailiffs.",
+  "effects": [
+   {
+    "trigger": "on_use",
+    "do": [
+     {
+      "op": "set_pocket_seal",
+      "seal": "seal_purple"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "f_charm_box",
+  "target": "none",
+  "cost": 5,
+  "icon": "f_charm_box",
+  "sfx": "pack_open",
+  "name_fr": "Boîte à grigris",
+  "name_en": "Charm Box",
+  "desc_fr": "Crée un grigri rare (s'il reste un emplacement).",
+  "desc_en": "Creates a rare charm (if a slot is free).",
+  "flavor_fr": "Ouvrez délicatement. Quelque chose respire dedans.",
+  "flavor_en": "Open gently. Something breathes inside.",
+  "effects": [
+   {
+    "trigger": "on_use",
+    "do": [
+     {
+      "op": "add_grigri",
+      "rarity": "rare"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "f_shuffle",
+  "target": "pocket",
+  "cost": 3,
+  "icon": "f_shuffle",
+  "sfx": "reroll",
+  "name_fr": "Battage",
+  "name_en": "Shuffle",
+  "desc_fr": "Change le numéro d'une case au hasard et lui donne un niveau.",
+  "desc_en": "Rerolls a pocket's number and gives it a level.",
+  "flavor_fr": "Le croupier a les mains vives. La roue aussi.",
+  "flavor_en": "Quick hands on the dealer. On the wheel too.",
+  "effects": [
+   {
+    "trigger": "on_use",
+    "do": [
+     {
+      "op": "randomize_pocket"
+     },
+     {
+      "op": "upgrade_pocket",
+      "v": 1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "f_artisan",
+  "target": "none",
+  "cost": 4,
+  "icon": "f_artisan",
+  "sfx": "transform",
+  "name_fr": "L'Artisan",
+  "name_en": "The Artisan",
+  "desc_fr": "Donne une édition aléatoire à un de tes grigris sans édition, et +2 $.",
+  "desc_en": "Gives a random edition to one of your plain charms, and +$2.",
+  "flavor_fr": "Il retouche vos porte-bonheur pendant que vous dormez.",
+  "flavor_en": "He touches up your charms while you sleep.",
+  "effects": [
+   {
+    "trigger": "on_use",
+    "do": [
+     {
+      "op": "add_random_edition_grigri"
+     },
+     {
+      "op": "add_money",
+      "v": 2
+     }
+    ]
+   }
+  ]
+ }
+]

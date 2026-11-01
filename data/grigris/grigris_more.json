@@ -1,0 +1,3879 @@
+[
+ {
+  "id": "g_neon_sign",
+  "rarity": "common",
+  "tags": [
+   "mult",
+   "spins"
+  ],
+  "icon": "g_neon_sign",
+  "sfx": "zap",
+  "name_fr": "Enseigne au néon",
+  "name_en": "Neon Sign",
+  "desc_fr": "+8 Mult au dernier tour d'une échéance.",
+  "desc_en": "+8 Mult on a deadline's last spin.",
+  "flavor_fr": "Elle clignote « OUVERT ». Elle ment.",
+  "flavor_en": "It blinks « OPEN ». It lies.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "last_spin"
+     }
+    ],
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 8
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_first_drink",
+  "rarity": "common",
+  "tags": [
+   "mult",
+   "spins"
+  ],
+  "icon": "g_first_drink",
+  "sfx": "chime",
+  "name_fr": "Premier verre",
+  "name_en": "First Drink",
+  "desc_fr": "+6 Mult au premier tour d'une échéance.",
+  "desc_en": "+6 Mult on a deadline's first spin.",
+  "flavor_fr": "Offert par la maison. Tout est offert, au début.",
+  "flavor_en": "On the house. Everything is, at first.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "first_spin"
+     }
+    ],
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 6
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_low_lamp",
+  "rarity": "common",
+  "tags": [
+   "mult",
+   "range"
+  ],
+  "icon": "g_low_lamp",
+  "sfx": "click",
+  "name_fr": "Lampe basse",
+  "name_en": "Low Lamp",
+  "desc_fr": "+5 Mult si le numéro est entre 1 et 18.",
+  "desc_en": "+5 Mult if the number is 1 to 18.",
+  "flavor_fr": "Elle éclaire juste assez pour perdre.",
+  "flavor_en": "Just enough light to lose by.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "range",
+      "v": "low"
+     }
+    ],
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 5
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_high_heels",
+  "rarity": "common",
+  "tags": [
+   "mult",
+   "range"
+  ],
+  "icon": "g_high_heels",
+  "sfx": "click",
+  "name_fr": "Talons hauts",
+  "name_en": "High Heels",
+  "desc_fr": "+5 Mult si le numéro est entre 19 et 36.",
+  "desc_en": "+5 Mult if the number is 19 to 36.",
+  "flavor_fr": "Elle a dansé jusqu'au dernier jeton.",
+  "flavor_en": "She danced till the last chip.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "range",
+      "v": "high"
+     }
+    ],
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 5
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_lucky_seven",
+  "rarity": "common",
+  "tags": [
+   "mult",
+   "pockets"
+  ],
+  "icon": "g_lucky_seven",
+  "sfx": "chime",
+  "name_fr": "Le Sept",
+  "name_en": "The Seven",
+  "desc_fr": "+10 Mult si le numéro est 7, 17 ou 27.",
+  "desc_en": "+10 Mult if the number is 7, 17 or 27.",
+  "flavor_fr": "Un chiffre porte-bonheur. Statistiquement, non.",
+  "flavor_en": "A lucky number. Statistically, no.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "number_in",
+      "v": [
+       7,
+       17,
+       27
+      ]
+     }
+    ],
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 10
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_baker",
+  "rarity": "common",
+  "tags": [
+   "bets",
+   "dozen",
+   "mult"
+  ],
+  "icon": "g_baker",
+  "sfx": "chips",
+  "name_fr": "Boulanger",
+  "name_en": "Baker",
+  "desc_fr": "+4 Mult par douzaine gagnante.",
+  "desc_en": "+4 Mult per winning dozen.",
+  "flavor_fr": "Treize à la douzaine, sauf ici.",
+  "flavor_en": "Baker's dozen, except here.",
+  "effects": [
+   {
+    "trigger": "on_bet_win",
+    "if": [
+     {
+      "c": "bet_kind",
+      "v": "dozen"
+     }
+    ],
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 4
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_column_drummer",
+  "rarity": "common",
+  "tags": [
+   "bets",
+   "column",
+   "mult"
+  ],
+  "icon": "g_column_drummer",
+  "sfx": "tick",
+  "name_fr": "Batteur de colonne",
+  "name_en": "Column Drummer",
+  "desc_fr": "+4 Mult par colonne gagnante.",
+  "desc_en": "+4 Mult per winning column.",
+  "flavor_fr": "Il bat la mesure sur la colonne de gauche.",
+  "flavor_en": "He keeps time on the left column.",
+  "effects": [
+   {
+    "trigger": "on_bet_win",
+    "if": [
+     {
+      "c": "bet_kind",
+      "v": "column"
+     }
+    ],
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 4
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_geometer",
+  "rarity": "common",
+  "tags": [
+   "bets",
+   "corner",
+   "street",
+   "six_line",
+   "mult"
+  ],
+  "icon": "g_geometer",
+  "sfx": "click",
+  "name_fr": "Géomètre",
+  "name_en": "Geometer",
+  "desc_fr": "+6 Mult par carré, transversale ou sixain gagnant.",
+  "desc_en": "+6 Mult per winning corner, street or six line.",
+  "flavor_fr": "Tout est affaire d'angles. Et d'angoisse.",
+  "flavor_en": "It's all angles. And angst.",
+  "effects": [
+   {
+    "trigger": "on_bet_win",
+    "if": [
+     {
+      "c": "bet_kind",
+      "v": [
+       "corner",
+       "street",
+       "six_line"
+      ]
+     }
+    ],
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 6
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_tramway",
+  "rarity": "common",
+  "tags": [
+   "bets",
+   "street",
+   "six_line",
+   "chips"
+  ],
+  "icon": "g_tramway",
+  "sfx": "ball_metal",
+  "name_fr": "Tramway",
+  "name_en": "Tramway",
+  "desc_fr": "+50 Jetons par transversale, sixain ou carré gagnant.",
+  "desc_en": "+50 Chips per winning street, six line or corner.",
+  "flavor_fr": "Dernier tram pour le sous-sol : 3 h du matin.",
+  "flavor_en": "Last tram to the basement: 3 a.m.",
+  "effects": [
+   {
+    "trigger": "on_bet_win",
+    "if": [
+     {
+      "c": "bet_kind",
+      "v": [
+       "street",
+       "six_line",
+       "corner"
+      ]
+     }
+    ],
+    "do": [
+     {
+      "op": "add_chips",
+      "v": 50
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_odd_pair",
+  "rarity": "common",
+  "tags": [
+   "bets",
+   "parity",
+   "mult"
+  ],
+  "icon": "g_odd_pair",
+  "sfx": "cloth",
+  "name_fr": "Paire dépareillée",
+  "name_en": "Odd Pair",
+  "desc_fr": "+3 Mult par pari Pair ou Impair gagnant.",
+  "desc_en": "+3 Mult per winning Even or Odd bet.",
+  "flavor_fr": "Une rouge, une verte. Personne n'ose rien dire.",
+  "flavor_en": "One red, one green. Nobody dares comment.",
+  "effects": [
+   {
+    "trigger": "on_bet_win",
+    "if": [
+     {
+      "c": "bet_kind",
+      "v": [
+       "even",
+       "odd"
+      ]
+     }
+    ],
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 3
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_half_moon",
+  "rarity": "common",
+  "tags": [
+   "range",
+   "chips"
+  ],
+  "icon": "g_half_moon",
+  "sfx": "chime",
+  "name_fr": "Demi-lune",
+  "name_en": "Half Moon",
+  "desc_fr": "+40 Jetons si le numéro est entre 19 et 36 et qu'au moins un pari gagne.",
+  "desc_en": "+40 Chips if the number is 19 to 36 and at least one bet wins.",
+  "flavor_fr": "La moitié haute de la nuit.",
+  "flavor_en": "The upper half of the night.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "range",
+      "v": "high"
+     },
+     {
+      "c": "bets_won",
+      "v": 1,
+      "op": ">="
+     }
+    ],
+    "do": [
+     {
+      "op": "add_chips",
+      "v": 40
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_sugar_cube",
+  "rarity": "common",
+  "tags": [
+   "bets",
+   "mult"
+  ],
+  "icon": "g_sugar_cube",
+  "sfx": "chips",
+  "name_fr": "Sucre en morceau",
+  "name_en": "Sugar Cube",
+  "desc_fr": "+2 Mult par pari gagnant.",
+  "desc_en": "+2 Mult per winning bet.",
+  "flavor_fr": "Pour faire passer la dette.",
+  "flavor_en": "Helps the debt go down.",
+  "effects": [
+   {
+    "trigger": "on_bet_win",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 2
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_paper_crown",
+  "rarity": "common",
+  "tags": [
+   "mult",
+   "slots"
+  ],
+  "icon": "g_paper_crown",
+  "sfx": "paper",
+  "name_fr": "Couronne en papier",
+  "name_en": "Paper Crown",
+  "desc_fr": "+1 Mult par grigri possédé.",
+  "desc_en": "+1 Mult per charm owned.",
+  "flavor_fr": "Roi d'un soir, débiteur à vie.",
+  "flavor_en": "King for a night, debtor for life.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": {
+       "var": "grigri_count"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_spare_change",
+  "rarity": "common",
+  "tags": [
+   "economy",
+   "chips"
+  ],
+  "icon": "g_spare_change",
+  "sfx": "coin",
+  "name_fr": "Petite monnaie",
+  "name_en": "Spare Change",
+  "desc_fr": "+2 Jetons par $ possédé.",
+  "desc_en": "+2 Chips per $ owned.",
+  "flavor_fr": "Ça tinte dans la poche. C'est déjà ça.",
+  "flavor_en": "It jingles in the pocket. That's something.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "add_chips",
+      "v": {
+       "var": "money",
+       "mul": 2
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_ashtray",
+  "rarity": "common",
+  "tags": [
+   "bets",
+   "chips",
+   "safety"
+  ],
+  "icon": "g_ashtray",
+  "sfx": "stone",
+  "name_fr": "Cendrier",
+  "name_en": "Ashtray",
+  "desc_fr": "+15 Jetons par pari perdu.",
+  "desc_en": "+15 Chips per losing bet.",
+  "flavor_fr": "Plein des cendres de paris consumés.",
+  "flavor_en": "Full of the ashes of burnt bets.",
+  "effects": [
+   {
+    "trigger": "on_bet_lose",
+    "do": [
+     {
+      "op": "add_chips",
+      "v": 15
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_umbrella",
+  "rarity": "common",
+  "tags": [
+   "zero",
+   "mult"
+  ],
+  "icon": "g_umbrella",
+  "sfx": "cloth",
+  "name_fr": "Parapluie",
+  "name_en": "Umbrella",
+  "desc_fr": "+8 Mult quand la bille tombe sur le Zéro.",
+  "desc_en": "+8 Mult when the ball lands on Zero.",
+  "flavor_fr": "Il pleut des pertes ? Ouvrez-le.",
+  "flavor_en": "Raining losses? Open it.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "is_zero"
+     }
+    ],
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 8
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_bellhop",
+  "rarity": "common",
+  "tags": [
+   "economy",
+   "spins"
+  ],
+  "icon": "g_bellhop",
+  "sfx": "jingle",
+  "name_fr": "Pourboire du groom",
+  "name_en": "Bellhop's Tip",
+  "desc_fr": "+2 $ au dernier tour d'une échéance.",
+  "desc_en": "+$2 on a deadline's last spin.",
+  "flavor_fr": "Il porte vos valises vers la sortie. Il n'y en a pas.",
+  "flavor_en": "He carries your bags to the exit. There is none.",
+  "effects": [
+   {
+    "trigger": "on_round_end",
+    "if": [
+     {
+      "c": "last_spin"
+     }
+    ],
+    "do": [
+     {
+      "op": "add_money",
+      "v": 2
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_metro_ticket",
+  "rarity": "common",
+  "tags": [
+   "ball",
+   "chips"
+  ],
+  "icon": "g_metro_ticket",
+  "sfx": "ball_land",
+  "name_fr": "Ticket de métro",
+  "name_en": "Metro Ticket",
+  "desc_fr": "+40 Jetons si la bille reste dans la zone visée.",
+  "desc_en": "+40 Chips if the ball stays in the aimed zone.",
+  "flavor_fr": "Valable pour un seul trajet. Vers le bas.",
+  "flavor_en": "Valid for one ride. Downward.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "in_zone"
+     }
+    ],
+    "do": [
+     {
+      "op": "add_chips",
+      "v": 40
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_rubber_ball",
+  "rarity": "common",
+  "tags": [
+   "ball",
+   "mult"
+  ],
+  "icon": "g_rubber_ball",
+  "sfx": "ball_bounce",
+  "name_fr": "Balle en caoutchouc",
+  "name_en": "Rubber Ball",
+  "desc_fr": "+6 Mult après un rebond fou (hors zone).",
+  "desc_en": "+6 Mult after a wild bounce (out of zone).",
+  "flavor_fr": "Elle rebondit partout. Comme vos créanciers.",
+  "flavor_en": "It bounces everywhere. Like your creditors.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "not",
+      "x": {
+       "c": "in_zone"
+      }
+     }
+    ],
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 6
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_magnifier",
+  "rarity": "common",
+  "tags": [
+   "pockets",
+   "chips"
+  ],
+  "icon": "g_magnifier",
+  "sfx": "glass",
+  "name_fr": "Loupe",
+  "name_en": "Magnifier",
+  "desc_fr": "Le numéro touché rapporte deux fois plus de Jetons (+2 × numéro).",
+  "desc_en": "The hit number scores extra Chips (+2 × number).",
+  "flavor_fr": "Grossit les chiffres. Et les illusions.",
+  "flavor_en": "Magnifies numbers. And illusions.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "add_chips",
+      "v": {
+       "var": "pocket_number",
+       "mul": 2
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_lipstick",
+  "rarity": "common",
+  "tags": [
+   "color",
+   "chips"
+  ],
+  "icon": "g_lipstick",
+  "sfx": "cloth",
+  "name_fr": "Rouge à lèvres",
+  "name_en": "Lipstick",
+  "desc_fr": "+40 Jetons si la bille tombe sur du rouge.",
+  "desc_en": "+40 Chips if the ball lands on red.",
+  "flavor_fr": "La trace sur le verre n'est pas la vôtre.",
+  "flavor_en": "The mark on the glass isn't yours.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "color",
+      "v": "red"
+     }
+    ],
+    "do": [
+     {
+      "op": "add_chips",
+      "v": 40
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_india_ink",
+  "rarity": "common",
+  "tags": [
+   "color",
+   "chips"
+  ],
+  "icon": "g_india_ink",
+  "sfx": "paper",
+  "name_fr": "Encre de Chine",
+  "name_en": "India Ink",
+  "desc_fr": "+40 Jetons si la bille tombe sur du noir.",
+  "desc_en": "+40 Chips if the ball lands on black.",
+  "flavor_fr": "Pour signer en noir sur noir.",
+  "flavor_en": "For signing black on black.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "color",
+      "v": "black"
+     }
+    ],
+    "do": [
+     {
+      "op": "add_chips",
+      "v": 40
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_green_visor",
+  "rarity": "common",
+  "tags": [
+   "bets",
+   "mult"
+  ],
+  "icon": "g_green_visor",
+  "sfx": "click",
+  "name_fr": "Visière verte",
+  "name_en": "Green Visor",
+  "desc_fr": "+4 Mult si 5 emplacements de pari ou plus sont joués.",
+  "desc_en": "+4 Mult if 5 or more bet spots are played.",
+  "flavor_fr": "Le comptable voit tout. Surtout en vert.",
+  "flavor_en": "The accountant sees all. Mostly in green.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "bets_placed",
+      "v": 5,
+      "op": ">="
+     }
+    ],
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 4
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_shoe_shine",
+  "rarity": "common",
+  "tags": [
+   "economy",
+   "mult"
+  ],
+  "icon": "g_shoe_shine",
+  "sfx": "cloth",
+  "name_fr": "Cireur",
+  "name_en": "Shoe Shiner",
+  "desc_fr": "+2 Mult par grigri vendu durant ce run.",
+  "desc_en": "+2 Mult per charm sold this run.",
+  "flavor_fr": "Il fait briller ce que vous lâchez.",
+  "flavor_en": "He shines whatever you let go.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": {
+       "var": "sold_count",
+       "mul": 2
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_coat_check",
+  "rarity": "common",
+  "tags": [
+   "fortune",
+   "mult"
+  ],
+  "icon": "g_coat_check",
+  "sfx": "card_place",
+  "name_fr": "Vestiaire",
+  "name_en": "Coat Check",
+  "desc_fr": "+3 Mult par carte Fortune détenue.",
+  "desc_en": "+3 Mult per Fortune card held.",
+  "flavor_fr": "Ticket 37. On ne vous rendra rien.",
+  "flavor_en": "Ticket 37. You'll get nothing back.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": {
+       "var": "fortune_count",
+       "mul": 3
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_dice_cup",
+  "rarity": "common",
+  "tags": [
+   "chance",
+   "mult"
+  ],
+  "icon": "g_dice_cup",
+  "sfx": "dice",
+  "name_fr": "Cornet à dés",
+  "name_en": "Dice Cup",
+  "desc_fr": "1 chance sur 2 : +5 Mult.",
+  "desc_en": "1 in 2: +5 Mult.",
+  "flavor_fr": "Secouez. Priez. Renversez.",
+  "flavor_en": "Shake. Pray. Spill.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "chance",
+      "v": 0.5
+     }
+    ],
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 5
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_cracked_chip",
+  "rarity": "common",
+  "tags": [
+   "mult",
+   "destroy"
+  ],
+  "icon": "g_cracked_chip",
+  "sfx": "crack",
+  "name_fr": "Jeton fêlé",
+  "name_en": "Cracked Chip",
+  "desc_fr": "+6 Mult. 1 chance sur 10 de se briser à chaque tour.",
+  "desc_en": "+6 Mult. 1 in 10 chance to break each spin.",
+  "flavor_fr": "Il a déjà survécu à une chute. De justesse.",
+  "flavor_en": "It survived one fall. Barely.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 6
+     }
+    ]
+   },
+   {
+    "trigger": "on_round_end",
+    "if": [
+     {
+      "c": "chance",
+      "v": 0.1
+     }
+    ],
+    "do": [
+     {
+      "op": "self_destroy",
+      "label": "shatter"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_patience",
+  "rarity": "common",
+  "tags": [
+   "growth",
+   "mult",
+   "safety"
+  ],
+  "icon": "g_patience",
+  "sfx": "tick",
+  "name_fr": "Patience",
+  "name_en": "Patience",
+  "desc_fr": "+1 Mult par tour consécutif sans pari gagnant (remis à zéro dès qu'un pari gagne).",
+  "desc_en": "+1 Mult per consecutive spin with no winning bet (resets when a bet wins).",
+  "flavor_fr": "La roue finit toujours par tourner. Paraît-il.",
+  "flavor_en": "The wheel always turns eventually. Supposedly.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": {
+       "var": "counter"
+      }
+     }
+    ]
+   },
+   {
+    "trigger": "on_round_end",
+    "if": [
+     {
+      "c": "won_nothing"
+     }
+    ],
+    "do": [
+     {
+      "op": "counter_add",
+      "v": 1
+     }
+    ]
+   },
+   {
+    "trigger": "on_round_end",
+    "if": [
+     {
+      "c": "not",
+      "x": {
+       "c": "won_nothing"
+      }
+     }
+    ],
+    "do": [
+     {
+      "op": "counter_set",
+      "v": 0
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_house_rules",
+  "rarity": "common",
+  "tags": [
+   "contract",
+   "mult"
+  ],
+  "icon": "g_house_rules",
+  "sfx": "paper",
+  "name_fr": "Règlement intérieur",
+  "name_en": "House Rules",
+  "desc_fr": "+3 Mult par Contrat signé.",
+  "desc_en": "+3 Mult per Contract signed.",
+  "flavor_fr": "Article 1 : La Maison a raison. Article 2 : voir article 1.",
+  "flavor_en": "Article 1: the House is right. Article 2: see article 1.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": {
+       "var": "contract_count",
+       "mul": 3
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_brass_knuckles",
+  "rarity": "common",
+  "tags": [
+   "bets",
+   "mult"
+  ],
+  "icon": "g_brass_knuckles",
+  "sfx": "clang",
+  "name_fr": "Poing américain",
+  "name_en": "Brass Knuckles",
+  "desc_fr": "+8 Mult si 3 paris ou plus gagnent.",
+  "desc_en": "+8 Mult if 3 or more bets win.",
+  "flavor_fr": "Pour les négociations difficiles.",
+  "flavor_en": "For tough negotiations.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "bets_won",
+      "v": 3,
+      "op": ">="
+     }
+    ],
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 8
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_slow_waltz",
+  "rarity": "common",
+  "tags": [
+   "spins",
+   "mult"
+  ],
+  "icon": "g_slow_waltz",
+  "sfx": "chime",
+  "name_fr": "Valse lente",
+  "name_en": "Slow Waltz",
+  "desc_fr": "+6 Mult au deuxième tour de chaque échéance.",
+  "desc_en": "+6 Mult on the second spin of each deadline.",
+  "flavor_fr": "Un, deux, trois. Un, deux, dette.",
+  "flavor_en": "One, two, three. One, two, debt.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "spin_index",
+      "v": 2,
+      "op": "=="
+     }
+    ],
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 6
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_cufflinks",
+  "rarity": "common",
+  "tags": [
+   "pockets",
+   "mult"
+  ],
+  "icon": "g_cufflinks",
+  "sfx": "click",
+  "name_fr": "Boutons de manchette",
+  "name_en": "Cufflinks",
+  "desc_fr": "+3 Mult si la case touchée est une case Standard.",
+  "desc_en": "+3 Mult if the hit pocket is Standard.",
+  "flavor_fr": "L'élégance, c'est la simplicité. Et le crédit.",
+  "flavor_en": "Elegance is simplicity. And credit.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "pocket_type",
+      "v": "standard"
+     }
+    ],
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 3
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_ruby_brooch",
+  "rarity": "common",
+  "tags": [
+   "pockets",
+   "mult"
+  ],
+  "icon": "g_ruby_brooch",
+  "sfx": "shimmer",
+  "name_fr": "Broche de rubis",
+  "name_en": "Ruby Brooch",
+  "desc_fr": "+2 Mult par case Rubis sur la roue.",
+  "desc_en": "+2 Mult per Ruby pocket on the wheel.",
+  "flavor_fr": "Épinglée sur un cœur qui n'en a plus.",
+  "flavor_en": "Pinned to a heart that has none left.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": {
+       "var": "type_count",
+       "t": "ruby",
+       "mul": 2
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_steel_toes",
+  "rarity": "common",
+  "tags": [
+   "pockets",
+   "mult"
+  ],
+  "icon": "g_steel_toes",
+  "sfx": "clang",
+  "name_fr": "Embouts d'acier",
+  "name_en": "Steel Toes",
+  "desc_fr": "+3 Mult par case Acier et +3 Mult par case de Verre sur la roue.",
+  "desc_en": "+3 Mult per Steel pocket and +3 Mult per Glass pocket on the wheel.",
+  "flavor_fr": "Pour marcher sur des éclats sans broncher.",
+  "flavor_en": "For walking on shards unflinching.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": {
+       "var": "type_count",
+       "t": "steel",
+       "mul": 3
+      }
+     }
+    ]
+   },
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": {
+       "var": "type_count",
+       "t": "glass",
+       "mul": 3
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_tip_jar",
+  "rarity": "common",
+  "tags": [
+   "economy",
+   "ball"
+  ],
+  "icon": "g_tip_jar",
+  "sfx": "coins",
+  "name_fr": "Bocal à pourboires",
+  "name_en": "Tip Jar",
+  "desc_fr": "+2 $ quand la bille frôle un de tes numéros.",
+  "desc_en": "+$2 when the ball lands next to one of your numbers.",
+  "flavor_fr": "La Maison a parfois pitié. Rarement.",
+  "flavor_en": "The House sometimes pities. Rarely.",
+  "effects": [
+   {
+    "trigger": "on_round_end",
+    "if": [
+     {
+      "c": "near_miss"
+     }
+    ],
+    "do": [
+     {
+      "op": "add_money",
+      "v": 2
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_matchbox",
+  "rarity": "common",
+  "tags": [
+   "mult",
+   "decay"
+  ],
+  "icon": "g_matchbox",
+  "sfx": "fire",
+  "name_fr": "Boîte d'allumettes",
+  "name_en": "Matchbox",
+  "desc_fr": "+10 Mult, −1 à chaque tour. Se consume à 0.",
+  "desc_en": "+10 Mult, −1 each spin. Burns out at 0.",
+  "flavor_fr": "Dix allumettes. Dix vœux. Dix déceptions.",
+  "flavor_en": "Ten matches. Ten wishes. Ten letdowns.",
+  "effects": [
+   {
+    "trigger": "on_acquire",
+    "do": [
+     {
+      "op": "counter_set",
+      "v": 10
+     }
+    ]
+   },
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": {
+       "var": "counter"
+      }
+     }
+    ]
+   },
+   {
+    "trigger": "on_round_end",
+    "do": [
+     {
+      "op": "counter_add",
+      "v": -1
+     }
+    ]
+   },
+   {
+    "trigger": "on_round_end",
+    "if": [
+     {
+      "c": "counter",
+      "v": 0,
+      "op": "<="
+     }
+    ],
+    "do": [
+     {
+      "op": "self_destroy",
+      "label": "burnt_out"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_billiard_chalk",
+  "rarity": "common",
+  "tags": [
+   "precision",
+   "mult"
+  ],
+  "icon": "g_billiard_chalk",
+  "sfx": "cloth",
+  "name_fr": "Craie de billard",
+  "name_en": "Billiard Chalk",
+  "desc_fr": "+2 Mult par point de Précision.",
+  "desc_en": "+2 Mult per point of Precision.",
+  "flavor_fr": "Mauvais jeu, bon geste.",
+  "flavor_en": "Wrong game, right gesture.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": {
+       "var": "precision",
+       "mul": 2
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_folding_fan",
+  "rarity": "common",
+  "tags": [
+   "budget",
+   "mult"
+  ],
+  "icon": "g_folding_fan",
+  "sfx": "whoosh",
+  "name_fr": "Éventail",
+  "name_en": "Folding Fan",
+  "desc_fr": "+2 Mult par jeton de budget non misé.",
+  "desc_en": "+2 Mult per unplaced bet chip.",
+  "flavor_fr": "Elle s'évente avec l'argent qu'elle n'a pas joué.",
+  "flavor_en": "She fans herself with money she didn't bet.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": {
+       "var": "unused_budget",
+       "mul": 2
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_tram_conductor",
+  "rarity": "rare",
+  "tags": [
+   "bets",
+   "street",
+   "six_line",
+   "corner",
+   "xmult"
+  ],
+  "icon": "g_tram_conductor",
+  "sfx": "ball_metal",
+  "name_fr": "Contrôleur de tram",
+  "name_en": "Tram Conductor",
+  "desc_fr": "×1,5 Mult par transversale, sixain ou carré gagnant.",
+  "desc_en": "×1.5 Mult per winning street, six line or corner.",
+  "flavor_fr": "Tickets, s'il vous plaît. Et vos économies.",
+  "flavor_en": "Tickets, please. And your savings.",
+  "effects": [
+   {
+    "trigger": "on_bet_win",
+    "if": [
+     {
+      "c": "bet_kind",
+      "v": [
+       "street",
+       "six_line",
+       "corner"
+      ]
+     }
+    ],
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 1.5
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_bishop",
+  "rarity": "rare",
+  "tags": [
+   "growth",
+   "corner",
+   "mult"
+  ],
+  "icon": "g_bishop",
+  "sfx": "choir",
+  "name_fr": "L'Évêque",
+  "name_en": "The Bishop",
+  "desc_fr": "Gagne +1 Mult (permanent) par carré gagnant.",
+  "desc_en": "Gains +1 Mult (permanent) per winning corner.",
+  "flavor_fr": "Il ne bouge qu'en diagonale. Comme la morale.",
+  "flavor_en": "Moves only diagonally. Like morals.",
+  "effects": [
+   {
+    "trigger": "on_bet_win",
+    "if": [
+     {
+      "c": "bet_kind",
+      "v": "corner"
+     }
+    ],
+    "do": [
+     {
+      "op": "counter_add",
+      "v": 1
+     }
+    ]
+   },
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": {
+       "var": "counter"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_neighbours",
+  "rarity": "rare",
+  "tags": [
+   "ball",
+   "xmult"
+  ],
+  "icon": "g_neighbours",
+  "sfx": "ball_land",
+  "name_fr": "Les Voisins",
+  "name_en": "The Neighbours",
+  "desc_fr": "×1,5 Mult si la bille reste dans la zone visée.",
+  "desc_en": "×1.5 Mult if the ball stays in the aimed zone.",
+  "flavor_fr": "Ils entendent tout à travers la cloison.",
+  "flavor_en": "They hear everything through the wall.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "in_zone"
+     }
+    ],
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 1.5
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_marksman",
+  "rarity": "rare",
+  "tags": [
+   "bets",
+   "straight",
+   "xmult"
+  ],
+  "icon": "g_marksman",
+  "sfx": "blade",
+  "name_fr": "Le Tireur",
+  "name_en": "The Marksman",
+  "desc_fr": "×1,5 Mult par plein gagnant.",
+  "desc_en": "×1.5 Mult per winning straight.",
+  "flavor_fr": "Un seul numéro. Une seule balle.",
+  "flavor_en": "One number. One bullet.",
+  "effects": [
+   {
+    "trigger": "on_bet_win",
+    "if": [
+     {
+      "c": "bet_kind",
+      "v": "straight"
+     }
+    ],
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 1.5
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_pickpocket",
+  "rarity": "rare",
+  "tags": [
+   "bets",
+   "chips"
+  ],
+  "icon": "g_pickpocket",
+  "sfx": "jingle",
+  "name_fr": "Pickpocket",
+  "name_en": "Pickpocket",
+  "desc_fr": "Chaque pari gagnant vole 3 jetons à La Maison (Jetons bonus).",
+  "desc_en": "Each winning bet steals 3 chips from the House (bonus Chips).",
+  "flavor_fr": "Main légère, conscience lourde.",
+  "flavor_en": "Light hands, heavy conscience.",
+  "effects": [
+   {
+    "trigger": "on_bet_win",
+    "do": [
+     {
+      "op": "steal_chips",
+      "v": 3
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_ledger",
+  "rarity": "rare",
+  "tags": [
+   "growth",
+   "chips"
+  ],
+  "icon": "g_ledger",
+  "sfx": "paper",
+  "name_fr": "Grand Livre",
+  "name_en": "The Ledger",
+  "desc_fr": "+5 % du score déjà marqué dans l'échéance en Jetons (max 300).",
+  "desc_en": "+5% of the score already made this deadline as Chips (max 300).",
+  "flavor_fr": "Chaque ligne est une promesse. Aucune n'est tenue.",
+  "flavor_en": "Every line a promise. None kept.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "add_chips",
+      "v": {
+       "var": "deadline_score",
+       "mul": 0.05,
+       "max": 300
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_hourglass",
+  "rarity": "rare",
+  "tags": [
+   "spins",
+   "xmult"
+  ],
+  "icon": "g_hourglass",
+  "sfx": "tick",
+  "name_fr": "Sablier",
+  "name_en": "Hourglass",
+  "desc_fr": "×Mult = 1 + 0,25 par tour restant.",
+  "desc_en": "×Mult = 1 + 0.25 per spin left.",
+  "flavor_fr": "Le sable tombe. La dette monte.",
+  "flavor_en": "Sand falls. Debt rises.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": {
+       "var": "spins_left",
+       "mul": 0.25,
+       "add": 1
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_last_call",
+  "rarity": "rare",
+  "tags": [
+   "spins",
+   "xmult"
+  ],
+  "icon": "g_last_call",
+  "sfx": "jackpot",
+  "name_fr": "Dernière tournée",
+  "name_en": "Last Call",
+  "desc_fr": "×2 Mult au dernier tour d'une échéance.",
+  "desc_en": "×2 Mult on a deadline's last spin.",
+  "flavor_fr": "La barmaid compte les verres. Et les têtes.",
+  "flavor_en": "The barmaid counts glasses. And heads.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "last_spin"
+     }
+    ],
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 2
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_twin_flame",
+  "rarity": "rare",
+  "tags": [
+   "streak",
+   "xmult"
+  ],
+  "icon": "g_twin_flame",
+  "sfx": "fire",
+  "name_fr": "Flamme jumelle",
+  "name_en": "Twin Flame",
+  "desc_fr": "×1,5 Mult si la même couleur sort 2 fois de suite ou plus.",
+  "desc_en": "×1.5 Mult if the same colour hits 2+ times in a row.",
+  "flavor_fr": "Deux fois rouge, et le cœur s'emballe.",
+  "flavor_en": "Red twice, and the heart races.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "color_streak",
+      "v": 2,
+      "op": ">="
+     }
+    ],
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 1.5
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_rainmaker",
+  "rarity": "rare",
+  "tags": [
+   "economy",
+   "outside"
+  ],
+  "icon": "g_rainmaker",
+  "sfx": "coins",
+  "name_fr": "Faiseur de pluie",
+  "name_en": "Rainmaker",
+  "desc_fr": "+1 $ par pari extérieur gagnant.",
+  "desc_en": "+$1 per winning outside bet.",
+  "flavor_fr": "Il fait pleuvoir des pièces. Petites.",
+  "flavor_en": "He makes it rain coins. Small ones.",
+  "effects": [
+   {
+    "trigger": "on_bet_win",
+    "if": [
+     {
+      "c": "bet_outside"
+     }
+    ],
+    "do": [
+     {
+      "op": "add_money",
+      "v": 1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_glass_cutter",
+  "rarity": "rare",
+  "tags": [
+   "pockets",
+   "glass",
+   "retrigger"
+  ],
+  "icon": "g_glass_cutter",
+  "sfx": "glass",
+  "name_fr": "Diamantaire",
+  "name_en": "Glass Cutter",
+  "desc_fr": "Une case de Verre touchée compte une fois de plus.",
+  "desc_en": "A hit Glass pocket scores one more time.",
+  "flavor_fr": "Il taille le verre comme d'autres taillent les cartes.",
+  "flavor_en": "He cuts glass the way others cut cards.",
+  "effects": [
+   {
+    "trigger": "on_ball_land",
+    "if": [
+     {
+      "c": "pocket_type",
+      "v": "glass"
+     }
+    ],
+    "do": [
+     {
+      "op": "retrigger_pocket",
+      "v": 1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_gilded_cage",
+  "rarity": "rare",
+  "tags": [
+   "pockets",
+   "golden",
+   "retrigger"
+  ],
+  "icon": "g_gilded_cage",
+  "sfx": "vault",
+  "name_fr": "Cage dorée",
+  "name_en": "Gilded Cage",
+  "desc_fr": "Une case Dorée touchée compte une fois de plus.",
+  "desc_en": "A hit Golden pocket scores one more time.",
+  "flavor_fr": "Le perroquet ne chante que « mise ».",
+  "flavor_en": "The parrot only sings « bet ».",
+  "effects": [
+   {
+    "trigger": "on_ball_land",
+    "if": [
+     {
+      "c": "pocket_type",
+      "v": "golden"
+     }
+    ],
+    "do": [
+     {
+      "op": "retrigger_pocket",
+      "v": 1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_ruby_slipper",
+  "rarity": "rare",
+  "tags": [
+   "pockets",
+   "xmult"
+  ],
+  "icon": "g_ruby_slipper",
+  "sfx": "shimmer",
+  "name_fr": "Escarpin rubis",
+  "name_en": "Ruby Slipper",
+  "desc_fr": "×2 Mult si la case touchée est un Rubis.",
+  "desc_en": "×2 Mult if the hit pocket is a Ruby.",
+  "flavor_fr": "Clac, clac, clac. On ne rentre pas à la maison.",
+  "flavor_en": "Click, click, click. There's no going home.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "pocket_type",
+      "v": "ruby"
+     }
+    ],
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 2
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_forger",
+  "rarity": "rare",
+  "tags": [
+   "pockets",
+   "chance"
+  ],
+  "icon": "g_forger",
+  "sfx": "double",
+  "name_fr": "Faussaire",
+  "name_en": "Forger",
+  "desc_fr": "1 chance sur 10 : la case touchée est dupliquée (la roue grandit).",
+  "desc_en": "1 in 10: the hit pocket is duplicated (the wheel grows).",
+  "flavor_fr": "Signature parfaite. Encre encore fraîche.",
+  "flavor_en": "Perfect signature. Ink still wet.",
+  "effects": [
+   {
+    "trigger": "on_round_end",
+    "if": [
+     {
+      "c": "chance",
+      "v": 0.1
+     }
+    ],
+    "do": [
+     {
+      "op": "add_pocket_copy"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_alchemist",
+  "rarity": "rare",
+  "tags": [
+   "pockets",
+   "golden"
+  ],
+  "icon": "g_alchemist",
+  "sfx": "transform",
+  "name_fr": "Alchimiste",
+  "name_en": "Alchemist",
+  "desc_fr": "3 chances sur 20 : une case Standard touchée devient Dorée.",
+  "desc_en": "3 in 20: a hit Standard pocket turns Golden.",
+  "flavor_fr": "Plomb, or, plomb, or… il a perdu le fil.",
+  "flavor_en": "Lead, gold, lead, gold… he lost track.",
+  "effects": [
+   {
+    "trigger": "on_round_end",
+    "if": [
+     {
+      "c": "pocket_type",
+      "v": "standard"
+     },
+     {
+      "c": "chance",
+      "v": 0.15
+     }
+    ],
+    "do": [
+     {
+      "op": "transform_pocket",
+      "type": "golden"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_jeweller",
+  "rarity": "rare",
+  "tags": [
+   "pockets",
+   "edition"
+  ],
+  "icon": "g_jeweller",
+  "sfx": "shimmer",
+  "name_fr": "Joaillier",
+  "name_en": "Jeweller",
+  "desc_fr": "+25 Jetons si la case touchée a une édition. 3 chances sur 20 : la case touchée devient Brillante.",
+  "desc_en": "+25 Chips if the hit pocket has an edition. 3 in 20: the hit pocket gains the Foil edition.",
+  "flavor_fr": "Il polit vos cases contre une petite commission.",
+  "flavor_en": "He polishes your pockets for a small fee.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "pocket_has_edition"
+     }
+    ],
+    "do": [
+     {
+      "op": "add_chips",
+      "v": 25
+     }
+    ]
+   },
+   {
+    "trigger": "on_round_end",
+    "if": [
+     {
+      "c": "chance",
+      "v": 0.15
+     }
+    ],
+    "do": [
+     {
+      "op": "set_pocket_edition",
+      "edition": "brillante"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_notary_stamp",
+  "rarity": "rare",
+  "tags": [
+   "pockets",
+   "seal"
+  ],
+  "icon": "g_notary_stamp",
+  "sfx": "stamp",
+  "name_fr": "Tampon du notaire",
+  "name_en": "Notary Stamp",
+  "desc_fr": "1 chance sur 10 à chaque tour : appose un sceau aléatoire sur une case au hasard.",
+  "desc_en": "1 in 10 each spin: puts a random seal on a random pocket.",
+  "flavor_fr": "Lu et approuvé. Surtout approuvé.",
+  "flavor_en": "Read and approved. Mostly approved.",
+  "effects": [
+   {
+    "trigger": "on_round_end",
+    "if": [
+     {
+      "c": "chance",
+      "v": 0.1
+     }
+    ],
+    "do": [
+     {
+      "op": "add_random_seal"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_gardener",
+  "rarity": "rare",
+  "tags": [
+   "pockets",
+   "growth"
+  ],
+  "icon": "g_gardener",
+  "sfx": "grow",
+  "name_fr": "Jardinier",
+  "name_en": "Gardener",
+  "desc_fr": "Si au moins un pari gagne, la case touchée gagne un niveau (+10 Jetons).",
+  "desc_en": "If at least one bet wins, the hit pocket gains a level (+10 Chips).",
+  "flavor_fr": "Il arrose les cases avec vos larmes.",
+  "flavor_en": "He waters the pockets with your tears.",
+  "effects": [
+   {
+    "trigger": "on_round_end",
+    "if": [
+     {
+      "c": "bets_won",
+      "v": 1,
+      "op": ">="
+     }
+    ],
+    "do": [
+     {
+      "op": "upgrade_pocket",
+      "v": 1,
+      "label": "grow"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_night_owl",
+  "rarity": "rare",
+  "tags": [
+   "bets",
+   "xmult"
+  ],
+  "icon": "g_night_owl",
+  "sfx": "whoosh",
+  "name_fr": "Oiseau de nuit",
+  "name_en": "Night Owl",
+  "desc_fr": "×1,5 Mult si 4 types de paris différents ou plus sont posés.",
+  "desc_en": "×1.5 Mult if 4 or more distinct bet types are placed.",
+  "flavor_fr": "Il ne dort jamais. Il mise.",
+  "flavor_en": "He never sleeps. He bets.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "distinct_kinds",
+      "v": 4,
+      "op": ">="
+     }
+    ],
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 1.5
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_metro_map",
+  "rarity": "rare",
+  "tags": [
+   "pockets",
+   "xmult"
+  ],
+  "icon": "g_metro_map",
+  "sfx": "paper",
+  "name_fr": "Plan de métro",
+  "name_en": "Metro Map",
+  "desc_fr": "×Mult = taille de la roue ÷ 37.",
+  "desc_en": "×Mult = wheel size ÷ 37.",
+  "flavor_fr": "Toutes les lignes mènent au terminus Zéro.",
+  "flavor_en": "Every line ends at Zero terminus.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": {
+       "var": "wheel_size",
+       "mul": 0.027027
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_bookie",
+  "rarity": "rare",
+  "tags": [
+   "bets",
+   "mult",
+   "safety"
+  ],
+  "icon": "g_bookie",
+  "sfx": "paper",
+  "name_fr": "Le Bookmaker",
+  "name_en": "The Bookie",
+  "desc_fr": "+2 Mult par pari perdu.",
+  "desc_en": "+2 Mult per losing bet.",
+  "flavor_fr": "Il note vos pertes avec tendresse.",
+  "flavor_en": "He logs your losses tenderly.",
+  "effects": [
+   {
+    "trigger": "on_bet_lose",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 2
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_insurance",
+  "rarity": "rare",
+  "tags": [
+   "safety",
+   "chips"
+  ],
+  "icon": "g_insurance",
+  "sfx": "paper",
+  "name_fr": "Police d'assurance",
+  "name_en": "Insurance Policy",
+  "desc_fr": "Si aucun pari ne gagne, les mises perdues sont remboursées en Jetons.",
+  "desc_en": "If no bet wins, lost stakes are refunded as Chips.",
+  "flavor_fr": "Clause 37 : sauf Zéro, sauf jeudi, sauf vous.",
+  "flavor_en": "Clause 37: except Zero, except Thursdays, except you.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "won_nothing"
+     }
+    ],
+    "do": [
+     {
+      "op": "refund_lost",
+      "v": 1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_compass",
+  "rarity": "rare",
+  "tags": [
+   "ball",
+   "precision"
+  ],
+  "icon": "g_compass",
+  "sfx": "breath",
+  "name_fr": "Boussole",
+  "name_en": "Compass",
+  "desc_fr": "Après un rebond fou, +1 Précision pour le lancer suivant.",
+  "desc_en": "After a wild bounce, +1 Precision for the next throw.",
+  "flavor_fr": "Le nord, c'est en bas.",
+  "flavor_en": "North is down.",
+  "effects": [
+   {
+    "trigger": "on_round_end",
+    "if": [
+     {
+      "c": "not",
+      "x": {
+       "c": "in_zone"
+      }
+     }
+    ],
+    "do": [
+     {
+      "op": "temp_precision",
+      "v": 1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_cartographer",
+  "rarity": "rare",
+  "tags": [
+   "ball",
+   "mult"
+  ],
+  "icon": "g_cartographer",
+  "sfx": "paper",
+  "name_fr": "Cartographe",
+  "name_en": "Cartographer",
+  "desc_fr": "+15 Mult quand la bille frôle un de tes numéros.",
+  "desc_en": "+15 Mult when the ball lands next to one of your numbers.",
+  "flavor_fr": "Il a tracé la roue au compas. Elle a bougé.",
+  "flavor_en": "He drew the wheel by compass. It moved.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "near_miss"
+     }
+    ],
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 15
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_accordion",
+  "rarity": "rare",
+  "tags": [
+   "growth",
+   "zero",
+   "mult"
+  ],
+  "icon": "g_accordion",
+  "sfx": "breath",
+  "name_fr": "Accordéon",
+  "name_en": "Accordion",
+  "desc_fr": "+0,5 Mult à chaque tour (cumulatif) ; remis à zéro par le Zéro.",
+  "desc_en": "+0.5 Mult every spin (cumulative); reset by Zero.",
+  "flavor_fr": "Il gonfle, il gonfle, puis le Zéro s'assoit dessus.",
+  "flavor_en": "It swells and swells, then Zero sits on it.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": {
+       "var": "counter"
+      }
+     }
+    ]
+   },
+   {
+    "trigger": "on_round_end",
+    "do": [
+     {
+      "op": "counter_add",
+      "v": 0.5
+     }
+    ]
+   },
+   {
+    "trigger": "on_zero",
+    "do": [
+     {
+      "op": "counter_set",
+      "v": 0
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_zero_tithe",
+  "rarity": "rare",
+  "tags": [
+   "zero",
+   "economy"
+  ],
+  "icon": "g_zero_tithe",
+  "sfx": "zero",
+  "name_fr": "Dîme du Zéro",
+  "name_en": "Zero's Tithe",
+  "desc_fr": "+5 $ quand la bille tombe sur le Zéro.",
+  "desc_en": "+$5 when the ball lands on Zero.",
+  "flavor_fr": "Le Zéro prend. Le Zéro rend, parfois.",
+  "flavor_en": "Zero takes. Zero gives, sometimes.",
+  "effects": [
+   {
+    "trigger": "on_zero",
+    "do": [
+     {
+      "op": "add_money",
+      "v": 5
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_double_or_nothing",
+  "rarity": "rare",
+  "tags": [
+   "chance",
+   "xmult"
+  ],
+  "icon": "g_double_or_nothing",
+  "sfx": "dice",
+  "name_fr": "Quitte ou double",
+  "name_en": "Double or Nothing",
+  "desc_fr": "1 chance sur 2 : ×2 Mult. Puis 1 chance sur 2 : ×0,75 Mult.",
+  "desc_en": "1 in 2: ×2 Mult. Then 1 in 2: ×0.75 Mult.",
+  "flavor_fr": "Une pièce, deux faces, zéro garantie.",
+  "flavor_en": "One coin, two faces, zero guarantees.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "chance",
+      "v": 0.5
+     }
+    ],
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 2
+     }
+    ]
+   },
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "chance",
+      "v": 0.5
+     }
+    ],
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 0.75
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_stockbroker",
+  "rarity": "rare",
+  "tags": [
+   "economy",
+   "growth",
+   "mult"
+  ],
+  "icon": "g_stockbroker",
+  "sfx": "coins",
+  "name_fr": "Agent de change",
+  "name_en": "Stockbroker",
+  "desc_fr": "À chaque échéance remboursée, gagne +1 Mult (permanent) par tranche de 10 $ possédés.",
+  "desc_en": "Each repaid deadline, gains +1 Mult (permanent) per $10 owned.",
+  "flavor_fr": "Achetez bas, vendez… non, ne vendez pas.",
+  "flavor_en": "Buy low, sell… no, don't sell.",
+  "effects": [
+   {
+    "trigger": "on_deadline_end",
+    "do": [
+     {
+      "op": "counter_add",
+      "v": {
+       "var": "money",
+       "div": 10
+      }
+     }
+    ]
+   },
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": {
+       "var": "counter"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_auctioneer",
+  "rarity": "rare",
+  "tags": [
+   "economy",
+   "growth",
+   "xmult"
+  ],
+  "icon": "g_auctioneer",
+  "sfx": "stamp",
+  "name_fr": "Commissaire-priseur",
+  "name_en": "Auctioneer",
+  "desc_fr": "×Mult = 1 + 0,25 par grigri vendu durant ce run.",
+  "desc_en": "×Mult = 1 + 0.25 per charm sold this run.",
+  "flavor_fr": "Adjugé ! À vous. Hélas.",
+  "flavor_en": "Sold! To you. Alas.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": {
+       "var": "sold_count",
+       "mul": 0.25,
+       "add": 1
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_window_shopper",
+  "rarity": "rare",
+  "tags": [
+   "economy",
+   "growth",
+   "mult"
+  ],
+  "icon": "g_window_shopper",
+  "sfx": "reroll",
+  "name_fr": "Lèche-vitrine",
+  "name_en": "Window Shopper",
+  "desc_fr": "+2 Mult par reroll de boutique effectué durant ce run.",
+  "desc_en": "+2 Mult per shop reroll made this run.",
+  "flavor_fr": "Elle regarde tout. N'achète rien. Gagne quand même.",
+  "flavor_en": "She looks at everything. Buys nothing. Wins anyway.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": {
+       "var": "rerolls",
+       "mul": 2
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_coupon_book",
+  "rarity": "rare",
+  "tags": [
+   "economy"
+  ],
+  "icon": "g_coupon_book",
+  "sfx": "paper",
+  "name_fr": "Carnet de bons",
+  "name_en": "Coupon Book",
+  "desc_fr": "Boutique −2 $ sur tout.",
+  "desc_en": "Shop −$2 on everything.",
+  "flavor_fr": "Valable jusqu'à la fin des temps. Ou du run.",
+  "flavor_en": "Valid until the end of time. Or the run.",
+  "effects": [
+   {
+    "trigger": "on_acquire",
+    "do": [
+     {
+      "op": "shop_discount",
+      "v": 2
+     }
+    ]
+   },
+   {
+    "trigger": "on_remove",
+    "do": [
+     {
+      "op": "shop_discount",
+      "v": -2
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_landlord",
+  "rarity": "rare",
+  "tags": [
+   "economy",
+   "slots"
+  ],
+  "icon": "g_landlord",
+  "sfx": "coins",
+  "name_fr": "Propriétaire",
+  "name_en": "Landlord",
+  "desc_fr": "+1 $ par emplacement de grigri vide, à chaque tour.",
+  "desc_en": "+$1 per empty charm slot, every spin.",
+  "flavor_fr": "Il loue le vide. Très cher.",
+  "flavor_en": "He rents out emptiness. Dearly.",
+  "effects": [
+   {
+    "trigger": "on_round_end",
+    "if": [
+     {
+      "c": "empty_slots",
+      "v": 1,
+      "op": ">="
+     }
+    ],
+    "do": [
+     {
+      "op": "add_money",
+      "v": {
+       "var": "empty_slots"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_salon_echo",
+  "rarity": "rare",
+  "tags": [
+   "copy",
+   "mult"
+  ],
+  "icon": "g_salon_echo",
+  "sfx": "echo",
+  "name_fr": "Écho de salon",
+  "name_en": "Salon Echo",
+  "desc_fr": "+2 Mult et copie le grigri à sa gauche.",
+  "desc_en": "+2 Mult and copies the charm to its left.",
+  "flavor_fr": "Ce qui se dit au salon se répète au salon.",
+  "flavor_en": "What's said in the lounge stays… repeated.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 2
+     },
+     {
+      "op": "copy_left"
+     }
+    ]
+   },
+   {
+    "trigger": "on_bet_win",
+    "do": [
+     {
+      "op": "copy_left"
+     }
+    ]
+   }
+  ],
+  "no_copy": true
+ },
+ {
+  "id": "g_seven_sisters",
+  "rarity": "rare",
+  "tags": [
+   "pockets",
+   "xmult"
+  ],
+  "icon": "g_seven_sisters",
+  "sfx": "choir",
+  "name_fr": "Les Sept Sœurs",
+  "name_en": "Seven Sisters",
+  "desc_fr": "×1,7 Mult si le numéro est un multiple de 7 (0, 7, 14, 21, 28, 35).",
+  "desc_en": "×1.7 Mult if the number is a multiple of 7 (0, 7, 14, 21, 28, 35).",
+  "flavor_fr": "Sept sœurs, sept dettes, un seul héritier.",
+  "flavor_en": "Seven sisters, seven debts, one heir.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "pocket_number",
+      "v": 7,
+      "op": "mod"
+     }
+    ],
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 1.7
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_fortune_teller",
+  "rarity": "rare",
+  "tags": [
+   "fortune"
+  ],
+  "icon": "g_fortune_teller",
+  "sfx": "card_use",
+  "name_fr": "Diseuse de bonne aventure",
+  "name_en": "Fortune Teller",
+  "desc_fr": "Au dernier tour d'une échéance, crée une carte Fortune.",
+  "desc_en": "On a deadline's last spin, creates a Fortune card.",
+  "flavor_fr": "Elle voit votre avenir. Elle préfère ne rien dire.",
+  "flavor_en": "She sees your future. She'd rather not say.",
+  "effects": [
+   {
+    "trigger": "on_round_end",
+    "if": [
+     {
+      "c": "last_spin"
+     }
+    ],
+    "do": [
+     {
+      "op": "add_fortune",
+      "id": "random"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_trapdoor",
+  "rarity": "rare",
+  "tags": [
+   "ball",
+   "spins",
+   "chance"
+  ],
+  "icon": "g_trapdoor",
+  "sfx": "crack",
+  "name_fr": "Trappe",
+  "name_en": "Trapdoor",
+  "desc_fr": "Après un rebond fou, 1 chance sur 4 : +1 tour.",
+  "desc_en": "After a wild bounce, 1 in 4: +1 spin.",
+  "flavor_fr": "Elle s'ouvre sous ceux qui n'ont plus rien. Et les rend.",
+  "flavor_en": "It opens under the broke. And gives them back.",
+  "effects": [
+   {
+    "trigger": "on_round_end",
+    "if": [
+     {
+      "c": "not",
+      "x": {
+       "c": "in_zone"
+      }
+     },
+     {
+      "c": "chance",
+      "v": 0.25
+     }
+    ],
+    "do": [
+     {
+      "op": "add_spins",
+      "v": 1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_overtime",
+  "rarity": "rare",
+  "tags": [
+   "spins"
+  ],
+  "icon": "g_overtime",
+  "sfx": "clock",
+  "name_fr": "Heures sup",
+  "name_en": "Overtime",
+  "desc_fr": "+1 tour par échéance.",
+  "desc_en": "+1 spin per deadline.",
+  "flavor_fr": "Payées en jetons. En jetons de La Maison.",
+  "flavor_en": "Paid in chips. House chips.",
+  "effects": [
+   {
+    "trigger": "on_acquire",
+    "do": [
+     {
+      "op": "add_extra_spins",
+      "v": 1
+     }
+    ]
+   },
+   {
+    "trigger": "on_remove",
+    "do": [
+     {
+      "op": "add_extra_spins",
+      "v": -1
+     }
+    ]
+   }
+  ],
+  "cost": 8
+ },
+ {
+  "id": "g_pearl_necklace",
+  "rarity": "rare",
+  "tags": [
+   "bets",
+   "chips"
+  ],
+  "icon": "g_pearl_necklace",
+  "sfx": "jingle",
+  "name_fr": "Collier de perles",
+  "name_en": "Pearl Necklace",
+  "desc_fr": "+20 Jetons par pari gagnant.",
+  "desc_en": "+20 Chips per winning bet.",
+  "flavor_fr": "Une perle par victoire. Le fil est court.",
+  "flavor_en": "A pearl per win. The string is short.",
+  "effects": [
+   {
+    "trigger": "on_bet_win",
+    "do": [
+     {
+      "op": "add_chips",
+      "v": 20
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_bow_tie",
+  "rarity": "rare",
+  "tags": [
+   "bets",
+   "xmult"
+  ],
+  "icon": "g_bow_tie",
+  "sfx": "cloth",
+  "name_fr": "Nœud papillon",
+  "name_en": "Bow Tie",
+  "desc_fr": "×1,5 Mult si 2 paris ou plus gagnent.",
+  "desc_en": "×1.5 Mult if 2 or more bets win.",
+  "flavor_fr": "Noué à la perfection. Pour l'enterrement de la dette.",
+  "flavor_en": "Tied perfectly. For the debt's funeral.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "bets_won",
+      "v": 2,
+      "op": ">="
+     }
+    ],
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 1.5
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_monogram",
+  "rarity": "rare",
+  "tags": [
+   "pockets",
+   "growth",
+   "mult"
+  ],
+  "icon": "g_monogram",
+  "sfx": "stamp",
+  "name_fr": "Monogramme",
+  "name_en": "Monogram",
+  "desc_fr": "+3 Mult par niveau de la case touchée.",
+  "desc_en": "+3 Mult per level of the hit pocket.",
+  "flavor_fr": "Brodé sur chaque case. Vos initiales. Vos dettes.",
+  "flavor_en": "Embroidered on every pocket. Your initials. Your debts.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": {
+       "var": "pocket_level",
+       "mul": 3
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_sommelier",
+  "rarity": "rare",
+  "tags": [
+   "spins",
+   "xmult"
+  ],
+  "icon": "g_sommelier",
+  "sfx": "glass",
+  "name_fr": "Sommelier",
+  "name_en": "Sommelier",
+  "desc_fr": "×2 Mult un tour sur trois (tours totaux du run).",
+  "desc_en": "×2 Mult every third spin (total run spins).",
+  "flavor_fr": "Un grand cru tous les trois verres.",
+  "flavor_en": "A fine vintage every third glass.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "total_spins",
+      "v": 3,
+      "op": "mod"
+     }
+    ],
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 2
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_spiderweb",
+  "rarity": "rare",
+  "tags": [
+   "pockets",
+   "chips"
+  ],
+  "icon": "g_spiderweb",
+  "sfx": "sticky",
+  "name_fr": "Toile d'araignée",
+  "name_en": "Spiderweb",
+  "desc_fr": "+60 Jetons si une case voisine de la case touchée est Dorée.",
+  "desc_en": "+60 Chips if a pocket next to the hit one is Golden.",
+  "flavor_fr": "Elle attrape tout ce qui brille.",
+  "flavor_en": "It catches all that glitters.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "neighbor_type",
+      "v": "golden"
+     }
+    ],
+    "do": [
+     {
+      "op": "add_chips",
+      "v": 60
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_red_carpet",
+  "rarity": "rare",
+  "tags": [
+   "bets",
+   "color",
+   "xmult"
+  ],
+  "icon": "g_red_carpet",
+  "sfx": "chime",
+  "name_fr": "Tapis rouge",
+  "name_en": "Red Carpet",
+  "desc_fr": "×1,25 Mult par pari Rouge ou Noir gagnant.",
+  "desc_en": "×1.25 Mult per winning Red or Black bet.",
+  "flavor_fr": "Déroulé pour vous. Enroulé derrière vous.",
+  "flavor_en": "Rolled out for you. Rolled up behind you.",
+  "effects": [
+   {
+    "trigger": "on_bet_win",
+    "if": [
+     {
+      "c": "bet_kind",
+      "v": [
+       "red",
+       "black"
+      ]
+     }
+    ],
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 1.25
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_grand_zero",
+  "rarity": "legendary",
+  "tags": [
+   "zero",
+   "xmult",
+   "safety"
+  ],
+  "icon": "g_grand_zero",
+  "sfx": "zero",
+  "name_fr": "Le Grand Zéro",
+  "name_en": "The Grand Zero",
+  "desc_fr": "Sur un Zéro : protège les paris et ×10 Mult.",
+  "desc_en": "On Zero: protects bets and ×10 Mult.",
+  "flavor_fr": "Le casino porte son nom. Ce n'est pas un hasard.",
+  "flavor_en": "The casino bears its name. No accident.",
+  "effects": [
+   {
+    "trigger": "on_zero",
+    "do": [
+     {
+      "op": "protect_zero"
+     }
+    ]
+   },
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "is_zero"
+     }
+    ],
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 10
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_golden_rake",
+  "rarity": "legendary",
+  "tags": [
+   "growth",
+   "bets",
+   "xmult"
+  ],
+  "icon": "g_golden_rake",
+  "sfx": "chips_win",
+  "name_fr": "Râteau d'or",
+  "name_en": "Golden Rake",
+  "desc_fr": "×Mult qui grandit de 0,1 par pari gagnant (permanent, départ ×1).",
+  "desc_en": "×Mult growing by 0.1 per winning bet (permanent, starts ×1).",
+  "flavor_fr": "Il ratisse pour vous, pour une fois.",
+  "flavor_en": "It rakes for you, for once.",
+  "effects": [
+   {
+    "trigger": "on_bet_win",
+    "do": [
+     {
+      "op": "counter_add",
+      "v": 0.1
+     }
+    ]
+   },
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": {
+       "var": "counter",
+       "add": 1
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_perpetual_motion",
+  "rarity": "legendary",
+  "tags": [
+   "retrigger",
+   "ball"
+  ],
+  "icon": "g_perpetual_motion",
+  "sfx": "wheel_spin",
+  "name_fr": "Mouvement perpétuel",
+  "name_en": "Perpetual Motion",
+  "desc_fr": "La case touchée compte une fois de plus ; dans la zone, les paris gagnants paient aussi deux fois.",
+  "desc_en": "The hit pocket scores once more; in the zone, winning bets also pay twice.",
+  "flavor_fr": "Les physiciens le disent impossible. La roue s'en moque.",
+  "flavor_en": "Physicists say it's impossible. The wheel doesn't care.",
+  "effects": [
+   {
+    "trigger": "on_ball_land",
+    "do": [
+     {
+      "op": "retrigger_pocket",
+      "v": 1
+     }
+    ]
+   },
+   {
+    "trigger": "on_ball_land",
+    "if": [
+     {
+      "c": "in_zone"
+     }
+    ],
+    "do": [
+     {
+      "op": "retrigger_bets",
+      "v": 1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_silver_tongue",
+  "rarity": "legendary",
+  "tags": [
+   "economy",
+   "xmult"
+  ],
+  "icon": "g_silver_tongue",
+  "sfx": "coins",
+  "name_fr": "Langue d'argent",
+  "name_en": "Silver Tongue",
+  "desc_fr": "×Mult = 1 + 0,1 par $ possédé (max ×4).",
+  "desc_en": "×Mult = 1 + 0.1 per $ owned (max ×4).",
+  "flavor_fr": "Elle a convaincu La Maison de lui faire crédit. Deux fois.",
+  "flavor_en": "She talked the House into credit. Twice.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": {
+       "var": "money",
+       "mul": 0.1,
+       "add": 1,
+       "max": 4
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_ballroom",
+  "rarity": "legendary",
+  "tags": [
+   "bets",
+   "xmult"
+  ],
+  "icon": "g_ballroom",
+  "sfx": "celebrate",
+  "name_fr": "Salle de bal",
+  "name_en": "Ballroom",
+  "desc_fr": "×Mult = 0,5 × nombre de types de paris posés (min ×1).",
+  "desc_en": "×Mult = 0.5 × number of distinct bet types placed (min ×1).",
+  "flavor_fr": "Chaque pari danse avec un autre.",
+  "flavor_en": "Every bet dances with another.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": {
+       "var": "distinct_kinds",
+       "mul": 0.5,
+       "min": 1
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_metropolis",
+  "rarity": "legendary",
+  "tags": [
+   "growth",
+   "mult"
+  ],
+  "icon": "g_metropolis",
+  "sfx": "grow",
+  "name_fr": "Métropole",
+  "name_en": "Metropolis",
+  "desc_fr": "+0,5 Mult par tour joué durant ce run.",
+  "desc_en": "+0.5 Mult per spin played this run.",
+  "flavor_fr": "La ville au-dessus grandit. En dessous aussi.",
+  "flavor_en": "The city above grows. So does the one below.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": {
+       "var": "total_spins",
+       "mul": 0.5
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_oracle",
+  "rarity": "legendary",
+  "tags": [
+   "precision",
+   "control",
+   "ball"
+  ],
+  "icon": "g_oracle",
+  "sfx": "choir",
+  "name_fr": "L'Oracle",
+  "name_en": "The Oracle",
+  "desc_fr": "+2 Précision et +15 % de contrôle de la bille.",
+  "desc_en": "+2 Precision and +15% ball control.",
+  "flavor_fr": "Elle a vu où tomberait la bille. Elle a souri.",
+  "flavor_en": "She saw where the ball would fall. She smiled.",
+  "effects": [
+   {
+    "trigger": "on_acquire",
+    "do": [
+     {
+      "op": "perm_precision",
+      "v": 2
+     }
+    ]
+   },
+   {
+    "trigger": "on_remove",
+    "do": [
+     {
+      "op": "perm_precision",
+      "v": -2
+     }
+    ]
+   },
+   {
+    "trigger": "on_acquire",
+    "do": [
+     {
+      "op": "perm_control",
+      "v": 0.15
+     }
+    ]
+   },
+   {
+    "trigger": "on_remove",
+    "do": [
+     {
+      "op": "perm_control",
+      "v": -0.15
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_revenge",
+  "rarity": "legendary",
+  "tags": [
+   "safety",
+   "xmult"
+  ],
+  "icon": "g_revenge",
+  "sfx": "boss_enter",
+  "name_fr": "La Revanche",
+  "name_en": "Revenge",
+  "desc_fr": "×4 Mult si aucun pari ne gagne.",
+  "desc_en": "×4 Mult if no bet wins.",
+  "flavor_fr": "Perdre, c'est juste gagner en différé.",
+  "flavor_en": "Losing is just winning, deferred.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "won_nothing"
+     }
+    ],
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 4
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_crown_jewels",
+  "rarity": "legendary",
+  "tags": [
+   "pockets",
+   "edition",
+   "xmult"
+  ],
+  "icon": "g_crown_jewels",
+  "sfx": "shimmer",
+  "name_fr": "Joyaux de la couronne",
+  "name_en": "Crown Jewels",
+  "desc_fr": "×Mult = 1 + 0,5 par case éditée sur la roue.",
+  "desc_en": "×Mult = 1 + 0.5 per edition pocket on the wheel.",
+  "flavor_fr": "Volés à un roi qui les avait mis en gage.",
+  "flavor_en": "Stolen from a king who had pawned them.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": {
+       "var": "edition_pockets",
+       "mul": 0.5,
+       "add": 1
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_house_of_cards",
+  "rarity": "legendary",
+  "tags": [
+   "xmult",
+   "destroy"
+  ],
+  "icon": "g_house_of_cards",
+  "sfx": "card_flip",
+  "name_fr": "Château de cartes",
+  "name_en": "House of Cards",
+  "desc_fr": "×5 Mult. 1 chance sur 6 de s'effondrer à chaque tour.",
+  "desc_en": "×5 Mult. 1 in 6 chance to collapse each spin.",
+  "flavor_fr": "Ne respirez pas. Ne misez pas trop fort.",
+  "flavor_en": "Don't breathe. Don't bet too hard.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 5
+     }
+    ]
+   },
+   {
+    "trigger": "on_round_end",
+    "if": [
+     {
+      "c": "chance",
+      "v": 0.1667
+     }
+    ],
+    "do": [
+     {
+      "op": "self_destroy",
+      "label": "shatter"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_philosophers_stone",
+  "rarity": "legendary",
+  "tags": [
+   "pockets",
+   "golden"
+  ],
+  "icon": "g_philosophers_stone",
+  "sfx": "transform",
+  "name_fr": "Pierre philosophale",
+  "name_en": "Philosopher's Stone",
+  "desc_fr": "Chaque case Standard touchée devient Dorée.",
+  "desc_en": "Every hit Standard pocket turns Golden.",
+  "flavor_fr": "Elle change tout en or. Sauf votre dette.",
+  "flavor_en": "It turns everything to gold. Except your debt.",
+  "effects": [
+   {
+    "trigger": "on_round_end",
+    "if": [
+     {
+      "c": "pocket_type",
+      "v": "standard"
+     }
+    ],
+    "do": [
+     {
+      "op": "transform_pocket",
+      "type": "golden"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_infinite_chip",
+  "rarity": "legendary",
+  "tags": [
+   "chips",
+   "economy"
+  ],
+  "icon": "g_infinite_chip",
+  "sfx": "chips_win",
+  "name_fr": "Jeton infini",
+  "name_en": "Infinite Chip",
+  "desc_fr": "+3 valeur de jeton.",
+  "desc_en": "+3 chip value.",
+  "flavor_fr": "On ne voit jamais son autre face.",
+  "flavor_en": "Nobody has seen its other side.",
+  "effects": [
+   {
+    "trigger": "on_acquire",
+    "do": [
+     {
+      "op": "perm_chip_value",
+      "v": 3
+     }
+    ]
+   },
+   {
+    "trigger": "on_remove",
+    "do": [
+     {
+      "op": "perm_chip_value",
+      "v": -3
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_maestro",
+  "rarity": "legendary",
+  "tags": [
+   "streak",
+   "xmult"
+  ],
+  "icon": "g_maestro",
+  "sfx": "jackpot",
+  "name_fr": "Le Maestro",
+  "name_en": "The Maestro",
+  "desc_fr": "×Mult = 1 + 0,5 par sortie consécutive de la même couleur.",
+  "desc_en": "×Mult = 1 + 0.5 per consecutive same-colour hit.",
+  "flavor_fr": "Il dirige la roue d'une baguette en os.",
+  "flavor_en": "He conducts the wheel with a bone baton.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": {
+       "var": "color_streak",
+       "mul": 0.5,
+       "add": 1
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_bank_vault",
+  "rarity": "legendary",
+  "tags": [
+   "economy",
+   "interest"
+  ],
+  "icon": "g_bank_vault",
+  "sfx": "vault",
+  "name_fr": "Salle des coffres",
+  "name_en": "Bank Vault",
+  "desc_fr": "Plafond des intérêts +10 $ et +1 $ à chaque tour.",
+  "desc_en": "Interest cap +$10 and +$1 every spin.",
+  "flavor_fr": "La combinaison est gravée sur votre pierre tombale.",
+  "flavor_en": "The combination is carved on your tombstone.",
+  "effects": [
+   {
+    "trigger": "on_acquire",
+    "do": [
+     {
+      "op": "interest_cap",
+      "v": 10
+     }
+    ]
+   },
+   {
+    "trigger": "on_remove",
+    "do": [
+     {
+      "op": "interest_cap",
+      "v": -10
+     }
+    ]
+   },
+   {
+    "trigger": "on_round_end",
+    "do": [
+     {
+      "op": "add_money",
+      "v": 1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_phoenix",
+  "rarity": "legendary",
+  "tags": [
+   "zero",
+   "growth",
+   "xmult"
+  ],
+  "icon": "g_phoenix",
+  "sfx": "fire",
+  "name_fr": "Phénix",
+  "name_en": "Phoenix",
+  "desc_fr": "Gagne ×1 Mult (permanent) à chaque Zéro ; ×Mult = 1 + nombre de Zéros vécus avec lui.",
+  "desc_en": "Gains ×1 Mult (permanent) on each Zero; ×Mult = 1 + Zeros seen with it.",
+  "flavor_fr": "Il renaît de vos cendres. Pas des siennes.",
+  "flavor_en": "It rises from your ashes. Not its own.",
+  "effects": [
+   {
+    "trigger": "on_zero",
+    "do": [
+     {
+      "op": "counter_add",
+      "v": 1
+     }
+    ]
+   },
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": {
+       "var": "counter",
+       "add": 1
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_grandmaster",
+  "rarity": "legendary",
+  "tags": [
+   "xmult"
+  ],
+  "icon": "g_grandmaster",
+  "sfx": "choir",
+  "name_fr": "Grand Maître",
+  "name_en": "Grandmaster",
+  "desc_fr": "×Mult = 1 + 0,5 par grigri légendaire possédé (lui compris).",
+  "desc_en": "×Mult = 1 + 0.5 per legendary charm owned (itself included).",
+  "flavor_fr": "Il a gagné ici en 1929. Il n'en est jamais remonté.",
+  "flavor_en": "He won here in 1929. He never came back up.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": {
+       "var": "legendary_count",
+       "mul": 0.5,
+       "add": 1
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_loan_shark",
+  "rarity": "cursed",
+  "tags": [
+   "debt",
+   "economy",
+   "mult",
+   "curse"
+  ],
+  "icon": "g_loan_shark",
+  "sfx": "pact",
+  "name_fr": "Prêt sur gage",
+  "name_en": "Loan Shark",
+  "desc_fr": "+15 $ à l'acquisition, +5 Mult. Chaque échéance commence avec +5 % de dette.",
+  "desc_en": "+$15 on acquire, +5 Mult. Every deadline starts with +5% debt.",
+  "flavor_fr": "Taux d'intérêt : oui.",
+  "flavor_en": "Interest rate: yes.",
+  "effects": [
+   {
+    "trigger": "on_acquire",
+    "do": [
+     {
+      "op": "add_money",
+      "v": 15
+     }
+    ]
+   },
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 5
+     }
+    ]
+   },
+   {
+    "trigger": "on_deadline_start",
+    "do": [
+     {
+      "op": "debt_add_pct",
+      "v": 0.05
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_black_hole",
+  "rarity": "cursed",
+  "tags": [
+   "xmult",
+   "destroy",
+   "curse"
+  ],
+  "icon": "g_black_hole",
+  "sfx": "void",
+  "name_fr": "Trou noir",
+  "name_en": "Black Hole",
+  "desc_fr": "×3 Mult. 1 chance sur 20 que la case touchée soit aspirée (détruite).",
+  "desc_en": "×3 Mult. 1 in 20 chance the hit pocket is swallowed (destroyed).",
+  "flavor_fr": "Il a avalé une roue entière en 1954.",
+  "flavor_en": "It swallowed a whole wheel in 1954.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 3
+     }
+    ]
+   },
+   {
+    "trigger": "on_round_end",
+    "if": [
+     {
+      "c": "chance",
+      "v": 0.05
+     }
+    ],
+    "do": [
+     {
+      "op": "destroy_pocket",
+      "label": "pocket_destroyed"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_glass_jaw",
+  "rarity": "cursed",
+  "tags": [
+   "xmult",
+   "destroy",
+   "curse"
+  ],
+  "icon": "g_glass_jaw",
+  "sfx": "shatter",
+  "name_fr": "Mâchoire de verre",
+  "name_en": "Glass Jaw",
+  "desc_fr": "×4 Mult. Si aucun pari ne gagne, 1 chance sur 10 de se briser.",
+  "desc_en": "×4 Mult. If no bet wins, 1 in 10 chance to shatter.",
+  "flavor_fr": "Un coup de malchance et tout part en éclats.",
+  "flavor_en": "One bad break and it all shatters.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 4
+     }
+    ]
+   },
+   {
+    "trigger": "on_round_end",
+    "if": [
+     {
+      "c": "won_nothing"
+     },
+     {
+      "c": "chance",
+      "v": 0.1
+     }
+    ],
+    "do": [
+     {
+      "op": "self_destroy",
+      "label": "shatter"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_leech",
+  "rarity": "cursed",
+  "tags": [
+   "xmult",
+   "economy",
+   "curse"
+  ],
+  "icon": "g_leech",
+  "sfx": "sticky",
+  "name_fr": "Sangsue",
+  "name_en": "Leech",
+  "desc_fr": "×2,5 Mult. Coûte 1 $ à chaque tour.",
+  "desc_en": "×2.5 Mult. Costs $1 every spin.",
+  "flavor_fr": "Elle boit lentement. Elle a tout son temps.",
+  "flavor_en": "It drinks slowly. It has all the time.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 2.5
+     }
+    ]
+   },
+   {
+    "trigger": "on_round_end",
+    "do": [
+     {
+      "op": "add_money",
+      "v": -1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_cursed_idol",
+  "rarity": "cursed",
+  "tags": [
+   "mult",
+   "precision",
+   "curse"
+  ],
+  "icon": "g_cursed_idol",
+  "sfx": "curse",
+  "name_fr": "Idole maudite",
+  "name_en": "Cursed Idol",
+  "desc_fr": "+20 Mult. −1 Précision.",
+  "desc_en": "+20 Mult. −1 Precision.",
+  "flavor_fr": "Ses yeux suivent la bille. Et vous.",
+  "flavor_en": "Its eyes follow the ball. And you.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 20
+     }
+    ]
+   },
+   {
+    "trigger": "on_acquire",
+    "do": [
+     {
+      "op": "perm_precision",
+      "v": -1
+     }
+    ]
+   },
+   {
+    "trigger": "on_remove",
+    "do": [
+     {
+      "op": "perm_precision",
+      "v": 1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_dead_mans_hand",
+  "rarity": "cursed",
+  "tags": [
+   "xmult",
+   "budget",
+   "curse"
+  ],
+  "icon": "g_dead_mans_hand",
+  "sfx": "curse",
+  "name_fr": "Main du mort",
+  "name_en": "Dead Man's Hand",
+  "desc_fr": "×3 Mult. −2 budget de mises.",
+  "desc_en": "×3 Mult. −2 bet budget.",
+  "flavor_fr": "Il tenait encore ses jetons quand on l'a trouvé.",
+  "flavor_en": "He still held his chips when they found him.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 3
+     }
+    ]
+   },
+   {
+    "trigger": "on_acquire",
+    "do": [
+     {
+      "op": "perm_budget",
+      "v": -2
+     }
+    ]
+   },
+   {
+    "trigger": "on_remove",
+    "do": [
+     {
+      "op": "perm_budget",
+      "v": 2
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_hex_bag",
+  "rarity": "cursed",
+  "tags": [
+   "xmult",
+   "pockets",
+   "curse"
+  ],
+  "icon": "g_hex_bag",
+  "sfx": "fire",
+  "name_fr": "Sac à sorts",
+  "name_en": "Hex Bag",
+  "desc_fr": "×2,5 Mult. 1 chance sur 10 à chaque tour de brûler une case au hasard.",
+  "desc_en": "×2.5 Mult. 1 in 10 each spin to burn a random pocket.",
+  "flavor_fr": "Il sent le soufre et la menthe.",
+  "flavor_en": "It smells of sulphur and mint.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 2.5
+     }
+    ]
+   },
+   {
+    "trigger": "on_round_end",
+    "if": [
+     {
+      "c": "chance",
+      "v": 0.1
+     }
+    ],
+    "do": [
+     {
+      "op": "burn_random_pocket",
+      "type": "burnt"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_blood_pact",
+  "rarity": "cursed",
+  "tags": [
+   "xmult",
+   "debt",
+   "curse"
+  ],
+  "icon": "g_blood_pact",
+  "sfx": "pact",
+  "name_fr": "Pacte de sang",
+  "name_en": "Blood Pact",
+  "desc_fr": "×3,5 Mult. Les Créanciers commencent avec +50 % de dette.",
+  "desc_en": "×3.5 Mult. Creditors start with +50% debt.",
+  "flavor_fr": "Signé en rouge. L'encre n'était pas de l'encre.",
+  "flavor_en": "Signed in red. The ink wasn't ink.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 3.5
+     }
+    ]
+   },
+   {
+    "trigger": "on_deadline_start",
+    "if": [
+     {
+      "c": "is_creditor"
+     }
+    ],
+    "do": [
+     {
+      "op": "debt_add_pct",
+      "v": 0.5
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_imp",
+  "rarity": "cursed",
+  "tags": [
+   "xmult",
+   "economy",
+   "curse"
+  ],
+  "icon": "g_imp",
+  "sfx": "coin",
+  "name_fr": "Diablotin avide",
+  "name_en": "Greedy Imp",
+  "desc_fr": "×Mult = 1 + 0,15 par $ possédé. Perd 3 $ à chaque tour.",
+  "desc_en": "×Mult = 1 + 0.15 per $ owned. Loses $3 every spin.",
+  "flavor_fr": "Il mange l'argent qu'il vous fait gagner.",
+  "flavor_en": "It eats the money it makes you win.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": {
+       "var": "money",
+       "mul": 0.15,
+       "add": 1
+      }
+     }
+    ]
+   },
+   {
+    "trigger": "on_round_end",
+    "do": [
+     {
+      "op": "add_money",
+      "v": -3
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_broken_clock",
+  "rarity": "cursed",
+  "tags": [
+   "xmult",
+   "spins",
+   "curse"
+  ],
+  "icon": "g_broken_clock",
+  "sfx": "tick",
+  "name_fr": "Horloge cassée",
+  "name_en": "Broken Clock",
+  "desc_fr": "×3 Mult. Chaque échéance a 1 tour de moins.",
+  "desc_en": "×3 Mult. Each deadline has 1 fewer spin.",
+  "flavor_fr": "Elle a raison deux fois par jour. Ici, il n'y a pas de jour.",
+  "flavor_en": "Right twice a day. There are no days down here.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 3
+     }
+    ]
+   },
+   {
+    "trigger": "on_deadline_start",
+    "do": [
+     {
+      "op": "add_spins",
+      "v": -1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_eclipse",
+  "rarity": "cursed",
+  "tags": [
+   "xmult",
+   "color",
+   "curse"
+  ],
+  "icon": "g_eclipse",
+  "sfx": "void",
+  "name_fr": "Éclipse",
+  "name_en": "Eclipse",
+  "desc_fr": "×5 Mult sur le noir, ×0,5 Mult sur le rouge.",
+  "desc_en": "×5 Mult on black, ×0.5 Mult on red.",
+  "flavor_fr": "Le rouge s'éteint. Le noir dévore.",
+  "flavor_en": "Red goes dark. Black devours.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "color",
+      "v": "black"
+     }
+    ],
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 5
+     }
+    ]
+   },
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "color",
+      "v": "red"
+     }
+    ],
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 0.5
+     }
+    ]
+   }
+  ]
+ }
+]

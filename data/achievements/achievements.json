@@ -1,0 +1,1070 @@
+[
+ {
+  "id": "ach_first_spin",
+  "on": "spin",
+  "cond": [
+   {
+    "k": "spin_score",
+    "op": ">=",
+    "v": 0
+   }
+  ],
+  "name_fr": "Faites vos jeux",
+  "name_en": "Place Your Bets",
+  "desc_fr": "Jouer un premier tour.",
+  "desc_en": "Play your first spin.",
+  "icon": "star"
+ },
+ {
+  "id": "ach_first_deadline",
+  "on": "deadline_won",
+  "cond": [
+   {
+    "k": "tier",
+    "op": ">=",
+    "v": 1
+   }
+  ],
+  "name_fr": "Premier versement",
+  "name_en": "First Instalment",
+  "desc_fr": "Rembourser une échéance.",
+  "desc_en": "Repay a deadline.",
+  "icon": "star"
+ },
+ {
+  "id": "ach_act1",
+  "on": "deadline_won",
+  "cond": [
+   {
+    "k": "tier",
+    "op": "==",
+    "v": 3
+   },
+   {
+    "k": "deadline",
+    "op": "==",
+    "v": 2
+   }
+  ],
+  "name_fr": "Le Rez-de-chaussée",
+  "name_en": "The Ground Floor",
+  "desc_fr": "Terminer l'Acte I.",
+  "desc_en": "Finish Act I.",
+  "icon": "star"
+ },
+ {
+  "id": "ach_act2",
+  "on": "deadline_won",
+  "cond": [
+   {
+    "k": "tier",
+    "op": "==",
+    "v": 6
+   },
+   {
+    "k": "deadline",
+    "op": "==",
+    "v": 2
+   }
+  ],
+  "name_fr": "Les Salons",
+  "name_en": "The Lounges",
+  "desc_fr": "Terminer l'Acte II.",
+  "desc_en": "Finish Act II.",
+  "icon": "star"
+ },
+ {
+  "id": "ach_ghost_story",
+  "on": "deadline_won",
+  "cond": [
+   {
+    "k": "tier",
+    "op": ">=",
+    "v": 7
+   }
+  ],
+  "name_fr": "Une histoire de fantôme",
+  "name_en": "A Ghost Story",
+  "desc_fr": "Atteindre la Cave du Zéro. Débloque Le Fantôme.",
+  "desc_en": "Reach the Zero Cellar. Unlocks The Ghost.",
+  "icon": "star",
+  "reward": {
+   "unlock_character": "ghost"
+  }
+ },
+ {
+  "id": "ach_victory",
+  "on": "run_end",
+  "cond": [
+   {
+    "k": "victory",
+    "op": "==",
+    "v": 1
+   }
+  ],
+  "name_fr": "La Maison perd",
+  "name_en": "The House Loses",
+  "desc_fr": "Gagner un run.",
+  "desc_en": "Win a run.",
+  "icon": "crown"
+ },
+ {
+  "id": "ach_win_lea",
+  "on": "run_end",
+  "cond": [
+   {
+    "k": "victory",
+    "op": "==",
+    "v": 1
+   },
+   {
+    "k": "character",
+    "op": "eq",
+    "v": "lea"
+   }
+  ],
+  "name_fr": "Victoire : Léa",
+  "name_en": "Victory: Léa",
+  "desc_fr": "Gagner avec Léa.",
+  "desc_en": "Win as Léa.",
+  "icon": "crown"
+ },
+ {
+  "id": "ach_win_vic",
+  "on": "run_end",
+  "cond": [
+   {
+    "k": "victory",
+    "op": "==",
+    "v": 1
+   },
+   {
+    "k": "character",
+    "op": "eq",
+    "v": "vic"
+   }
+  ],
+  "name_fr": "Victoire : Vic",
+  "name_en": "Victory: Vic",
+  "desc_fr": "Gagner avec Vic.",
+  "desc_en": "Win as Vic.",
+  "icon": "crown"
+ },
+ {
+  "id": "ach_win_odile",
+  "on": "run_end",
+  "cond": [
+   {
+    "k": "victory",
+    "op": "==",
+    "v": 1
+   },
+   {
+    "k": "character",
+    "op": "eq",
+    "v": "odile"
+   }
+  ],
+  "name_fr": "Victoire : Odile",
+  "name_en": "Victory: Odile",
+  "desc_fr": "Gagner avec Odile.",
+  "desc_en": "Win as Odile.",
+  "icon": "crown"
+ },
+ {
+  "id": "ach_win_barnabe",
+  "on": "run_end",
+  "cond": [
+   {
+    "k": "victory",
+    "op": "==",
+    "v": 1
+   },
+   {
+    "k": "character",
+    "op": "eq",
+    "v": "barnabe"
+   }
+  ],
+  "name_fr": "Victoire : Barnabé",
+  "name_en": "Victory: Barnabé",
+  "desc_fr": "Gagner avec Barnabé.",
+  "desc_en": "Win as Barnabé.",
+  "icon": "crown"
+ },
+ {
+  "id": "ach_win_marthe",
+  "on": "run_end",
+  "cond": [
+   {
+    "k": "victory",
+    "op": "==",
+    "v": 1
+   },
+   {
+    "k": "character",
+    "op": "eq",
+    "v": "marthe"
+   }
+  ],
+  "name_fr": "Victoire : Sœur Marthe",
+  "name_en": "Victory: Sister Marthe",
+  "desc_fr": "Gagner avec Sœur Marthe.",
+  "desc_en": "Win as Sister Marthe.",
+  "icon": "crown"
+ },
+ {
+  "id": "ach_win_ghost",
+  "on": "run_end",
+  "cond": [
+   {
+    "k": "victory",
+    "op": "==",
+    "v": 1
+   },
+   {
+    "k": "character",
+    "op": "eq",
+    "v": "ghost"
+   }
+  ],
+  "name_fr": "Victoire : Le Fantôme",
+  "name_en": "Victory: The Ghost",
+  "desc_fr": "Gagner avec Le Fantôme.",
+  "desc_en": "Win as The Ghost.",
+  "icon": "crown"
+ },
+ {
+  "id": "ach_risk_2",
+  "on": "run_end",
+  "cond": [
+   {
+    "k": "victory",
+    "op": "==",
+    "v": 1
+   },
+   {
+    "k": "risk",
+    "op": ">=",
+    "v": 2
+   }
+  ],
+  "name_fr": "Risque 2",
+  "name_en": "Risk 2",
+  "desc_fr": "Gagner au Risque 2 ou plus.",
+  "desc_en": "Win at Risk 2 or higher.",
+  "icon": "skull"
+ },
+ {
+  "id": "ach_risk_4",
+  "on": "run_end",
+  "cond": [
+   {
+    "k": "victory",
+    "op": "==",
+    "v": 1
+   },
+   {
+    "k": "risk",
+    "op": ">=",
+    "v": 4
+   }
+  ],
+  "name_fr": "Risque 4",
+  "name_en": "Risk 4",
+  "desc_fr": "Gagner au Risque 4 ou plus.",
+  "desc_en": "Win at Risk 4 or higher.",
+  "icon": "skull"
+ },
+ {
+  "id": "ach_risk_6",
+  "on": "run_end",
+  "cond": [
+   {
+    "k": "victory",
+    "op": "==",
+    "v": 1
+   },
+   {
+    "k": "risk",
+    "op": ">=",
+    "v": 6
+   }
+  ],
+  "name_fr": "Risque 6",
+  "name_en": "Risk 6",
+  "desc_fr": "Gagner au Risque 6 ou plus.",
+  "desc_en": "Win at Risk 6 or higher.",
+  "icon": "skull"
+ },
+ {
+  "id": "ach_risk_8",
+  "on": "run_end",
+  "cond": [
+   {
+    "k": "victory",
+    "op": "==",
+    "v": 1
+   },
+   {
+    "k": "risk",
+    "op": ">=",
+    "v": 8
+   }
+  ],
+  "name_fr": "Risque 8",
+  "name_en": "Risk 8",
+  "desc_fr": "Gagner au Risque 8 ou plus.",
+  "desc_en": "Win at Risk 8 or higher.",
+  "icon": "skull"
+ },
+ {
+  "id": "ach_endless_10",
+  "on": "run_end",
+  "cond": [
+   {
+    "k": "endless_tier",
+    "op": ">=",
+    "v": 10
+   }
+  ],
+  "name_fr": "Sans fin",
+  "name_en": "Endless",
+  "desc_fr": "Atteindre le palier 10 en mode Infini.",
+  "desc_en": "Reach tier 10 in Endless.",
+  "icon": "snake_ring"
+ },
+ {
+  "id": "ach_score_1000",
+  "on": "spin",
+  "cond": [
+   {
+    "k": "spin_score",
+    "op": ">=",
+    "v": 1000
+   }
+  ],
+  "name_fr": "Mille",
+  "name_en": "A Thousand",
+  "desc_fr": "Marquer 1 000 en un tour.",
+  "desc_en": "Score 1,000 in one spin.",
+  "icon": "coin"
+ },
+ {
+  "id": "ach_score_10000",
+  "on": "spin",
+  "cond": [
+   {
+    "k": "spin_score",
+    "op": ">=",
+    "v": 10000
+   }
+  ],
+  "name_fr": "Dix mille",
+  "name_en": "Ten Thousand",
+  "desc_fr": "Marquer 10 000 en un tour.",
+  "desc_en": "Score 10,000 in one spin.",
+  "icon": "coin"
+ },
+ {
+  "id": "ach_score_100000",
+  "on": "spin",
+  "cond": [
+   {
+    "k": "spin_score",
+    "op": ">=",
+    "v": 100000
+   }
+  ],
+  "name_fr": "Cent mille",
+  "name_en": "A Hundred Grand",
+  "desc_fr": "Marquer 100 000 en un tour.",
+  "desc_en": "Score 100,000 in one spin.",
+  "icon": "coin"
+ },
+ {
+  "id": "ach_score_1000000",
+  "on": "spin",
+  "cond": [
+   {
+    "k": "spin_score",
+    "op": ">=",
+    "v": 1000000
+   }
+  ],
+  "name_fr": "Le million",
+  "name_en": "The Million",
+  "desc_fr": "Marquer 1 000 000 en un tour.",
+  "desc_en": "Score 1,000,000 in one spin.",
+  "icon": "coin"
+ },
+ {
+  "id": "ach_mult_10",
+  "on": "spin",
+  "cond": [
+   {
+    "k": "spin_mult",
+    "op": ">=",
+    "v": 10
+   }
+  ],
+  "name_fr": "Mult ×10",
+  "name_en": "Mult ×10",
+  "desc_fr": "Atteindre 10 de Mult en un tour.",
+  "desc_en": "Reach 10 Mult in one spin.",
+  "icon": "times"
+ },
+ {
+  "id": "ach_mult_50",
+  "on": "spin",
+  "cond": [
+   {
+    "k": "spin_mult",
+    "op": ">=",
+    "v": 50
+   }
+  ],
+  "name_fr": "Mult ×50",
+  "name_en": "Mult ×50",
+  "desc_fr": "Atteindre 50 de Mult en un tour.",
+  "desc_en": "Reach 50 Mult in one spin.",
+  "icon": "times"
+ },
+ {
+  "id": "ach_straight",
+  "on": "spin",
+  "cond": [
+   {
+    "k": "straight_won",
+    "op": "==",
+    "v": 1
+   }
+  ],
+  "name_fr": "En plein",
+  "name_en": "Bang On",
+  "desc_fr": "Gagner un pari plein.",
+  "desc_en": "Win a straight bet.",
+  "icon": "razor"
+ },
+ {
+  "id": "ach_five_wins",
+  "on": "spin",
+  "cond": [
+   {
+    "k": "bets_won",
+    "op": ">=",
+    "v": 5
+   }
+  ],
+  "name_fr": "Arrosage",
+  "name_en": "Spray and Pray",
+  "desc_fr": "Gagner 5 paris en un seul tour.",
+  "desc_en": "Win 5 bets in one spin.",
+  "icon": "bars"
+ },
+ {
+  "id": "ach_zero_friend",
+  "on": "spin",
+  "cond": [
+   {
+    "k": "is_zero",
+    "op": "==",
+    "v": 1
+   },
+   {
+    "k": "spin_score",
+    "op": ">=",
+    "v": 100
+   }
+  ],
+  "name_fr": "Ami du Zéro",
+  "name_en": "Friend of Zero",
+  "desc_fr": "Marquer 100 points sur un Zéro.",
+  "desc_en": "Score 100 on a Zero.",
+  "icon": "zero"
+ },
+ {
+  "id": "ach_golden_hit",
+  "on": "spin",
+  "cond": [
+   {
+    "k": "landing_type",
+    "op": "eq",
+    "v": "golden"
+   }
+  ],
+  "name_fr": "Tout ce qui brille",
+  "name_en": "All That Glitters",
+  "desc_fr": "Tomber sur une case Dorée.",
+  "desc_en": "Land on a Golden pocket.",
+  "icon": "coin"
+ },
+ {
+  "id": "ach_lightning_hit",
+  "on": "spin",
+  "cond": [
+   {
+    "k": "landing_type",
+    "op": "eq",
+    "v": "lightning"
+   }
+  ],
+  "name_fr": "Coup de foudre",
+  "name_en": "Thunderstruck",
+  "desc_fr": "Tomber sur une case Éclair.",
+  "desc_en": "Land on a Lightning pocket.",
+  "icon": "bolt"
+ },
+ {
+  "id": "ach_near_miss",
+  "on": "spin",
+  "cond": [
+   {
+    "k": "near_miss",
+    "op": "==",
+    "v": 1
+   }
+  ],
+  "name_fr": "Si près",
+  "name_en": "So Close",
+  "desc_fr": "Voir la bille frôler un de tes numéros.",
+  "desc_en": "Watch the ball graze one of your numbers.",
+  "icon": "arrow_near"
+ },
+ {
+  "id": "ach_streak_5",
+  "on": "spin",
+  "cond": [
+   {
+    "k": "color_streak",
+    "op": ">=",
+    "v": 5
+   }
+  ],
+  "name_fr": "Monochrome",
+  "name_en": "Monochrome",
+  "desc_fr": "Voir la même couleur sortir 5 fois de suite.",
+  "desc_en": "See the same colour 5 times in a row.",
+  "icon": "flames"
+ },
+ {
+  "id": "ach_big_wheel",
+  "on": "spin",
+  "cond": [
+   {
+    "k": "wheel_size",
+    "op": ">=",
+    "v": 45
+   }
+  ],
+  "name_fr": "Grande roue",
+  "name_en": "Big Wheel",
+  "desc_fr": "Avoir une roue de 45 cases ou plus.",
+  "desc_en": "Have a wheel of 45+ pockets.",
+  "icon": "wheel"
+ },
+ {
+  "id": "ach_all_in",
+  "on": "spin",
+  "cond": [
+   {
+    "k": "bets_placed",
+    "op": "==",
+    "v": 1
+   },
+   {
+    "k": "chips_staked",
+    "op": ">=",
+    "v": 10
+   },
+   {
+    "k": "bets_won",
+    "op": "==",
+    "v": 1
+   }
+  ],
+  "name_fr": "Tout sur un seul",
+  "name_en": "All on One",
+  "desc_fr": "Gagner avec tout le budget sur un seul emplacement.",
+  "desc_en": "Win with your whole budget on one spot.",
+  "icon": "ribbon"
+ },
+ {
+  "id": "ach_money_50",
+  "on": "deadline_won",
+  "cond": [
+   {
+    "k": "money",
+    "op": ">=",
+    "v": 50
+   }
+  ],
+  "name_fr": "Bas de laine",
+  "name_en": "Nest Egg",
+  "desc_fr": "Avoir 50 $ à la fin d'une échéance.",
+  "desc_en": "Have $50 after a deadline.",
+  "icon": "bag"
+ },
+ {
+  "id": "ach_money_100",
+  "on": "deadline_won",
+  "cond": [
+   {
+    "k": "money",
+    "op": ">=",
+    "v": 100
+   }
+  ],
+  "name_fr": "Rentier",
+  "name_en": "Rentier",
+  "desc_fr": "Avoir 100 $ à la fin d'une échéance.",
+  "desc_en": "Have $100 after a deadline.",
+  "icon": "bag"
+ },
+ {
+  "id": "ach_broke",
+  "on": "deadline_won",
+  "cond": [
+   {
+    "k": "money",
+    "op": "==",
+    "v": 0
+   }
+  ],
+  "name_fr": "Fauché mais digne",
+  "name_en": "Broke but Proud",
+  "desc_fr": "Rembourser une échéance avec 0 $ en poche.",
+  "desc_en": "Repay a deadline with $0 in pocket.",
+  "icon": "pocket"
+ },
+ {
+  "id": "ach_buy_legendary",
+  "on": "shop",
+  "cond": [
+   {
+    "k": "action",
+    "op": "eq",
+    "v": "buy"
+   },
+   {
+    "k": "rarity",
+    "op": "eq",
+    "v": "legendary"
+   }
+  ],
+  "name_fr": "Objet de légende",
+  "name_en": "Legendary Find",
+  "desc_fr": "Acheter un grigri légendaire.",
+  "desc_en": "Buy a legendary charm.",
+  "icon": "crown"
+ },
+ {
+  "id": "ach_reroll_5",
+  "on": "shop",
+  "cond": [
+   {
+    "k": "action",
+    "op": "eq",
+    "v": "reroll"
+   },
+   {
+    "k": "rerolls_here",
+    "op": ">=",
+    "v": 5
+   }
+  ],
+  "name_fr": "Encore une fois",
+  "name_en": "One More Time",
+  "desc_fr": "Relancer l'étal 5 fois dans la même boutique.",
+  "desc_en": "Reroll 5 times in one shop.",
+  "icon": "die"
+ },
+ {
+  "id": "ach_full_slots",
+  "on": "run_end",
+  "cond": [
+   {
+    "k": "grigri_count",
+    "op": ">=",
+    "v": 8
+   }
+  ],
+  "name_fr": "Poches pleines",
+  "name_en": "Full Pockets",
+  "desc_fr": "Finir un run avec 8 grigris.",
+  "desc_en": "End a run with 8 charms.",
+  "icon": "pocket"
+ },
+ {
+  "id": "ach_three_cursed",
+  "on": "run_end",
+  "cond": [
+   {
+    "k": "cursed_count",
+    "op": ">=",
+    "v": 3
+   }
+  ],
+  "name_fr": "Collectionneur maudit",
+  "name_en": "Cursed Collector",
+  "desc_fr": "Finir un run avec 3 grigris maudits.",
+  "desc_en": "End a run with 3 cursed charms.",
+  "icon": "skull"
+ },
+ {
+  "id": "ach_two_legendary",
+  "on": "run_end",
+  "cond": [
+   {
+    "k": "legendary_count",
+    "op": ">=",
+    "v": 2
+   }
+  ],
+  "name_fr": "Panthéon",
+  "name_en": "Pantheon",
+  "desc_fr": "Finir un run avec 2 grigris légendaires.",
+  "desc_en": "End a run with 2 legendary charms.",
+  "icon": "crown"
+ },
+ {
+  "id": "ach_fortunes_10",
+  "on": "run_end",
+  "cond": [
+   {
+    "k": "fortunes_used",
+    "op": ">=",
+    "v": 10
+   }
+  ],
+  "name_fr": "Diseuse de bonne aventure",
+  "name_en": "Fortune Teller",
+  "desc_fr": "Utiliser 10 cartes Fortune en un run.",
+  "desc_en": "Use 10 Fortune cards in a run.",
+  "icon": "card"
+ },
+ {
+  "id": "ach_beat_muet",
+  "on": "deadline_won",
+  "cond": [
+   {
+    "k": "creditor",
+    "op": "eq",
+    "v": "cr_muet"
+   }
+  ],
+  "name_fr": "Le silence est d'or",
+  "name_en": "Silence Is Golden",
+  "desc_fr": "Vaincre Le Croupier Muet.",
+  "desc_en": "Beat The Mute Dealer.",
+  "icon": "seal"
+ },
+ {
+  "id": "ach_beat_rouge_noir",
+  "on": "deadline_won",
+  "cond": [
+   {
+    "k": "creditor",
+    "op": "eq",
+    "v": "cr_rouge_noir"
+   }
+  ],
+  "name_fr": "Ni rouge ni noir",
+  "name_en": "Neither Red nor Black",
+  "desc_fr": "Vaincre Madame Rouge-et-Noire.",
+  "desc_en": "Beat Madame Red-and-Black.",
+  "icon": "seal"
+ },
+ {
+  "id": "ach_beat_baron_carre",
+  "on": "deadline_won",
+  "cond": [
+   {
+    "k": "creditor",
+    "op": "eq",
+    "v": "cr_baron_carre"
+   }
+  ],
+  "name_fr": "Quadrature",
+  "name_en": "Squaring the Circle",
+  "desc_fr": "Vaincre Baron Carré.",
+  "desc_en": "Beat Baron Square.",
+  "icon": "seal"
+ },
+ {
+  "id": "ach_beat_usurier",
+  "on": "deadline_won",
+  "cond": [
+   {
+    "k": "creditor",
+    "op": "eq",
+    "v": "cr_usurier"
+   }
+  ],
+  "name_fr": "Intérêt nul",
+  "name_en": "Zero Interest",
+  "desc_fr": "Vaincre L'Usurier.",
+  "desc_en": "Beat The Usurer.",
+  "icon": "seal"
+ },
+ {
+  "id": "ach_beat_pyromane",
+  "on": "deadline_won",
+  "cond": [
+   {
+    "k": "creditor",
+    "op": "eq",
+    "v": "cr_pyromane"
+   }
+  ],
+  "name_fr": "Pompier",
+  "name_en": "Firefighter",
+  "desc_fr": "Vaincre Le Pyromane.",
+  "desc_en": "Beat The Arsonist.",
+  "icon": "seal"
+ },
+ {
+  "id": "ach_beat_patron",
+  "on": "deadline_won",
+  "cond": [
+   {
+    "k": "creditor",
+    "op": "eq",
+    "v": "cr_patron"
+   }
+  ],
+  "name_fr": "Le Patron tombe",
+  "name_en": "The Boss Falls",
+  "desc_fr": "Vaincre Le Patron.",
+  "desc_en": "Beat The Boss.",
+  "icon": "seal"
+ },
+ {
+  "id": "ach_first_challenge",
+  "on": "run_end",
+  "cond": [
+   {
+    "k": "challenge",
+    "op": "ne",
+    "v": ""
+   },
+   {
+    "k": "victory",
+    "op": "==",
+    "v": 1
+   }
+  ],
+  "name_fr": "Défi relevé",
+  "name_en": "Challenge Accepted",
+  "desc_fr": "Réussir un défi.",
+  "desc_en": "Complete a challenge.",
+  "icon": "scroll"
+ },
+ {
+  "id": "ach_challenges_5",
+  "on": "profile",
+  "cond": [
+   {
+    "k": "challenges_done",
+    "op": ">=",
+    "v": 5
+   }
+  ],
+  "name_fr": "Bête de défi",
+  "name_en": "Challenge Beast",
+  "desc_fr": "Réussir 5 défis.",
+  "desc_en": "Complete 5 challenges.",
+  "icon": "scroll"
+ },
+ {
+  "id": "ach_challenges_20",
+  "on": "profile",
+  "cond": [
+   {
+    "k": "challenges_done",
+    "op": ">=",
+    "v": 20
+   }
+  ],
+  "name_fr": "Tous les défis",
+  "name_en": "Every Challenge",
+  "desc_fr": "Réussir les 20 défis.",
+  "desc_en": "Complete all 20 challenges.",
+  "icon": "crown"
+ },
+ {
+  "id": "ach_daily",
+  "on": "run_end",
+  "cond": [
+   {
+    "k": "daily",
+    "op": "==",
+    "v": 1
+   }
+  ],
+  "name_fr": "Rituel quotidien",
+  "name_en": "Daily Ritual",
+  "desc_fr": "Terminer un run de la graine du jour.",
+  "desc_en": "Finish a daily seed run.",
+  "icon": "clock"
+ },
+ {
+  "id": "ach_runs_10",
+  "on": "profile",
+  "cond": [
+   {
+    "k": "runs",
+    "op": ">=",
+    "v": 10
+   }
+  ],
+  "name_fr": "Habitué",
+  "name_en": "Regular",
+  "desc_fr": "Commencer 10 runs.",
+  "desc_en": "Start 10 runs.",
+  "icon": "hat"
+ },
+ {
+  "id": "ach_spins_1000",
+  "on": "profile",
+  "cond": [
+   {
+    "k": "spins",
+    "op": ">=",
+    "v": 1000
+   }
+  ],
+  "name_fr": "Mille tours",
+  "name_en": "A Thousand Spins",
+  "desc_fr": "Jouer 1 000 tours au total.",
+  "desc_en": "Play 1,000 spins in total.",
+  "icon": "wheel"
+ },
+ {
+  "id": "ach_zeros_100",
+  "on": "profile",
+  "cond": [
+   {
+    "k": "zeros",
+    "op": ">=",
+    "v": 100
+   }
+  ],
+  "name_fr": "Zéro pointé",
+  "name_en": "Total Zero",
+  "desc_fr": "Voir le Zéro sortir 100 fois au total.",
+  "desc_en": "See Zero hit 100 times in total.",
+  "icon": "zero"
+ },
+ {
+  "id": "ach_collector",
+  "on": "profile",
+  "cond": [
+   {
+    "k": "seen_grigris",
+    "op": ">=",
+    "v": 75
+   }
+  ],
+  "name_fr": "Collectionneur",
+  "name_en": "Collector",
+  "desc_fr": "Avoir vu 75 grigris différents.",
+  "desc_en": "Have seen 75 different charms.",
+  "icon": "eye"
+ },
+ {
+  "id": "ach_one_spin",
+  "on": "deadline_won",
+  "cond": [
+   {
+    "k": "spins_used",
+    "op": "==",
+    "v": 1
+   }
+  ],
+  "name_fr": "Rapide comme l'éclair",
+  "name_en": "Lightning Fast",
+  "desc_fr": "Rembourser une échéance en un seul tour.",
+  "desc_en": "Repay a deadline in one spin.",
+  "icon": "bolt"
+ },
+ {
+  "id": "ach_overkill",
+  "on": "deadline_won",
+  "cond": [
+   {
+    "k": "score_ratio",
+    "op": ">=",
+    "v": 5
+   }
+  ],
+  "name_fr": "Excès de zèle",
+  "name_en": "Overkill",
+  "desc_fr": "Rembourser 5 fois la dette d'une échéance.",
+  "desc_en": "Repay 5× a deadline's debt.",
+  "icon": "times"
+ },
+ {
+  "id": "ach_pacts_3",
+  "on": "run_end",
+  "cond": [
+   {
+    "k": "pacts",
+    "op": ">=",
+    "v": 3
+   }
+  ],
+  "name_fr": "Pacte faustien",
+  "name_en": "Faustian Bargain",
+  "desc_fr": "Conclure 3 Pactes en un run.",
+  "desc_en": "Strike 3 Pacts in one run.",
+  "icon": "scroll"
+ },
+ {
+  "id": "ach_no_zero_win",
+  "on": "run_end",
+  "cond": [
+   {
+    "k": "victory",
+    "op": "==",
+    "v": 1
+   },
+   {
+    "k": "zeros",
+    "op": "==",
+    "v": 0
+   }
+  ],
+  "name_fr": "Jamais de Zéro",
+  "name_en": "Zero Zeros",
+  "desc_fr": "Gagner un run sans jamais voir le Zéro.",
+  "desc_en": "Win a run without ever seeing Zero.",
+  "icon": "shield"
+ },
+ {
+  "id": "ach_perfect_aim",
+  "on": "spin",
+  "cond": [
+   {
+    "k": "in_zone",
+    "op": "==",
+    "v": 1
+   },
+   {
+    "k": "straight_won",
+    "op": "==",
+    "v": 1
+   },
+   {
+    "k": "spin_score",
+    "op": ">=",
+    "v": 500
+   }
+  ],
+  "name_fr": "Œil de lynx",
+  "name_en": "Eagle Eye",
+  "desc_fr": "Gagner un plein dans la zone visée pour 500 points.",
+  "desc_en": "Win a straight in your aimed zone for 500 points.",
+  "icon": "eye"
+ }
+]

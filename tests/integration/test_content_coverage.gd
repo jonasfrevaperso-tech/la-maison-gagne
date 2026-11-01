@@ -73,6 +73,20 @@ func _play(c: RunController, spins: int, seed_value: int) -> Dictionary:
 		for e: ScoreEvent in out.ctx.events:
 			seen[e.source_id] = true
 		if i % 25 == 24:
+			# Passage en boutique simulé : reroll, achat/vente d'un grigri tiers, Fortune, contrat.
+			r.money += 30
+			ShopModel.enter(r, c.db)
+			ShopModel.reroll(r, c.db)
+			if r.empty_grigri_slots() > 0:
+				var helper: GrigriInstance = ShopModel.acquire_grigri(r, c.db, "g_lucky_penny", &"")
+				ShopModel.sell_grigri(r, c.db, helper.uid)
+			r.fortunes = ["f_focus"]
+			c.use_fortune(0)
+			for cid: String in c.db.ids("contracts"):
+				if not r.contracts.has(cid) and String(c.db.get_entry("contracts", cid).get("requires", "")) == "":
+					ShopModel.add_contract(r, c.db, cid)
+					break
+			r.phase = RunState.Phase.BETTING
 			# Fin d'échéance simulée : déclencheurs de fin et de début.
 			EffectRunner.fire(&"on_deadline_end", r, null, c.db)
 			EffectRunner.fire(&"on_deadline_start", r, null, c.db)

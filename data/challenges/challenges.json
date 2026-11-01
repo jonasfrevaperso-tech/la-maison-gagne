@@ -1,0 +1,410 @@
+[
+ {
+  "id": "ch_red_only",
+  "name_fr": "Rouge à lèvres",
+  "name_en": "Lipstick",
+  "desc_fr": "Seuls les paris Rouge sont autorisés. Toutes les cases rouges sont en Rubis.",
+  "desc_en": "Only Red bets are allowed. All red pockets are Ruby.",
+  "setup": {
+   "flags": {
+    "allowed_kinds_always": [
+     "red"
+    ]
+   },
+   "wheel": [
+    {
+     "op": "set_type",
+     "numbers": [
+      1,
+      3,
+      5,
+      7,
+      9,
+      12,
+      14,
+      16,
+      18,
+      19,
+      21,
+      23,
+      25,
+      27,
+      30,
+      32,
+      34,
+      36
+     ],
+     "type": "ruby"
+    }
+   ]
+  }
+ },
+ {
+  "id": "ch_glass_wheel",
+  "name_fr": "Roue de cristal",
+  "name_en": "Crystal Wheel",
+  "desc_fr": "Toutes les cases sont en Verre. Chaque tour peut briser ta roue.",
+  "desc_en": "Every pocket is Glass. Every spin may shatter your wheel.",
+  "setup": {
+   "wheel": [
+    {
+     "op": "set_type",
+     "numbers": "all",
+     "type": "glass"
+    }
+   ]
+  }
+ },
+ {
+  "id": "ch_tiny_wheel",
+  "name_fr": "Roulette de poche",
+  "name_en": "Pocket Roulette",
+  "desc_fr": "La roue ne compte que 18 cases (les rouges disparaissent).",
+  "desc_en": "The wheel has only 18 pockets (the reds are gone).",
+  "setup": {
+   "wheel": [
+    {
+     "op": "remove",
+     "numbers": [
+      1,
+      3,
+      5,
+      7,
+      9,
+      12,
+      14,
+      16,
+      18,
+      19,
+      21,
+      23,
+      25,
+      27,
+      30,
+      32,
+      34,
+      36
+     ]
+    }
+   ],
+   "flags": {
+    "debt_mult": 0.8
+   }
+  }
+ },
+ {
+  "id": "ch_zero_hero",
+  "name_fr": "Zéro absolu",
+  "name_en": "Absolute Zero",
+  "desc_fr": "Six Zéros doubles sur la roue, mais tu commences avec l'Amoureux du Zéro.",
+  "desc_en": "Six Double Zeros on the wheel, but you start with Zero's Sweetheart.",
+  "setup": {
+   "wheel": [
+    {
+     "op": "add",
+     "numbers": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "type": "double_zero"
+    }
+   ],
+   "grigris": [
+    "g_zero_lover"
+   ]
+  }
+ },
+ {
+  "id": "ch_one_spin",
+  "name_fr": "Un seul tour",
+  "name_en": "One Shot",
+  "desc_fr": "Un seul tour par échéance, dettes ×0,35.",
+  "desc_en": "One spin per deadline, debts ×0.35.",
+  "setup": {
+   "flags": {
+    "spins_mod": -3,
+    "debt_mult": 0.35
+   }
+  }
+ },
+ {
+  "id": "ch_blind",
+  "name_fr": "À l'aveugle",
+  "name_en": "Blindfolded",
+  "desc_fr": "Les cotes sont toujours masquées et la Précision ne peut pas monter.",
+  "desc_en": "Odds are always hidden and Precision can't rise.",
+  "setup": {
+   "flags": {
+    "hide_odds_always": true
+   }
+  },
+  "effects": [
+   {
+    "trigger": "on_spin_start",
+    "if": [
+     {
+      "c": "precision",
+      "op": ">",
+      "v": 1
+     }
+    ],
+    "do": [
+     {
+      "op": "temp_precision",
+      "v": {
+       "var": "precision",
+       "mul": -1,
+       "add": 1
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ch_cursed_collection",
+  "name_fr": "Collection maudite",
+  "name_en": "Cursed Collection",
+  "desc_fr": "Commence avec trois grigris maudits.",
+  "desc_en": "Start with three cursed charms.",
+  "setup": {
+   "grigris": [
+    "g_iou",
+    "g_zero_pact",
+    "g_vampire"
+   ]
+  }
+ },
+ {
+  "id": "ch_heir",
+  "name_fr": "L'héritier",
+  "name_en": "The Heir",
+  "desc_fr": "Commence avec 50 $, mais la boutique coûte double et il n'y a pas d'intérêts.",
+  "desc_en": "Start with $50, but the shop costs double and there's no interest.",
+  "setup": {
+   "stats": {
+    "money": 46
+   },
+   "flags": {
+    "shop_price_mult": 2.0,
+    "no_interest": true
+   }
+  }
+ },
+ {
+  "id": "ch_straights",
+  "name_fr": "Plein pot",
+  "name_en": "Full Throttle",
+  "desc_fr": "Seuls les pleins sont autorisés. Limites de table +2.",
+  "desc_en": "Only straight bets are allowed. Table limits +2.",
+  "setup": {
+   "flags": {
+    "allowed_kinds_always": [
+     "straight"
+    ]
+   }
+  },
+  "effects": [
+   {
+    "trigger": "on_run_start",
+    "do": [
+     {
+      "op": "table_limit",
+      "v": 2
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ch_outside",
+  "name_fr": "Prudence",
+  "name_en": "Prudence",
+  "desc_fr": "Seuls les paris extérieurs sont autorisés.",
+  "desc_en": "Only outside bets are allowed.",
+  "setup": {
+   "flags": {
+    "allowed_kinds_always": [
+     "dozen",
+     "column",
+     "red",
+     "black",
+     "even",
+     "odd",
+     "low",
+     "high"
+    ]
+   }
+  }
+ },
+ {
+  "id": "ch_blaze",
+  "name_fr": "Brasier",
+  "name_en": "Blaze",
+  "desc_fr": "Une case brûle après chaque tour.",
+  "desc_en": "A pocket burns after every spin.",
+  "effects": [
+   {
+    "trigger": "on_round_end",
+    "do": [
+     {
+      "op": "burn_random_pocket",
+      "type": "burnt"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ch_usury",
+  "name_fr": "Usure",
+  "name_en": "Usury",
+  "desc_fr": "La dette grimpe de 4 % à chaque tour.",
+  "desc_en": "Debt grows 4% every spin.",
+  "effects": [
+   {
+    "trigger": "on_round_end",
+    "do": [
+     {
+      "op": "debt_add_pct",
+      "v": 0.04
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ch_double_or_nothing",
+  "name_fr": "Double ou rien",
+  "name_en": "Double or Nothing",
+  "desc_fr": "Valeur de jeton doublée, mais un tour de moins par échéance.",
+  "desc_en": "Chip value doubled, but one fewer spin per deadline.",
+  "setup": {
+   "stats": {
+    "chip_value": 5
+   },
+   "flags": {
+    "spins_mod": -1
+   }
+  }
+ },
+ {
+  "id": "ch_haunted",
+  "name_fr": "Maison hantée",
+  "name_en": "Haunted House",
+  "desc_fr": "Dix cases Fantômes. Le Fantôme est imposé.",
+  "desc_en": "Ten Ghost pockets. The Ghost is forced.",
+  "setup": {
+   "wheel": [
+    {
+     "op": "set_type",
+     "numbers": [
+      2,
+      6,
+      10,
+      14,
+      18,
+      22,
+      26,
+      30,
+      34,
+      1
+     ],
+     "type": "ghost"
+    }
+   ]
+  },
+  "character": "ghost"
+ },
+ {
+  "id": "ch_no_charms",
+  "name_fr": "Sans gri-gri",
+  "name_en": "Charmless",
+  "desc_fr": "Aucun emplacement de grigri, mais +4 de budget et +2 de valeur de jeton.",
+  "desc_en": "No charm slots, but +4 bet budget and +2 chip value.",
+  "setup": {
+   "stats": {
+    "grigri_slots": -5,
+    "bet_budget": 4,
+    "chip_value": 2
+   }
+  }
+ },
+ {
+  "id": "ch_magnetic",
+  "name_fr": "Tout attire",
+  "name_en": "Everything Attracts",
+  "desc_fr": "Douze cases Aimant. La bille ne sait plus où donner de la tête.",
+  "desc_en": "Twelve Magnet pockets. The ball doesn't know where to go.",
+  "setup": {
+   "wheel": [
+    {
+     "op": "set_type",
+     "numbers": [
+      3,
+      6,
+      9,
+      12,
+      15,
+      18,
+      21,
+      24,
+      27,
+      30,
+      33,
+      36
+     ],
+     "type": "magnet"
+    }
+   ]
+  }
+ },
+ {
+  "id": "ch_rush",
+  "name_fr": "Contre la montre",
+  "name_en": "Against the Clock",
+  "desc_fr": "Trois tours par échéance, dettes ×0,8.",
+  "desc_en": "Three spins per deadline, debts ×0.8.",
+  "setup": {
+   "flags": {
+    "spins_mod": -1,
+    "debt_mult": 0.8
+   }
+  }
+ },
+ {
+  "id": "ch_marathon",
+  "name_fr": "Marathon",
+  "name_en": "Marathon",
+  "desc_fr": "Atteindre le palier 12 en mode Infini.",
+  "desc_en": "Reach tier 12 in Endless mode.",
+  "goal": {
+   "endless_tier": 12
+  }
+ },
+ {
+  "id": "ch_house_rules",
+  "name_fr": "Les règles de La Maison",
+  "name_en": "House Rules",
+  "desc_fr": "Tous les niveaux de Risque sont actifs.",
+  "desc_en": "Every Risk level is active.",
+  "risk": 8
+ },
+ {
+  "id": "ch_sister_vow",
+  "name_fr": "Le vœu de Marthe",
+  "name_en": "Marthe's Vow",
+  "desc_fr": "Sœur Marthe imposée, sans aucun Pacte possible.",
+  "desc_en": "Sister Marthe forced, no Pacts allowed.",
+  "setup": {
+   "flags": {
+    "no_pact": true
+   }
+  },
+  "character": "marthe"
+ }
+]

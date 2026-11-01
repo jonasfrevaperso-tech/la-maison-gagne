@@ -1,0 +1,1008 @@
+[
+ {
+  "id": "ev_lost_child",
+  "act_min": 1,
+  "name_fr": "L'enfant du vestiaire",
+  "name_en": "The Cloakroom Kid",
+  "desc_fr": "Un gamin en costume trop grand pleure entre deux manteaux de fourrure. Il dit qu'il a perdu son père à la roulette. Pas dans la foule : à la roulette.",
+  "desc_en": "A kid in an oversized suit cries between two fur coats. He says he lost his father at roulette. Not in the crowd: at roulette.",
+  "choices": [
+   {
+    "text_fr": "Lui donner 3 $ pour le tramway (+6 % de contrôle : le karma, ça existe).",
+    "text_en": "Give him $3 for the tram (+6% control: karma is real).",
+    "if": [
+     {
+      "c": "money",
+      "op": ">=",
+      "v": 3
+     }
+    ],
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "add_money",
+        "v": -3
+       },
+       {
+        "op": "perm_control",
+        "v": 0.06
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "text_fr": "Lui apprendre à compter les cartes (+1 Précision).",
+    "text_en": "Teach him to count cards (+1 Precision).",
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "perm_precision",
+        "v": 1
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "text_fr": "Passer ton chemin.",
+    "text_en": "Walk on by.",
+    "effects": []
+   }
+  ]
+ },
+ {
+  "id": "ev_card_shark",
+  "act_min": 1,
+  "name_fr": "Le requin du bar",
+  "name_en": "The Bar Shark",
+  "desc_fr": "« Pile ou face, l'ami ? Cinq dollars. » Sa pièce a deux piles. Tu l'as vue. Il sait que tu l'as vue.",
+  "desc_en": "« Heads or tails, friend? Five bucks. » His coin has two heads. You saw it. He knows you saw it.",
+  "choices": [
+   {
+    "text_fr": "Jouer quand même (−5 $, une chance sur deux de gagner 15 $).",
+    "text_en": "Play anyway (−$5, one in two to win $15).",
+    "if": [
+     {
+      "c": "money",
+      "op": ">=",
+      "v": 5
+     }
+    ],
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "add_money",
+        "v": -5
+       }
+      ]
+     },
+     {
+      "trigger": "on_use",
+      "if": [
+       {
+        "c": "chance",
+        "v": 0.5
+       }
+      ],
+      "do": [
+       {
+        "op": "add_money",
+        "v": 15
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "text_fr": "Lui voler sa pièce (Fortune aléatoire).",
+    "text_en": "Steal his coin (random Fortune).",
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "add_fortune",
+        "id": "random"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "text_fr": "Décliner poliment.",
+    "text_en": "Politely decline.",
+    "effects": []
+   }
+  ]
+ },
+ {
+  "id": "ev_free_drink",
+  "act_min": 1,
+  "name_fr": "Le cocktail offert",
+  "name_en": "The Complimentary Cocktail",
+  "desc_fr": "Un serveur dépose un verre fluo : « De la part de La Maison. » Ça fume. Ça sent la menthe et les regrets.",
+  "desc_en": "A waiter sets down a glowing glass: « Compliments of the House. » It smokes. It smells of mint and regret.",
+  "choices": [
+   {
+    "text_fr": "Boire cul sec (+1 budget de mises, prochaine dette +10 %).",
+    "text_en": "Down it (+1 bet budget, next debt +10%).",
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "perm_budget",
+        "v": 1
+       },
+       {
+        "op": "next_debt_pct",
+        "v": 0.1
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "text_fr": "Le revendre au client d'à côté (+4 $).",
+    "text_en": "Sell it to the next guy (+$4).",
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "add_money",
+        "v": 4
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ev_old_wheel",
+  "act_min": 1,
+  "name_fr": "La roue du grenier",
+  "name_en": "The Attic Wheel",
+  "desc_fr": "Dans un couloir de service, une roue de 1890 attend la casse. Ses cases sont dorées à la feuille.",
+  "desc_en": "In a service corridor, an 1890 wheel awaits the scrapyard. Its pockets are gold-leafed.",
+  "choices": [
+   {
+    "text_fr": "Démonter une case dorée pour ta roue.",
+    "text_en": "Take a golden pocket for your wheel.",
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "burn_random_pocket",
+        "type": "golden",
+        "label": "gift"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "text_fr": "Démonter le ressort de l'aiguille (+1 Précision).",
+    "text_en": "Take the needle spring (+1 Precision).",
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "perm_precision",
+        "v": 1
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ev_fortune_teller",
+  "act_min": 1,
+  "name_fr": "Madame Irma Quatorze",
+  "name_en": "Madame Irma Fourteen",
+  "desc_fr": "« Je vois… une roue. Je vois… une dette. Je vois… que vous allez payer. Quatre dollars. »",
+  "desc_en": "« I see… a wheel. I see… a debt. I see… that you will pay. Four dollars. »",
+  "choices": [
+   {
+    "text_fr": "Payer 4 $ (deux cartes Fortune).",
+    "text_en": "Pay $4 (two Fortune cards).",
+    "if": [
+     {
+      "c": "money",
+      "op": ">=",
+      "v": 4
+     }
+    ],
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "add_money",
+        "v": -4
+       },
+       {
+        "op": "add_fortune",
+        "id": "random"
+       },
+       {
+        "op": "add_fortune",
+        "id": "random"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "text_fr": "Lui prédire son avenir à ta façon (+1 emplacement de Fortune).",
+    "text_en": "Read her future your way (+1 Fortune slot).",
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "add_fortune_slot",
+        "v": 1
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ev_debt_collector",
+  "act_min": 1,
+  "name_fr": "Le recouvreur",
+  "name_en": "The Collector",
+  "desc_fr": "Un homme au chapeau trempé t'attend près de l'ascenseur. Il a un carnet. Ton nom y est souligné deux fois.",
+  "desc_en": "A man in a soaked hat waits by the lift. He has a notebook. Your name is underlined twice.",
+  "choices": [
+   {
+    "text_fr": "Payer 8 $ d'acompte (prochaine dette −15 %).",
+    "text_en": "Pay an $8 instalment (next debt −15%).",
+    "if": [
+     {
+      "c": "money",
+      "op": ">=",
+      "v": 8
+     }
+    ],
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "add_money",
+        "v": -8
+       },
+       {
+        "op": "next_debt_pct",
+        "v": -0.15
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "text_fr": "Lui tenir tête (prochaine dette +10 %, +5 $).",
+    "text_en": "Stand your ground (next debt +10%, +$5).",
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "next_debt_pct",
+        "v": 0.1
+       },
+       {
+        "op": "add_money",
+        "v": 5
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ev_mirror_maze",
+  "act_min": 1,
+  "name_fr": "Le labyrinthe de miroirs",
+  "name_en": "The Hall of Mirrors",
+  "desc_fr": "Mille reflets de toi. Certains ont l'air de mieux s'en sortir. Un seul te fait signe.",
+  "desc_en": "A thousand reflections of you. Some seem to be doing better. Only one waves.",
+  "choices": [
+   {
+    "text_fr": "Suivre le reflet (édition aléatoire sur un grigri ; 30 % de perdre un grigri).",
+    "text_en": "Follow the reflection (random edition on a charm; 30% to lose a charm).",
+    "if": [
+     {
+      "c": "grigri_count",
+      "op": ">=",
+      "v": 1
+     }
+    ],
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "add_random_edition_grigri"
+       }
+      ]
+     },
+     {
+      "trigger": "on_use",
+      "if": [
+       {
+        "c": "chance",
+        "v": 0.3
+       }
+      ],
+      "do": [
+       {
+        "op": "destroy_random_grigri"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "text_fr": "Briser un miroir (un sceau aléatoire sur ta roue).",
+    "text_en": "Break a mirror (random seal on your wheel).",
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "add_random_seal"
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ev_pawn_shop",
+  "act_min": 1,
+  "name_fr": "Le prêteur sur gages",
+  "name_en": "The Pawnbroker",
+  "desc_fr": "Derrière une grille, un vieux monsieur pèse des alliances. « Je prends tout. Surtout ce qui porte chance. »",
+  "desc_en": "Behind bars, an old man weighs wedding rings. « I take everything. Especially lucky things. »",
+  "choices": [
+   {
+    "text_fr": "Mettre un grigri au clou (perds un grigri au hasard, +10 $).",
+    "text_en": "Pawn a charm (lose a random charm, +$10).",
+    "if": [
+     {
+      "c": "grigri_count",
+      "op": ">=",
+      "v": 1
+     }
+    ],
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "destroy_random_grigri"
+       },
+       {
+        "op": "add_money",
+        "v": 10
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "text_fr": "Racheter un objet oublié (−8 $, grigri rare).",
+    "text_en": "Buy a forgotten item (−$8, rare charm).",
+    "if": [
+     {
+      "c": "money",
+      "op": ">=",
+      "v": 8
+     },
+     {
+      "c": "empty_slots",
+      "op": ">=",
+      "v": 1
+     }
+    ],
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "add_money",
+        "v": -8
+       },
+       {
+        "op": "add_grigri",
+        "rarity": "rare"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "text_fr": "Juste regarder.",
+    "text_en": "Just browse.",
+    "effects": []
+   }
+  ]
+ },
+ {
+  "id": "ev_lucky_cat",
+  "act_min": 1,
+  "name_fr": "Le chat de la cuisine",
+  "name_en": "The Kitchen Cat",
+  "desc_fr": "Un chat noir aux yeux émeraude te suit depuis trois tables. Il s'assoit. Il attend quelque chose.",
+  "desc_en": "A black cat with emerald eyes has followed you for three tables. It sits. It expects something.",
+  "choices": [
+   {
+    "text_fr": "Le caresser (il te suit : grigri Chat noir).",
+    "text_en": "Pet it (it follows you: Black Cat charm).",
+    "if": [
+     {
+      "c": "empty_slots",
+      "op": ">=",
+      "v": 1
+     },
+     {
+      "c": "not",
+      "x": {
+       "c": "has_grigri",
+       "v": "g_black_cat"
+      }
+     }
+    ],
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "add_grigri",
+        "id": "g_black_cat"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "text_fr": "Le suivre en cuisine (+5 $ trouvés sous un frigo).",
+    "text_en": "Follow it to the kitchen (+$5 under a fridge).",
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "add_money",
+        "v": 5
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ev_vip_pass",
+  "act_min": 1,
+  "name_fr": "Le passe VIP",
+  "name_en": "The VIP Pass",
+  "desc_fr": "Un portier te tend un carton noir et or. « Pour les tables sans plafond. Six dollars, et je n'ai rien vu. »",
+  "desc_en": "A doorman hands you a black-and-gold card. « For the tables with no ceiling. Six dollars, and I saw nothing. »",
+  "choices": [
+   {
+    "text_fr": "Payer 6 $ (limites de table +1).",
+    "text_en": "Pay $6 (table limits +1).",
+    "if": [
+     {
+      "c": "money",
+      "op": ">=",
+      "v": 6
+     }
+    ],
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "add_money",
+        "v": -6
+       },
+       {
+        "op": "table_limit",
+        "v": 1
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "text_fr": "Le contrefaire (limites +1, prochaine dette +20 %).",
+    "text_en": "Forge one (limits +1, next debt +20%).",
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "table_limit",
+        "v": 1
+       },
+       {
+        "op": "next_debt_pct",
+        "v": 0.2
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ev_rigged_ball",
+  "act_min": 2,
+  "name_fr": "La bille truquée",
+  "name_en": "The Rigged Ball",
+  "desc_fr": "Un croupier te glisse une bille un peu trop lourde. « Elle sait où aller. Moi, je n'étais pas là. »",
+  "desc_en": "A dealer slips you a slightly heavy ball. « It knows where to go. I was never here. »",
+  "choices": [
+   {
+    "text_fr": "L'accepter (+10 % de contrôle, prochaine dette +15 %).",
+    "text_en": "Accept it (+10% control, next debt +15%).",
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "perm_control",
+        "v": 0.1
+       },
+       {
+        "op": "next_debt_pct",
+        "v": 0.15
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "text_fr": "Le dénoncer (+6 $ de récompense).",
+    "text_en": "Report him (+$6 reward).",
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "add_money",
+        "v": 6
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ev_choir",
+  "act_min": 1,
+  "name_fr": "La chorale des endettés",
+  "name_en": "The Debtors' Choir",
+  "desc_fr": "Douze voix chantent un cantique sur l'amortissement. C'est beau. C'est faux. C'est contagieux.",
+  "desc_en": "Twelve voices sing a hymn about amortisation. It's beautiful. It's off-key. It's catchy.",
+  "choices": [
+   {
+    "text_fr": "Chanter avec eux (deux sceaux aléatoires sur ta roue).",
+    "text_en": "Sing along (two random seals on your wheel).",
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "add_random_seal"
+       },
+       {
+        "op": "add_random_seal"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "text_fr": "Faire la quête (+1 $ par grigri possédé, au moins 2 $).",
+    "text_en": "Pass the hat (+$1 per charm owned, at least $2).",
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "add_money",
+        "v": {
+         "var": "grigri_count",
+         "min": 2
+        }
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ev_fire_drill",
+  "act_min": 1,
+  "name_fr": "L'exercice d'incendie",
+  "name_en": "The Fire Drill",
+  "desc_fr": "Une alarme sonne. Personne ne bouge. Sauf le Pyromane, qui sourit.",
+  "desc_en": "An alarm rings. Nobody moves. Except the Arsonist, who smiles.",
+  "choices": [
+   {
+    "text_fr": "Sauver la caisse (+8 $, une case de ta roue brûle).",
+    "text_en": "Save the till (+$8, one wheel pocket burns).",
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "add_money",
+        "v": 8
+       },
+       {
+        "op": "burn_random_pocket",
+        "type": "burnt"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "text_fr": "Sauver la roue (une case devient Sacrée).",
+    "text_en": "Save the wheel (a pocket turns Sacred).",
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "burn_random_pocket",
+        "type": "sacred",
+        "label": "gift"
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ev_grandpa_letter",
+  "act_min": 2,
+  "name_fr": "La lettre de grand-père",
+  "name_en": "Grandfather's Letter",
+  "desc_fr": "Une enveloppe jaunie à ton nom, coincée sous un tapis : « Si tu lis ceci, tu es descendu trop bas. Prends ça. Et pardonne-moi. »",
+  "desc_en": "A yellowed envelope with your name, stuck under a rug: « If you read this, you went too deep. Take this. And forgive me. »",
+  "choices": [
+   {
+    "text_fr": "Ouvrir le paquet (grigri légendaire, prochaine dette +20 %, quelqu'un t'attendra au palier 6).",
+    "text_en": "Open the parcel (legendary charm, next debt +20%, someone will wait for you at tier 6).",
+    "if": [
+     {
+      "c": "empty_slots",
+      "op": ">=",
+      "v": 1
+     }
+    ],
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "add_grigri",
+        "rarity": "legendary"
+       },
+       {
+        "op": "next_debt_pct",
+        "v": 0.2
+       },
+       {
+        "op": "set_flag",
+        "flag": "grandpa_letter",
+        "value": true
+       },
+       {
+        "op": "set_flag",
+        "flag": "creditor_override_6",
+        "value": "cr_ombre"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "text_fr": "Brûler la lettre (+3 $ et un peu de paix).",
+    "text_en": "Burn the letter (+$3 and some peace).",
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "add_money",
+        "v": 3
+       },
+       {
+        "op": "set_flag",
+        "flag": "grandpa_letter",
+        "value": true
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ev_accountant_offer",
+  "act_min": 1,
+  "name_fr": "Le refinancement",
+  "name_en": "The Refinancing",
+  "desc_fr": "Un stagiaire du Comptable te propose « un produit financier innovant ». Il transpire.",
+  "desc_en": "The Accountant's intern offers you « an innovative financial product ». He is sweating.",
+  "choices": [
+   {
+    "text_fr": "Signer (plafond des intérêts +3 $).",
+    "text_en": "Sign (interest cap +$3).",
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "interest_cap",
+        "v": 3
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "text_fr": "Prendre le chèque de bienvenue (+6 $).",
+    "text_en": "Take the welcome cheque (+$6).",
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "add_money",
+        "v": 6
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ev_magician",
+  "act_min": 1,
+  "name_fr": "Le magicien raté",
+  "name_en": "The Failed Magician",
+  "desc_fr": "« Choisissez une case, n'importe laquelle ! » Il fait disparaître ton portefeuille, puis le tien, puis le sien.",
+  "desc_en": "« Pick a pocket, any pocket! » He makes your wallet vanish, then yours, then his own.",
+  "choices": [
+   {
+    "text_fr": "Être volontaire (une case devient Chanceuse).",
+    "text_en": "Volunteer (a pocket becomes Lucky).",
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "burn_random_pocket",
+        "type": "lucky",
+        "label": "gift"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "text_fr": "Lui apprendre le vrai tour (une case devient Miroir).",
+    "text_en": "Teach him the real trick (a pocket becomes Mirror).",
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "burn_random_pocket",
+        "type": "mirror",
+        "label": "gift"
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ev_bartender",
+  "act_min": 1,
+  "name_fr": "Le barman philosophe",
+  "name_en": "The Philosopher Barman",
+  "desc_fr": "« La roue est un cercle, mon ami. Et le cercle, c'est une ligne qui a renoncé. » Il essuie le même verre depuis 1952.",
+  "desc_en": "« The wheel is a circle, my friend. And a circle is a line that gave up. » He's been wiping the same glass since 1952.",
+  "choices": [
+   {
+    "text_fr": "Écouter jusqu'au bout (+1 Précision).",
+    "text_en": "Listen to the end (+1 Precision).",
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "perm_precision",
+        "v": 1
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "text_fr": "Laisser un pourboire de 3 $ (carte Fortune).",
+    "text_en": "Leave a $3 tip (Fortune card).",
+    "if": [
+     {
+      "c": "money",
+      "op": ">=",
+      "v": 3
+     }
+    ],
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "add_money",
+        "v": -3
+       },
+       {
+        "op": "add_fortune",
+        "id": "random"
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ev_twins",
+  "act_min": 2,
+  "name_fr": "Les jumelles du vestiaire",
+  "name_en": "The Cloakroom Twins",
+  "desc_fr": "Elles finissent les phrases l'une de l'autre. Elles finissent aussi tes phrases. C'est épuisant.",
+  "desc_en": "They finish each other's sentences. They finish yours too. It's exhausting.",
+  "choices": [
+   {
+    "text_fr": "Leur confier ta roue (une case devient Jumelle).",
+    "text_en": "Lend them your wheel (a pocket becomes Twin).",
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "burn_random_pocket",
+        "type": "twin",
+        "label": "gift"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "text_fr": "Leur confier ton manteau (+4 $ de pourboire… pour toi ?).",
+    "text_en": "Lend them your coat (+$4 tip… for you?).",
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "add_money",
+        "v": 4
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ev_cursed_idol",
+  "act_min": 2,
+  "name_fr": "L'idole sous verre",
+  "name_en": "The Idol Under Glass",
+  "desc_fr": "Une statuette de jade grimace dans une vitrine. L'étiquette dit : « Ne pas toucher. Sérieusement. »",
+  "desc_en": "A jade figurine grimaces in a display case. The label reads: « Do not touch. Seriously. »",
+  "choices": [
+   {
+    "text_fr": "La prendre (grigri maudit, +10 $).",
+    "text_en": "Take it (cursed charm, +$10).",
+    "if": [
+     {
+      "c": "empty_slots",
+      "op": ">=",
+      "v": 1
+     }
+    ],
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "add_grigri",
+        "rarity": "cursed"
+       },
+       {
+        "op": "add_money",
+        "v": 10
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "text_fr": "Respecter l'étiquette.",
+    "text_en": "Respect the label.",
+    "effects": []
+   }
+  ]
+ },
+ {
+  "id": "ev_house_whisper",
+  "act_min": 2,
+  "name_fr": "Le murmure de La Maison",
+  "name_en": "The House Whispers",
+  "desc_fr": "Les murs vibrent. Une voix sans bouche : « Je peux te donner du temps. Tout a un prix. Surtout le temps. »",
+  "desc_en": "The walls hum. A mouthless voice: « I can give you time. Everything has a price. Time most of all. »",
+  "choices": [
+   {
+    "text_fr": "Accepter (+1 tour par échéance, prochaine dette +25 %).",
+    "text_en": "Accept (+1 spin per deadline, next debt +25%).",
+    "effects": [
+     {
+      "trigger": "on_use",
+      "do": [
+       {
+        "op": "add_extra_spins",
+        "v": 1
+       },
+       {
+        "op": "next_debt_pct",
+        "v": 0.25
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "text_fr": "Se boucher les oreilles.",
+    "text_en": "Cover your ears.",
+    "effects": []
+   }
+  ]
+ }
+]
