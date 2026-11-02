@@ -148,7 +148,7 @@ func _next_shot() -> void:
 		if amb == "":
 			AudioBus.stop_ambience()
 		else:
-			AudioBus.play_ambience(amb)
+			AudioBus.play_ambience(amb, float(s.get("ambience_db", Balance.f("audio.cutscene_ambience_db"))))
 	_next_caption()
 
 

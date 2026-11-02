@@ -1,16 +1,16 @@
 [
  {
   "id": "cherry",
-  "weight": 28,
+  "weight": 20,
   "icon": "slot_cherry",
   "name_fr": "Cerise",
   "name_en": "Cherry",
-  "desc_fr": "La plus fréquente : du Mult pour le prochain tour.",
-  "desc_en": "The most common: Mult for the next spin."
+  "desc_fr": "Fréquente : du Mult pour le prochain tour.",
+  "desc_en": "Common: Mult for the next spin."
  },
  {
   "id": "bell",
-  "weight": 22,
+  "weight": 17,
   "icon": "slot_bell",
   "name_fr": "Cloche",
   "name_en": "Bell",
@@ -19,7 +19,7 @@
  },
  {
   "id": "clover",
-  "weight": 20,
+  "weight": 16,
   "icon": "slot_clover",
   "name_fr": "Trèfle",
   "name_en": "Clover",
@@ -28,7 +28,7 @@
  },
  {
   "id": "chip",
-  "weight": 20,
+  "weight": 16,
   "icon": "slot_chip",
   "name_fr": "Jeton",
   "name_en": "Chip",
@@ -37,7 +37,7 @@
  },
  {
   "id": "seven",
-  "weight": 10,
+  "weight": 9,
   "icon": "slot_seven",
   "name_fr": "Sept",
   "name_en": "Seven",
@@ -46,11 +46,29 @@
  },
  {
   "id": "diamond",
-  "weight": 6,
+  "weight": 5,
   "icon": "slot_diamond",
   "name_fr": "Diamant",
   "name_en": "Diamond",
   "desc_fr": "Très rare : ×Mult au prochain tour, ou un grigri rare offert.",
   "desc_en": "Very rare: ×Mult next spin, or a free rare charm."
+ },
+ {
+  "id": "lemon",
+  "weight": 20,
+  "icon": "slot_lemon",
+  "name_fr": "Citron",
+  "name_en": "Lemon",
+  "desc_fr": "Le plus banal : un peu d'argent.",
+  "desc_en": "The plainest: a little money."
+ },
+ {
+  "id": "horseshoe",
+  "weight": 16,
+  "icon": "slot_horseshoe",
+  "name_fr": "Fer à cheval",
+  "name_en": "Horseshoe",
+  "desc_fr": "Porte-bonheur : du Mult et une main plus sûre.",
+  "desc_en": "Lucky charm: Mult and a steadier hand."
  }
 ]

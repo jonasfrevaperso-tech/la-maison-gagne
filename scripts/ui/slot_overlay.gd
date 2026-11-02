@@ -1,63 +1,62 @@
 class_name SlotOverlay
 extends Control
-## JACKPOT ! Un plein gagnant fait surgir la machine à sous du casino : 1 à 3 tirages selon le
-## verdict du mini-jeu de lancer. Les combinaisons et leurs gains sont DÉJÀ résolus par le cœur
-## (RunController → SlotMachine) ; cette surcouche les met en scène : levier, rouleaux qui
-## s'arrêtent un par un (ralenti quand deux symboles s'alignent), ampoules qui défilent puis
-## clignotent, pluie de pièces 3D, bannière de gain. Toute commande tire le levier / continue.
+## JACKPOT ! Lucette, la machine à sous du Grand Zéro, apparaît en 3D dans sa salle : 1 à 5
+## tirages. Les combinaisons et leurs gains sont DÉJÀ résolus par le cœur (RunController →
+## SlotMachine) ; cette surcouche les met en scène : levier, quatre rouleaux lancés à pleine
+## vitesse qui s'arrêtent lentement l'un après l'autre (le dernier rampe case par case quand un
+## brelan ou un carré est possible), ampoules, pièces qui tombent dans le bac, bannière de gain.
+## Toute commande tire le levier / accélère / continue.
 
 signal closed
 
 enum Step { INTRO, WAIT_PULL, SPINNING, RESULT, SUMMARY }
 
-const MACHINE: Vector2 = Vector2(880, 800)
-const WINDOW: Rect2 = Rect2(150, 250, 520, 330)
-const REEL_W: float = 150.0
-const REEL_GAP: float = 35.0
-const BULBS: int = 34
-const CHASE_SPEED: float = 9.0
-const INTRO_TIME: float = 0.9
-const AUTO_PULL: float = 3.5
-const RESULT_TIME: float = 1.9
-const AUTO_CLOSE: float = 7.0
-const STOP_TIMES: Array[float] = [0.9, 1.35, 1.8]
-const TEASE_EXTRA: float = 0.6
-const LEVER_TIME: float = 0.45
-const COINS_TRIPLE: int = 110
-const COINS_PAIR: int = 30
-const RAYS: int = 18
-const SPARKS_TRIPLE: int = 70
-const SPARKS_PAIR: int = 24
-const TRAY: Rect2 = Rect2(170, 612, 480, 44)
-const TRAY_COINS_TRIPLE: int = 14
-const TRAY_COINS_PAIR: int = 5
-const TRAY_MAX: int = 60
+const REELS: int = SlotCabinet3D.REELS
+const INTRO_TIME: float = 1.6
+const AUTO_PULL: float = 4.0
+const RESULT_TIME: float = 2.6
+const AUTO_CLOSE: float = 9.0
+const LEVER_TIME: float = 0.7
+const SPIN_SPEED: float = 16.0
+const SPIN_ACCEL: float = 28.0
+## Instant (après le levier) où chaque rouleau commence à freiner.
+const STOP_AT: Array[float] = [1.5, 2.3, 3.1, 3.9]
+const STOP_TIME: float = 1.3
+## Freinage du rouleau sous tension : bien plus long, courbe plus douce (rampe case par case).
+const TEASE_TIME: float = 3.2
+const TEASE_POW: float = 5.0
+const NORMAL_POW: float = 3.0
+const HURRY_TIME: float = 0.5
+const BOUNCE: float = 0.12
+const COINS_BIG: int = 110
+const COINS_SMALL: int = 30
+const TRAY_COINS: Dictionary = {"pair": 5, "triple": 14, "quad": 30}
 
+var _hurried: bool = false
 var _spins: Array[Dictionary] = []
 var _db: ContentDB = null
 var _index: int = 0
 var _step: Step = Step.INTRO
 var _t: float = 0.0
-var _chase: float = 0.0
-var _strobe: float = 0.0
-var _lever: float = 0.0
+var _phase: float = 0.0
+var _win: float = 0.0
+var _lever_t: float = -1.0
 var _won: Array[Dictionary] = []
-var _machine: Control = null
-var _reels: Array[SlotReel] = []
-var _banner: String = ""
-var _banner_col: Color = Palette.GOLD_LIGHT
-var _banner_t: float = 0.0
-var _stopped: int = 0
-var _spin_sound_t: float = 0.0
-var _summary: VBoxContainer = null
-## Étincelles du gain : position, vitesse, durée de vie restante (repère de la surcouche).
-var _sparks: Array[Dictionary] = []
-## Pièces tombées dans le bac : x relatif et hauteur de pile (repère de la machine).
-var _tray: Array[Vector2] = []
-var _falling: Array[Dictionary] = []
-var _rays: float = 0.0
+var _stage: Stage3D = null
+var _cab: SlotCabinet3D = null
+var _pos: Array[float] = []
+var _speed: Array[float] = []
+## Freinage en cours : départ, arrivée, durée, temps écoulé, exposant (-1 = tourne librement).
+var _stop: Array[Dictionary] = []
+var _done: Array[bool] = []
+var _tease: int = -1
+var _heart_t: float = 0.0
+var _banner: Label = null
+var _info: Label = null
+var _prompt: RichTextLabel = null
+var _summary: PanelContainer = null
 var _blink_t: float = 2.0
-var _back: Control = null
+var _rng: RandomNumberGenerator = null
 
 
 func configure(spins: Array[Dictionary], db: ContentDB) -> SlotOverlay:
@@ -70,39 +69,26 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	theme = UiKit.theme()
-	var dim: ColorRect = ColorRect.new()
-	dim.color = Color(0.02, 0.0, 0.03, 0.82)
-	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(dim)
-	_machine = Control.new()
-	_machine.size = MACHINE
-	_machine.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_machine.draw.connect(_draw_machine)
-	_back = Control.new()
-	_back.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_back.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_back.draw.connect(_draw_backdrop)
-	add_child(_back)
-	add_child(_machine)
+	_rng = RngService.cosmetic()
+	_stage = Stage3D.new()
+	add_child(_stage)
+	_stage.env.ambient_light_energy = 0.35
+	_cab = SlotCabinet3D.new()
+	_stage.root.add_child(_cab)
 	var ids: Array[String] = []
 	for s: Dictionary in _db.list("slot_symbols"):
 		ids.append(String(s["id"]))
-	for k: int in 3:
-		var r: SlotReel = SlotReel.new()
-		r.position = WINDOW.position + Vector2(25.0 + float(k) * (REEL_W + REEL_GAP), 0.0)
-		r.size = Vector2(REEL_W, WINDOW.size.y)
-		r.setup(ids)
-		r.stopped.connect(_on_reel_stopped.bind(k))
-		_machine.add_child(r)
-		_reels.append(r)
-	resized.connect(_fit)
-	_fit()
-	_machine.scale = Vector2(0.2, 0.2) * _fit_scale()
-	_machine.modulate.a = 0.0
-	var tw: Tween = create_tween().set_parallel(true)
-	tw.tween_property(_machine, "scale", Vector2.ONE * _fit_scale(), INTRO_TIME * 0.8).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tw.tween_property(_machine, "modulate:a", 1.0, INTRO_TIME * 0.4)
+	_cab.build(ids, _rng)
+	for k: int in REELS:
+		_pos.append(float(_rng.randi_range(0, SlotCabinet3D.CELLS - 1)))
+		_speed.append(0.0)
+		_stop.append({})
+		_done.append(true)
+		_cab.set_reel(k, _pos[k])
+	_build_texts()
+	_stage.look(Vector3(0, 2.6, 7.5), Vector3(0, 1.6, 0), 40.0)
+	modulate.a = 0.0
+	create_tween().tween_property(self, "modulate:a", 1.0, 0.35)
 	AudioBus.play("jackpot", 1.0, 0.0)
 	AudioBus.play("slot_ring", 1.0, -3.0)
 	EventBus.juice_flash.emit(Palette.GOLD_LIGHT, 0.4)
@@ -110,20 +96,32 @@ func _ready() -> void:
 	EventBus.subtitle.emit(tr("SUB_SLOT"))
 
 
-func _fit_scale() -> float:
-	var room: Vector2 = size * 0.94
-	if room.x <= 0.0:
-		room = get_viewport_rect().size * 0.94
-	return minf(1.0, minf(room.x / MACHINE.x, room.y / MACHINE.y))
-
-
-func _fit() -> void:
-	var s: float = _fit_scale()
-	if _step != Step.INTRO:
-		_machine.scale = Vector2(s, s)
-	var vs: Vector2 = size if size.x > 0.0 else get_viewport_rect().size
-	_machine.position = (vs - MACHINE * s) * 0.5
-	_machine.pivot_offset = Vector2.ZERO
+func _build_texts() -> void:
+	_info = UiKit.label("", UiKit.SIZE_H2, Palette.IVORY, "display")
+	_info.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_info.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_info.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	_info.position = Vector2(36, 24)
+	_info.add_theme_color_override("font_outline_color", Palette.INK)
+	_info.add_theme_constant_override("outline_size", 10)
+	add_child(_info)
+	_banner = UiKit.label("", UiKit.SIZE_H1, Palette.GOLD_LIGHT, "display")
+	_banner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_banner.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_banner.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	_banner.offset_top = -150.0
+	_banner.offset_bottom = -70.0
+	_banner.offset_left = 80.0
+	_banner.offset_right = -80.0
+	_banner.add_theme_color_override("font_outline_color", Palette.INK)
+	_banner.add_theme_constant_override("outline_size", 14)
+	_banner.pivot_offset = Vector2(0, 40)
+	add_child(_banner)
+	_prompt = UiKit.rich("", UiKit.SIZE_BODY + 4)
+	_prompt.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	_prompt.offset_top = -64.0
+	_prompt.offset_bottom = -16.0
+	add_child(_prompt)
 
 
 # --------------------------------------------------------------------------- déroulé
@@ -131,28 +129,26 @@ func _fit() -> void:
 
 func _process(delta: float) -> void:
 	_t += delta
-	_chase += delta * CHASE_SPEED * (3.0 if _step == Step.SPINNING else 1.0)
-	_strobe = maxf(_strobe - delta, 0.0)
-	_banner_t = maxf(_banner_t - delta, 0.0)
-	_lever = maxf(_lever - delta / LEVER_TIME, 0.0)
-	_rays = lerpf(_rays, 1.0 if _strobe > 0.0 else 0.25, clampf(delta * 3.0, 0.0, 1.0))
-	_blink_t -= delta
-	if _blink_t < -0.15:
-		_blink_t = RngService.cosmetic().randf_range(1.5, 4.0)
-	_update_particles(delta)
+	_phase += delta * (12.0 if _step == Step.SPINNING else 4.0)
+	_win = maxf(_win - delta * 0.5, 0.0)
+	_cab.bulbs(_phase, _win)
+	_update_lever(delta)
+	_update_reels(delta)
+	_update_eyes(delta)
+	_update_camera(delta)
 	match _step:
 		Step.INTRO:
 			if _t >= INTRO_TIME:
-				_fit()
 				_wait_pull()
 		Step.WAIT_PULL:
+			var a: float = 0.55 + 0.45 * sin(_t * 6.0)
+			_prompt.modulate.a = a
 			if _t >= AUTO_PULL:
 				_pull()
 		Step.SPINNING:
-			_spin_sound_t -= delta
-			if _spin_sound_t <= 0.0:
-				_spin_sound_t = 1.0
-				AudioBus.play("slot_spin", 1.0, -6.0)
+			_tick_tension(delta)
+			if _done.all(func(d: bool) -> bool: return d):
+				_resolve()
 		Step.RESULT:
 			if _t >= RESULT_TIME:
 				_index += 1
@@ -163,13 +159,55 @@ func _process(delta: float) -> void:
 		Step.SUMMARY:
 			if _t >= AUTO_CLOSE:
 				_close()
-	_machine.queue_redraw()
-	_back.queue_redraw()
+
+
+## Caméra : travelling d'entrée vers la machine, léger flottement, zoom sur la fenêtre au gain.
+func _update_camera(delta: float) -> void:
+	var near: Vector3 = Vector3(0.0, 1.95, 3.85)
+	var at: Vector3 = Vector3(0.0, 1.82, 0.0)
+	if _step == Step.INTRO:
+		var u: float = clampf(_t / INTRO_TIME, 0.0, 1.0)
+		var e: float = 1.0 - pow(1.0 - u, 3.0)
+		_stage.look(Vector3(0, 2.6, 7.5).lerp(near, e), at, 40.0)
+		return
+	var sway: Vector3 = Vector3(sin(_t * 0.4) * 0.06, sin(_t * 0.31) * 0.03, 0.0)
+	var zoom: float = 0.35 * _win if _step == Step.RESULT else 0.0
+	var target: Vector3 = near + sway + Vector3(0, -0.2, -1.6) * zoom
+	var cur: Vector3 = _stage.cam.position.lerp(target, clampf(delta * 3.0, 0.0, 1.0))
+	_stage.look(cur, at.lerp(Vector3(0, SlotCabinet3D.REEL_Y, 0), zoom), 40.0)
+
+
+func _update_lever(delta: float) -> void:
+	if _lever_t < 0.0:
+		return
+	_lever_t += delta
+	var u: float = _lever_t / LEVER_TIME
+	_cab.lever(sin(clampf(u, 0.0, 1.0) * PI))
+	if u >= 1.0:
+		_lever_t = -1.0
+		_cab.lever(0.0)
+
+
+func _update_eyes(delta: float) -> void:
+	_blink_t -= delta
+	if _blink_t < -0.15:
+		_blink_t = _rng.randf_range(1.5, 4.0)
+	var look: float = 0.0
+	if _step == Step.SPINNING:
+		for k: int in REELS:
+			if not _done[k]:
+				look = (float(k) - 1.5) / 1.5
+				break
+	var closed: bool = _blink_t < 0.0 or (_step == Step.RESULT and _win > 0.3 and int(_t * 6.0) % 2 == 0)
+	_cab.eyes(look, closed)
 
 
 func _wait_pull() -> void:
 	_step = Step.WAIT_PULL
 	_t = 0.0
+	_info.text = tr("SLOT_SPIN_COUNT") % [_index + 1, _spins.size()]
+	_prompt.text = "[center]%s[/center]" % InputGlyphs.expand(tr("SLOT_PULL") % "{ui_spin}", 34)
+	_banner.text = ""
 
 
 func _pull() -> void:
@@ -177,77 +215,194 @@ func _pull() -> void:
 		return
 	_step = Step.SPINNING
 	_t = 0.0
-	_lever = 1.0
-	_stopped = 0
-	_banner = ""
+	_lever_t = 0.0
+	_prompt.text = ""
+	_banner.text = ""
 	AudioBus.play("slot_lever")
+	AudioBus.play("slot_spin", 1.0, -6.0)
 	var reels: Array = _spins[_index]["reels"]
-	var tease: bool = String(reels[0]) == String(reels[1])
+	_tease = _tease_reel(reels)
+	_hurried = false
+	for k: int in REELS:
+		_done[k] = false
+		_stop[k] = {}
+		_speed[k] = 0.0
+
+
+## Rouleau à faire attendre : le dernier quand les trois premiers promettent un brelan ou un
+## carré, sinon le troisième quand les deux premiers sont identiques.
+static func _tease_reel(reels: Array) -> int:
+	var counts: Dictionary = {}
 	for k: int in 3:
-		var after: float = STOP_TIMES[k] + (TEASE_EXTRA if tease and k == 2 else 0.0)
-		_reels[k].spin(String(reels[k]), after, tease and k == 2)
-	_spin_sound_t = 0.0
+		counts[String(reels[k])] = int(counts.get(String(reels[k]), 0)) + 1
+	if counts.values().max() >= 2:
+		return 3
+	if String(reels[0]) == String(reels[1]):
+		return 2
+	return -1
+
+
+func _update_reels(delta: float) -> void:
+	if _step != Step.SPINNING:
+		return
+	var reels: Array = _spins[_index]["reels"]
+	for k: int in REELS:
+		if _done[k]:
+			continue
+		var st: Dictionary = _stop[k]
+		if st.is_empty():
+			# Lancement échelonné puis vitesse de croisière.
+			if _t > 0.25 + 0.08 * float(k):
+				_speed[k] = minf(_speed[k] + SPIN_ACCEL * delta, SPIN_SPEED)
+				_advance(k, _speed[k] * delta)
+			var at: float = STOP_AT[k] + (TEASE_TIME * 0.35 if k > _tease and _tease >= 0 else 0.0)
+			if _t >= at and (k == 0 or not _stop[k - 1].is_empty()):
+				_begin_stop(k, String(reels[k]), k == _tease)
+			continue
+		st["t"] = float(st["t"]) + delta
+		var u: float = clampf(float(st["t"]) / float(st["dur"]), 0.0, 1.0)
+		var e: float = 1.0 - pow(1.0 - u, float(st["pow"]))
+		var p: float = lerpf(float(st["from"]), float(st["to"]), e)
+		var after: float = float(st["t"]) - float(st["dur"])
+		if after > 0.0:
+			# Petit rebond mécanique à l'arrêt.
+			p = float(st["to"]) - sin(clampf(after / BOUNCE, 0.0, 1.0) * PI) * 0.08
+			if after >= BOUNCE:
+				p = float(st["to"])
+				_done[k] = true
+				_on_reel_stopped(k)
+		_advance(k, p - _pos[k])
+
+
+func _advance(k: int, d: float) -> void:
+	var before: int = int(floor(_pos[k] + 0.5))
+	_pos[k] += d
+	_cab.set_reel(k, _pos[k])
+	# Cliquetis à chaque case qui passe quand le rouleau ralentit (tension audible).
+	var after: int = int(floor(_pos[k] + 0.5))
+	if after != before and not _stop[k].is_empty() and _speed[k] > 0.0:
+		var slow_u: float = clampf(float(_stop[k]["t"]) / float(_stop[k]["dur"]), 0.0, 1.0)
+		if slow_u > 0.35:
+			AudioBus.play("tick", 0.8 + 0.6 * slow_u, -8.0)
+
+
+## Freinage : on choisit la case d'arrivée pour que la vitesse reste continue (courbe
+## 1 - (1-u)^n, de pente initiale n·distance/durée = vitesse actuelle).
+func _begin_stop(k: int, symbol: String, tease: bool) -> void:
+	var pw: float = TEASE_POW if tease else NORMAL_POW
+	var dur: float = TEASE_TIME if tease else STOP_TIME
+	var v: float = maxf(_speed[k], 1.0)
+	var to: int = _cab.cell_for(k, symbol, _pos[k] + v * dur / pw)
+	var real_dur: float = clampf((float(to) - _pos[k]) * pw / v, dur * 0.7, dur * 1.6)
+	_stop[k] = {"from": _pos[k], "to": float(to), "dur": real_dur, "t": 0.0, "pow": pw}
+	if tease:
+		AudioBus.play("slot_tease")
+		_heart_t = 0.0
+
+
+func _tick_tension(delta: float) -> void:
+	if _tease < 0 or _done[_tease] or _stop[_tease].is_empty():
+		return
+	_heart_t -= delta
+	if _heart_t <= 0.0:
+		_heart_t = 0.55
+		AudioBus.play("heartbeat", 1.0, -4.0)
+		EventBus.juice_shake.emit(0.06)
+
+
+## Accélère la fin du tirage — une seule fois par tirage : marteler la touche ne doit pas
+## relancer le freinage à chaque appui (les rouleaux ne s'arrêteraient jamais).
+func _hurry() -> void:
+	if _hurried:
+		return
+	_hurried = true
+	var reels: Array = _spins[_index]["reels"]
+	for k: int in REELS:
+		if _done[k]:
+			continue
+		if _stop[k].is_empty():
+			_speed[k] = SPIN_SPEED
+		var to: int = _cab.cell_for(k, String(reels[k]), _pos[k] + 1.0)
+		_stop[k] = {"from": _pos[k], "to": float(to), "dur": HURRY_TIME + 0.1 * float(k), "t": 0.0, "pow": NORMAL_POW}
 
 
 func _on_reel_stopped(k: int) -> void:
-	_stopped += 1
-	AudioBus.play("slot_stop", 0.9 + 0.1 * float(k))
-	EventBus.juice_shake.emit(0.15)
-	var reels: Array = _spins[_index]["reels"]
-	if k == 1 and String(reels[0]) == String(reels[1]):
-		AudioBus.play("slot_tease")
-	if _stopped >= 3:
-		_resolve()
+	AudioBus.play("slot_stop", 0.85 + 0.1 * float(k))
+	EventBus.juice_shake.emit(0.18 if k != _tease else 0.4)
+	_speed[k] = 0.0
 
 
 func _resolve() -> void:
 	_step = Step.RESULT
 	_t = 0.0
 	var pid: String = String(_spins[_index]["prize"])
-	var at: Vector2 = _machine.get_global_transform() * (WINDOW.get_center())
 	if pid == "":
-		_banner = tr("SLOT_NOTHING")
-		_banner_col = Palette.SMOKE
+		_banner.text = tr("SLOT_NOTHING")
+		_banner.add_theme_color_override("font_color", Palette.SMOKE)
 		AudioBus.play("lose_soft")
-	else:
-		var prize: Dictionary = _db.get_entry("slot_prizes", pid)
-		_won.append(prize)
-		_banner = Localization.t(prize, "name")
-		var triple: bool = String(prize.get("match", "")) == "triple"
-		_banner_col = Palette.GOLD_LIGHT if triple else Palette.EMERALD
-		_strobe = 2.0 if triple else 0.9
-		for r: SlotReel in _reels:
-			r.flash()
-		AudioBus.play("slot_big" if triple else "slot_win")
-		AudioBus.play("coins", 1.0, -4.0)
-		EventBus.juice_flash.emit(Palette.GOLD_LIGHT, 0.5 if triple else 0.25)
-		EventBus.juice_shake.emit(0.8 if triple else 0.3)
-		ChipBurst3D.spawn(self, get_global_transform().affine_inverse() * at, COINS_TRIPLE if triple else COINS_PAIR, true)
-	_banner_t = RESULT_TIME
+		return
+	var prize: Dictionary = _db.get_entry("slot_prizes", pid)
+	_won.append(prize)
+	var match_kind: String = String(prize.get("match", ""))
+	var big: bool = match_kind != "pair"
+	_banner.text = Localization.t(prize, "name")
+	_banner.add_theme_color_override("font_color", Palette.GOLD_LIGHT if big else Palette.EMERALD)
+	_banner.scale = Vector2(0.4, 0.4)
+	_banner.pivot_offset = Vector2(_banner.size.x * 0.5, 40.0)
+	_banner.create_tween().tween_property(_banner, "scale", Vector2.ONE, 0.45).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_win = 1.0 if big else 0.6
+	_cab.drop_coins(int(TRAY_COINS.get(match_kind, 5)), _rng)
+	AudioBus.play("slot_big" if big else "slot_win")
+	AudioBus.play("coins", 1.0, -4.0)
+	if match_kind == "quad":
+		AudioBus.play("choir", 1.0, -2.0)
+	EventBus.juice_flash.emit(Palette.GOLD_LIGHT, 0.5 if big else 0.25)
+	EventBus.juice_shake.emit(0.8 if big else 0.3)
+	var at: Vector2 = _stage.project(Vector3(0, SlotCabinet3D.REEL_Y, 0.4))
+	ChipBurst3D.spawn(self, at, COINS_BIG if big else COINS_SMALL, true)
+	move_child(_banner, get_child_count() - 1)
 
 
 func _show_summary() -> void:
 	_step = Step.SUMMARY
 	_t = 0.0
-	_summary = VBoxContainer.new()
-	_summary.add_theme_constant_override("separation", 6)
-	_summary.position = Vector2(WINDOW.position.x, WINDOW.end.y + 84)
-	_summary.custom_minimum_size = Vector2(WINDOW.size.x + 50, 0)
-	_machine.add_child(_summary)
+	_banner.text = ""
+	_prompt.text = ""
+	_info.text = ""
+	_summary = UiKit.panel(Color(Palette.INK, 0.88), Palette.GOLD)
+	_summary.custom_minimum_size = Vector2(720, 0)
+	var v: VBoxContainer = VBoxContainer.new()
+	v.add_theme_constant_override("separation", 8)
+	_summary.add_child(v)
 	var head_txt: String = tr("SLOT_SUMMARY") if not _won.is_empty() else tr("SLOT_SUMMARY_NONE")
-	var head: Label = UiKit.label(head_txt, UiKit.SIZE_BODY + 4, Palette.GOLD_LIGHT, "display")
+	var head: Label = UiKit.label(head_txt, UiKit.SIZE_H2, Palette.GOLD_LIGHT, "display")
 	head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_summary.add_child(head)
+	head.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	v.add_child(head)
 	for p: Dictionary in _won:
 		var l: Label = UiKit.label("✦ " + Localization.t(p, "name"), UiKit.SIZE_BODY, Palette.IVORY)
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		_summary.add_child(l)
+		v.add_child(l)
 	var b: Button = UiKit.button(tr("SLOT_CONTINUE"), _close, Vector2(260, 52))
 	b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	PromptBadge.attach(b, "ui_accept")
-	_summary.add_child(b)
+	v.add_child(b)
+	add_child(_summary)
+	_place_summary.call_deferred()
 	b.grab_focus.call_deferred()
+
+
+## Bilan centré dans le bas de l'écran (sous la fenêtre des rouleaux), toujours dans l'écran.
+func _place_summary() -> void:
+	if _summary == null:
+		return
+	var vs: Vector2 = size if size.x > 0.0 else get_viewport_rect().size
+	var w: float = minf(720.0, vs.x - 40.0)
+	_summary.custom_minimum_size.x = w
+	var sz: Vector2 = _summary.get_combined_minimum_size()
+	_summary.size = sz
+	_summary.position = Vector2((vs.x - sz.x) * 0.5, clampf(vs.y - sz.y - 30.0, 20.0, vs.y - sz.y - 10.0))
 
 
 func _close() -> void:
@@ -256,9 +411,9 @@ func _close() -> void:
 	_step = Step.INTRO
 	set_process(false)
 	AudioBus.ui("panel_close")
-	var tw: Tween = create_tween().set_parallel(true)
-	tw.tween_property(_machine, "modulate:a", 0.0, 0.25)
-	tw.chain().tween_callback(closed.emit)
+	var tw: Tween = create_tween()
+	tw.tween_property(self, "modulate:a", 0.0, 0.3)
+	tw.tween_callback(closed.emit)
 
 
 # --------------------------------------------------------------------------- commandes
@@ -278,8 +433,8 @@ func _input(event: InputEvent) -> void:
 		Step.WAIT_PULL:
 			_pull()
 		Step.SPINNING:
-			for r: SlotReel in _reels:
-				r.hurry()
+			if _t > 0.6:
+				_hurry()
 		Step.RESULT:
 			_t = maxf(_t, RESULT_TIME - 0.35)
 		Step.SUMMARY:
@@ -288,236 +443,3 @@ func _input(event: InputEvent) -> void:
 		_:
 			return
 	get_viewport().set_input_as_handled()
-
-
-# --------------------------------------------------------------------------- dessin
-
-
-func _draw_machine() -> void:
-	var m: Control = _machine
-	var body: Rect2 = Rect2(70, 150, 680, 620)
-	m.draw_rect(Rect2(body.position + Vector2(14, 18), body.size), Color(0, 0, 0, 0.5))
-	m.draw_style_box(UiKit.flat(Color("5a0e1e"), Palette.GOLD, 6, 28, 0), body)
-	# Laque en dégradé (bandes horizontales) et reflet chromé.
-	for k: int in 12:
-		var bh: float = (body.size.y - 16) / 12.0
-		var band: Rect2 = Rect2(body.position.x + 8, body.position.y + 8 + k * bh, body.size.x - 16, bh)
-		m.draw_rect(band, Color("7a1428").darkened(float(k) / 16.0))
-	m.draw_style_box(UiKit.flat(Color(0, 0, 0, 0), Palette.GOLD_DARK, 2, 22, 0), body.grow(-14))
-	# Colonnes lumineuses : chenillard vertical de chaque côté.
-	for side: int in 2:
-		var x: float = body.position.x + 30.0 if side == 0 else body.end.x - 42.0
-		m.draw_rect(Rect2(x, body.position.y + 40, 12, body.size.y - 80), Color(Palette.GOLD_LIGHT, 0.18))
-		for j: int in 11:
-			var y: float = body.position.y + 60 + j * (body.size.y - 120) / 10.0
-			var chase: bool = posmod(j + int(_chase * (1.0 if side == 0 else -1.0)), 4) == 0
-			var on: bool = chase or (_strobe > 0.0 and int(_t * 12.0) % 2 == j % 2)
-			m.draw_circle(Vector2(x + 6, y), 6.0, Palette.MAGENTA if on else Color("3a1020"))
-			if on:
-				m.draw_circle(Vector2(x + 6, y), 12.0, Color(Palette.MAGENTA, 0.25))
-	# Rivets dorés.
-	var rivets: Array[Vector2] = [
-		body.position + Vector2(22, 22),
-		Vector2(body.end.x - 22, body.position.y + 22),
-		body.end - Vector2(22, 22),
-		Vector2(body.position.x + 22, body.end.y - 22),
-	]
-	for c: Vector2 in rivets:
-		m.draw_circle(c, 7.0, Palette.GOLD)
-		m.draw_circle(c + Vector2(-2, -2), 2.5, Palette.GOLD_LIGHT)
-	_draw_marquee(m)
-	_draw_face(m)
-	if _step != Step.SUMMARY:
-		_draw_tray(m)
-	# Fenêtre des rouleaux et ligne de paiement.
-	m.draw_rect(WINDOW.grow(18), Palette.INK)
-	m.draw_rect(WINDOW.grow(18), Palette.GOLD, false, 4.0)
-	m.draw_rect(WINDOW.grow(10), Palette.GOLD_DARK, false, 2.0)
-	var mid: float = WINDOW.get_center().y
-	var line_col: Color = Palette.MAGENTA.lerp(Palette.GOLD_LIGHT, clampf(_strobe, 0.0, 1.0))
-	m.draw_line(Vector2(WINDOW.position.x - 30, mid), Vector2(WINDOW.position.x - 6, mid), line_col, 6.0)
-	m.draw_line(Vector2(WINDOW.end.x + 6, mid), Vector2(WINDOW.end.x + 30, mid), line_col, 6.0)
-	var wx: float = WINDOW.position.x
-	m.draw_colored_polygon(PackedVector2Array([Vector2(wx - 4, mid), Vector2(wx - 22, mid - 14), Vector2(wx - 22, mid + 14)]), line_col)
-	if _strobe > 0.0:
-		var glow: float = clampf(_strobe, 0.0, 1.0) * (0.6 + 0.4 * sin(_t * 18.0))
-		m.draw_rect(Rect2(WINDOW.position.x, mid - 6, WINDOW.size.x, 12), Color(Palette.GOLD_LIGHT, 0.35 * glow))
-		m.draw_rect(WINDOW.grow(18), Color(Palette.GOLD_LIGHT, glow), false, 6.0)
-	_draw_lever(m)
-	_draw_texts(m)
-
-
-func _draw_marquee(m: Control) -> void:
-	var r: Rect2 = Rect2(40, 14, 740, 172)
-	m.draw_style_box(UiKit.flat(Palette.INK, Palette.GOLD, 5, 60, 0), r)
-	var f: Font = UiKit.font("display")
-	var fs: int = UiKit.fs(UiKit.SIZE_TITLE)
-	var txt: String = tr("SLOT_TITLE")
-	var w: float = f.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
-	var pulse: float = 0.5 + 0.5 * sin(_t * 8.0)
-	var col: Color = Palette.GOLD_LIGHT.lerp(Palette.MAGENTA, pulse * 0.5 if _strobe > 0.0 else 0.0)
-	var pos: Vector2 = Vector2(r.get_center().x - w * 0.5, r.get_center().y + fs * 0.33)
-	m.draw_string_outline(f, pos, txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, 14, Palette.MAGENTA.darkened(0.4))
-	m.draw_string(f, pos, txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, col)
-	# Ampoules du pourtour : chenillard, puis stroboscope sur un gain.
-	var per: float = (r.size.x + r.size.y) * 2.0
-	for i: int in BULBS:
-		var d: float = per * float(i) / float(BULBS)
-		var p: Vector2 = _perimeter(r.grow(-14), d)
-		var lit: bool = (i + int(_chase)) % 3 == 0
-		if _strobe > 0.0:
-			lit = int(_t * 14.0) % 2 == i % 2
-		m.draw_circle(p, 9.0, Color("3a2a10"))
-		if lit:
-			m.draw_circle(p, 14.0, Color(Palette.GOLD_LIGHT, 0.25))
-			m.draw_circle(p, 8.0, Palette.GOLD_LIGHT)
-
-
-## Lucette en personne : deux yeux au-dessus des rouleaux, qui clignent, suivent les rouleaux
-## et deviennent des cœurs sur un gain.
-func _draw_face(m: Control) -> void:
-	var cy: float = WINDOW.position.y - 52.0
-	var happy: bool = _strobe > 0.0
-	var look: float = sin(_t * 14.0) * 8.0 if _step == Step.SPINNING else 0.0
-	for k: int in 2:
-		var c: Vector2 = Vector2(MACHINE.x * 0.5 - 30 + (-170.0 if k == 0 else 170.0), cy)
-		# Orbite sombre et cerclage doré : les yeux de Lucette se lisent de loin.
-		m.draw_circle(c, 27.0, Palette.GOLD_DARK)
-		m.draw_circle(c, 24.0, Palette.INK)
-		if happy:
-			var hc: Color = Palette.MAGENTA.lightened(0.2)
-			m.draw_circle(c + Vector2(-8, -5), 10.0, hc)
-			m.draw_circle(c + Vector2(8, -5), 10.0, hc)
-			m.draw_colored_polygon(PackedVector2Array([c + Vector2(-17, -2), c + Vector2(17, -2), c + Vector2(0, 17)]), hc)
-		elif _blink_t < 0.0:
-			m.draw_line(c - Vector2(17, 0), c + Vector2(17, 0), Palette.GOLD_LIGHT, 4.0)
-		else:
-			m.draw_circle(c, 19.0, Palette.IVORY)
-			m.draw_circle(c + Vector2(look, 2), 10.0, Palette.INK)
-			m.draw_circle(c + Vector2(look - 3, -2), 3.0, Palette.IVORY)
-		# Cils de diva.
-		for j: int in 3:
-			var a0: float = -PI * 0.5 + (float(j) - 1.0) * 0.45 + (-0.25 if k == 0 else 0.25)
-			m.draw_line(c + Vector2(cos(a0), sin(a0)) * 26.0, c + Vector2(cos(a0), sin(a0)) * 36.0, Palette.GOLD_LIGHT, 3.0)
-
-
-## Bac à pièces : chaque gain y fait tomber des pièces qui s'empilent.
-func _draw_tray(m: Control) -> void:
-	m.draw_rect(TRAY.grow(6), Palette.GOLD_DARK)
-	m.draw_rect(TRAY, Color("1a0a10"))
-	m.draw_rect(Rect2(TRAY.position, Vector2(TRAY.size.x, 6)), Color(Palette.GOLD_LIGHT, 0.4))
-	for c: Vector2 in _tray:
-		var p: Vector2 = Vector2(TRAY.position.x + c.x, TRAY.end.y - 8.0 - c.y)
-		m.draw_rect(Rect2(p - Vector2(13, 5), Vector2(26, 10)), Palette.GOLD_DARK)
-		m.draw_rect(Rect2(p - Vector2(13, 7), Vector2(26, 6)), Palette.GOLD_LIGHT)
-	for f: Dictionary in _falling:
-		var fp: Vector2 = f["p"]
-		m.draw_circle(fp, 10.0, Palette.GOLD)
-		m.draw_circle(fp + Vector2(-3, -3), 3.0, Palette.GOLD_LIGHT)
-
-
-func _drop_coins(n: int) -> void:
-	var rng: RandomNumberGenerator = RngService.cosmetic()
-	for i: int in n:
-		var start: Vector2 = Vector2(rng.randf_range(TRAY.position.x + 20, TRAY.end.x - 20), WINDOW.end.y - 10.0 - float(i) * 14.0)
-		_falling.append({"p": start, "v": rng.randf_range(0.0, 80.0)})
-
-
-func _burst(at: Vector2, n: int) -> void:
-	var rng: RandomNumberGenerator = RngService.cosmetic()
-	for i: int in n:
-		var a: float = rng.randf() * TAU
-		var sp: float = rng.randf_range(200.0, 900.0)
-		var col: Color = [Palette.GOLD_LIGHT, Palette.MAGENTA, Palette.CYAN, Palette.IVORY][i % 4]
-		_sparks.append({"p": at, "v": Vector2(cos(a), sin(a)) * sp, "l": rng.randf_range(0.5, 1.3), "c": col})
-
-
-func _update_particles(delta: float) -> void:
-	for sp: Dictionary in _sparks:
-		sp["v"] = (sp["v"] as Vector2) * (1.0 - delta * 1.5) + Vector2(0, 700.0 * delta)
-		sp["p"] = (sp["p"] as Vector2) + (sp["v"] as Vector2) * delta
-		sp["l"] = float(sp["l"]) - delta
-	_sparks = _sparks.filter(func(q: Dictionary) -> bool: return float(q["l"]) > 0.0)
-	var landed: Array[Dictionary] = []
-	for f: Dictionary in _falling:
-		f["v"] = float(f["v"]) + 1600.0 * delta
-		var fp: Vector2 = f["p"]
-		fp.y += float(f["v"]) * delta
-		f["p"] = fp
-		if fp.y >= TRAY.end.y - 10.0:
-			landed.append(f)
-	for f2: Dictionary in landed:
-		_falling.erase(f2)
-		if _tray.size() < TRAY_MAX:
-			var x: float = (f2["p"] as Vector2).x - TRAY.position.x
-			var h: float = 0.0
-			for c: Vector2 in _tray:
-				if absf(c.x - x) < 22.0:
-					h = maxf(h, c.y + 7.0)
-			_tray.append(Vector2(x, minf(h, TRAY.size.y - 12.0)))
-		AudioBus.play("coin", RngService.cosmetic().randf_range(0.9, 1.3), -10.0)
-
-
-## Arrière-plan plein écran : rayons de lumière qui tournent derrière la machine, étincelles.
-func _draw_backdrop() -> void:
-	var c: Vector2 = _machine.position + MACHINE * _machine.scale * 0.5
-	var r: float = size.length()
-	for i: int in RAYS:
-		var a0: float = _t * 0.35 + TAU * float(i) / float(RAYS)
-		var a1: float = a0 + TAU / float(RAYS) * 0.45
-		var col: Color = Color(Palette.GOLD_LIGHT if i % 2 == 0 else Palette.MAGENTA, 0.06 + 0.12 * _rays)
-		_back.draw_colored_polygon(PackedVector2Array([c, c + Vector2(cos(a0), sin(a0)) * r, c + Vector2(cos(a1), sin(a1)) * r]), col)
-	for sp: Dictionary in _sparks:
-		var p: Vector2 = sp["p"]
-		var l: float = clampf(float(sp["l"]), 0.0, 1.0)
-		var col2: Color = sp["c"]
-		_back.draw_rect(Rect2(p - Vector2(4, 4) * l, Vector2(8, 8) * l), Color(col2, l))
-
-
-func _perimeter(r: Rect2, d: float) -> Vector2:
-	var w: float = r.size.x
-	var h: float = r.size.y
-	d = fposmod(d, (w + h) * 2.0)
-	if d < w:
-		return r.position + Vector2(d, 0)
-	if d < w + h:
-		return r.position + Vector2(w, d - w)
-	if d < w * 2.0 + h:
-		return r.position + Vector2(w - (d - w - h), h)
-	return r.position + Vector2(0, h - (d - w * 2.0 - h))
-
-
-func _draw_lever(m: Control) -> void:
-	var base: Vector2 = Vector2(770, 420)
-	m.draw_rect(Rect2(base - Vector2(10, 40), Vector2(40, 80)), Palette.GOLD_DARK)
-	var pull: float = sin(_lever * PI)
-	var top: Vector2 = base + Vector2(40, -170 + 260 * pull)
-	m.draw_line(base + Vector2(30, 0), top, Palette.GOLD_LIGHT, 10.0)
-	m.draw_circle(top, 26.0, Color("b81d3a"))
-	m.draw_circle(top + Vector2(-8, -8), 8.0, Color(1, 1, 1, 0.5))
-
-
-func _draw_texts(m: Control) -> void:
-	var f: Font = UiKit.font("display")
-	var fs: int = UiKit.fs(UiKit.SIZE_BODY)
-	var info: String = tr("SLOT_SPIN_COUNT") % [mini(_index + 1, _spins.size()), _spins.size()]
-	_text_center(m, f, fs, info, Vector2(MACHINE.x * 0.5 - 30, WINDOW.position.y - 34), Palette.IVORY)
-	if _step == Step.WAIT_PULL:
-		var a: float = 0.55 + 0.45 * sin(_t * 6.0)
-		var pull: String = tr("SLOT_PULL") % InputGlyphs.plain("ui_spin")
-		_text_center(m, f, fs, pull, Vector2(MACHINE.x * 0.5 - 30, TRAY.end.y + 52), Color(Palette.GOLD_LIGHT, a))
-	if _banner != "" and _step == Step.RESULT:
-		var u: float = 1.0 - _banner_t / RESULT_TIME
-		var pop: float = 1.0 + 0.3 * (1.0 - clampf(u * 5.0, 0.0, 1.0))
-		var bfs: int = int(UiKit.fs(UiKit.SIZE_H2) * pop)
-		_text_center(m, f, bfs, _banner, Vector2(MACHINE.x * 0.5 - 30, TRAY.end.y + 60), _banner_col)
-
-
-func _text_center(m: Control, f: Font, fs: int, txt: String, at: Vector2, col: Color) -> void:
-	var w: float = f.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
-	var maxw: float = WINDOW.size.x + 120.0
-	if w > maxw:
-		fs = int(float(fs) * maxw / w)
-		w = f.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
-	m.draw_string_outline(f, at - Vector2(w * 0.5, 0), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, 8, Palette.INK)
-	m.draw_string(f, at - Vector2(w * 0.5, 0), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, col)

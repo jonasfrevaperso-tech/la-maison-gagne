@@ -135,7 +135,12 @@ func load_settings() -> void:
 
 
 ## Anciennes clés : `video/fullscreen` (booléen) devient `video/window_mode`.
+## 1.5.2 : la vitesse d'animation repart une fois à ×1 (un réglage ×4 hérité restait collé).
 func _migrate() -> void:
+	if not _cfg.has_section_key("meta", "speed_reset_152"):
+		if _cfg.has_section_key("game", "speed"):
+			_cfg.set_value("game", "speed", 1)
+		_cfg.set_value("meta", "speed_reset_152", true)
 	if _cfg.has_section_key("video", "fullscreen"):
 		if not _cfg.has_section_key("video", "window_mode"):
 			_cfg.set_value("video", "window_mode", "fullscreen" if bool(_cfg.get_value("video", "fullscreen")) else "windowed")

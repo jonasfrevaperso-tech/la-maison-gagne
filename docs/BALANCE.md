@@ -256,3 +256,13 @@ Vérification finale avec tout le contenu 1.5.1 (machine à sous plus fréquente
 Le début plus doux compense des premiers paliers où le joueur n'a pas encore de build ; la fin plus raide demande de vrais moteurs multiplicatifs (les grigris ×Mult croissants permettent des tours à plusieurs millions). Le total d'un tour est plafonné à 10¹⁸.
 
 « Photo de Lucette » et « Réaction en chaîne » ressortent « dominants » (≈ 90 % de choix) : le bot glouton surévalue l'étiquette ×Mult. Leurs gains ont été réduits (+0,2 par jackpot ; +×0,35 par relance) sans effet sur le taux de choix, et le taux de victoire reste dans la cible : artefact du bot, à confirmer avec des parties humaines.
+
+## Version 1.5.2
+
+La machine à sous passe à quatre rouleaux avec deux symboles de plus (citron, fer à cheval) pour garder des combinaisons rares : paire ≈ 56 %, brelan ≈ 6,9 %, carré ≈ 0,3 % (cotes calculées par énumération, vérifiées par `test_v14_slot`). Les carrés ont des lots dédiés (`slot_prizes.json`), en repli sur le brelan puis la paire.
+
+| Bot | Parties | Victoire | 1.5.1 |
+|---|---|---|---|
+| glouton | 600 | **43,3 %** | 39,0 % |
+
+La hausse (+4,3 points) vient des lots de la machine à sous, plus variés et plus fréquents (paires à 4 rouleaux) ; elle reste dans la cible de 35–45 %, aucun réglage modifié. Correction qui touche l'adresse : aux Fléchettes, un appui immédiat ne tombe plus au centre (le banc des épreuves reste vert : bot ≥ 0,8, inactif ≤ 0,4 sur les 14 épreuves).

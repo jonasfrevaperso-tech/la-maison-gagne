@@ -11,11 +11,35 @@ var _phase: float = 0.0
 var _shake: float = 0.0
 var _end_t: float = -1.0
 var _ice_t: float = 0.0
+## Scène 3D : le bar et le shaker en inox qui tremble.
+var _shaker3: Node3D = null
+var _shaker_home: Vector3 = Vector3.ZERO
 
 
 func begin() -> void:
 	_phase = rng.randf() * TAU
 	_level = 0.15
+	_build_3d()
+
+
+func _build_3d() -> void:
+	var st: Stage3D = use_3d()
+	var r: Rect2 = play_rect()
+	st.env.background_color = Color(0.05, 0.03, 0.03)
+	st.key.light_energy = 0.4
+	st.frontal(0.005, r.get_center(), r.size.y, 36.0)
+	BarSet3D.build(st, r)
+	var px: float = st.px3
+	_shaker_home = st.to3(Vector2(r.position.x + 150.0, r.end.y - 16.0), 0.25)
+	_shaker3 = Node3D.new()
+	_shaker3.position = _shaker_home
+	st.root.add_child(_shaker3)
+	var steel: StandardMaterial3D = Stage3D.mat(Color(0.82, 0.84, 0.88), 0.45, 0.22)
+	var dark: StandardMaterial3D = Stage3D.mat(Color(0.6, 0.62, 0.66), 0.5, 0.3)
+	Stage3D.cylinder(_shaker3, 36.0 * px, 130.0 * px, Vector3(0, 65.0 * px, 0), steel, 46.0 * px).rotation.z = PI
+	Stage3D.cylinder(_shaker3, 40.0 * px, 22.0 * px, Vector3(0, 141.0 * px, 0), dark)
+	Stage3D.cylinder(_shaker3, 30.0 * px, 40.0 * px, Vector3(0, 172.0 * px, 0), steel, 14.0 * px)
+	Stage3D.cylinder(_shaker3, 16.0 * px, 14.0 * px, Vector3(0, 199.0 * px, 0), dark)
 
 
 func _band_center() -> float:
@@ -88,18 +112,11 @@ func bot_apply(w: Dictionary) -> void:
 
 func paint() -> void:
 	var r: Rect2 = play_rect()
-	# Shaker qui tremble.
-	var c: Vector2 = Vector2(r.position.x + 150.0, r.get_center().y + 8.0)
-	var jig: Vector2 = Vector2(sin(t * 70.0) * 10.0, cos(t * 55.0) * 6.0) * _shake
-	var rot: float = (0.25 if _last_side == 0 else -0.25) * _shake
-	draw_set_transform(c + jig, rot)
-	var steel: Color = Color(0.72, 0.74, 0.78)
-	draw_colored_polygon(PackedVector2Array([Vector2(-46, 90), Vector2(46, 90), Vector2(36, -40), Vector2(-36, -40)]), steel)
-	draw_rect(Rect2(-40, -60, 80, 22), steel.darkened(0.15))
-	draw_colored_polygon(PackedVector2Array([Vector2(-30, -60), Vector2(30, -60), Vector2(14, -100), Vector2(-14, -100)]), steel)
-	draw_rect(Rect2(-16, -112, 32, 14), steel.darkened(0.25))
-	draw_rect(Rect2(-30, -30, 10, 110), Color(1, 1, 1, 0.35))
-	draw_set_transform(Vector2.ZERO)
+	# Shaker 3D qui tremble et bascule du côté de la dernière secousse.
+	if _shaker3 != null:
+		var jig: Vector3 = Vector3(sin(t * 70.0) * 0.05, cos(t * 55.0) * 0.03, 0) * _shake
+		_shaker3.position = _shaker_home + jig
+		_shaker3.rotation.z = -(0.25 if _last_side == 0 else -0.25) * _shake
 	# Jauge de mousse et bande dorée.
 	var g: Rect2 = Rect2(Vector2(r.position.x + 330.0, r.position.y + 30.0), Vector2(70.0, r.size.y - 50.0))
 	draw_rect(g, Palette.VELVET_DEEP)

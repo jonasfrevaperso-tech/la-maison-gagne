@@ -242,9 +242,11 @@ func stop_ambience() -> void:
 		_ambience.stream = null
 
 
-func play_ambience(amb_id: String) -> void:
+## `db` : atténuation propre à la scène (la pluie de la cinématique reste en fond).
+func play_ambience(amb_id: String, db: float = 0.0) -> void:
 	if _silent:
 		return
+	_ambience.volume_db = db
 	var path: String = "%s%s.wav" % [SFX_DIR, amb_id]
 	if ResourceLoader.exists(path) and (_ambience.stream == null or _ambience.stream.resource_path != path):
 		_ambience.stream = _looping(load(path) as AudioStream)

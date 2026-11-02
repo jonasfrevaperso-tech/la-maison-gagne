@@ -46,6 +46,12 @@
 - ✅ Super builds : ×Mult croissants, nombres abrégés, Mult en feu ; courbe de dettes façon Balatro.
 - ✅ Dépôt GitHub public et releases.
 
+## 1.5.2 — Lumières sur la table ✅
+- ✅ Épreuves retravaillées, onze en 3D ; cartons d'annonce illustrés en pixel art ; couleurs Xbox.
+- ✅ Machine à sous 3D à quatre rouleaux, tirage lent et à suspense, carrés.
+- ✅ Menu principal en 3D (salle abandonnée), résumé de la partie, astuces.
+- ✅ Confort : rythme sans accords opposés, bonneteau sans indice, vitesse ×1, pluie adoucie, options lisibles.
+
 ## 1.6 — Pistes
 - Glyphes Steam Deck et PlayStation au choix (le Deck accepte déjà les glyphes Xbox).
 - Classement partagé de la Course de graine (export/import d'un fichier de résultats, sans serveur).

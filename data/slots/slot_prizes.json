@@ -198,5 +198,225 @@
   "name_en": "×1.5 Mult next spin",
   "desc_fr": "×1,5 Mult au prochain tour",
   "desc_en": "×1.5 Mult next spin"
+ },
+ {
+  "id": "p_seven4",
+  "match": "quad",
+  "symbol": "seven",
+  "do": [
+   {
+    "op": "add_spins",
+    "v": 2
+   },
+   {
+    "op": "add_money",
+    "v": 15
+   }
+  ],
+  "name_fr": "MÉGA TOUR ! +2 tours et +15 $",
+  "name_en": "MEGA SPIN! +2 spins and +15 $",
+  "desc_fr": "MÉGA TOUR ! +2 tours et +15 $",
+  "desc_en": "MEGA SPIN! +2 spins and +15 $"
+ },
+ {
+  "id": "p_cherry4",
+  "match": "quad",
+  "symbol": "cherry",
+  "do": [
+   {
+    "op": "temp_mult",
+    "v": 12
+   },
+   {
+    "op": "temp_xmult",
+    "v": 3
+   }
+  ],
+  "name_fr": "×3 et +12 Mult au prochain tour",
+  "name_en": "×3 and +12 Mult next spin",
+  "desc_fr": "×3 et +12 Mult au prochain tour",
+  "desc_en": "×3 and +12 Mult next spin"
+ },
+ {
+  "id": "p_bell4",
+  "match": "quad",
+  "symbol": "bell",
+  "do": [
+   {
+    "op": "add_money",
+    "v": 20
+   },
+   {
+    "op": "add_random_seal",
+    "seal": "seal_bell"
+   },
+   {
+    "op": "add_random_seal",
+    "seal": "seal_bell"
+   }
+  ],
+  "name_fr": "+20 $ et deux Sceaux Cloche",
+  "name_en": "+20 $ and two Bell Seals",
+  "desc_fr": "+20 $ et deux Sceaux Cloche",
+  "desc_en": "+20 $ and two Bell Seals"
+ },
+ {
+  "id": "p_clover4",
+  "match": "quad",
+  "symbol": "clover",
+  "do": [
+   {
+    "op": "temp_control",
+    "v": 0.25
+   },
+   {
+    "op": "temp_precision",
+    "v": 2
+   }
+  ],
+  "name_fr": "Main d'or : +25 % de contrôle et +2 Précision au prochain lancer",
+  "name_en": "Golden hand: +25% control and +2 Precision next throw",
+  "desc_fr": "Main d'or : +25 % de contrôle et +2 Précision au prochain lancer",
+  "desc_en": "Golden hand: +25% control and +2 Precision next throw"
+ },
+ {
+  "id": "p_chip4",
+  "match": "quad",
+  "symbol": "chip",
+  "do": [
+   {
+    "op": "temp_budget",
+    "v": 8
+   },
+   {
+    "op": "add_money",
+    "v": 5
+   }
+  ],
+  "name_fr": "+8 jetons de mise au prochain tour et +5 $",
+  "name_en": "+8 betting chips next spin and +5 $",
+  "desc_fr": "+8 jetons de mise au prochain tour et +5 $",
+  "desc_en": "+8 betting chips next spin and +5 $"
+ },
+ {
+  "id": "p_diamond4",
+  "match": "quad",
+  "symbol": "diamond",
+  "do": [
+   {
+    "op": "add_grigri",
+    "rarity": "legendary"
+   },
+   {
+    "op": "add_money",
+    "v": 10
+   }
+  ],
+  "name_fr": "Un grigri LÉGENDAIRE offert (si place libre) et +10 $",
+  "name_en": "A LEGENDARY charm (if room) and +10 $",
+  "desc_fr": "Un grigri LÉGENDAIRE offert (si place libre) et +10 $",
+  "desc_en": "A LEGENDARY charm (if room) and +10 $"
+ },
+ {
+  "id": "p_lemon2",
+  "match": "pair",
+  "symbol": "lemon",
+  "do": [
+   {
+    "op": "add_money",
+    "v": 1
+   }
+  ],
+  "name_fr": "+1 $",
+  "name_en": "+1 $",
+  "desc_fr": "+1 $",
+  "desc_en": "+1 $"
+ },
+ {
+  "id": "p_lemon3",
+  "match": "triple",
+  "symbol": "lemon",
+  "do": [
+   {
+    "op": "add_money",
+    "v": 6
+   }
+  ],
+  "name_fr": "+6 $",
+  "name_en": "+6 $",
+  "desc_fr": "+6 $",
+  "desc_en": "+6 $"
+ },
+ {
+  "id": "p_lemon4",
+  "match": "quad",
+  "symbol": "lemon",
+  "do": [
+   {
+    "op": "add_money",
+    "v": 15
+   },
+   {
+    "op": "temp_mult",
+    "v": 5
+   }
+  ],
+  "name_fr": "+15 $ et +5 Mult au prochain tour",
+  "name_en": "+15 $ and +5 Mult next spin",
+  "desc_fr": "+15 $ et +5 Mult au prochain tour",
+  "desc_en": "+15 $ and +5 Mult next spin"
+ },
+ {
+  "id": "p_horseshoe2",
+  "match": "pair",
+  "symbol": "horseshoe",
+  "do": [
+   {
+    "op": "temp_mult",
+    "v": 1
+   }
+  ],
+  "name_fr": "+1 Mult au prochain tour",
+  "name_en": "+1 Mult next spin",
+  "desc_fr": "+1 Mult au prochain tour",
+  "desc_en": "+1 Mult next spin"
+ },
+ {
+  "id": "p_horseshoe3",
+  "match": "triple",
+  "symbol": "horseshoe",
+  "do": [
+   {
+    "op": "temp_precision",
+    "v": 1
+   },
+   {
+    "op": "temp_control",
+    "v": 0.1
+   }
+  ],
+  "name_fr": "Porte-bonheur : +1 Précision et +10 % de contrôle au prochain lancer",
+  "name_en": "Lucky charm: +1 Precision and +10% control next throw",
+  "desc_fr": "Porte-bonheur : +1 Précision et +10 % de contrôle au prochain lancer",
+  "desc_en": "Lucky charm: +1 Precision and +10% control next throw"
+ },
+ {
+  "id": "p_horseshoe4",
+  "match": "quad",
+  "symbol": "horseshoe",
+  "do": [
+   {
+    "op": "temp_xmult",
+    "v": 2
+   },
+   {
+    "op": "temp_control",
+    "v": 0.2
+   }
+  ],
+  "name_fr": "×2 Mult et +20 % de contrôle au prochain tour",
+  "name_en": "×2 Mult and +20% control next spin",
+  "desc_fr": "×2 Mult et +20 % de contrôle au prochain tour",
+  "desc_en": "×2 Mult and +20% control next spin"
  }
 ]

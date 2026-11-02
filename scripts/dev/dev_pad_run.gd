@@ -166,11 +166,16 @@ func _signature() -> String:
 	if ctl != null and ctl.run != null:
 		run_sig = "%d/%d/%d/%d/%d" % [ctl.run.total_spins, ctl.run.phase, ctl.run.slip.total(), ctl.run.money, ctl.run.grigris.size()]
 	var rs: RunScreen = _run_screen()
-	return "%s|%s|%s|%s" % [
+	var ov: String = "-"
+	if rs != null and rs.overlay_root.get_child_count() > 0:
+		var top: Node = rs.overlay_root.get_child(rs.overlay_root.get_child_count() - 1)
+		ov = String(top.get_script().get_global_name()) if top.get_script() != null else top.get_class()
+	return "%s|%s|%s|%s|%s" % [
 		root.get_class() + ":" + String(root.name) if root != null else "-",
 		String(f.name) if f != null else "-",
 		run_sig,
 		str(rs.state) if rs != null else "-",
+		ov,
 	]
 
 

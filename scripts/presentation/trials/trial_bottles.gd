@@ -31,13 +31,87 @@ var _phase_t: float = 0.0
 ## Valeurs de l'image précédente (le bot détecte le passage sur la cible).
 var _prev_aim: float = 0.0
 var _prev_power: float = 0.0
+## Scène 3D : bouteilles de verre sur l'étagère, comptoir, mur de briques, néon « BAR ».
+var _bottles3: Array[Node3D] = []
+var _chip3: Node3D = null
+var _neon: Label3D = null
+var _neon_light: OmniLight3D = null
 
 
 func begin() -> void:
 	for k: int in BOTTLES:
 		_xs.append(lerpf(SHELF_X.x, SHELF_X.y, (float(k) + 0.5) / float(BOTTLES)) + rng.randf_range(-20.0, 20.0))
 		_alive.append(true)
+	_build_3d()
 	_next_target()
+
+
+func _build_3d() -> void:
+	var st: Stage3D = use_3d()
+	st.env.background_color = Color(0.05, 0.03, 0.03)
+	st.key.light_energy = 0.3
+	st.frontal(0.0042, Vector2(960.0, SHELF_Y), 1080.0, 40.0)
+	var r: Node3D = st.root
+	var px: float = st.px3
+	# Mur de briques (texture procédurale), néon qui grésille.
+	var wall: StandardMaterial3D = Stage3D.mat(Color.WHITE, 0.0, 0.95)
+	wall.albedo_texture = _brick_texture()
+	wall.uv1_scale = Vector3(16, 8, 1)
+	wall.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	Stage3D.box(r, Vector3(1920.0 * px * 1.6, 1080.0 * px * 1.4, 0.1), st.to3(Vector2(960, 400), -0.6), wall)
+	_neon = Stage3D.text3d(r, "BAR", st.to3(Vector2(960, 230), -0.5), 260, Palette.MAGENTA, Color("4a0a2a"))
+	_neon_light = Stage3D.omni(r, Palette.MAGENTA, 1.6, st.to3(Vector2(960, 260), 0.0), 4.0)
+	# Étagère.
+	var shelf_w: float = (SHELF_X.y - SHELF_X.x + 240.0) * px
+	Stage3D.box(r, Vector3(shelf_w, 22.0 * px, 0.32), st.to3(Vector2(960, SHELF_Y + 11.0), 0.0), Stage3D.mat(Color(0.36, 0.21, 0.1), 0.0, 0.6))
+	for x: float in [SHELF_X.x - 60.0, SHELF_X.y + 60.0]:
+		Stage3D.box(r, Vector3(0.04, 0.12, 0.25), st.to3(Vector2(x, SHELF_Y + 40.0), -0.02), Stage3D.mat(Color(0.3, 0.3, 0.32), 0.8, 0.3))
+	# Bouteilles : corps, épaule, goulot, capsule, étiquette ; verre translucide.
+	for k: int in BOTTLES:
+		var b: Node3D = Node3D.new()
+		b.position = st.to3(Vector2(_xs[k], SHELF_Y))
+		r.add_child(b)
+		var glass: StandardMaterial3D = Stage3D.mat(GLASS[k % GLASS.size()].lightened(0.15), 0.2, 0.08)
+		glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		glass.albedo_color.a = 0.78
+		glass.rim_enabled = true
+		glass.rim = 0.6
+		var rad: float = BOTTLE_W * 0.5 * px
+		var body_h: float = BOTTLE_H * 0.62 * px
+		Stage3D.cylinder(b, rad, body_h, Vector3(0, body_h * 0.5, 0), glass)
+		var sh_h: float = BOTTLE_H * 0.2 * px
+		Stage3D.cylinder(b, rad, sh_h, Vector3(0, body_h + sh_h * 0.5, 0), glass, rad * 0.38)
+		var neck_h: float = BOTTLE_H * 0.18 * px
+		Stage3D.cylinder(b, rad * 0.38, neck_h, Vector3(0, body_h + sh_h + neck_h * 0.5, 0), glass)
+		Stage3D.cylinder(b, rad * 0.46, 8.0 * px, Vector3(0, BOTTLE_H * px, 0), Stage3D.mat(Palette.GOLD, 0.8, 0.3))
+		Stage3D.cylinder(b, rad * 1.02, 34.0 * px, Vector3(0, body_h * 0.55, 0), Stage3D.mat(Palette.IVORY.darkened(0.2), 0.0, 0.8))
+		_bottles3.append(b)
+	# Comptoir au premier plan.
+	var top: Vector3 = st.to3(Vector2(960, 800), 0.0)
+	Stage3D.box(r, Vector3(1920.0 * px * 1.3, 0.08, 0.9), Vector3(0, top.y, 0.9), Stage3D.mat(Color(0.42, 0.26, 0.12), 0.2, 0.35))
+	Stage3D.box(r, Vector3(1920.0 * px * 1.3, 2.0, 0.1), Vector3(0, top.y - 1.0, 1.35), Stage3D.mat(Color(0.22, 0.12, 0.06), 0.0, 0.7))
+	var lamp: OmniLight3D = Stage3D.omni(r, Color(1.0, 0.85, 0.6), 2.5, st.to3(Vector2(960, 300), 1.2), 6.0)
+	lamp.shadow_enabled = not Settings.b("video", "handheld")
+	# Jeton lancé.
+	_chip3 = Node3D.new()
+	r.add_child(_chip3)
+	var chip_body: MeshInstance3D = Stage3D.cylinder(_chip3, 34.0 * px, 8.0 * px, Vector3.ZERO, Stage3D.mat(Palette.ROULETTE_RED, 0.1, 0.4))
+	chip_body.rotation.x = PI * 0.5
+	var ring: MeshInstance3D = Stage3D.cylinder(_chip3, 24.0 * px, 9.0 * px, Vector3.ZERO, Stage3D.mat(Palette.IVORY, 0.0, 0.5))
+	ring.rotation.x = PI * 0.5
+
+
+static func _brick_texture() -> ImageTexture:
+	var w: int = 64
+	var h: int = 32
+	var img: Image = Image.create(w, h, false, Image.FORMAT_RGB8)
+	img.fill(Color(0.05, 0.03, 0.03))
+	for row: int in 4:
+		var off: int = 0 if row % 2 == 0 else 8
+		for col: int in 5:
+			var shade: float = 0.1 + 0.03 * float((row * 7 + col * 13) % 5) / 4.0
+			img.fill_rect(Rect2i(off + col * 16 - 8, row * 8 + 1, 15, 7), Color(shade + 0.06, shade * 0.6, shade * 0.5))
+	return ImageTexture.create_from_image(img)
 
 
 func _next_target() -> void:
@@ -160,10 +234,12 @@ func bot_apply(w: Dictionary) -> void:
 
 
 func paint() -> void:
-	_draw_bar()
+	_sync_3d()
 	for k: int in BOTTLES:
-		if _alive[k]:
-			_draw_bottle(_xs[k], k == _target and _phase != Phase.REST, GLASS[k % GLASS.size()])
+		if _alive[k] and k == _target and _phase != Phase.REST:
+			var pulse: float = 0.5 + 0.5 * sin(t * 8.0)
+			var hl: Rect2 = Rect2(_xs[k] - BOTTLE_W * 0.8, SHELF_Y - BOTTLE_H - 14, BOTTLE_W * 1.6, BOTTLE_H + 18)
+			draw_rect(hl, Color(Palette.GOLD_LIGHT, 0.3 + 0.4 * pulse), false, 3.0)
 	for sh: Dictionary in _shards:
 		var c: Color = sh["c"]
 		c.a = clampf(float(sh["t"]), 0.0, 1.0)
@@ -176,49 +252,28 @@ func paint() -> void:
 		Phase.POWER:
 			_draw_reticle(_aim_lock, Palette.GOLD_LIGHT)
 			_draw_power()
-		Phase.FLIGHT:
-			var u: float = clampf(_phase_t / p("flight_seconds"), 0.0, 1.0)
-			var dest: Vector2 = Vector2(_aim_lock, SHELF_Y - BOTTLE_H * (0.35 + 0.6 * (_power - 0.4)))
-			var pos: Vector2 = HAND.lerp(dest, u) + Vector2(0, -260.0 * sin(u * PI))
-			_draw_chip(pos, 1.0 - u * 0.55, _phase_t * 18.0)
-	if _phase != Phase.FLIGHT:
-		_draw_chip(HAND, 1.0, 0.0)
 
 
-func _draw_bar() -> void:
-	# Mur de briques sombres, néon « BAR » qui grésille, étagère, comptoir.
-	draw_rect(Rect2(0, 0, size.x, 780), Color(0.09, 0.05, 0.05))
-	for row: int in 20:
-		var y: float = 140.0 + row * 32.0
-		var off: float = 0.0 if row % 2 == 0 else 40.0
-		for col: int in 26:
-			var br: Rect2 = Rect2(off + col * 80.0 - 40.0, y, 76.0, 28.0)
-			var shade: float = 0.07 + 0.03 * float((row * 7 + col * 13) % 5) / 4.0
-			draw_rect(br, Color(shade + 0.05, shade * 0.6, shade * 0.5))
-	var flick: float = 0.75 + 0.25 * (1.0 if fposmod(t * 7.3, 3.1) > 0.2 else 0.0)
-	text(Vector2(960, 230), "BAR", UiKit.SIZE_H1 + 30, Color(Palette.MAGENTA, flick), "display", 10)
-	draw_rect(Rect2(SHELF_X.x - 120.0, SHELF_Y, SHELF_X.y - SHELF_X.x + 240.0, 22.0), Color(0.32, 0.19, 0.09))
-	draw_rect(Rect2(SHELF_X.x - 120.0, SHELF_Y + 22.0, SHELF_X.y - SHELF_X.x + 240.0, 8.0), Color(0.16, 0.09, 0.04))
-	draw_rect(Rect2(0, 780, size.x, 300), Color(0.22, 0.12, 0.06))
-	draw_rect(Rect2(0, 780, size.x, 14), Color(0.42, 0.26, 0.12))
-	for k: int in 8:
-		draw_line(Vector2(k * 260.0, 800), Vector2(k * 260.0 + 140.0, 1080), Color(0.17, 0.09, 0.04), 3.0)
-
-
-func _draw_bottle(x: float, highlight: bool, glass: Color) -> void:
-	var base: Vector2 = Vector2(x, SHELF_Y)
-	var body: Rect2 = Rect2(base.x - BOTTLE_W * 0.5, base.y - BOTTLE_H * 0.62, BOTTLE_W, BOTTLE_H * 0.62)
-	draw_rect(body, glass)
-	draw_colored_polygon(PackedVector2Array([body.position, body.position + Vector2(BOTTLE_W, 0),
-		Vector2(x + 9, base.y - BOTTLE_H * 0.82), Vector2(x - 9, base.y - BOTTLE_H * 0.82)]), glass)
-	draw_rect(Rect2(x - 9, base.y - BOTTLE_H, 18, BOTTLE_H * 0.18), glass.darkened(0.1))
-	draw_rect(Rect2(x - 11, base.y - BOTTLE_H - 4, 22, 8), Palette.GOLD_DARK)
-	draw_rect(Rect2(body.position.x + 4, body.position.y + 26, BOTTLE_W - 8, 34), Palette.IVORY.darkened(0.25))
-	draw_rect(Rect2(body.position.x + 6, body.position.y + 6, 6, BOTTLE_H * 0.5), Color(1, 1, 1, 0.18))
-	if highlight:
-		var pulse: float = 0.5 + 0.5 * sin(t * 8.0)
-		var hl: Rect2 = Rect2(x - BOTTLE_W * 0.8, base.y - BOTTLE_H - 14, BOTTLE_W * 1.6, BOTTLE_H + 18)
-		draw_rect(hl, Color(Palette.GOLD_LIGHT, 0.3 + 0.4 * pulse), false, 3.0)
+func _sync_3d() -> void:
+	if stage == null:
+		return
+	for k: int in _bottles3.size():
+		_bottles3[k].visible = _alive[k]
+		_bottles3[k].rotation.z = sin(t * 2.0 + float(k)) * 0.01
+	var flick: float = 1.0 if fposmod(t * 7.3, 3.1) > 0.2 else 0.35
+	_neon.modulate = Color(Palette.MAGENTA, flick)
+	_neon_light.light_energy = 1.6 * flick
+	var pos: Vector2 = HAND
+	var spin: float = 0.0
+	var depth: float = 1.45
+	if _phase == Phase.FLIGHT:
+		var u: float = clampf(_phase_t / p("flight_seconds"), 0.0, 1.0)
+		var dest: Vector2 = Vector2(_aim_lock, SHELF_Y - BOTTLE_H * (0.35 + 0.6 * (_power - 0.4)))
+		pos = HAND.lerp(dest, u) + Vector2(0, -260.0 * sin(u * PI))
+		spin = _phase_t * 18.0
+		depth = lerpf(1.45, 0.12, u)
+	_chip3.position = stage.to3(pos, depth)
+	_chip3.rotation = Vector3(spin, 0, 0)
 
 
 func _draw_reticle(x: float, col: Color) -> void:
@@ -241,13 +296,3 @@ func _draw_power() -> void:
 	text(Vector2(r.get_center().x, r.position.y - 24), tr("TRIAL_BOTTLES_POWER"), UiKit.SIZE_SMALL, Palette.IVORY)
 
 
-func _draw_chip(at: Vector2, sc: float, spin: float) -> void:
-	var rx: float = 34.0 * sc
-	var ry: float = rx * absf(cos(spin)) + 4.0
-	draw_set_transform(at, 0.0, Vector2(1.0, ry / rx))
-	draw_circle(Vector2.ZERO, rx, Palette.ROULETTE_RED)
-	draw_arc(Vector2.ZERO, rx * 0.72, 0, TAU, 24, Palette.IVORY, 4.0 * sc, true)
-	for k: int in 6:
-		var a: float = TAU * float(k) / 6.0
-		draw_line(Vector2(cos(a), sin(a)) * rx * 0.78, Vector2(cos(a), sin(a)) * rx, Palette.IVORY, 5.0 * sc)
-	draw_set_transform(Vector2.ZERO)

@@ -6,6 +6,7 @@ extends ThrowTrial
 ## Le temps de réflexion se resserre à chaque carte. Note = part des bons choix.
 
 const RANKS: Array[String] = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "V", "D", "R"]
+const RANKS_EN: Array[String] = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
 const CARD: Vector2 = Vector2(130.0, 180.0)
 
 var _cards: Array[int] = []
@@ -97,11 +98,76 @@ func _draw_card(at: Vector2, rank: int, face: bool) -> void:
 	if not face:
 		draw_rect(r, Palette.ROULETTE_RED.darkened(0.3))
 		draw_rect(r.grow(-8), Palette.GOLD_DARK, false, 2.0)
+		for k: int in 5:
+			var y: float = r.position.y + 24.0 + float(k) * 33.0
+			draw_line(Vector2(r.position.x + 14, y), Vector2(r.end.x - 14, y + 16.0), Color(Palette.GOLD_DARK, 0.5), 2.0)
 		return
 	draw_rect(r, Palette.IVORY)
+	draw_rect(r.grow(-5), Color(Palette.GOLD_DARK, 0.5), false, 1.0)
 	var red: bool = rank % 2 == 0
-	text(r.get_center(), RANKS[rank - 1], UiKit.SIZE_H1, Palette.ROULETTE_RED if red else Palette.INK, "display", 0)
-	text(r.position + Vector2(22, 24), RANKS[rank - 1], UiKit.SIZE_SMALL, Palette.ROULETTE_RED if red else Palette.INK, "display", 0)
+	var ink: Color = Palette.ROULETTE_RED if red else Palette.INK
+	var label: String = (RANKS_EN if Localization.locale().begins_with("en") else RANKS)[rank - 1]
+	# Index dans les coins (lettre + couleur), comme une vraie carte.
+	text(r.position + Vector2(20, 22), label, UiKit.SIZE_SMALL, ink, "display", 0)
+	_suit(r.position + Vector2(20, 46), 7.0, red)
+	text(r.end - Vector2(20, 46), label, UiKit.SIZE_SMALL, ink, "display", 0)
+	_suit(r.end - Vector2(20, 22), 7.0, red)
+	var c: Vector2 = r.get_center()
+	if rank >= 11:
+		# Figure : son emblème au centre (bonnet à plume, diadème, couronne), lettre dessous.
+		_figure(c + Vector2(0, -16), rank, ink)
+		text(c + Vector2(0, 46), label, UiKit.SIZE_H2, ink, "display", 0)
+	else:
+		text(c + Vector2(0, -8), label, UiKit.SIZE_H1, ink, "display", 0)
+		_suit(c + Vector2(0, 46), 13.0, red)
+
+
+## Symbole de couleur : cœur (rouge) ou pique (noir).
+func _suit(at: Vector2, s: float, red: bool) -> void:
+	if red:
+		draw_circle(at + Vector2(-s * 0.5, -s * 0.3), s * 0.55, Palette.ROULETTE_RED)
+		draw_circle(at + Vector2(s * 0.5, -s * 0.3), s * 0.55, Palette.ROULETTE_RED)
+		var tri: PackedVector2Array = PackedVector2Array([
+			at + Vector2(-s * 1.02, -s * 0.15), at + Vector2(s * 1.02, -s * 0.15), at + Vector2(0, s)])
+		draw_colored_polygon(tri, Palette.ROULETTE_RED)
+	else:
+		draw_circle(at + Vector2(-s * 0.5, s * 0.2), s * 0.55, Palette.INK)
+		draw_circle(at + Vector2(s * 0.5, s * 0.2), s * 0.55, Palette.INK)
+		var tip: PackedVector2Array = PackedVector2Array([
+			at + Vector2(-s * 1.02, s * 0.05), at + Vector2(s * 1.02, s * 0.05), at + Vector2(0, -s)])
+		draw_colored_polygon(tip, Palette.INK)
+		draw_colored_polygon(PackedVector2Array([at + Vector2(0, s * 0.3), at + Vector2(-s * 0.4, s), at + Vector2(s * 0.4, s)]), Palette.INK)
+
+
+## Emblème des figures : Valet = bonnet à plume, Dame = diadème et rose, Roi = couronne fermée.
+func _figure(c: Vector2, rank: int, ink: Color) -> void:
+	var gold: Color = Palette.GOLD
+	var dark: Color = Palette.GOLD_DARK
+	match rank:
+		11:
+			draw_colored_polygon(PackedVector2Array([c + Vector2(-30, 14), c + Vector2(30, 14), c + Vector2(22, -8), c + Vector2(-18, -14)]), ink)
+			draw_rect(Rect2(c + Vector2(-32, 12), Vector2(64, 8)), dark)
+			draw_colored_polygon(PackedVector2Array([c + Vector2(14, -8), c + Vector2(40, -40), c + Vector2(46, -34), c + Vector2(20, -4)]), gold)
+			for k: int in 4:
+				draw_line(c + Vector2(22 + k * 6, -14 - k * 7), c + Vector2(30 + k * 6, -12 - k * 7), dark, 2.0)
+		12:
+			draw_colored_polygon(PackedVector2Array([c + Vector2(-30, 16), c + Vector2(30, 16), c + Vector2(30, 0), c + Vector2(15, -18),
+				c + Vector2(0, -4), c + Vector2(-15, -18), c + Vector2(-30, 0)]), gold)
+			draw_rect(Rect2(c + Vector2(-30, 10), Vector2(60, 6)), dark)
+			for x: float in [-15.0, 15.0]:
+				draw_circle(c + Vector2(x, -20), 4.0, ink)
+			draw_circle(c + Vector2(0, -12), 6.0, Palette.ROULETTE_RED)
+			draw_circle(c + Vector2(0, -12), 3.0, Palette.ROULETTE_RED.lightened(0.3))
+		_:
+			draw_colored_polygon(PackedVector2Array([c + Vector2(-32, 18), c + Vector2(32, 18), c + Vector2(34, -14), c + Vector2(17, 0),
+				c + Vector2(0, -24), c + Vector2(-17, 0), c + Vector2(-34, -14)]), gold)
+			draw_rect(Rect2(c + Vector2(-32, 10), Vector2(64, 8)), dark)
+			for x: float in [-34.0, 0.0, 34.0]:
+				draw_circle(c + Vector2(x, -14 if x != 0.0 else -26), 5.0, gold)
+			draw_line(c + Vector2(0, -32), c + Vector2(0, -44), gold, 3.0)
+			draw_line(c + Vector2(-5, -38), c + Vector2(5, -38), gold, 3.0)
+			for x: float in [-16.0, 0.0, 16.0]:
+				draw_circle(c + Vector2(x, 14), 3.0, ink if x != 0.0 else Palette.CYAN)
 
 
 func paint() -> void:

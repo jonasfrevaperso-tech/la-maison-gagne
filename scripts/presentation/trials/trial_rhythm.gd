@@ -2,7 +2,7 @@ class_name TrialRhythm
 extends ThrowTrial
 ## EFFET : un vrai petit jeu de rythme. Un morceau (jazz, funk ou mambo) démarre après une
 ## mesure de décompte ; les notes glissent sur quatre couloirs vers la ligne et tombent sur la
-## grille du morceau (croches), avec des accords (deux couloirs à la fois).
+## grille du morceau (croches), avec des accords (deux couloirs voisins à la fois).
 ## Clavier : flèches ; manette : X / Y / B / A ; souris : clics gauche / droit (deux couloirs).
 ## Note = moyenne des notes frappées, moins une pénalité par frappe dans le vide.
 
@@ -10,7 +10,8 @@ const LANE_KEYS: Array[String] = ["pad_x", "pad_y", "pad_b", "pad_a"]
 const MOUSE_KEYS: Array[String] = ["mouse_left", "mouse_right"]
 const ARROWS: Array[Vector2] = [Vector2.LEFT, Vector2.UP, Vector2.RIGHT, Vector2.DOWN]
 const LANE_SFX: Array[String] = ["qte_kick", "qte_snare", "qte_hat", "qte_clap"]
-const LANE_COLORS: Array[Color] = [Palette.CYAN, Palette.GOLD_LIGHT, Palette.MAGENTA, Palette.EMERALD]
+## Couleurs des boutons Xbox (X bleu, Y jaune, B rouge, A vert), comme le tri et le juke-box.
+const LANE_COLORS: Array[Color] = [Color("2f7bff"), Color("ffc81e"), Color("e8343e"), Color("38c14a")]
 const PROMPT: float = 38.0
 const HIT_X: float = 96.0
 const GROOVES: Array[String] = ["jazz", "funk", "mambo"]
@@ -67,7 +68,9 @@ func begin() -> void:
 		_add(picked[i], lane)
 		if chords > 0 and picked[i] % 4 == 0 and i > 0:
 			chords -= 1
-			_add(picked[i], (lane + 1 + rng.randi_range(0, _lanes - 2)) % _lanes)
+			# Accord : toujours deux boutons voisins (X+Y, Y+B, B+A, A+X), jamais opposés (X+B, Y+A),
+			# qu'un seul pouce ne peut pas presser ensemble à la manette.
+			_add(picked[i], (lane + (1 if rng.randf() < 0.5 else _lanes - 1)) % _lanes)
 	_end = _lead + float(steps) * _beat * 0.5 + _window() + 0.3
 	AudioBus.duck_music(true)
 	AudioBus.play("groove_" + _groove, 1.0, -2.0)
@@ -79,8 +82,13 @@ func _add(step: int, lane: int) -> void:
 	_scores.append(-1.0)
 
 
+## Fenêtre propre au rythme (plus large que l'invite d'effet : on suit une musique).
 func _window() -> float:
-	return ThrowSkill.tap_window(assist)
+	return (p("window_seconds") + p("perfect_seconds")) * widen()
+
+
+func _tap_score(err: float) -> float:
+	return ThrowSkill.timing_score(err, p("perfect_seconds") * widen(), p("window_seconds") * widen())
 
 
 func handle(event: InputEvent) -> bool:
@@ -107,7 +115,7 @@ func tap(lane: int) -> void:
 		_combo = 0
 		AudioBus.play("click", 0.6, -10.0)
 		return
-	var sc: float = ThrowSkill.tap_score(best_err, assist)
+	var sc: float = _tap_score(best_err)
 	_scores[best] = sc
 	pop(Vector2(HIT_X, _lane_y(lane) - 26.0), sc)
 	AudioBus.play(LANE_SFX[lane], 1.0, -3.0)
@@ -172,6 +180,7 @@ func paint() -> void:
 	if count_in > 0 and t < _lead:
 		text(Vector2(r.get_center().x, r.position.y + 52.0), str(count_in), UiKit.SIZE_H2, Palette.IVORY)
 	var beat_pulse: float = 1.0 - fposmod(t, _beat) / _beat
+	_draw_stage(r, beat_pulse)
 	for l: int in _lanes:
 		var y: float = _lane_y(l)
 		var lane_r: Rect2 = Rect2(r.position.x + 20.0, y - lane_h * 0.42, r.size.x - 40.0, lane_h * 0.84)
@@ -197,8 +206,28 @@ func paint() -> void:
 		if u2 > 1.0 or u2 < -0.3:
 			continue
 		var x2: float = HIT_X + u2 * (r.end.x - 30.0 - HIT_X)
-		_prompt(Vector2(x2, _lane_y(_lane_of[i])), _lane_of[i], clampf(1.2 - u2, 0.45, 1.0))
+		var ny: float = _lane_y(_lane_of[i])
+		var lc: Color = LANE_COLORS[_lane_of[i]]
+		# Traînée lumineuse derrière la note.
+		draw_rect(Rect2(x2, ny - 4.0, 70.0, 8.0), Color(lc, 0.18))
+		draw_circle(Vector2(x2, ny), PROMPT * 0.72, Color(lc, 0.22))
+		_prompt(Vector2(x2, ny), _lane_of[i], clampf(1.2 - u2, 0.45, 1.0))
 	pips_line(r)
+
+
+## Scène de cabaret : rideau sombre, égaliseur qui bat la mesure, projecteurs colorés.
+func _draw_stage(r: Rect2, pulse: float) -> void:
+	draw_rect(Rect2(r.position + Vector2(3, 3), r.size - Vector2(6, 6)), Color(0.05, 0.02, 0.05))
+	var bars: int = 34
+	var w: float = (r.size.x - 40.0) / float(bars)
+	for k: int in bars:
+		var h: float = (0.25 + 0.75 * absf(sin(t * 2.3 + float(k) * 0.7) * cos(t * 1.1 + float(k) * 0.31))) * (0.55 + 0.45 * pulse)
+		var bh: float = h * (r.size.y - 60.0) * 0.8
+		var col: Color = LANE_COLORS[k % LANE_COLORS.size()]
+		draw_rect(Rect2(r.position.x + 20.0 + float(k) * w + 2.0, r.end.y - 20.0 - bh, w - 4.0, bh), Color(col, 0.07))
+	for k: int in 3:
+		var cx: float = r.position.x + r.size.x * (0.3 + 0.2 * float(k)) + sin(t * 0.8 + float(k) * 2.0) * 120.0
+		draw_circle(Vector2(cx, r.position.y + r.size.y * 0.55), 150.0, Color(LANE_COLORS[(k + int(t / _beat)) % 4], 0.04 + 0.04 * pulse))
 
 
 ## Barre de progression du morceau.

@@ -19,10 +19,74 @@ var _rest: float = 0.0
 var _wait: float = 0.0
 var _scores: Array[float] = []
 var _gurgle_t: float = 0.0
+## Scène 3D : tireuse en laiton, verre translucide, boisson et mousse, filet versé.
+var _glass3: MeshInstance3D = null
+var _drink3: MeshInstance3D = null
+var _foam3: MeshInstance3D = null
+var _stream3: MeshInstance3D = null
+var _drink_mat: StandardMaterial3D = null
 
 
 func begin() -> void:
+	_build_3d()
 	_new_glass()
+
+
+func _build_3d() -> void:
+	var st: Stage3D = use_3d()
+	var r: Rect2 = play_rect()
+	st.env.background_color = Color(0.05, 0.03, 0.03)
+	st.key.light_energy = 0.4
+	st.frontal(0.005, r.get_center(), r.size.y, 36.0)
+	BarSet3D.build(st, r)
+	var px: float = st.px3
+	var root: Node3D = st.root
+	# Tireuse : colonne de laiton, bec, poignée émaillée.
+	var brass: StandardMaterial3D = Stage3D.mat(Palette.GOLD.darkened(0.15), 0.95, 0.25)
+	var tap: Vector3 = st.to3(Vector2(r.get_center().x, r.position.y + 20.0), 0.0)
+	Stage3D.cylinder(root, 0.07, 0.6, tap + Vector3(0, 0.3, -0.25), brass)
+	Stage3D.box(root, Vector3(0.12, 0.08, 0.32), tap + Vector3(0, 0.02, -0.1), brass)
+	Stage3D.cylinder(root, 0.025, 0.1, tap + Vector3(0, -0.04, 0), brass)
+	Stage3D.box(root, Vector3(0.05, 0.3, 0.05), tap + Vector3(0, 0.22, -0.08), Stage3D.mat(Color(0.15, 0.35, 0.2), 0.2, 0.3))
+	var glass: StandardMaterial3D = Stage3D.mat(Color(0.85, 0.92, 1.0, 0.22), 0.1, 0.05)
+	glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	glass.rim_enabled = true
+	glass.rim = 1.0
+	_glass3 = Stage3D.cylinder(root, 1.0, 1.0, Vector3.ZERO, glass)
+	_drink_mat = Stage3D.mat(DRINKS[0], 0.1, 0.2)
+	_drink_mat.emission_enabled = true
+	_drink_mat.emission_energy_multiplier = 0.25
+	_drink3 = Stage3D.cylinder(root, 1.0, 1.0, Vector3.ZERO, _drink_mat)
+	_foam3 = Stage3D.cylinder(root, 1.0, 1.0, Vector3.ZERO, Stage3D.mat(FOAM, 0.0, 0.8))
+	_stream3 = Stage3D.cylinder(root, 4.0 * px, 1.0, Vector3.ZERO, _drink_mat)
+
+
+func _sync_3d() -> void:
+	if _glass3 == null:
+		return
+	var px: float = stage.px3
+	var g: Rect2 = _glass_rect()
+	var rad: float = g.size.x * 0.5 * px
+	var base: Vector3 = stage.to3(Vector2(g.get_center().x, g.end.y), 0.0)
+	var gh: float = g.size.y * px
+	_glass3.scale = Vector3(rad + 0.01, gh, rad + 0.01)
+	_glass3.position = base + Vector3(0, gh * 0.5, 0)
+	var lv: float = clampf(_level, 0.0, 1.0)
+	var col: Color = DRINKS[_glass % DRINKS.size()]
+	_drink_mat.albedo_color = col
+	_drink_mat.emission = col
+	_drink3.visible = lv > 0.005
+	_drink3.scale = Vector3(rad * 0.94, maxf(gh * lv, 0.001), rad * 0.94)
+	_drink3.position = base + Vector3(0, gh * lv * 0.5, 0)
+	_foam3.visible = lv > 0.02
+	_foam3.scale = Vector3(rad * 0.95, 10.0 * px, rad * 0.95)
+	_foam3.position = base + Vector3(0, gh * lv + 5.0 * px, 0)
+	_stream3.visible = _pouring
+	if _pouring:
+		var top: float = stage.to3(Vector2(0, play_rect().position.y + 24.0)).y
+		var bottom: float = base.y + gh * lv
+		_stream3.scale = Vector3(1, maxf(top - bottom, 0.01), 1)
+		_stream3.position = Vector3(base.x, (top + bottom) * 0.5, 0)
 
 
 func _new_glass() -> void:
@@ -144,24 +208,11 @@ func _glass_rect() -> Rect2:
 
 func paint() -> void:
 	var r: Rect2 = play_rect()
-	# Comptoir et étagère du bar.
-	draw_rect(Rect2(r.position.x + 10, r.end.y - 30, r.size.x - 20, 14), Color(0.35, 0.2, 0.1))
-	for k: int in 5:
-		var bx: float = r.position.x + 60.0 + float(k) * 70.0
-		draw_rect(Rect2(bx, r.position.y + 70.0, 26, 70), Color(DRINKS[k % 3], 0.35))
-		draw_rect(Rect2(bx + 8, r.position.y + 52.0, 10, 20), Color(DRINKS[k % 3], 0.35))
+	_sync_3d()
 	var g: Rect2 = _glass_rect()
-	var lv: float = clampf(_level, 0.0, 1.05)
-	var fill_h: float = g.size.y * minf(lv, 1.0)
-	var col: Color = DRINKS[_glass % DRINKS.size()]
-	draw_rect(Rect2(g.position.x, g.end.y - fill_h, g.size.x, fill_h), col)
-	if fill_h > 4.0:
-		draw_rect(Rect2(g.position.x, g.end.y - fill_h - 10.0, g.size.x, 12.0), FOAM)
 	if _level > 1.0:
 		draw_rect(Rect2(g.position.x - 14, g.position.y, 10, g.size.y), Color(FOAM, 0.8))
 		draw_rect(Rect2(g.end.x + 4, g.position.y, 10, g.size.y), Color(FOAM, 0.8))
-	draw_rect(g, Color(1, 1, 1, 0.7), false, 3.0)
-	draw_rect(Rect2(g.position.x + 6, g.position.y + 10, 6, g.size.y - 20), Color(1, 1, 1, 0.25))
 	# Trait doré visé.
 	var ty: float = g.end.y - g.size.y * _target
 	draw_line(Vector2(g.position.x - 30, ty), Vector2(g.end.x + 30, ty), Palette.GOLD_LIGHT, 3.0)
@@ -169,10 +220,6 @@ func paint() -> void:
 		[Vector2(g.position.x - 30, ty - 9), Vector2(g.position.x - 14, ty), Vector2(g.position.x - 30, ty + 9)]
 	)
 	draw_colored_polygon(tip, Palette.GOLD_LIGHT)
-	if _pouring:
-		var sx: float = g.get_center().x
-		draw_line(Vector2(sx, r.position.y + 30), Vector2(sx, g.end.y - fill_h), col, 8.0)
-		draw_rect(Rect2(sx - 30, r.position.y + 6, 60, 30), Color(0.15, 0.35, 0.2))
 	pips(Vector2(r.end.x - 120.0, r.position.y + 34.0), _scores, pi("glasses"))
 	if not _pouring and _rest <= 0.0 and _settle <= 0.0:
 		var left: float = clampf(1.0 - _wait / (p("wait_seconds") * slow), 0.0, 1.0)

@@ -35,6 +35,8 @@ var rng: RandomNumberGenerator = null
 ## Bandeau des étapes du lancer (« 1 · Bouteilles  2 · Effet  3 · Lâcher ») et étape courante.
 var steps: Array[String] = []
 var step: int = 0
+## Scène 3D facultative (objets de l'épreuve), dessinée DERRIÈRE les textes et repères 2D.
+var stage: Stage3D = null
 ## Carton d'annonce (nom, règle, commandes) avant que l'épreuve ne commence.
 var intro_left: float = 0.0
 var _intro_total: float = 1.0
@@ -42,6 +44,12 @@ var _begun: bool = false
 var _verdict: int = -1
 var _pops: Array[Dictionary] = []
 var _hint: RichTextLabel = null
+## Illustration pixel art du carton d'annonce (gardée en membre : une texture chargée dans
+## _draw et relâchée aussitôt s'afficherait blanche).
+var _art: Texture2D = null
+## Commandes en grand sur le carton (périphérique actif), placées sous la règle.
+var _keys_label: RichTextLabel = null
+var _keys_label_rect: Rect2 = Rect2()
 
 
 func setup(p_entry: Dictionary, p_precision: int, p_assist: bool, p_mouse: bool) -> ThrowTrial:
@@ -63,10 +71,17 @@ func _ready() -> void:
 	_hint.autowrap_mode = TextServer.AUTOWRAP_OFF
 	_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_hint)
+	_keys_label = UiKit.rich("", UiKit.SIZE_BODY)
+	_keys_label.fit_content = true
+	_keys_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_keys_label)
 	resized.connect(_place_hint)
 	_refresh_hint()
 	_intro_total = Balance.f("throw_game.trial_intro_seconds")
 	intro_left = _intro_total
+	var art_path: String = "res://assets/trials/trial_%s.png" % String(entry.get("id", ""))
+	if ResourceLoader.exists(art_path):
+		_art = load(art_path) as Texture2D
 	AudioBus.play("panel_open", 1.0, -6.0)
 
 
@@ -81,6 +96,7 @@ func _refresh_hint() -> void:
 	raw = raw.replace("{confirm}", "{@click}" if mouse else "{ui_spin}")
 	raw = raw.replace("{move}", "{@mouse}" if mouse else ("{@lstick}" if InputGlyphs.using_pad else "{@arrows}"))
 	_hint.text = "[center]%s[/center]" % InputGlyphs.expand(raw, 24)
+	_keys_label.text = "[center]%s[/center]" % InputGlyphs.expand(raw, 36)
 	_place_hint()
 
 
@@ -170,11 +186,26 @@ func act(w: Dictionary) -> void:
 	bot_apply(w)
 
 
+## Crée la scène 3D de l'épreuve (appelée par begin()) : elle remplit la zone de jeu et passe
+## derrière le dessin 2D de l'épreuve (consignes, pastilles, notes).
+func use_3d() -> Stage3D:
+	stage = Stage3D.new()
+	stage.show_behind_parent = true
+	add_child(stage)
+	move_child(stage, 0)
+	stage.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	if not full():
+		stage.offset_bottom = -HINT_H
+	return stage
+
+
 func _start() -> void:
 	if _begun:
 		return
 	_begun = true
 	t = 0.0
+	_keys_label.visible = false
+	_hint.visible = true
 	AudioBus.play("whoosh", 1.3, -8.0)
 	begin()
 
@@ -209,6 +240,11 @@ func _process(delta: float) -> void:
 		intro_left -= dt
 		if intro_left <= 0.0:
 			_start()
+		_keys_label.visible = not _begun and _keys_label_rect.size.x > 0.0
+		_hint.visible = not _keys_label.visible
+		if _keys_label.visible:
+			_keys_label.position = _keys_label_rect.position
+			_keys_label.size = _keys_label_rect.size
 		queue_redraw()
 		return
 	t += dt
@@ -228,10 +264,19 @@ func _gui_input(event: InputEvent) -> void:
 
 
 func _draw() -> void:
-	if full():
+	if stage != null and _begun:
+		# La 3D occupe le fond : seulement le cadre doré pour une épreuve sur le tapis.
+		if not full():
+			draw_rect(Rect2(0, size.y - HINT_H, size.x, HINT_H), Color(Palette.INK, 0.98))
+			draw_rect(Rect2(Vector2.ZERO, size), Palette.GOLD, false, 2.0)
+	elif full():
 		backdrop()
 	else:
-		frame(Rect2(Vector2.ZERO, size), 0.98)
+		frame(Rect2(Vector2.ZERO, size), 1.0)
+		# Fond de velours : halo doux en haut, ombre en bas (les épreuves 2D gagnent du relief).
+		for k: int in 6:
+			var band: float = float(k) / 6.0
+			draw_rect(Rect2(4, 4 + (size.y - 8) * band, size.x - 8, (size.y - 8) / 6.0), Color(Palette.VELVET, 0.16 * (1.0 - band)))
 	if not _begun:
 		_draw_steps()
 		_draw_intro()
@@ -264,24 +309,50 @@ func _draw_steps() -> void:
 		text(Vector2(w * (float(k) + 0.5), y), "%d · %s" % [k + 1, steps[k]], UiKit.SIZE_SMALL, col)
 
 
-## Carton d'annonce : nom de l'épreuve, règle en une phrase, jauge du temps restant.
+## Carton d'annonce : illustration propre à l'épreuve, nom, règle en une phrase, jauge du temps
+## restant ; les commandes du périphérique actif restent affichées en bas (invite).
+## Sur le tapis : image à gauche, texte à droite. En plein écran : grande image au-dessus.
 func _draw_intro() -> void:
-	var c: Vector2 = play_rect().get_center()
+	var pr: Rect2 = play_rect()
 	var u: float = 1.0 - clampf(intro_left / maxf(_intro_total, 0.01), 0.0, 1.0)
 	var pop_s: float = 1.0 + 0.15 * (1.0 - clampf(u * 6.0, 0.0, 1.0))
-	text(c + Vector2(0, -60), tr("TRIAL_TITLE") % (step + 1), UiKit.SIZE_SMALL, Palette.SMOKE)
+	var text_c: Vector2 = pr.get_center()
+	var maxw: float = minf(size.x - 60.0, 900.0)
+	if _art != null:
+		var art_size: Vector2 = _art.get_size()
+		var room: Vector2 = Vector2(pr.size.x * 0.44, pr.size.y - 40.0) if not full() else Vector2(pr.size.x * 0.5, pr.size.y * 0.5)
+		var k: float = floorf(minf(room.x / art_size.x, room.y / art_size.y) * 2.0) / 2.0
+		var dst: Vector2 = art_size * maxf(k, 1.0)
+		var at: Vector2
+		if full():
+			at = Vector2(pr.get_center().x - dst.x * 0.5, pr.position.y + 90.0)
+			text_c = Vector2(pr.get_center().x, at.y + dst.y + 110.0)
+		else:
+			at = Vector2(pr.position.x + 24.0, pr.get_center().y - dst.y * 0.5 + 6.0)
+			var right: float = at.x + dst.x + 24.0
+			maxw = pr.end.x - right - 24.0
+			text_c = Vector2(right + maxw * 0.5, pr.get_center().y)
+		# Léger zoom d'entrée, cadre doré.
+		var grow: float = (pop_s - 1.0) * 30.0
+		var r: Rect2 = Rect2(at, dst).grow(grow)
+		draw_rect(r.grow(6.0), Palette.GOLD_DARK)
+		draw_rect(r.grow(3.0), Palette.INK)
+		draw_texture_rect(_art, r, false)
+	text(text_c + Vector2(0, -60), tr("TRIAL_TITLE") % (step + 1), UiKit.SIZE_SMALL, Palette.SMOKE)
 	var big: int = UiKit.SIZE_H1 if full() else UiKit.SIZE_H2
-	text(c + Vector2(0, -24), Localization.t(entry, "name"), int(big * pop_s), Palette.GOLD_LIGHT)
+	text(text_c + Vector2(0, -24), Localization.t(entry, "name"), int(big * pop_s), Palette.GOLD_LIGHT)
 	var f: Font = UiKit.font("body")
 	var fs: int = UiKit.fs(UiKit.SIZE_BODY - 2)
-	var maxw: float = minf(size.x - 60.0, 900.0)
 	var desc: String = Localization.t(entry, "desc")
-	var pos: Vector2 = Vector2(c.x - maxw * 0.5, c.y + 22.0)
-	draw_multiline_string_outline(f, pos, desc, HORIZONTAL_ALIGNMENT_CENTER, maxw, fs, 3, 6, Palette.INK)
-	draw_multiline_string(f, pos, desc, HORIZONTAL_ALIGNMENT_CENTER, maxw, fs, 3, Palette.IVORY)
-	var bar: Rect2 = Rect2(c.x - 120.0, c.y + 100.0, 240.0, 5.0)
+	var pos: Vector2 = Vector2(text_c.x - maxw * 0.5, text_c.y + 22.0)
+	draw_multiline_string_outline(f, pos, desc, HORIZONTAL_ALIGNMENT_CENTER, maxw, fs, 4, 6, Palette.INK)
+	draw_multiline_string(f, pos, desc, HORIZONTAL_ALIGNMENT_CENTER, maxw, fs, 4, Palette.IVORY)
+	var text_h: float = f.get_multiline_string_size(desc, HORIZONTAL_ALIGNMENT_CENTER, maxw, fs).y
+	var lines: int = mini(4, int(text_h / float(fs)) + 1)
+	var bar: Rect2 = Rect2(text_c.x - 120.0, pos.y + float(lines) * float(fs) * 1.2 + 10.0, 240.0, 5.0)
 	draw_rect(bar, Palette.VELVET_DEEP)
 	draw_rect(Rect2(bar.position, Vector2(bar.size.x * u, bar.size.y)), Palette.GOLD)
+	_keys_label_rect = Rect2(Vector2(text_c.x - maxw * 0.5, bar.end.y + 14.0), Vector2(maxw, 48.0))
 
 
 # --------------------------------------------------------------------------- commandes

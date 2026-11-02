@@ -83,6 +83,11 @@ func _throw_minigame(rs: RunScreen) -> void:
 		if act != "" and not shots.has(tag):
 			shots[tag] = true
 			await _shot("throw_" + tag)
+		# Vue en plein jeu (1 s après le carton) : contrôle des décors de chaque épreuve.
+		var mid: String = "%s_play" % (g.trial.entry.get("id", "") if g.trial != null else "")
+		if g.trial != null and not g.trial.in_intro() and g.trial.t > 1.0 and not shots.has(mid):
+			shots[mid] = true
+			await _shot("throw_" + mid)
 		g.bot_apply(want)
 		await get_tree().process_frame
 

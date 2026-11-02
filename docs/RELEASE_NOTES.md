@@ -1,3 +1,32 @@
+# Notes de version — 1.5.2 « Lumières sur la table »
+
+## Les épreuves en 3D
+- **Onze épreuves passent en 3D** : Bonneteau (gobelets de cuivre, lampe nue qui se balance), Mémoire des cartes (vraies cartes qui se retournent sur le tapis), Fléchettes (cible de pub dans son armoire, fléchettes qui se plantent), Tour de jetons (plaques laquées), Bouteilles (étagère du bar, verre teinté, néon BAR qui grésille), Juke-box (caisse laquée, tubes à bulles, disque qui tourne, boutons qui s'enfoncent), Pluie de jetons (pièces qui tournoient, plateau en laiton qui se remplit), Coffre-fort (porte d'acier, molette graduée qui tourne vraiment), Shaker et Verre parfait (comptoir, étagère de bouteilles rétroéclairée, tireuse en laiton).
+- **Les autres sont redessinées** : Tri des jetons, Effet (rythme) et Plus haut / plus bas.
+- **Cartons d'annonce illustrés** : chaque épreuve a sa propre illustration en pixel art, avec son titre, sa règle et ses commandes (clavier, souris ou manette selon l'appareil utilisé).
+- **Couleurs des boutons Xbox** : le Tri des jetons, le Juke-box et l'Effet utilisent les couleurs de la manette, à la même place : X bleu à gauche, Y jaune en haut, B rouge à droite, A vert en bas.
+- **Plus haut, plus bas** : les figures ont leur emblème (bonnet à plume du Valet, diadème de la Dame, couronne du Roi), leur couleur (cœur ou pique) et des index dans les coins ; en anglais, J / Q / K.
+
+## La machine à sous
+- **Quatre rouleaux** au lieu de trois, **en 3D**, dans son propre décor : moquette, néon « LUCETTE », machines voisines, tabourets.
+- **Tirage bien plus long** : les rouleaux ralentissent un par un, cran par cran. Quand un gain est possible, le dernier rouleau traîne et le cœur bat.
+- **Carrés** (très rares) : quatre 7 = deux tours offerts, quatre diamants = un grigri légendaire… Deux nouveaux symboles, le citron et le fer à cheval.
+
+## Menu principal
+- **Nouvelle scène 3D** : la grande salle du Grand Zéro abandonnée. Lustre qui se balance, poussière dans la lumière, enseigne qui grésille, projecteur qui balaie la salle, machines éteintes (une clignote encore).
+- **Nouveau menu** : la reprise affiche un résumé de la partie en cours (personnage, palier, échéance), les écrans secondaires sont rangés en grille, et une astuce change toutes les quelques secondes.
+
+## Confort
+- **Effet (rythme)** : plus de doubles notes sur deux boutons opposés (X+B ou Y+A), seulement des boutons voisins ; un peu plus de marge sur le timing.
+- **Bonneteau** : à chaque nouvelle manche, le curseur repart du gobelet du milieu. Avec un nombre pair de gobelets, aucun n'est présélectionné : il ne trahit plus jamais la bonne réponse.
+- **Vitesse d'animation** remise à ×1 (un réglage ×4 hérité restait en mémoire).
+- **Pluie de la cinématique** moins forte.
+- **Options › Jeu** : les descriptions passent à la ligne, la page ne s'élargit plus.
+
+## Corrections
+- Fléchettes : un appui immédiat sur une nouvelle fléchette tombait pile au centre (le viseur n'était pas encore décalé).
+- Épreuves sur le tapis : le fond est entièrement opaque, la table ne transparaît plus.
+
 # Notes de version — 1.5.1 « Faites chauffer la machine »
 
 ## La machine à sous tourne plus souvent

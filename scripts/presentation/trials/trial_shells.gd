@@ -25,10 +25,80 @@ var _cursor: int = 1
 var _picked: int = -1
 var _scores: Array[float] = []
 var _phase_t: float = 0.0
+## Scène 3D : gobelets de cuivre (4 au plus), bille, lampe nue qui se balance.
+var _cup3: Array[Node3D] = []
+var _ball3: MeshInstance3D = null
+var _lamp: Node3D = null
+var _lamp_light: OmniLight3D = null
 
 
 func begin() -> void:
+	_build_3d()
 	_new_round()
+
+
+## Table de rue en 3D : caisse, nappe verte usée, gobelets de cuivre cerclés, lampe suspendue.
+func _build_3d() -> void:
+	var st: Stage3D = use_3d()
+	st.env.background_color = Color(0.04, 0.025, 0.035)
+	st.key.light_energy = 0.25
+	st.look(Vector3(0, 2.3, 3.5), Vector3(0, 0.35, 0), 38.0)
+	var r: Node3D = st.root
+	Stage3D.box(r, Vector3(5.2, 0.06, 2.4), Vector3(0, -0.03, 0), Stage3D.mat(Color(0.07, 0.24, 0.13), 0.0, 0.95))
+	Stage3D.box(r, Vector3(5.3, 0.08, 0.1), Vector3(0, -0.02, 1.22), Stage3D.mat(Color(0.3, 0.18, 0.08), 0.0, 0.7))
+	Stage3D.box(r, Vector3(5.0, 1.2, 2.2), Vector3(0, -0.66, 0), Stage3D.mat(Color(0.24, 0.14, 0.06), 0.0, 0.85))
+	for k: int in 6:
+		Stage3D.box(r, Vector3(5.02, 0.03, 2.22), Vector3(0, -0.2 - 0.18 * float(k), 0), Stage3D.mat(Color(0.16, 0.09, 0.04)))
+	Stage3D.box(r, Vector3(12, 6, 0.2), Vector3(0, 1.5, -3.0), Stage3D.mat(Color(0.09, 0.05, 0.07), 0.0, 1.0))
+	_lamp = Node3D.new()
+	_lamp.position = Vector3(0, 3.1, 0.2)
+	r.add_child(_lamp)
+	Stage3D.cylinder(_lamp, 0.006, 1.6, Vector3(0, -0.8, 0), Stage3D.mat(Palette.SMOKE))
+	Stage3D.cylinder(_lamp, 0.32, 0.22, Vector3(0, -1.65, 0), Stage3D.mat(Color(0.12, 0.3, 0.2), 0.5, 0.4), 0.08)
+	Stage3D.sphere(_lamp, 0.07, Vector3(0, -1.78, 0), Stage3D.glow(Palette.GOLD_LIGHT, 4.0))
+	_lamp_light = Stage3D.omni(_lamp, Color(1.0, 0.85, 0.55), 3.2, Vector3(0, -1.85, 0), 6.0)
+	_lamp_light.shadow_enabled = not Settings.b("video", "handheld")
+	var copper: StandardMaterial3D = Stage3D.mat(Color(0.78, 0.45, 0.24), 0.85, 0.22)
+	var rim: StandardMaterial3D = Stage3D.mat(Color(0.5, 0.26, 0.12), 0.7, 0.4)
+	for c: int in 4:
+		var cup: Node3D = Node3D.new()
+		r.add_child(cup)
+		Stage3D.cylinder(cup, 0.3, 0.62, Vector3(0, 0.31, 0), copper, 0.19)
+		Stage3D.cylinder(cup, 0.32, 0.06, Vector3(0, 0.03, 0), rim)
+		Stage3D.cylinder(cup, 0.21, 0.05, Vector3(0, 0.62, 0), rim)
+		for y: float in [0.2, 0.44]:
+			Stage3D.cylinder(cup, 0.3 - 0.11 * y / 0.62 + 0.006, 0.014, Vector3(0, y, 0), rim)
+		_cup3.append(cup)
+	_ball3 = Stage3D.sphere(r, 0.1, Vector3.ZERO, Stage3D.mat(Palette.IVORY, 0.0, 0.2))
+
+
+## Position 3D d'un créneau (même ordre que _slot_x).
+func _slot3(s: float) -> float:
+	return (s - float(_cups - 1) * 0.5) * 0.9
+
+
+func _sync_3d() -> void:
+	var sway: float = sin(t * 1.3) * 0.18
+	_lamp.rotation.z = sway * 0.6
+	for c: int in _cup3.size():
+		var cup: Node3D = _cup3[c]
+		cup.visible = c < _cups
+		if c >= _cups:
+			continue
+		var p2: Vector2 = _cup_pos(c)
+		var x: float = _slot3((p2.x - size.x * 0.5) / SPACING + float(_cups - 1) * 0.5)
+		var lifted: float = _lift if (_phase != Phase.REVEAL or _slot[c] == _picked or _slot[c] == _slot[_ball]) else 0.0
+		cup.position = Vector3(x, lifted * 0.55, (p2.y - TABLE_Y) / 40.0 * 0.35)
+		cup.rotation.z = -lifted * 0.25
+	_ball3.visible = _phase in [Phase.SHOW, Phase.HIDE, Phase.REVEAL]
+	_ball3.position = Vector3(_slot3(float(_slot[_ball])), 0.1, 0)
+
+
+## Point d'écran au sommet du gobelet posé au créneau s (curseur, notes, clic souris).
+func _slot_screen(s: int, y: float = 0.7) -> Vector2:
+	if stage == null:
+		return Vector2(_slot_x(float(s)), TABLE_Y - CUP.y * y)
+	return stage.project(Vector3(_slot3(float(s)), y, 0))
 
 
 func _new_round() -> void:
@@ -79,7 +149,7 @@ func handle(event: InputEvent) -> bool:
 	if _phase != Phase.PICK:
 		return confirm_pressed(event) or dir_pressed(event) != Vector2i.ZERO
 	var mm: InputEventMouseMotion = event as InputEventMouseMotion
-	if mm != null:
+	if mm != null and mouse:
 		var hs: int = _slot_at(mm.position)
 		if hs >= 0:
 			_cursor = hs
@@ -100,22 +170,34 @@ func handle(event: InputEvent) -> bool:
 	return false
 
 
+## Position de départ sans indice : le gobelet du milieu, ou aucun si leur nombre est pair.
+func _neutral_cursor() -> int:
+	return (_cups >> 1) if _cups % 2 == 1 else -1
+
+
 func _slot_at(pt: Vector2) -> int:
 	for s: int in _cups:
-		if absf(pt.x - _slot_x(float(s))) < CUP.x * 0.6 and pt.y > TABLE_Y - CUP.y - 40.0 and pt.y < TABLE_Y + 40.0:
+		var top: Vector2 = _slot_screen(s, 0.75)
+		var base: Vector2 = _slot_screen(s, 0.0)
+		var half: float = maxf(absf(_slot_screen(s, 0.0).x - _slot_screen(mini(s + 1, _cups - 1), 0.0).x), 120.0) * 0.4
+		if absf(pt.x - base.x) < half and pt.y > top.y - 20.0 and pt.y < base.y + 30.0:
 			return s
 	return -1
 
 
 func move(dx: int) -> void:
-	_cursor = clampi(_cursor + dx, 0, _cups - 1)
+	if _cursor < 0:
+		# Aucun gobelet présélectionné (nombre pair) : le premier appui choisit un des deux du centre.
+		_cursor = (_cups >> 1) - (1 if dx < 0 else 0)
+	else:
+		_cursor = clampi(_cursor + dx, 0, _cups - 1)
 	AudioBus.play("hover", 1.0, -8.0)
 
 
 func pick(timed_out: bool = false) -> void:
-	if _phase != Phase.PICK:
+	if _phase != Phase.PICK or (_cursor < 0 and not timed_out):
 		return
-	_picked = _cursor
+	_picked = _cursor if _cursor >= 0 else (_cups >> 1)
 	var ok: bool = _slot[_ball] == _picked
 	var thinking: float = clampf(_phase_t / (p("pick_seconds") * slow), 0.0, 1.0)
 	# Trop tard : le croupier soulève le gobelet visé, mais la manche ne rapporte rien.
@@ -125,7 +207,7 @@ func pick(timed_out: bool = false) -> void:
 	_phase_t = 0.0
 	AudioBus.play("cloth", 1.3, -4.0)
 	AudioBus.play("chips_win" if ok else "lose_soft", 1.0, -2.0)
-	pop(Vector2(_slot_x(float(_picked)), TABLE_Y - CUP.y - 90.0), sc, "TRIAL_SHELLS_FOUND" if ok else "TRIAL_SHELLS_EMPTY")
+	pop(_slot_screen(_picked, 1.4), sc, "TRIAL_SHELLS_FOUND" if ok else "TRIAL_SHELLS_EMPTY")
 
 
 func tick(dt: float) -> void:
@@ -156,7 +238,7 @@ func tick(dt: float) -> void:
 				if _swap_i >= _swaps.size():
 					_phase = Phase.PICK
 					_phase_t = 0.0
-					_cursor = 1
+					_cursor = _neutral_cursor()
 		Phase.PICK:
 			if _phase_t > p("pick_seconds") * slow:
 				pick(true)  # trop long : le croupier soulève le gobelet visé, sans points
@@ -191,15 +273,7 @@ func bot_apply(w: Dictionary) -> void:
 
 
 func paint() -> void:
-	# Table de rue : caisse en bois, nappe verte usée, lampe nue qui se balance.
-	draw_rect(Rect2(Vector2.ZERO, size), Color(0.06, 0.04, 0.05))
-	var sway: float = sin(t * 1.3) * 60.0
-	draw_line(Vector2(size.x * 0.5, 0), Vector2(size.x * 0.5 + sway, 200), Palette.SMOKE, 2.0)
-	draw_circle(Vector2(size.x * 0.5 + sway, 210), 16.0, Palette.GOLD_LIGHT)
-	draw_circle(Vector2(size.x * 0.5 + sway * 0.6, 640), 560.0, Color(1.0, 0.85, 0.5, 0.06))
-	draw_rect(Rect2(size.x * 0.5 - 720.0, TABLE_Y + 20.0, 1440.0, 240.0), Color(0.07, 0.24, 0.13))
-	draw_rect(Rect2(size.x * 0.5 - 720.0, TABLE_Y + 20.0, 1440.0, 10.0), Color(0.3, 0.18, 0.08))
-	draw_rect(Rect2(size.x * 0.5 - 700.0, TABLE_Y + 260.0, 1400.0, 100.0), Color(0.24, 0.14, 0.06))
+	_sync_3d()
 	pips(Vector2(size.x * 0.5, 110), _scores, pi("rounds"))
 	var msg: String = ""
 	match _phase:
@@ -210,35 +284,14 @@ func paint() -> void:
 		Phase.PICK:
 			msg = tr("TRIAL_SHELLS_PICK")
 	if msg != "":
-		text(Vector2(size.x * 0.5, 300), msg, UiKit.SIZE_H2, Palette.IVORY)
-	var show_ball: bool = _phase in [Phase.SHOW, Phase.HIDE, Phase.REVEAL]
-	if show_ball:
-		var bp: Vector2 = Vector2(_slot_x(float(_slot[_ball])), TABLE_Y - 18.0)
-		draw_circle(bp, 20.0, Palette.IVORY)
-		draw_circle(bp + Vector2(-6, -6), 6.0, Color(1, 1, 1, 0.8))
-	for c: int in _cups:
-		var lifted: float = _lift if (_phase != Phase.REVEAL or _slot[c] == _picked or _slot[c] == _slot[_ball]) else 0.0
-		_draw_cup(_cup_pos(c) + Vector2(0, -lifted * 150.0), _phase == Phase.PICK and _slot[c] == _cursor)
+		text(Vector2(size.x * 0.5, 200), msg, UiKit.SIZE_H2, Palette.IVORY)
+	if _phase == Phase.PICK and _cursor >= 0:
+		# Flèche cyan au-dessus du gobelet visé.
+		var top: Vector2 = _slot_screen(_cursor, 0.8) + Vector2(0, -20.0 - 8.0 * sin(t * 8.0))
+		draw_colored_polygon(PackedVector2Array([top, top + Vector2(-26, -34), top + Vector2(26, -34)]), Palette.CYAN)
+		draw_polyline(PackedVector2Array([top, top + Vector2(-26, -34), top + Vector2(26, -34), top]), Palette.INK, 3.0)
 	if _phase == Phase.PICK:
 		var left: float = clampf(1.0 - _phase_t / (p("pick_seconds") * slow), 0.0, 1.0)
 		var bar: Rect2 = Rect2(size.x * 0.5 - 200.0, 980.0, 400.0, 10.0)
 		draw_rect(bar, Palette.VELVET_DEEP)
 		draw_rect(Rect2(bar.position, Vector2(bar.size.x * left, bar.size.y)), Palette.GOLD)
-
-
-func _draw_cup(base: Vector2, focus: bool) -> void:
-	var w0: float = CUP.x
-	var w1: float = CUP.x * 0.62
-	var pts: PackedVector2Array = PackedVector2Array([
-		base + Vector2(-w0 * 0.5, 0), base + Vector2(w0 * 0.5, 0),
-		base + Vector2(w1 * 0.5, -CUP.y), base + Vector2(-w1 * 0.5, -CUP.y)])
-	draw_colored_polygon(pts, Color(0.62, 0.34, 0.16))
-	draw_colored_polygon(PackedVector2Array([pts[0], pts[0] + Vector2(28, 0), pts[3] + Vector2(18, 0), pts[3]]), Color(0.85, 0.55, 0.3))
-	draw_rect(Rect2(base + Vector2(-w0 * 0.5 - 6, -16), Vector2(w0 + 12, 16)), Color(0.5, 0.26, 0.12))
-	draw_rect(Rect2(base + Vector2(-w1 * 0.5 - 4, -CUP.y - 10), Vector2(w1 + 8, 12)), Color(0.5, 0.26, 0.12))
-	for k: int in 3:
-		var y: float = -CUP.y * (0.3 + 0.2 * float(k))
-		draw_line(base + Vector2(-w0 * 0.42 + k * 6, y), base + Vector2(w0 * 0.42 - k * 6, y), Color(0.4, 0.2, 0.08), 3.0)
-	if focus:
-		var pulse: float = 0.6 + 0.4 * sin(t * 8.0)
-		draw_rect(Rect2(base + Vector2(-w0 * 0.5 - 14, -CUP.y - 24), Vector2(w0 + 28, CUP.y + 38)), Color(Palette.CYAN, pulse), false, 4.0)

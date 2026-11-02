@@ -112,15 +112,15 @@ func _bigscore_later() -> void:
 	panel.show_total(int(3.2e6 * 4800.0), 1.0)
 
 
-## Machine à sous de démonstration : brelan de 7, paire de cerises, rien.
+## Machine à sous de démonstration : carré de 7, brelan de diamants, rien.
 func _slot_later() -> void:
 	for _i: int in 90:
 		await get_tree().process_frame
 	var rs: RunScreen = get_tree().root.find_children("*", "RunScreen", true, false)[0] as RunScreen
 	var spins: Array[Dictionary] = [
-		{"reels": ["seven", "seven", "seven"], "prize": "p_seven3"},
-		{"reels": ["diamond", "diamond", "diamond"], "prize": "p_diamond3"},
-		{"reels": ["chip", "bell", "seven"], "prize": ""},
+		{"reels": ["seven", "seven", "seven", "seven"], "prize": "p_seven4"},
+		{"reels": ["diamond", "diamond", "lemon", "diamond"], "prize": "p_diamond3"},
+		{"reels": ["chip", "bell", "seven", "horseshoe"], "prize": ""},
 	]
 	rs.call("_show_overlay", SlotOverlay.new().configure(spins, DataRegistry.db))
 

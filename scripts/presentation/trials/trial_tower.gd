@@ -3,8 +3,12 @@ extends ThrowTrial
 ## TOUR DE JETONS : empiler des jetons qui glissent de gauche à droite, de plus en plus vite.
 ## Confirmer pour lâcher : ce qui dépasse de la pile tombe, et le jeton suivant est plus étroit.
 ## Lâcher pile dessus (à quelques pixels) garde toute la largeur. Note = largeur finale.
+## Rendu 3D : des plaques de casino laquées, vues de face en légère plongée (caméra
+## orthographique : 1 px du repère de l'épreuve = PX3 m, la logique reste en pixels).
 
 const CHIP_H: float = 24.0
+const PX3: float = 0.01
+const DEPTH3: float = 0.7
 const COLORS: Array[Color] = [Palette.ROULETTE_RED, Palette.CYAN, Palette.EMERALD, Palette.GOLD, Palette.MAGENTA, Palette.IVORY]
 
 ## Jetons posés : x (gauche) et largeur.
@@ -16,6 +20,9 @@ var _falling: Array[Dictionary] = []
 var _perfects: int = 0
 var _end_t: float = -1.0
 var _chip_t: float = 0.0
+var _plates: Array[MeshInstance3D] = []
+var _mats: Array[StandardMaterial3D] = []
+var _root3: Node3D = null
 
 
 func begin() -> void:
@@ -23,6 +30,66 @@ func begin() -> void:
 	var r: Rect2 = play_rect()
 	_stack.append(Vector2(r.get_center().x - _w * 0.5, _w))
 	_x = r.position.x + 20.0
+	_build_3d()
+
+
+func _build_3d() -> void:
+	var st: Stage3D = use_3d()
+	st.env.background_color = Color(0.05, 0.03, 0.05)
+	st.key.light_energy = 0.55
+	st.key.rotation_degrees = Vector3(-40, -30, 0)
+	var r: Rect2 = play_rect()
+	var a: float = 0.32
+	var yc: float = (_base_y() - r.get_center().y) * PX3
+	st.cam.projection = Camera3D.PROJECTION_ORTHOGONAL
+	st.cam.size = r.size.y * PX3
+	st.cam.position = Vector3(0, yc + sin(a) * 20.0, cos(a) * 20.0)
+	st.cam.look_at(Vector3(0, yc, 0), Vector3.UP)
+	_root3 = st.root
+	Stage3D.box(_root3, Vector3(r.size.x * PX3, 0.3, 4.0), Vector3(0, -0.15, 0), Stage3D.mat(Color(0.07, 0.26, 0.15), 0.0, 0.95))
+	Stage3D.box(_root3, Vector3(r.size.x * PX3, 0.06, 0.08), Vector3(0, 0.0, 2.0), Stage3D.mat(Palette.GOLD_DARK, 0.7, 0.35))
+	Stage3D.box(_root3, Vector3(r.size.x * PX3 * 1.2, 12.0, 0.2), Vector3(0, 5.0, -3.0), Stage3D.mat(Color(0.1, 0.05, 0.08), 0.0, 1.0))
+	var lamp: OmniLight3D = Stage3D.omni(_root3, Color(1.0, 0.88, 0.65), 1.2, Vector3(0, 4.0, 2.0), 9.0)
+	lamp.shadow_enabled = not Settings.b("video", "handheld")
+	# Piles de jetons décoratives sur les côtés du tapis.
+	var half: float = r.size.x * PX3 * 0.5
+	for side: float in [-1.0, 1.0]:
+		for pile: int in 3:
+			var at: Vector3 = Vector3(side * (half - 0.5 - 0.55 * float(pile)), 0, -0.6 + 0.35 * float(pile % 2))
+			for k: int in 3 + pile * 2:
+				var cm: StandardMaterial3D = Stage3D.mat(COLORS[(pile + k) % COLORS.size()].darkened(0.35), 0.1, 0.45)
+				Stage3D.cylinder(_root3, 0.22, 0.07, at + Vector3(0, 0.035 + 0.075 * float(k), 0), cm)
+	for col: Color in COLORS:
+		_mats.append(Stage3D.mat(col.darkened(0.35), 0.1, 0.45))
+
+
+## Plaque n° k (réutilisée d'une image à l'autre) : boîte laquée et liseré doré en façade.
+func _plate(k: int) -> MeshInstance3D:
+	while _plates.size() <= k:
+		var mi: MeshInstance3D = MeshInstance3D.new()
+		mi.mesh = BoxMesh.new()
+		_root3.add_child(mi)
+		var trim: StandardMaterial3D = Stage3D.mat(Palette.IVORY, 0.0, 0.4)
+		var band: MeshInstance3D = Stage3D.box(mi, Vector3(1, 0.035, 0.02), Vector3(0, 0, DEPTH3 * 0.5 + 0.005), trim)
+		band.name = "band"
+		_plates.append(mi)
+	return _plates[k]
+
+
+## Place une plaque de la logique (rect en pixels) dans la scène 3D.
+func _place(k: int, x: float, w: float, top_y: float, col_i: int, tilt: float = 0.0) -> void:
+	var mi: MeshInstance3D = _plate(k)
+	mi.visible = w > 0.5
+	if not mi.visible:
+		return
+	(mi.mesh as BoxMesh).size = Vector3(w * PX3, (CHIP_H - 2.0) * PX3, DEPTH3)
+	mi.material_override = _mats[col_i % _mats.size()]
+	var cx: float = (x + w * 0.5 - play_rect().get_center().x) * PX3
+	var cy: float = (_base_y() - top_y - (CHIP_H - 2.0) * 0.5) * PX3
+	mi.position = Vector3(cx, cy, 0)
+	mi.rotation.z = tilt
+	var band: MeshInstance3D = mi.get_node("band") as MeshInstance3D
+	band.scale = Vector3(maxf(w * PX3 - 0.12, 0.01), 1, 1)
 
 
 func _speed() -> float:
@@ -116,32 +183,29 @@ func bot_apply(w: Dictionary) -> void:
 
 func paint() -> void:
 	var r: Rect2 = play_rect()
-	draw_rect(Rect2(r.position.x + 10, _base_y(), r.size.x - 20, 10), Color(0.07, 0.24, 0.13))
-	for k: int in _stack.size():
-		var c: Vector2 = _stack[k]
-		if c.y > 0.0:
-			_chip(Rect2(c.x, _base_y() - CHIP_H * float(k + 1), c.y, CHIP_H - 2.0), COLORS[k % COLORS.size()])
+	var used: int = 0
+	if _root3 != null:
+		for k: int in _stack.size():
+			var c: Vector2 = _stack[k]
+			_place(used, c.x, c.y, _base_y() - CHIP_H * float(k + 1), k)
+			used += 1
+		if _end_t < 0.0:
+			var y: float = _base_y() - CHIP_H * float(_stack.size() + 1)
+			_place(used, _x, _w, y, _stack.size())
+			used += 1
+		for f: Dictionary in _falling:
+			var col_i: int = COLORS.find(f["c"] as Color)
+			var spin: float = float(f["v"]) * 0.0006 * (1.0 if float(f["x"]) > r.get_center().x else -1.0)
+			_place(used, float(f["x"]), float(f["w"]), float(f["y"]), maxi(col_i, 0), spin)
+			used += 1
+		for k: int in range(used, _plates.size()):
+			_plates[k].visible = false
 	if _end_t < 0.0:
-		var y: float = _base_y() - CHIP_H * float(_stack.size() + 1)
-		_chip(Rect2(_x, y, _w, CHIP_H - 2.0), COLORS[_stack.size() % COLORS.size()])
+		var y2: float = _base_y() - CHIP_H * float(_stack.size() + 1)
 		var top: Vector2 = _stack[-1]
-		draw_line(Vector2(top.x, y - 8), Vector2(top.x, _base_y()), Color(Palette.GOLD_LIGHT, 0.25), 1.0)
-		draw_line(Vector2(top.x + top.y, y - 8), Vector2(top.x + top.y, _base_y()), Color(Palette.GOLD_LIGHT, 0.25), 1.0)
-	for f: Dictionary in _falling:
-		_chip(Rect2(float(f["x"]), float(f["y"]), float(f["w"]), CHIP_H - 2.0), f["c"] as Color)
+		for gx: float in [top.x, top.x + top.y]:
+			draw_line(Vector2(gx, y2 - 8), Vector2(gx, y2 + CHIP_H * 2.0), Color(Palette.GOLD_LIGHT, 0.35), 2.0)
 	var n: int = mini(_stack.size() - 1, pi("chips"))
 	text(Vector2(r.end.x - 80.0, r.position.y + 30.0), "%d / %d" % [n, pi("chips")], UiKit.SIZE_BODY, Palette.IVORY, "mono")
 	var width_txt: String = tr("TRIAL_TOWER_WIDTH") % roundi(_stack[-1].y / p("chip_w") * 100.0)
 	text(Vector2(r.position.x + 110.0, r.position.y + 30.0), width_txt, UiKit.SIZE_SMALL, Palette.GOLD_LIGHT)
-
-
-## Jeton vu de profil : tranche colorée, liseré ivoire, encoches.
-func _chip(r: Rect2, col: Color) -> void:
-	if r.size.x <= 0.5:
-		return
-	draw_rect(r, col.darkened(0.2))
-	draw_rect(Rect2(r.position, Vector2(r.size.x, 5.0)), col.lightened(0.15))
-	var k: float = r.position.x + 12.0
-	while k < r.end.x - 8.0:
-		draw_rect(Rect2(k, r.position.y + 6.0, 8.0, r.size.y - 8.0), Color(Palette.IVORY, 0.8))
-		k += 34.0

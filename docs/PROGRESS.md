@@ -156,3 +156,15 @@ Plan (chaque étape : code → tests → captures → corrections) :
 7. Contrôle complet de l'interface (manette, 6 définitions) ; dépôt GitHub public avec les releases ; docs, exports, tag v1.5.1.
 
 Bilan 1.5.1 : les 7 étapes sont livrées. `tools/check.sh` vert (92 tests, banc des 14 épreuves, interface 204 vues sur 6 définitions et 2 tailles de texte sans problème, campagne gagnée à la manette seule). Équilibrage : glouton 39,0 %, expert 45,0 % (`docs/BALANCE.md`). Exports Windows, Linux et Flatpak 1.5.1 régénérés ; dépôt GitHub public avec les releases.
+
+## Version 1.5.2 — « Lumières sur la table »
+Plan (chaque étape : code → tests → captures → corrections) :
+1. Corrections rapides : vitesse d'animation ×1 par défaut (sélecteur fiabilisé) ; pluie de la cinématique moins forte ; figures (V, D, R) avec leur symbole dans « Plus haut, plus bas » ; Bonneteau à la manette : curseur remis au gobelet du milieu à chaque choix ; épreuve de rythme plus abordable et sans accords sur des touches opposées ; Tri des jetons aux couleurs des boutons Xbox (A vert, B rouge, X bleu, Y jaune) et plus beau ; descriptions de l'onglet Jeu des options qui débordaient à l'horizontale.
+2. Machine à sous : 4 rouleaux, lancer bien plus long avec arrêts lents un par un (tension, faux arrêts), machine en 3D avec son décor.
+3. Cartes de présentation des épreuves : une illustration unique en pixel art par épreuve, avec titre et commandes du périphérique actif.
+4. Graphismes des épreuves retravaillés, 3D quand c'est cohérent (gobelets, bouteilles, cartes, jetons, cible, coffre…).
+5. Menu principal retravaillé (décor animé, mise en scène, navigation manette).
+6. Campagne de tests complète : interface (6 définitions, 2 tailles de texte, manette), mécaniques, animations, menus et sous-menus ; difficulté des épreuves et équilibrage par simulations ; corrections jusqu'au dernier problème.
+7. Docs, `tools/check.sh`, exports, tag v1.5.2, publication GitHub (release).
+
+Bilan 1.5.2 : les 7 étapes sont livrées. Onze épreuves en 3D (`Stage3D.use_3d`, caméra frontale calée au pixel), trois redessinées, 14 illustrations pixel art (`tools/gen_trial_art.py`) sur les cartons d'annonce ; machine à sous 3D à 4 rouleaux (arrêts lents, suspense, carrés) ; écran titre en 3D (salle abandonnée) avec résumé de partie et astuces. Bugs trouvés en test et corrigés : Fléchettes (appui immédiat = centre garanti), machine à sous bloquée si l'on martelait la touche pendant le tirage (accélération limitée à une fois par tirage), astuce de l'écran titre qui chevauchait la mention légale en 1920×1200 avec texte agrandi, test d'un bonus temporaire trop strict. `tools/check.sh` vert (92 tests, banc des 14 épreuves, interface 204 vues, campagne gagnée à la manette seule en 24 tours). Équilibrage : glouton 43,3 % (cible 35–45 %).

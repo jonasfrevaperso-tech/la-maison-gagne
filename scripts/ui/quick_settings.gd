@@ -108,7 +108,7 @@ func _choice(box: VBoxContainer, key: String, section: String, k: String, values
 	var cur: Variant = Settings.get_value(section, k)
 	for i: int in values.size():
 		o.add_item(tr(String(labels[i])))
-		if str(values[i]) == str(cur):
+		if str(values[i]) == str(cur) or (cur is float and values[i] is int and is_equal_approx(float(values[i]), float(cur))):
 			o.select(i)
 	o.item_selected.connect(func(i: int) -> void: Settings.set_value(section, k, values[i]))
 	h.add_child(o)

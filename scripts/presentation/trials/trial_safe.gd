@@ -15,6 +15,10 @@ var _bot_axis: float = 0.0
 var _drag: bool = false
 var _open_t: float = -1.0
 var _scores: Array[float] = []
+## Scène 3D : porte de coffre en acier, molette graduée qui tourne vraiment, voyant du cran.
+var _dial3: Node3D = null
+var _dial_home: Vector3 = Vector3.ZERO
+var _lamp3: StandardMaterial3D = null
 
 
 func begin() -> void:
@@ -25,6 +29,78 @@ func begin() -> void:
 		_codes.append(c)
 	_dial = float(rng.randi_range(0, DIAL_N - 1))
 	_last_notch = int(round(_dial))
+	_build_3d()
+
+
+func _dial_center() -> Vector2:
+	var r: Rect2 = play_rect()
+	return Vector2(r.position.x + 185.0, r.get_center().y + 4.0)
+
+
+func _build_3d() -> void:
+	var st: Stage3D = use_3d()
+	var r: Rect2 = play_rect()
+	st.env.background_color = Color(0.04, 0.04, 0.05)
+	st.key.light_energy = 0.5
+	st.key.rotation_degrees = Vector3(-35, -40, 0)
+	st.frontal(0.005, r.get_center(), r.size.y, 36.0)
+	var root: Node3D = st.root
+	var px: float = st.px3
+	# Mur de la salle des coffres : plaques d'acier rivetées.
+	var plate: StandardMaterial3D = Stage3D.mat(Color(0.13, 0.14, 0.16), 0.7, 0.55)
+	for k: int in 8:
+		var at: Vector3 = st.to3(Vector2(r.position.x + 70.0 + 140.0 * float(k), r.get_center().y), -0.8)
+		Stage3D.box(root, Vector3(136.0 * px, r.size.y * px * 1.3, 0.05), at, plate)
+		for y: float in [-0.7, 0.7]:
+			Stage3D.sphere(root, 0.025, at + Vector3(-0.28, y, 0.04), Stage3D.mat(Color(0.3, 0.3, 0.33), 0.9, 0.3))
+	# Le coffre, légèrement de trois quarts.
+	var c3: Vector3 = st.to3(_dial_center(), 0.0)
+	var body: Node3D = Node3D.new()
+	body.position = c3 + Vector3(0, 0, -0.35)
+	body.rotation.y = 0.18
+	root.add_child(body)
+	var steel: StandardMaterial3D = Stage3D.mat(Color(0.24, 0.26, 0.28), 0.8, 0.4)
+	Stage3D.box(body, Vector3(300.0 * px, 330.0 * px, 0.7), Vector3.ZERO, steel)
+	Stage3D.box(body, Vector3(262.0 * px, 290.0 * px, 0.04), Vector3(0, 0, 0.36), Stage3D.mat(Color(0.3, 0.32, 0.34), 0.85, 0.3))
+	for y: float in [-0.45, 0.45]:
+		Stage3D.cylinder(body, 0.05, 0.22, Vector3(-150.0 * px, y, 0.3), Stage3D.mat(Palette.GOLD_DARK, 0.9, 0.3))
+	for k: int in 4:
+		var corner: Vector3 = Vector3((-112.0 if k % 2 == 0 else 112.0) * px, (-120.0 if k < 2 else 120.0) * px, 0.39)
+		Stage3D.sphere(body, 0.03, corner, Stage3D.mat(Color(0.5, 0.5, 0.55), 0.9, 0.25))
+	var bright: StandardMaterial3D = Stage3D.mat(Color(0.7, 0.7, 0.75), 1.0, 0.2)
+	var handle: MeshInstance3D = Stage3D.box(body, Vector3(0.05, 0.4, 0.06), Vector3(118.0 * px, 0, 0.42), bright)
+	handle.rotation.z = 0.4
+	# Molette : couronne noire, cadran gradué, chiffres en relief, bouton central.
+	_dial_home = c3 + Vector3(0, 0, 0.12)
+	var bezel: StandardMaterial3D = Stage3D.mat(Color(0.08, 0.08, 0.09), 0.6, 0.4)
+	Stage3D.cylinder(root, (DIAL_R + 10.0) * px, 0.06, c3 + Vector3(0, 0, 0.06), bezel).rotation.x = PI * 0.5
+	_dial3 = Node3D.new()
+	_dial3.position = _dial_home
+	root.add_child(_dial3)
+	var face: MeshInstance3D = Stage3D.cylinder(_dial3, DIAL_R * px, 0.05, Vector3.ZERO, Stage3D.mat(Color(0.34, 0.35, 0.37), 0.9, 0.25))
+	face.rotation.x = PI * 0.5
+	var ivory: StandardMaterial3D = Stage3D.mat(Palette.IVORY, 0.0, 0.5)
+	for n: int in DIAL_N:
+		var th: float = PI * 0.5 - TAU * float(n) / float(DIAL_N)
+		var big: bool = n % 5 == 0
+		var len: float = (14.0 if big else 8.0) * px
+		var tick: MeshInstance3D = Stage3D.box(_dial3, Vector3(len, (2.5 if big else 1.5) * px * 2.0, 0.01), Vector3.ZERO, ivory)
+		tick.position = Vector3(cos(th), sin(th), 0) * (DIAL_R * px - len * 0.5 - 2.0 * px) + Vector3(0, 0, 0.03)
+		tick.rotation.z = th
+		if big:
+			var at: Vector3 = Vector3(cos(th), sin(th), 0) * (DIAL_R - 32.0) * px + Vector3(0, 0, 0.032)
+			var lbl: Label3D = Stage3D.text3d(_dial3, str(n), at, 48, Palette.IVORY)
+			lbl.font = UiKit.font("mono")
+			lbl.pixel_size = 0.0022
+			lbl.rotation.z = th - PI * 0.5
+	Stage3D.cylinder(_dial3, 26.0 * px, 0.1, Vector3(0, 0, 0.04), Stage3D.mat(Color(0.18, 0.18, 0.2), 0.9, 0.3)).rotation.x = PI * 0.5
+	# Repère doré du haut et voyant qui s'allume quand on approche du cran.
+	var mark_at: Vector3 = c3 + Vector3(0, (DIAL_R + 18.0) * px, 0.14)
+	var mark: MeshInstance3D = Stage3D.cylinder(root, 0.05, 0.04, mark_at, Stage3D.glow(Palette.GOLD_LIGHT, 1.5), 0.001)
+	mark.rotation.z = PI
+	_lamp3 = Stage3D.glow(Palette.EMERALD, 0.2)
+	Stage3D.sphere(root, 0.05, c3 + Vector3(-110.0 * px, (DIAL_R + 18.0) * px, 0.14), _lamp3)
+	Stage3D.omni(root, Color(1.0, 0.9, 0.75), 1.6, c3 + Vector3(0.6, 0.6, 1.4), 4.0)
 
 
 func _target() -> int:
@@ -138,32 +214,13 @@ func _slot_x(k: int) -> float:
 
 func paint() -> void:
 	var r: Rect2 = play_rect()
-	var c: Vector2 = Vector2(r.position.x + 150.0, r.get_center().y + 4.0)
-	# Porte du coffre : acier, rivets, molette graduée.
-	draw_rect(Rect2(c - Vector2(130, 118), Vector2(260, 236)), Color(0.22, 0.24, 0.26))
-	for k: int in 4:
-		var corner: Vector2 = c + Vector2(-112 if k % 2 == 0 else 112, -100 if k < 2 else 100)
-		draw_circle(corner, 6.0, Color(0.45, 0.47, 0.5))
-	var shake: Vector2 = Vector2(sin(t * 60.0), cos(t * 53.0)) * 2.0 * _closeness() * _closeness()
-	var dc: Vector2 = c + shake
-	draw_circle(dc, DIAL_R + 8.0, Color(0.1, 0.1, 0.11))
-	draw_circle(dc, DIAL_R, Color(0.32, 0.33, 0.35))
-	var f: Font = UiKit.font("mono")
-	var fs: int = UiKit.fs(UiKit.SIZE_SMALL - 4)
-	for n: int in DIAL_N:
-		var a: float = -PI * 0.5 + TAU * (float(n) - _dial) / DIAL_N
-		var dir: Vector2 = Vector2(cos(a), sin(a))
-		var big: bool = n % 5 == 0
-		draw_line(dc + dir * (DIAL_R - (16.0 if big else 9.0)), dc + dir * (DIAL_R - 2.0), Palette.IVORY, 2.0 if big else 1.0)
-		if big:
-			var lbl: String = str(n)
-			var w: float = f.get_string_size(lbl, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
-			draw_string(f, dc + dir * (DIAL_R - 32.0) + Vector2(-w * 0.5, fs * 0.35), lbl, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Palette.IVORY)
-	draw_circle(dc, 26.0, Color(0.2, 0.2, 0.22))
-	var notch: PackedVector2Array = PackedVector2Array(
-		[c + Vector2(-10, -DIAL_R - 22), c + Vector2(10, -DIAL_R - 22), c + Vector2(0, -DIAL_R - 6)]
-	)
-	draw_colored_polygon(notch, Palette.GOLD_LIGHT)
+	# Molette 3D : rotation réelle, tremblement quand le stéthoscope s'affole.
+	if _dial3 != null:
+		var shake: Vector3 = Vector3(sin(t * 60.0), cos(t * 53.0), 0) * 0.008 * _closeness() * _closeness()
+		_dial3.position = _dial_home + shake
+		_dial3.rotation.z = TAU * _dial / float(DIAL_N)
+		_lamp3.emission_energy_multiplier = 0.2 + 3.0 * _closeness() * _closeness()
+		_lamp3.emission = Palette.EMERALD.lerp(Palette.GOLD_LIGHT, _closeness())
 	# Combinaison : trois cases, chiffre en cours qui clignote.
 	for k: int in _codes.size():
 		var box: Rect2 = Rect2(Vector2(_slot_x(k) - 36.0, r.position.y + 96.0), Vector2(72, 64))

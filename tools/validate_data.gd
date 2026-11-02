@@ -107,7 +107,7 @@ func _validate_entry(db: ContentDB, cat: String, e: Dictionary) -> void:
 	if cat == "slot_symbols" and float(e.get("weight", 0)) <= 0.0:
 		errors.append("%s : poids nul" % eid)
 	if cat == "slot_prizes":
-		if not String(e.get("match", "")) in ["triple", "pair"]:
+		if not String(e.get("match", "")) in ["quad", "triple", "pair"]:
 			errors.append("%s : combinaison inconnue" % eid)
 		if not db.has_entry("slot_symbols", String(e.get("symbol", ""))):
 			errors.append("%s : symbole inconnu" % eid)

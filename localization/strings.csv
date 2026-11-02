@@ -571,8 +571,10 @@ TRIAL_HIGHLOW_UP,▲ Plus haut,▲ Higher
 TRIAL_HIGHLOW_DOWN,▼ Plus bas,▼ Lower
 TRIAL_HIGHLOW_GOOD,Bon calcul,Good call
 TRIAL_HIGHLOW_BAD,Mauvais pari,Bad call
-TRIAL_SORT_HINT,"Trie avec {@qte} : rouge, vert, or, noir","Sort with {@qte}: red, green, gold, black"
-TRIAL_SORT_HINT_MOUSE,{@click} rouge · {@right_click} noir,{@click} red · {@right_click} black
+TRIAL_SORT_HINT,"Trie avec {@qte} : chaque couleur part dans la direction de son bouton","Sort with {@qte}: each colour goes the way of its button"
+TRIAL_SORT_HINT_MOUSE,{@click} bleu · {@right_click} rouge,{@click} blue · {@right_click} red
 TRIAL_SORT_LEFT_CLICK,Clic G,L-click
 TRIAL_SORT_RIGHT_CLICK,Clic D,R-click
 TAG_JACKPOT,Jackpot,Jackpot
+MENU_TIP,Astuce :,Tip:
+MENU_CONTINUE_INFO,%s · Palier %d · Échéance %d,%s · Tier %d · Deadline %d

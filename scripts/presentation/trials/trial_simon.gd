@@ -7,7 +7,10 @@ extends ThrowTrial
 enum Phase { LISTEN, PLAY, RESULT }
 
 const PITCHES: Array[float] = [1.0, 1.26, 1.5, 1.68]
-const COLORS: Array[Color] = [Palette.ROULETTE_RED, Palette.EMERALD, Palette.GOLD, Palette.CYAN]
+## Couleurs des boutons de la manette Xbox, dans les mêmes directions : X bleu à gauche, Y jaune
+## en haut, B rouge à droite, A vert en bas (comme le tri des jetons). Souris : bleu / rouge.
+const COLORS: Array[Color] = [Color("2f7bff"), Color("ffc81e"), Color("e8343e"), Color("38c14a")]
+const PAD_LABEL: Array[String] = ["X", "Y", "B", "A"]
 const PAD: Vector2 = Vector2(230.0, 150.0)
 
 var _phase: Phase = Phase.LISTEN
@@ -19,10 +22,75 @@ var _lit: int = -1
 var _lit_t: float = 0.0
 var _scores: Array[float] = []
 var _input_t: float = 0.0
+## Scène 3D : le juke-box, ses boutons (qui s'enfoncent et s'allument), son disque qui tourne.
+var _btn3: Array[MeshInstance3D] = []
+var _btn_mat: Array[StandardMaterial3D] = []
+var _btn_light: Array[OmniLight3D] = []
+var _disc: Node3D = null
+var _tubes: Array[StandardMaterial3D] = []
 
 
 func begin() -> void:
+	_build_3d()
 	_new_round()
+
+
+## Couleur du bouton k (à la souris, le second bouton est le rouge de droite).
+func _col(k: int) -> Color:
+	return COLORS[2 if mouse and k == 1 else k]
+
+
+func _build_3d() -> void:
+	var st: Stage3D = use_3d()
+	st.env.background_color = Color(0.05, 0.02, 0.04)
+	st.key.light_energy = 0.35
+	st.frontal(0.004, Vector2(960.0, 600.0), 1080.0, 38.0)
+	var r: Node3D = st.root
+	Stage3D.box(r, Vector3(14, 8, 0.1), Vector3(0, 0.5, -1.2), Stage3D.mat(Color(0.14, 0.04, 0.08), 0.0, 1.0))
+	Stage3D.box(r, Vector3(14, 0.1, 6), Vector3(0, -2.1, 0), Stage3D.mat(Color(0.12, 0.08, 0.06), 0.1, 0.4))
+	# Caisse du juke-box (placée en pixels du repère 2D) : arche laquée cerclée de chrome,
+	# corps, tubes à bulles, disque sous verre en haut, grille du haut-parleur en bas.
+	var lacquer: StandardMaterial3D = Stage3D.mat(Color(0.35, 0.08, 0.12), 0.3, 0.25)
+	var chrome: StandardMaterial3D = Stage3D.mat(Color(0.85, 0.85, 0.9), 1.0, 0.15)
+	var px: float = st.px3
+	var arch_c: Vector3 = st.to3(Vector2(960, 560), -0.5)
+	var arch: MeshInstance3D = Stage3D.cylinder(r, 500.0 * px, 0.8, arch_c, lacquer)
+	arch.rotation.x = PI * 0.5
+	var trim: MeshInstance3D = Stage3D.cylinder(r, 525.0 * px, 0.7, arch_c + Vector3(0, 0, -0.02), chrome)
+	trim.rotation.x = PI * 0.5
+	var body_c: Vector3 = st.to3(Vector2(960, 860), -0.5)
+	Stage3D.box(r, Vector3(1000.0 * px, 600.0 * px, 0.8), body_c, lacquer)
+	for side: float in [-1.0, 1.0]:
+		Stage3D.box(r, Vector3(0.12, 600.0 * px, 0.9), body_c + Vector3(side * 510.0 * px, 0, 0), chrome)
+		var tube: StandardMaterial3D = Stage3D.glow(Palette.MAGENTA, 1.6)
+		_tubes.append(tube)
+		Stage3D.cylinder(r, 0.08, 700.0 * px, st.to3(Vector2(960.0 + side * 430.0, 720), -0.05), tube)
+	var win_c: Vector3 = st.to3(Vector2(960, 230), -0.08)
+	Stage3D.cylinder(r, 150.0 * px, 0.05, win_c, Stage3D.mat(Color(0.05, 0.03, 0.05), 0.0, 0.9)).rotation.x = PI * 0.5
+	Stage3D.cylinder(r, 162.0 * px, 0.04, win_c + Vector3(0, 0, -0.01), chrome).rotation.x = PI * 0.5
+	_disc = Node3D.new()
+	_disc.position = win_c + Vector3(0, 0, 0.05)
+	_disc.rotation.x = PI * 0.5
+	r.add_child(_disc)
+	Stage3D.cylinder(_disc, 125.0 * px, 0.02, Vector3.ZERO, Stage3D.mat(Color(0.03, 0.03, 0.04), 0.4, 0.2))
+	Stage3D.cylinder(_disc, 40.0 * px, 0.025, Vector3.ZERO, Stage3D.mat(Palette.GOLD, 0.5, 0.4))
+	Stage3D.box(_disc, Vector3(0.04, 0.03, 0.12), Vector3(0, 0, 0.06), Stage3D.mat(Palette.ROULETTE_RED))
+	for k: int in 6:
+		Stage3D.box(r, Vector3(700.0 * px, 0.035, 0.05), st.to3(Vector2(960, 990.0 + 14.0 * float(k)), -0.08), chrome)
+	# Boutons : gros champignons de couleur sur la façade, lumière propre.
+	for k: int in 4:
+		var pc: Vector3 = st.to3(_pad_center(k), 0.0)
+		var m: StandardMaterial3D = Stage3D.mat(_col(k).darkened(0.5), 0.1, 0.25)
+		m.emission_enabled = true
+		m.emission = _col(k)
+		m.emission_energy_multiplier = 0.0
+		var b: MeshInstance3D = Stage3D.cylinder(r, PAD.y * 0.5 * st.px3, 0.18, pc, m)
+		b.rotation.x = PI * 0.5
+		Stage3D.cylinder(r, PAD.y * 0.58 * st.px3, 0.12, pc + Vector3(0, 0, -0.08), chrome).rotation.x = PI * 0.5
+		_btn3.append(b)
+		_btn_mat.append(m)
+		_btn_light.append(Stage3D.omni(r, _col(k), 0.0, pc + Vector3(0, 0, 0.6), 2.5))
+	Stage3D.omni(r, Color(1.0, 0.8, 0.7), 1.2, Vector3(0, 2.0, 2.5), 7.0)
 
 
 func _keys() -> int:
@@ -138,28 +206,33 @@ func bot_apply(want: Dictionary) -> void:
 
 
 func paint() -> void:
-	backdrop()
-	# Juke-box : arche lumineuse, grille du haut-parleur, disques.
-	var c: Vector2 = Vector2(size.x * 0.5, 600.0)
-	var arch: Rect2 = Rect2(c.x - 520, 170, 1040, 860)
-	draw_rect(arch, Color(0.22, 0.08, 0.12))
-	for k: int in 14:
-		var col: Color = [Palette.MAGENTA, Palette.GOLD_LIGHT, Palette.CYAN][(k + int(t * 6.0)) % 3]
-		draw_circle(Vector2(arch.position.x + 40 + k * 74.0, arch.position.y + 30), 10.0, Color(col, 0.8))
-	draw_rect(arch, Palette.GOLD, false, 6.0)
+	_sync_3d()
 	for k2: int in _keys():
 		var pc: Vector2 = _pad_center(k2)
-		var r: Rect2 = Rect2(pc - PAD * 0.5, PAD)
-		var on: bool = _lit == k2
-		draw_rect(r.grow(8), Color(COLORS[k2], 0.35 if on else 0.08))
-		draw_rect(r, COLORS[k2] if on else COLORS[k2].darkened(0.6))
-		draw_rect(r, Palette.GOLD_DARK, false, 3.0)
-		var glyph: String = ["←", "↑", "→", "↓"][k2] if not mouse else ""
-		if glyph != "":
-			text(pc, glyph, UiKit.SIZE_H1, Palette.IVORY)
+		if mouse:
+			continue
+		var glyph: String = PAD_LABEL[k2] if InputGlyphs.using_pad else ["←", "↑", "→", "↓"][k2]
+		text(pc, glyph, UiKit.SIZE_H1, Palette.IVORY if _lit != k2 else Palette.INK)
 	var msg: String = tr("TRIAL_SIMON_LISTEN") if _phase == Phase.LISTEN else (tr("TRIAL_SIMON_PLAY") % [_pos, _seq.size()])
-	text(Vector2(size.x * 0.5, 250.0), msg, UiKit.SIZE_H2, Palette.GOLD_LIGHT)
-	pips(Vector2(size.x * 0.5, 300.0), _scores, pi("rounds"))
+	text(Vector2(size.x * 0.5, 880.0), msg, UiKit.SIZE_H2, Palette.GOLD_LIGHT)
+	pips(Vector2(size.x * 0.5, 930.0), _scores, pi("rounds"))
 	if _phase == Phase.PLAY:
 		var left: float = clampf(1.0 - _input_t / (p("input_seconds") * slow), 0.0, 1.0)
 		draw_rect(Rect2(size.x * 0.5 - 200, 960, 400 * left, 10), Palette.GOLD if left > 0.3 else Palette.DANGER)
+
+
+func _sync_3d() -> void:
+	if _disc == null:
+		return
+	_disc.basis = Basis(Vector3.RIGHT, PI * 0.5) * Basis(Vector3.UP, t * 3.4)
+	for k: int in _tubes.size():
+		_tubes[k].emission = Color.from_hsv(fposmod(t * 0.15 + 0.5 * float(k), 1.0), 0.8, 1.0)
+		_tubes[k].albedo_color = _tubes[k].emission
+	for k: int in _btn3.size():
+		var on: bool = _lit == k
+		_btn3[k].visible = k < _keys()
+		_btn_mat[k].emission_energy_multiplier = 2.5 if on else 0.15
+		_btn_mat[k].albedo_color = _col(k) if on else _col(k).darkened(0.5)
+		_btn_light[k].light_energy = 2.5 if on else 0.0
+		var pc: Vector3 = stage.to3(_pad_center(k), 0.0)
+		_btn3[k].position = pc + Vector3(0, 0, -0.06 if on else 0.0)

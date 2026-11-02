@@ -239,14 +239,16 @@
     },
     "rhythm": {
       "bars": 4,
-      "notes": 20,
-      "chords": 3,
+      "notes": 17,
+      "chords": 2,
       "assist_fewer": 5,
-      "travel_seconds": 1.7,
+      "travel_seconds": 2.0,
       "stray_penalty": 0.04,
       "bpm_jazz": 112,
       "bpm_funk": 100,
-      "bpm_mambo": 120
+      "bpm_mambo": 120,
+      "perfect_seconds": 0.05,
+      "window_seconds": 0.15
     },
     "bottles": {
       "throws": 3,
@@ -378,5 +380,8 @@
   "slot": {
     "big_win_debt_frac": 0.5,
     "max_pulls": 5
+  },
+  "audio": {
+    "cutscene_ambience_db": -11.0
   }
 }

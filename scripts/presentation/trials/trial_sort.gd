@@ -1,14 +1,20 @@
 class_name TrialSort
 extends ThrowTrial
 ## TRI DES JETONS : le tapis roulant de la caisse s'est remis en marche. Chaque jeton qui passe
-## dans la fenêtre de tri doit partir dans le bon bac : rouge, vert, or ou noir (à la souris :
-## rouge clic gauche, noir clic droit). Le tapis accélère. Note = jetons bien triés, moins une
+## dans la fenêtre de tri doit partir dans le bon bac. Les couleurs sont celles des boutons de
+## la manette Xbox, disposés en losange autour de la fenêtre : X bleu à gauche, Y jaune en haut,
+## B rouge à droite, A vert en bas (au clavier, les flèches dans les mêmes directions ; à la
+## souris : bleu clic gauche, rouge clic droit). Le tapis accélère. Note = jetons bien triés, moins une
 ## pénalité par appui à vide ou mauvais bac.
 
 const CHIP_R: float = 26.0
 ## Couleur de chaque symbole (0 gauche/X, 1 haut/Y, 2 droite/B, 3 bas/A).
-const COLORS: Array[Color] = [Palette.ROULETTE_RED, Palette.EMERALD, Palette.GOLD, Color(0.12, 0.11, 0.14)]
+const COLORS: Array[Color] = [Color("2f7bff"), Color("ffc81e"), Color("e8343e"), Color("38c14a")]
 const KEYS_LABEL: Array[String] = ["←", "↑", "→", "↓"]
+const PAD_LABEL: Array[String] = ["X", "Y", "B", "A"]
+const DIRS: Array[Vector2] = [Vector2.LEFT, Vector2.UP, Vector2.RIGHT, Vector2.DOWN]
+## Distance entre la fenêtre de tri et chaque bac du losange.
+const BIN_GAP: Vector2 = Vector2(175.0, 122.0)
 
 var _chips: Array[Dictionary] = []
 var _spawned: int = 0
@@ -22,9 +28,14 @@ func _kinds() -> int:
 	return 2 if mouse else 4
 
 
-## Couleur effective : à la souris, le symbole 1 (clic droit) désigne le noir.
+## Couleur effective : à la souris, le symbole 1 (clic droit) désigne le rouge (B, à droite).
 func _color(kind: int) -> Color:
-	return COLORS[3] if mouse and kind == 1 else COLORS[kind]
+	return COLORS[_dir_of(kind)]
+
+
+## Direction (et bac) d'un symbole : à la souris, clic gauche → gauche, clic droit → droite.
+func _dir_of(kind: int) -> int:
+	return 2 if mouse and kind == 1 else kind
 
 
 func _window() -> Rect2:
@@ -76,16 +87,16 @@ func tick(dt: float) -> void:
 		_spawned += 1
 		var r: Rect2 = play_rect()
 		var kind: int = rng.randi_range(0, _kinds() - 1)
-		_chips.append({"p": Vector2(r.position.x - 30.0, r.get_center().y), "kind": kind, "done": false, "to": -1, "t": 0.0})
+		_chips.append({"p": Vector2(r.position.x + 24.0, r.get_center().y), "kind": kind, "done": false, "to": -1, "t": 0.0})
 		_spawn_t = p("gap_px") / _speed()
 	var kept: Array[Dictionary] = []
 	for c: Dictionary in _chips:
 		var pos: Vector2 = c["p"]
 		if bool(c["done"]):
 			c["t"] = float(c["t"]) + dt
-			var dirs: Array[Vector2] = [Vector2.LEFT, Vector2.UP, Vector2.RIGHT, Vector2.DOWN]
-			pos += dirs[clampi(int(c["to"]), 0, 3)] * 700.0 * dt
-			if float(c["t"]) < 0.5:
+			var goal: Vector2 = _window().get_center() + DIRS[_dir_of(clampi(int(c["to"]), 0, 3))] * BIN_GAP
+			pos = pos.lerp(goal, minf(dt * 12.0, 1.0))
+			if float(c["t"]) < 0.45:
 				c["p"] = pos
 				kept.append(c)
 			continue
@@ -117,30 +128,66 @@ func bot_apply(want: Dictionary) -> void:
 
 func paint() -> void:
 	var r: Rect2 = play_rect()
-	var belt: Rect2 = Rect2(r.position.x + 10.0, r.get_center().y - 40.0, r.size.x - 20.0, 80.0)
-	draw_rect(belt, Color(0.12, 0.12, 0.14))
-	var off: float = fmod(t * _speed(), 40.0)
-	var x: float = belt.position.x - 40.0 + off
-	while x < belt.end.x:
-		if x > belt.position.x:
-			draw_line(Vector2(x, belt.position.y), Vector2(x, belt.end.y), Color(0.25, 0.25, 0.28), 3.0)
-		x += 40.0
-	var w: Rect2 = _window()
-	draw_rect(w, Color(Palette.GOLD_LIGHT, 0.12))
-	draw_rect(w, Palette.GOLD_LIGHT, false, 3.0)
-	# Bacs : une rangée de couleurs avec leur touche, au-dessus du tapis.
+	var c0: Vector2 = _window().get_center()
+	# Fond : tôle de la salle des coffres, rivets.
+	draw_rect(Rect2(r.position + Vector2(4, 4), r.size - Vector2(8, 8)), Color(0.07, 0.07, 0.09))
+	for k: int in 14:
+		var x: float = r.position.x + 30.0 + float(k) * (r.size.x - 60.0) / 13.0
+		draw_circle(Vector2(x, r.position.y + 16.0), 3.0, Color(0.25, 0.25, 0.3))
+		draw_circle(Vector2(x, r.end.y - 14.0), 3.0, Color(0.25, 0.25, 0.3))
+	# Tapis roulant : rebords d'acier, lattes qui défilent, rouleaux aux bouts.
+	var belt: Rect2 = Rect2(r.position.x + 20.0, c0.y - 38.0, r.size.x - 40.0, 76.0)
+	draw_rect(belt.grow(6.0), Color(0.3, 0.31, 0.36))
+	draw_rect(belt, Color(0.1, 0.1, 0.12))
+	var off: float = fmod(t * _speed(), 36.0)
+	var x2: float = belt.position.x - 36.0 + off
+	while x2 < belt.end.x:
+		if x2 > belt.position.x:
+			draw_line(Vector2(x2, belt.position.y + 3), Vector2(x2, belt.end.y - 3), Color(0.2, 0.2, 0.24), 4.0)
+		x2 += 36.0
+	draw_line(belt.position, Vector2(belt.end.x, belt.position.y), Color(0.55, 0.56, 0.62), 2.0)
+	for side: float in [belt.position.x, belt.end.x]:
+		draw_circle(Vector2(side, c0.y), 40.0, Color(0.22, 0.22, 0.26))
+		draw_circle(Vector2(side, c0.y), 12.0, Color(0.45, 0.46, 0.5))
+	# Bacs en losange, comme les boutons de la manette : la couleur EST la touche.
 	var n: int = _kinds()
 	for k: int in n:
-		var at: Vector2 = Vector2(r.get_center().x + (float(k) - float(n - 1) * 0.5) * 170.0, r.position.y + 50.0)
-		var lbl: String = KEYS_LABEL[k] if not mouse else (tr("TRIAL_SORT_LEFT_CLICK") if k == 0 else tr("TRIAL_SORT_RIGHT_CLICK"))
-		draw_circle(at, 28.0, _color(k).darkened(0.1))
-		draw_arc(at, 28.0, 0, TAU, 24, Palette.GOLD_DARK, 2.0, true)
-		text(at + Vector2(0, 50.0), lbl, UiKit.SIZE_SMALL if mouse else UiKit.SIZE_BODY, Palette.IVORY)
-	for c: Dictionary in _chips:
-		var pos: Vector2 = c["p"]
-		var col: Color = _color(int(c["kind"]))
-		var a: float = 1.0 - clampf(float(c["t"]) / 0.5, 0.0, 1.0) if bool(c["done"]) else 1.0
-		draw_circle(pos, CHIP_R, Color(col.darkened(0.25), a))
-		draw_circle(pos, CHIP_R - 6.0, Color(col, a))
-		draw_arc(pos, CHIP_R - 10.0, 0, TAU, 20, Color(Palette.IVORY, a), 3.0)
-	text(Vector2(r.end.x - 110.0, r.position.y + 30.0), "%d / %d" % [_good, pi("chips")], UiKit.SIZE_BODY, Palette.IVORY, "mono")
+		var d: int = _dir_of(k)
+		var at: Vector2 = c0 + DIRS[d] * BIN_GAP
+		var col: Color = COLORS[d]
+		var hot: float = 0.0
+		for ch: Dictionary in _chips:
+			if bool(ch["done"]) and int(ch["to"]) == k:
+				hot = maxf(hot, 1.0 - float(ch["t"]) / 0.45)
+		draw_circle(at, 44.0 + 6.0 * hot, Color(col, 0.18 + 0.3 * hot))
+		draw_circle(at, 34.0, col.darkened(0.45))
+		draw_circle(at, 30.0, col.lerp(Color.WHITE, 0.25 * hot))
+		draw_circle(at + Vector2(-9, -10), 8.0, Color(1, 1, 1, 0.25))
+		var lbl: String
+		if mouse:
+			lbl = tr("TRIAL_SORT_LEFT_CLICK") if k == 0 else tr("TRIAL_SORT_RIGHT_CLICK")
+			text(at + Vector2(0, 52.0), lbl, UiKit.SIZE_SMALL, Palette.IVORY)
+		else:
+			lbl = PAD_LABEL[k] if InputGlyphs.using_pad else KEYS_LABEL[k]
+			text(at, lbl, UiKit.SIZE_H2, Palette.INK, "display", 0)
+	# Fenêtre de tri : équerres dorées.
+	var w: Rect2 = _window()
+	draw_rect(w, Color(Palette.GOLD_LIGHT, 0.08))
+	for corner: Vector2 in [w.position, Vector2(w.end.x, w.position.y), w.end, Vector2(w.position.x, w.end.y)]:
+		var sx: float = 1.0 if corner.x < w.get_center().x else -1.0
+		var sy: float = 1.0 if corner.y < w.get_center().y else -1.0
+		draw_line(corner, corner + Vector2(22.0 * sx, 0), Palette.GOLD_LIGHT, 4.0)
+		draw_line(corner, corner + Vector2(0, 22.0 * sy), Palette.GOLD_LIGHT, 4.0)
+	for ch: Dictionary in _chips:
+		var pos: Vector2 = ch["p"]
+		var col2: Color = _color(int(ch["kind"]))
+		var a: float = 1.0 - clampf(float(ch["t"]) / 0.45, 0.0, 1.0) if bool(ch["done"]) else 1.0
+		var rad: float = CHIP_R * (1.0 - 0.4 * (1.0 - a))
+		draw_circle(pos + Vector2(3, 5), rad, Color(0, 0, 0, 0.4 * a))
+		draw_circle(pos, rad, Color(col2.darkened(0.3), a))
+		draw_circle(pos, rad - 5.0, Color(col2, a))
+		for e: int in 6:
+			var ang: float = float(e) * TAU / 6.0 + t * 0.5
+			draw_circle(pos + Vector2.from_angle(ang) * (rad - 2.5), 3.0, Color(Palette.IVORY, a))
+		draw_arc(pos, rad * 0.5, 0, TAU, 20, Color(Palette.IVORY, a * 0.8), 2.0)
+	text(Vector2(r.end.x - 110.0, r.position.y + 40.0), "%d / %d" % [_good, pi("chips")], UiKit.SIZE_BODY, Palette.IVORY, "mono")

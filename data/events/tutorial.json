@@ -151,8 +151,8 @@
   "trigger": "jackpot",
   "anchor": "center",
   "order": 16,
-  "text_fr": "JACKPOT ! Un plein gagnant — ou un coup assez énorme pour solder l'échéance — réveille la vieille machine à sous. Tire le levier ({ui_spin}) : 1 tirage, 2 sur un « Très bien », 3 sur un « Parfait ». Les cases à SCEAU CLOCHE et certains grigris offrent des tirages gratuits. Paires et brelans : argent, Mult ou ×Mult pour le tour suivant, grigris… ou un tour offert.",
-  "text_en": "JACKPOT! A winning straight bet — or a hit big enough to clear the deadline — wakes the old slot machine. Pull the lever ({ui_spin}): 1 pull, 2 on a « Great » throw, 3 on a « Perfect » one. BELL SEAL pockets and some grigris grant free pulls. Pairs and triples: money, Mult or ×Mult for the next spin, grigris… or a free spin."
+  "text_fr": "JACKPOT ! Un plein gagnant — ou un coup assez énorme pour solder l'échéance — réveille la vieille machine à sous. Tire le levier ({ui_spin}) : 1 tirage, 2 sur un « Très bien », 3 sur un « Parfait ». Les cases à SCEAU CLOCHE et certains grigris offrent des tirages gratuits. Quatre rouleaux : paires, brelans et carrés (très rares, énormes) donnent argent, Mult ou ×Mult pour le tour suivant, grigris… ou un tour offert.",
+  "text_en": "JACKPOT! A winning straight bet — or a hit big enough to clear the deadline — wakes the old slot machine. Pull the lever ({ui_spin}): 1 pull, 2 on a « Great » throw, 3 on a « Perfect » one. BELL SEAL pockets and some grigris grant free pulls. Four reels: pairs, triples and quads (very rare, huge) give money, Mult or ×Mult for the next spin, grigris… or a free spin."
  },
  {
   "id": "tip_decor",

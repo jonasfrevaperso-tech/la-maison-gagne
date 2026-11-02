@@ -72,12 +72,23 @@ func _back() -> void:
 func _tab(title: String) -> VBoxContainer:
 	var scroll: ScrollContainer = ScrollContainer.new()
 	scroll.name = tr(title)
+	# Jamais de défilement horizontal : les textes longs vont à la ligne.
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	var box: VBoxContainer = VBoxContainer.new()
 	box.add_theme_constant_override("separation", 12)
 	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(box)
 	_tabs.add_child(scroll)
 	return box
+
+
+## Texte d'aide sous une option : retour à la ligne automatique dans la largeur de l'onglet.
+func _desc(box: VBoxContainer, key: String) -> void:
+	var l: Label = UiKit.label(tr(key), UiKit.SIZE_SMALL, Palette.SMOKE)
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	l.custom_minimum_size = Vector2(200, 0)
+	box.add_child(l)
 
 
 func _row(box: VBoxContainer, label_key: String) -> HBoxContainer:
@@ -138,7 +149,7 @@ func _choice(box: VBoxContainer, label_key: String, section: String, key: String
 	var cur: Variant = Settings.get_value(section, key)
 	for i: int in values.size():
 		o.add_item(tr(String(label_keys[i])), i)
-		if str(values[i]) == str(cur):
+		if str(values[i]) == str(cur) or (cur is float and values[i] is int and is_equal_approx(float(values[i]), float(cur))):
 			o.select(i)
 	o.item_selected.connect(func(i: int) -> void: _on_choice(section, key, values[i]))
 	h.add_child(o)
@@ -176,7 +187,7 @@ func _video_tab() -> void:
 			sizes.append("%dx%d" % [r2.x, r2.y])
 			size_labels.append("%d × %d  (%s)" % [r2.x, r2.y, UiLayout.aspect_label(r2)])
 		_choice(b, "OPT_RENDER_RES", "video", "render_resolution", sizes, size_labels)
-	b.add_child(UiKit.label(tr("OPT_RES_DESC"), UiKit.SIZE_SMALL, Palette.SMOKE))
+	_desc(b, "OPT_RES_DESC")
 	_choice(b, "OPT_FPS_CAP", "video", "fps_cap", [0, 30, 60, 90, 120, 144], ["OPT_FPS_UNLIMITED", "30", "60", "90", "120", "144"])
 	_check(b, "OPT_VSYNC", "video", "vsync")
 	_slider(b, "OPT_CRT", "video", "crt", 0.0, 1.0, 0.05)
@@ -186,7 +197,7 @@ func _video_tab() -> void:
 	_check(b, "OPT_DECOR_3D", "video", "decor_3d")
 	b.add_child(UiKit.label(tr("OPT_WHEEL_3D_DESC"), UiKit.SIZE_SMALL, Palette.SMOKE))
 	_check(b, "OPT_HANDHELD", "video", "handheld")
-	b.add_child(UiKit.label(tr("OPT_HANDHELD_DESC"), UiKit.SIZE_SMALL, Palette.SMOKE))
+	_desc(b, "OPT_HANDHELD_DESC")
 
 
 func _juice_tab() -> void:
@@ -205,11 +216,11 @@ func _game_tab() -> void:
 	_check(b, "OPT_CONFIRM", "game", "confirm_irreversible")
 	_check(b, "OPT_SHOW_PROBS", "game", "show_probabilities")
 	_choice(b, "OPT_THROW_MODE", "game", "throw_mode", ["skill", "quick", "simple"], ["OPT_TM_SKILL", "OPT_TM_QUICK", "OPT_TM_SIMPLE"])
-	b.add_child(UiKit.label(tr("OPT_THROW_MODE_DESC"), UiKit.SIZE_SMALL, Palette.SMOKE))
+	_desc(b, "OPT_THROW_MODE_DESC")
 	_check(b, "OPT_ASSIST", "game", "assist")
 	_check(b, "OPT_TUTORIAL_TIPS", "game", "tutorial_tips")
 	_check(b, "OPT_TELEMETRY", "game", "telemetry")
-	b.add_child(UiKit.label(tr("OPT_TELEMETRY_DESC"), UiKit.SIZE_SMALL, Palette.SMOKE))
+	_desc(b, "OPT_TELEMETRY_DESC")
 	b.add_child(UiKit.button(tr("OPT_RESET_TUTORIAL"), _reset_tutorial))
 	b.add_child(UiKit.button(tr("OPT_OPEN_DATA"), _open_data_dir))
 
@@ -225,7 +236,7 @@ func _access_tab() -> void:
 		["CB_OFF", "CB_PROTAN", "CB_DEUTAN", "CB_TRITAN"]
 	)
 	_slider(b, "OPT_TEXT_SCALE", "access", "text_scale", UiKit.TEXT_SCALE_MIN, UiKit.TEXT_SCALE_MAX, 0.05)
-	b.add_child(UiKit.label(tr("OPT_TEXT_SCALE_DESC"), UiKit.SIZE_SMALL, Palette.SMOKE))
+	_desc(b, "OPT_TEXT_SCALE_DESC")
 	_check(b, "OPT_HIGH_CONTRAST", "access", "high_contrast")
 	_check(b, "OPT_SUBTITLES", "access", "subtitles")
 
@@ -233,9 +244,9 @@ func _access_tab() -> void:
 func _input_tab() -> void:
 	var b: VBoxContainer = _tab("OPT_TAB_INPUT")
 	_choice(b, "OPT_INPUT_MODE", "game", "input_mode", InputGlyphs.MODES, ["OPT_IM_AUTO", "OPT_IM_KEYBOARD", "OPT_IM_GAMEPAD"])
-	b.add_child(UiKit.label(tr("OPT_INPUT_MODE_DESC"), UiKit.SIZE_SMALL, Palette.SMOKE))
+	_desc(b, "OPT_INPUT_MODE_DESC")
 	_slider(b, "OPT_STICK_SENS", "input", "stick_sensitivity", 0.0, 1.0, 0.05)
-	b.add_child(UiKit.label(tr("OPT_STICK_SENS_DESC"), UiKit.SIZE_SMALL, Palette.SMOKE))
+	_desc(b, "OPT_STICK_SENS_DESC")
 	_remap_box = VBoxContainer.new()
 	_remap_box.add_theme_constant_override("separation", 12)
 	b.add_child(_remap_box)
