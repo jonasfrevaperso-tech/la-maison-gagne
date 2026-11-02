@@ -530,5 +530,155 @@
   "motif": "eye",
   "a": "cyan",
   "b": "ink"
+ },
+ "g_wax_stamp": {
+  "motif": "seal",
+  "a": "red",
+  "b": "gold_light"
+ },
+ "g_notary_ring": {
+  "motif": "snake_ring",
+  "a": "gold",
+  "b": "red"
+ },
+ "g_sealing_wax": {
+  "motif": "flames",
+  "a": "red",
+  "b": "gold_light"
+ },
+ "g_archivist": {
+  "motif": "scroll",
+  "a": "ivory",
+  "b": "gold"
+ },
+ "g_red_tape": {
+  "motif": "ribbon",
+  "a": "danger",
+  "b": "ivory"
+ },
+ "g_cursed_seal": {
+  "motif": "seal",
+  "a": "purple",
+  "b": "black"
+ },
+ "g_insomniac": {
+  "motif": "moon",
+  "a": "cyan",
+  "b": "ivory"
+ },
+ "g_eternity_clock": {
+  "motif": "clock",
+  "a": "gold_light",
+  "b": "purple"
+ },
+ "g_marathon": {
+  "motif": "arrow_near",
+  "a": "emerald",
+  "b": "ivory"
+ },
+ "g_after_hours": {
+  "motif": "bottle",
+  "a": "magenta",
+  "b": "gold_light"
+ },
+ "g_undertaker": {
+  "motif": "hat",
+  "a": "black",
+  "b": "smoke"
+ },
+ "g_ash_collector": {
+  "motif": "flask",
+  "a": "smoke",
+  "b": "orange"
+ },
+ "g_glass_blower": {
+  "motif": "flask",
+  "a": "glass",
+  "b": "cyan"
+ },
+ "g_scrap_dealer": {
+  "motif": "anchor",
+  "a": "steel",
+  "b": "brown"
+ },
+ "g_lottery_ticket": {
+  "motif": "card",
+  "a": "gold_light",
+  "b": "magenta"
+ },
+ "g_window_dresser": {
+  "motif": "mirror",
+  "a": "cyan",
+  "b": "gold"
+ },
+ "g_impatient": {
+  "motif": "clock",
+  "a": "danger",
+  "b": "black"
+ },
+ "g_tarot_reader": {
+  "motif": "eye",
+  "a": "purple",
+  "b": "gold_light"
+ },
+ "g_fortune_cookie": {
+  "motif": "moon",
+  "a": "orange",
+  "b": "ivory"
+ },
+ "g_deck_of_fate": {
+  "motif": "card",
+  "a": "purple",
+  "b": "gold"
+ },
+ "g_hinge": {
+  "motif": "key",
+  "a": "steel",
+  "b": "gold"
+ },
+ "g_seamstress": {
+  "motif": "feather",
+  "a": "magenta",
+  "b": "ivory"
+ },
+ "g_quartet": {
+  "motif": "bell",
+  "a": "gold",
+  "b": "ivory"
+ },
+ "g_six_pack": {
+  "motif": "bottle",
+  "a": "emerald",
+  "b": "gold_light"
+ },
+ "g_tram_line": {
+  "motif": "ladder",
+  "a": "orange",
+  "b": "steel"
+ },
+ "g_city_block": {
+  "motif": "bars",
+  "a": "steel",
+  "b": "cyan"
+ },
+ "g_magnet_shoes": {
+  "motif": "magnet",
+  "a": "red",
+  "b": "steel"
+ },
+ "g_pendulum": {
+  "motif": "metronome",
+  "a": "gold",
+  "b": "brown"
+ },
+ "g_census": {
+  "motif": "wheel",
+  "a": "gold_light",
+  "b": "felt"
+ },
+ "g_twin_city": {
+  "motif": "mirror",
+  "a": "gold_light",
+  "b": "magenta"
  }
 }

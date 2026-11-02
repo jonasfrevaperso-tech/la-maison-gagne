@@ -3,8 +3,8 @@
 > Reprise après coupure : lire ce fichier, `CLAUDE.md`, puis `docs/DECISIONS.md`. Lancer `tools/check.sh`.
 
 ## État courant
-- Phase en cours : **Livré (1.1.0)** — suite : sessions humaines (`docs/PLAYTEST.md`), puis `docs/ROADMAP.md` (1.1.x)
-- Dernier tag : `v1.1.0`
+- Phase en cours : **Livré (1.2.0)** — suite : test sur un vrai Steam Deck (`docs/STEAM_DECK.md`), sessions humaines (`docs/PLAYTEST.md`), `docs/ROADMAP.md` (1.3)
+- Dernier tag : `v1.2.0`
 
 ## Phase 0 — Reconnaissance ✅
 - Environnement : Godot 4.7.2 (MCP godot OK), Blender 5.2.2, Python 3.14 + numpy 2.4 + Pillow 12, uv, gdtoolkit 4 (installé via uv), git 2.53, 12 cœurs.
@@ -98,6 +98,16 @@ Plan : (0) corriger les retours de la 1.0 → (1) télémétrie locale → (2) h
 - (7) Bot expert : la version « espérance brute » ne gagnait que 36,6 % (paris à forte variance) ; avec une utilité plafonnée par le besoin de l'échéance, 44,2 % sur 330 runs, survie 95→91 %, paris variés. Règlement intérieur, seul dominant pour les deux bots, passe de +2 à +1,5 Mult par contrat. Détails : `docs/BALANCE.md`.
 - Testé : 60 tests, `check.sh` vert (import, données, i18n, audio, mixage, lint, tests, fuzzing, simulation, interface, démarrage) ; binaires de release sans scripts de dev, options `--dev-*` inertes.
 - Reste (humain) : sessions de playtest, écoute, Steam Deck et Windows réels.
+
+## Version 1.2 — Tapis de jeu ✅
+Plan : (1) entrées : mode manette, schéma complet, glyphes Xbox 360, invites du seul appareil actif → (2) prise en charge manette totale (menus, astuces, boutique, Fortune, paquets, clavier virtuel) prouvée par une campagne automatique → (3) Steam Deck Vérifié (lisibilité, clavier virtuel, liste de contrôle) → (4) refonte visuelle → (5) passe de test, rythme et animations → (6) contenu 1.2 → (7) docs, exports, tag.
+- (1) Cause racine : `ui_accept`/`ui_cancel` sans manette en Godot 4.7 (D-020). `tools/gen_input_map.py`, `InputGlyphs`, `PromptBar`, `PromptBadge`, `tools/gen_glyphs.py` (26 glyphes), remappage clavier et manette.
+- (2) `PadNavigator`, `RunScreenInput` (mode objets, ciblage à la croix), cartes focalisables (infobulle, LB/RB, Y), `VirtualKeyboard`, astuces A/X avec glyphes inline. `--dev-pad-run` gagne la campagne à la manette seule ; défaut trouvé et corrigé (focus sur un choix indisponible).
+- (3) Plancher de police et vraie taille de texte (D-023), audit 9 px dans `--dev-ui-check` (4 configurations, 80 vues), `docs/STEAM_DECK.md`.
+- (4) Boutique, fin de run, Hall, HUD ; DecoDivider, tuiles, cartes de section, boutons animés.
+- (5) Décompte qui s'emballe, bille 3,1 s, transitions plus courtes ; campagnes complètes au clavier (pilote automatique) et à la manette sans erreur.
+- (6) 30 grigris (`data/grigris/grigris_v12.json`) avec icônes dédiées, déclencheurs `on_seal` / `on_pocket_destroyed` enfin émis pour les grigris, variables `seal_count`, `landing_copies`, `endless_tiers`, opération `swap_pockets` ; créanciers Le Bonneteur et La Valseuse (portraits) ; Course de graine (`RunHistory.leaderboard`, écran dédié).
+- Testé : 68 tests, `check.sh` vert (dont interface 80 vues et campagne à la manette).
 
 ## Rapport de phase
 Format : fait / testé / reste à faire / risques.

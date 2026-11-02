@@ -1,3 +1,35 @@
+# Notes de version — 1.2.0 « Tapis de jeu »
+
+## Manette, de bout en bout
+- **Mode manette** dans Options → Commandes : Automatique, Activé ou Désactivé.
+- **Tout se joue à la manette** : menus (A valide, B revient, LB/RB changent d'onglet, stick droit défile), mises au curseur, lancer à la gâchette, astuces (A compris, X couper), boutique (acheter, vendre, verrouiller, réordonner), paquets, cartes Fortune et choix de la case, pactes, événements, finale, clavier virtuel pour la graine et les notes.
+- **Glyphes de manette Xbox 360 en pixel art**, et en mode clavier des touches en relief portant le nom réel de la touche. Seules les indications de l'appareil utilisé s'affichent, partout (aide sous le tapis, boutons, tutoriel, boutique).
+- Remappage au clavier **et** à la manette.
+
+## Steam Deck
+Préparé pour le badge Vérifié : 1280×800, texte d'au moins 9 px (option de taille réparée), clavier virtuel, mise en veille, invites manette au premier lancement. Liste de contrôle : `docs/STEAM_DECK.md`.
+
+## Interface et rythme
+- Nouvelles boutique, fin de run (tuiles de statistiques, analyse en deux cartes), Hall (personnages en portraits, défis lisibles), HUD du run (bandeau, titres de barres).
+- Boutons qui réagissent au survol, à la sélection et à l'appui ; ornements art déco.
+- Décompte du score qui s'emballe au fil des événements, bille plus vive, transitions plus courtes.
+
+## Contenu
+- **30 nouveaux grigris** autour des mécaniques peu exploitées : sceaux, mode Infini, destructions de cases, relances, cartes Fortune, chevaux / carrés / transversales / sixains, attraction de la bille, taille de la roue.
+- **2 créanciers qui manipulent la roue** : Le Bonneteur (échange des cases de place) et La Valseuse (roue à l'envers, visée plus rapide).
+- **Course de graine** : classement local de tous tes runs sur une même graine, celle du jour ou n'importe quel code partagé.
+
+## Corrections
+- A et B ne validaient ni n'annulaient rien dans les menus (actions d'interface sans manette dans Godot 4.7).
+- Un choix d'événement indisponible pouvait recevoir la sélection et bloquer la manette.
+- L'option « Taille du texte » n'avait plus d'effet depuis la 1.1.
+- Recharger une partie hors phase de mise pouvait retirer des jetons du bulletin précédent après un bonus de budget temporaire (trouvé par le fuzzing).
+
+## Équilibrage
+- Victoires du bot expert : 38,8 % sur 330 runs (cible 35–45 %). Six grigris à mise en place renforcés (Couturière, Ligne de tramway, Collectionneur de cendres, Biscuit chinois, Ferrailleur, Horloge d'éternité). Détails : `docs/BALANCE.md`.
+
+---
+
 # Notes de version — 1.1.0 « Retours de table »
 
 ## Corrections signalées après la 1.0

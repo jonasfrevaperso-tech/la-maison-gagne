@@ -34,7 +34,10 @@ func start() -> bool:
 		add_child(DevUiCheck.new())
 		return true
 	if args.has("dev-screen"):
-		GameState.goto(StringName(String(args["dev-screen"])))
+		var params: Dictionary = {}
+		if args.has("dev-seed-code"):
+			params["seed"] = String(args["dev-seed-code"])
+		GameState.goto(StringName(String(args["dev-screen"])), params)
 		return true
 	if not args.has("dev-run"):
 		return false

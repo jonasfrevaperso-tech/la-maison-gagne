@@ -1,106 +1,590 @@
 [
-  {"id": "cr_muet", "tier_min": 1, "tier_max": 3, "name_fr": "Le Croupier Muet", "name_en": "The Mute Dealer",
-   "desc_fr": "Les cotes sont masquées. −1 Précision.", "desc_en": "Odds are hidden. −1 Precision.",
-   "flavor_fr": "Il ne dit rien. Il n'en a pas besoin.", "flavor_en": "He says nothing. He doesn't need to.",
-   "portrait": "cr_muet", "music": "boss", "color": "6b6275", "debt_mult": 1.0,
-   "intro_fr": "…", "intro_en": "…",
-   "effects": [{"trigger": "on_deadline_start", "do": [{"op": "set_flag", "flag": "hide_odds", "value": true}]},
-               {"trigger": "on_spin_start", "do": [{"op": "temp_precision", "v": -1}]}]},
-  {"id": "cr_rouge_noir", "tier_min": 1, "tier_max": 3, "name_fr": "Madame Rouge-et-Noire", "name_en": "Madame Red-and-Black",
-   "desc_fr": "Interdit le pari sur une couleur à chaque tour.", "desc_en": "Forbids betting on one colour each spin.",
-   "flavor_fr": "Une moitié de robe rouge, l'autre noire, et aucune moitié d'indulgence.", "flavor_en": "Half her gown red, half black, and no half-measures.",
-   "portrait": "cr_rouge_noir", "music": "boss", "color": "c8102e", "debt_mult": 1.0,
-   "intro_fr": "Choisis, mon chou. Enfin… choisis l'autre.", "intro_en": "Choose, darling. Well… choose the other one.",
-   "effects": [{"trigger": "on_bet_phase", "do": [{"op": "ban_random_color"}]}]},
-  {"id": "cr_comptable", "tier_min": 1, "tier_max": 3, "name_fr": "Le Comptable", "name_en": "The Accountant",
-   "desc_fr": "Prélève 25 % de chaque pari gagnant.", "desc_en": "Takes 25% of every winning bet.",
-   "flavor_fr": "Il a calculé ton espérance de vie. Elle est négative.", "flavor_en": "He computed your life expectancy. It's negative.",
-   "portrait": "cr_comptable", "music": "boss", "color": "d4af37", "debt_mult": 1.0,
-   "intro_fr": "Signez ici, ici, et là. Non, là aussi.", "intro_en": "Sign here, here, and there. No, there too.",
-   "effects": [{"trigger": "on_bet_win", "do": [{"op": "multiply_win", "v": 0.75, "label": "tax"}]}]},
-  {"id": "cr_chanteuse", "tier_min": 1, "tier_max": 3, "name_fr": "La Chanteuse", "name_en": "The Singer",
-   "desc_fr": "Son rythme décale la bille : −15 % de contrôle.", "desc_en": "Her rhythm nudges the ball: −15% control.",
-   "flavor_fr": "Elle chante faux exprès. C'est pire.", "flavor_en": "She sings off-key on purpose. It's worse.",
-   "portrait": "cr_chanteuse", "music": "boss", "color": "ff2e88", "debt_mult": 1.0,
-   "intro_fr": "Une petite valse pour la route ?", "intro_en": "A little waltz for the road?",
-   "effects": [{"trigger": "on_deadline_start", "do": [{"op": "set_flag", "flag": "control_temp", "value": -0.15}]}]},
-  {"id": "cr_jumeau", "tier_min": 4, "tier_max": 6, "name_fr": "Le Jumeau", "name_en": "The Twin",
-   "desc_fr": "Il « emprunte » un de tes grigris (désactivé) le temps de l'échéance.", "desc_en": "He « borrows » one of your charms (disabled) for the deadline.",
-   "flavor_fr": "Il a ton visage. En mieux, dit-il.", "flavor_en": "He has your face. A better one, he says.",
-   "portrait": "cr_jumeau", "music": "boss", "color": "29e0ff", "debt_mult": 1.0,
-   "intro_fr": "On partage tout, entre frères. Surtout ce qui est à toi.", "intro_en": "Brothers share everything. Especially your things.",
-   "effects": [{"trigger": "on_deadline_start", "do": [{"op": "disable_random_grigri"}]}]},
-  {"id": "cr_baron_carre", "tier_min": 4, "tier_max": 6, "name_fr": "Baron Carré", "name_en": "Baron Square",
-   "desc_fr": "Seuls les carrés et les sixains sont autorisés.", "desc_en": "Only corners and six lines are allowed.",
-   "flavor_fr": "Monocle carré, moustache carrée, esprit carré.", "flavor_en": "Square monocle, square moustache, square mind.",
-   "portrait": "cr_baron_carre", "music": "boss", "color": "8a6d1e", "debt_mult": 0.9, "allowed_kinds": ["corner", "six_line"],
-   "intro_fr": "Les angles, jeune homme. Tout est dans les angles.", "intro_en": "Angles, young one. It's all in the angles.",
-   "effects": []},
-  {"id": "cr_usurier", "tier_min": 4, "tier_max": 6, "name_fr": "L'Usurier", "name_en": "The Usurer",
-   "desc_fr": "La dette augmente de 6 % à chaque tour.", "desc_en": "Debt grows 6% every spin.",
-   "flavor_fr": "Ses doigts comptent même quand il dort.", "flavor_en": "His fingers count even in his sleep.",
-   "portrait": "cr_usurier", "music": "boss", "color": "2ee6a8", "debt_mult": 0.85,
-   "intro_fr": "Le temps, c'est de l'argent. Le tien, c'est le mien.", "intro_en": "Time is money. Yours is mine.",
-   "effects": [{"trigger": "on_round_end", "do": [{"op": "debt_add_pct", "v": 0.06, "label": "interest"}]}]},
-  {"id": "cr_pyromane", "tier_min": 4, "tier_max": 6, "name_fr": "Le Pyromane", "name_en": "The Arsonist",
-   "desc_fr": "Brûle une case au hasard à chaque tour.", "desc_en": "Burns a random pocket every spin.",
-   "flavor_fr": "Il dit que c'est pour l'ambiance.", "flavor_en": "He says it's for the ambience.",
-   "portrait": "cr_pyromane", "music": "boss", "color": "ff4d3d", "debt_mult": 1.0,
-   "intro_fr": "T'as du feu ? Non ? Moi si.", "intro_en": "Got a light? No? I do.",
-   "effects": [{"trigger": "on_round_end", "do": [{"op": "burn_random_pocket", "type": "burnt"}]}]},
-  {"id": "cr_douairiere", "tier_min": 4, "tier_max": 6, "name_fr": "La Douairière", "name_en": "The Dowager",
-   "desc_fr": "−2 $ à chaque tour où moins de 2 paris gagnent.", "desc_en": "−$2 every spin where fewer than 2 bets win.",
-   "flavor_fr": "Elle a enterré quatre maris et une banque.", "flavor_en": "She buried four husbands and a bank.",
-   "portrait": "cr_douairiere", "music": "boss", "color": "b8b2c2", "debt_mult": 1.0,
-   "intro_fr": "Un seul pari ? Comme c'est… modeste.", "intro_en": "Just one bet? How… modest.",
-   "effects": [{"trigger": "on_round_end", "if": [{"c": "bets_won", "op": "<", "v": 2}], "do": [{"op": "add_money", "v": -2}]}]},
-  {"id": "cr_magnetiseur", "tier_min": 4, "tier_max": 6, "name_fr": "Le Magnétiseur", "name_en": "The Mesmerist",
-   "desc_fr": "La zone de visée s'élargit à 9 cases.", "desc_en": "The aiming zone widens to 9 pockets.",
-   "flavor_fr": "Regarde la bille. Regarde-la bien. Tu as sommeil.", "flavor_en": "Watch the ball. Watch it closely. You're sleepy.",
-   "portrait": "cr_magnetiseur", "music": "boss", "color": "b03aff", "debt_mult": 1.0,
-   "intro_fr": "Tu ne contrôles rien. Moi non plus, mais je le cache mieux.", "intro_en": "You control nothing. Neither do I, but I hide it better.",
-   "effects": [{"trigger": "on_deadline_start", "do": [{"op": "set_flag", "flag": "zone_width_override", "value": 9}]}]},
-  {"id": "cr_notaire", "tier_min": 4, "tier_max": 6, "name_fr": "Le Notaire", "name_en": "The Notary",
-   "desc_fr": "Un tour de moins pour rembourser.", "desc_en": "One fewer spin to repay.",
-   "flavor_fr": "Il a l'acte. Il a toujours l'acte.", "flavor_en": "He has the deed. He always has the deed.",
-   "portrait": "cr_notaire", "music": "boss", "color": "6b6275", "debt_mult": 0.85,
-   "intro_fr": "Article 37, alinéa zéro.", "intro_en": "Article 37, paragraph zero.",
-   "effects": [{"trigger": "on_deadline_start", "do": [{"op": "add_spins", "v": -1}]}]},
-  {"id": "cr_prestidigitateur", "tier_min": 4, "tier_max": 6, "name_fr": "Le Prestidigitateur", "name_en": "The Conjurer",
-   "desc_fr": "30 % de chances que la case touchée change de numéro (définitivement).", "desc_en": "30% chance the hit pocket changes number (permanently).",
-   "flavor_fr": "Ton 17 ? Quel 17 ?", "flavor_en": "Your 17? What 17?",
-   "portrait": "cr_prestidigitateur", "music": "boss", "color": "29e0ff", "debt_mult": 1.0,
-   "intro_fr": "Rien dans les manches. Tout dans les tiennes.", "intro_en": "Nothing up my sleeves. Everything up yours.",
-   "effects": [{"trigger": "on_round_end", "if": [{"c": "chance", "v": 0.3}], "do": [{"op": "randomize_pocket", "label": "trick"}]}]},
-  {"id": "cr_ombre", "tier_min": 1, "tier_max": 8, "secret": true, "name_fr": "L'Ombre du Grand-Père", "name_en": "Grandfather's Shadow",
-   "desc_fr": "Mult ×0,5. Ses dettes deviennent les tiennes.", "desc_en": "Mult ×0.5. His debts become yours.",
-   "flavor_fr": "Il te sourit avec tes dents.", "flavor_en": "He smiles at you with your teeth.",
-   "portrait": "cr_ombre", "music": "boss", "color": "2b2631", "debt_mult": 0.6,
-   "intro_fr": "Tu as mes yeux. Et mon ardoise.", "intro_en": "You have my eyes. And my tab.",
-   "effects": [{"trigger": "on_score_calc", "do": [{"op": "mul_mult", "v": 0.5}]}]},
-  {"id": "cr_croupier_or", "tier_min": 1, "tier_max": 8, "secret": true, "name_fr": "Le Croupier d'Or", "name_en": "The Golden Dealer",
-   "desc_fr": "−3 $ à chaque tour. Le vaincre rapporte une fortune.", "desc_en": "−$3 every spin. Beating him pays a fortune.",
-   "flavor_fr": "Entièrement en or. Même les cils.", "flavor_en": "Solid gold. Even the eyelashes.",
-   "portrait": "cr_croupier_or", "music": "boss", "color": "f2d27a", "debt_mult": 1.2,
-   "intro_fr": "Tout ce qui brille est à moi.", "intro_en": "All that glitters is mine.",
-   "effects": [{"trigger": "on_round_end", "do": [{"op": "add_money", "v": -3}]},
-               {"trigger": "on_deadline_end", "do": [{"op": "add_money", "v": 25}]}]},
-  {"id": "cr_patron", "tier_min": 7, "tier_max": 7, "name_fr": "Le Patron", "name_en": "The Boss",
-   "desc_fr": "Interdit une couleur à chaque tour et prélève 20 % des gains.", "desc_en": "Bans a colour each spin and takes 20% of winnings.",
-   "flavor_fr": "Personne n'a vu ses mains. Il porte des gants de toute façon.", "flavor_en": "Nobody's seen his hands. He wears gloves anyway.",
-   "portrait": "cr_patron", "music": "boss", "color": "d4af37", "debt_mult": 1.0,
-   "intro_fr": "Ta famille m'a toujours payé. Avec intérêts.", "intro_en": "Your family always paid me. With interest.",
-   "effects": [{"trigger": "on_bet_phase", "do": [{"op": "ban_random_color"}]},
-               {"trigger": "on_bet_win", "do": [{"op": "multiply_win", "v": 0.8, "label": "tax"}]}]},
-  {"id": "cr_la_maison", "tier_min": 8, "tier_max": 8, "name_fr": "La Maison", "name_en": "The House",
-   "desc_fr": "Roue vivante en 3 phases : intérêts, puis interdits et brouillage, puis brasier.", "desc_en": "Living wheel in 3 phases: interest, then bans and jamming, then blaze.",
-   "flavor_fr": "Elle ne s'est jamais arrêtée de tourner. Elle ne sait pas comment.", "flavor_en": "It has never stopped spinning. It doesn't know how.",
-   "portrait": "cr_la_maison", "music": "boss", "color": "ff2e88", "debt_mult": 1.0,
-   "intro_fr": "TU ES LA TRENTE-HUITIÈME CASE.", "intro_en": "YOU ARE THE THIRTY-EIGHTH POCKET.",
-   "effects": [],
-   "phases": [
-     {"name_fr": "L'Éveil", "name_en": "The Waking", "effects": [{"trigger": "on_round_end", "do": [{"op": "debt_add_pct", "v": 0.03}]}]},
-     {"name_fr": "La Ronde", "name_en": "The Round", "effects": [{"trigger": "on_bet_phase", "do": [{"op": "ban_random_color"}]}, {"trigger": "on_spin_start", "do": [{"op": "temp_precision", "v": -1}]}]},
-     {"name_fr": "Le Brasier", "name_en": "The Blaze", "effects": [{"trigger": "on_round_end", "do": [{"op": "burn_random_pocket", "type": "burnt"}]}, {"trigger": "on_score_calc", "do": [{"op": "mul_mult", "v": 0.8}]}]}
-   ]}
+ {
+  "id": "cr_muet",
+  "tier_min": 1,
+  "tier_max": 3,
+  "name_fr": "Le Croupier Muet",
+  "name_en": "The Mute Dealer",
+  "desc_fr": "Les cotes sont masquées. −1 Précision.",
+  "desc_en": "Odds are hidden. −1 Precision.",
+  "flavor_fr": "Il ne dit rien. Il n'en a pas besoin.",
+  "flavor_en": "He says nothing. He doesn't need to.",
+  "portrait": "cr_muet",
+  "music": "boss",
+  "color": "6b6275",
+  "debt_mult": 1.0,
+  "intro_fr": "…",
+  "intro_en": "…",
+  "effects": [
+   {
+    "trigger": "on_deadline_start",
+    "do": [
+     {
+      "op": "set_flag",
+      "flag": "hide_odds",
+      "value": true
+     }
+    ]
+   },
+   {
+    "trigger": "on_spin_start",
+    "do": [
+     {
+      "op": "temp_precision",
+      "v": -1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cr_rouge_noir",
+  "tier_min": 1,
+  "tier_max": 3,
+  "name_fr": "Madame Rouge-et-Noire",
+  "name_en": "Madame Red-and-Black",
+  "desc_fr": "Interdit le pari sur une couleur à chaque tour.",
+  "desc_en": "Forbids betting on one colour each spin.",
+  "flavor_fr": "Une moitié de robe rouge, l'autre noire, et aucune moitié d'indulgence.",
+  "flavor_en": "Half her gown red, half black, and no half-measures.",
+  "portrait": "cr_rouge_noir",
+  "music": "boss",
+  "color": "c8102e",
+  "debt_mult": 1.0,
+  "intro_fr": "Choisis, mon chou. Enfin… choisis l'autre.",
+  "intro_en": "Choose, darling. Well… choose the other one.",
+  "effects": [
+   {
+    "trigger": "on_bet_phase",
+    "do": [
+     {
+      "op": "ban_random_color"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cr_comptable",
+  "tier_min": 1,
+  "tier_max": 3,
+  "name_fr": "Le Comptable",
+  "name_en": "The Accountant",
+  "desc_fr": "Prélève 25 % de chaque pari gagnant.",
+  "desc_en": "Takes 25% of every winning bet.",
+  "flavor_fr": "Il a calculé ton espérance de vie. Elle est négative.",
+  "flavor_en": "He computed your life expectancy. It's negative.",
+  "portrait": "cr_comptable",
+  "music": "boss",
+  "color": "d4af37",
+  "debt_mult": 1.0,
+  "intro_fr": "Signez ici, ici, et là. Non, là aussi.",
+  "intro_en": "Sign here, here, and there. No, there too.",
+  "effects": [
+   {
+    "trigger": "on_bet_win",
+    "do": [
+     {
+      "op": "multiply_win",
+      "v": 0.75,
+      "label": "tax"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cr_chanteuse",
+  "tier_min": 1,
+  "tier_max": 3,
+  "name_fr": "La Chanteuse",
+  "name_en": "The Singer",
+  "desc_fr": "Son rythme décale la bille : −15 % de contrôle.",
+  "desc_en": "Her rhythm nudges the ball: −15% control.",
+  "flavor_fr": "Elle chante faux exprès. C'est pire.",
+  "flavor_en": "She sings off-key on purpose. It's worse.",
+  "portrait": "cr_chanteuse",
+  "music": "boss",
+  "color": "ff2e88",
+  "debt_mult": 1.0,
+  "intro_fr": "Une petite valse pour la route ?",
+  "intro_en": "A little waltz for the road?",
+  "effects": [
+   {
+    "trigger": "on_deadline_start",
+    "do": [
+     {
+      "op": "set_flag",
+      "flag": "control_temp",
+      "value": -0.15
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cr_jumeau",
+  "tier_min": 4,
+  "tier_max": 6,
+  "name_fr": "Le Jumeau",
+  "name_en": "The Twin",
+  "desc_fr": "Il « emprunte » un de tes grigris (désactivé) le temps de l'échéance.",
+  "desc_en": "He « borrows » one of your charms (disabled) for the deadline.",
+  "flavor_fr": "Il a ton visage. En mieux, dit-il.",
+  "flavor_en": "He has your face. A better one, he says.",
+  "portrait": "cr_jumeau",
+  "music": "boss",
+  "color": "29e0ff",
+  "debt_mult": 1.0,
+  "intro_fr": "On partage tout, entre frères. Surtout ce qui est à toi.",
+  "intro_en": "Brothers share everything. Especially your things.",
+  "effects": [
+   {
+    "trigger": "on_deadline_start",
+    "do": [
+     {
+      "op": "disable_random_grigri"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cr_baron_carre",
+  "tier_min": 4,
+  "tier_max": 6,
+  "name_fr": "Baron Carré",
+  "name_en": "Baron Square",
+  "desc_fr": "Seuls les carrés et les sixains sont autorisés.",
+  "desc_en": "Only corners and six lines are allowed.",
+  "flavor_fr": "Monocle carré, moustache carrée, esprit carré.",
+  "flavor_en": "Square monocle, square moustache, square mind.",
+  "portrait": "cr_baron_carre",
+  "music": "boss",
+  "color": "8a6d1e",
+  "debt_mult": 0.9,
+  "allowed_kinds": [
+   "corner",
+   "six_line"
+  ],
+  "intro_fr": "Les angles, jeune homme. Tout est dans les angles.",
+  "intro_en": "Angles, young one. It's all in the angles.",
+  "effects": []
+ },
+ {
+  "id": "cr_usurier",
+  "tier_min": 4,
+  "tier_max": 6,
+  "name_fr": "L'Usurier",
+  "name_en": "The Usurer",
+  "desc_fr": "La dette augmente de 6 % à chaque tour.",
+  "desc_en": "Debt grows 6% every spin.",
+  "flavor_fr": "Ses doigts comptent même quand il dort.",
+  "flavor_en": "His fingers count even in his sleep.",
+  "portrait": "cr_usurier",
+  "music": "boss",
+  "color": "2ee6a8",
+  "debt_mult": 0.85,
+  "intro_fr": "Le temps, c'est de l'argent. Le tien, c'est le mien.",
+  "intro_en": "Time is money. Yours is mine.",
+  "effects": [
+   {
+    "trigger": "on_round_end",
+    "do": [
+     {
+      "op": "debt_add_pct",
+      "v": 0.06,
+      "label": "interest"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cr_pyromane",
+  "tier_min": 4,
+  "tier_max": 6,
+  "name_fr": "Le Pyromane",
+  "name_en": "The Arsonist",
+  "desc_fr": "Brûle une case au hasard à chaque tour.",
+  "desc_en": "Burns a random pocket every spin.",
+  "flavor_fr": "Il dit que c'est pour l'ambiance.",
+  "flavor_en": "He says it's for the ambience.",
+  "portrait": "cr_pyromane",
+  "music": "boss",
+  "color": "ff4d3d",
+  "debt_mult": 1.0,
+  "intro_fr": "T'as du feu ? Non ? Moi si.",
+  "intro_en": "Got a light? No? I do.",
+  "effects": [
+   {
+    "trigger": "on_round_end",
+    "do": [
+     {
+      "op": "burn_random_pocket",
+      "type": "burnt"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cr_douairiere",
+  "tier_min": 4,
+  "tier_max": 6,
+  "name_fr": "La Douairière",
+  "name_en": "The Dowager",
+  "desc_fr": "−2 $ à chaque tour où moins de 2 paris gagnent.",
+  "desc_en": "−$2 every spin where fewer than 2 bets win.",
+  "flavor_fr": "Elle a enterré quatre maris et une banque.",
+  "flavor_en": "She buried four husbands and a bank.",
+  "portrait": "cr_douairiere",
+  "music": "boss",
+  "color": "b8b2c2",
+  "debt_mult": 1.0,
+  "intro_fr": "Un seul pari ? Comme c'est… modeste.",
+  "intro_en": "Just one bet? How… modest.",
+  "effects": [
+   {
+    "trigger": "on_round_end",
+    "if": [
+     {
+      "c": "bets_won",
+      "op": "<",
+      "v": 2
+     }
+    ],
+    "do": [
+     {
+      "op": "add_money",
+      "v": -2
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cr_magnetiseur",
+  "tier_min": 4,
+  "tier_max": 6,
+  "name_fr": "Le Magnétiseur",
+  "name_en": "The Mesmerist",
+  "desc_fr": "La zone de visée s'élargit à 9 cases.",
+  "desc_en": "The aiming zone widens to 9 pockets.",
+  "flavor_fr": "Regarde la bille. Regarde-la bien. Tu as sommeil.",
+  "flavor_en": "Watch the ball. Watch it closely. You're sleepy.",
+  "portrait": "cr_magnetiseur",
+  "music": "boss",
+  "color": "b03aff",
+  "debt_mult": 1.0,
+  "intro_fr": "Tu ne contrôles rien. Moi non plus, mais je le cache mieux.",
+  "intro_en": "You control nothing. Neither do I, but I hide it better.",
+  "effects": [
+   {
+    "trigger": "on_deadline_start",
+    "do": [
+     {
+      "op": "set_flag",
+      "flag": "zone_width_override",
+      "value": 9
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cr_notaire",
+  "tier_min": 4,
+  "tier_max": 6,
+  "name_fr": "Le Notaire",
+  "name_en": "The Notary",
+  "desc_fr": "Un tour de moins pour rembourser.",
+  "desc_en": "One fewer spin to repay.",
+  "flavor_fr": "Il a l'acte. Il a toujours l'acte.",
+  "flavor_en": "He has the deed. He always has the deed.",
+  "portrait": "cr_notaire",
+  "music": "boss",
+  "color": "6b6275",
+  "debt_mult": 0.85,
+  "intro_fr": "Article 37, alinéa zéro.",
+  "intro_en": "Article 37, paragraph zero.",
+  "effects": [
+   {
+    "trigger": "on_deadline_start",
+    "do": [
+     {
+      "op": "add_spins",
+      "v": -1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cr_prestidigitateur",
+  "tier_min": 4,
+  "tier_max": 6,
+  "name_fr": "Le Prestidigitateur",
+  "name_en": "The Conjurer",
+  "desc_fr": "30 % de chances que la case touchée change de numéro (définitivement).",
+  "desc_en": "30% chance the hit pocket changes number (permanently).",
+  "flavor_fr": "Ton 17 ? Quel 17 ?",
+  "flavor_en": "Your 17? What 17?",
+  "portrait": "cr_prestidigitateur",
+  "music": "boss",
+  "color": "29e0ff",
+  "debt_mult": 1.0,
+  "intro_fr": "Rien dans les manches. Tout dans les tiennes.",
+  "intro_en": "Nothing up my sleeves. Everything up yours.",
+  "effects": [
+   {
+    "trigger": "on_round_end",
+    "if": [
+     {
+      "c": "chance",
+      "v": 0.3
+     }
+    ],
+    "do": [
+     {
+      "op": "randomize_pocket",
+      "label": "trick"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cr_bonneteur",
+  "tier_min": 3,
+  "tier_max": 6,
+  "name_fr": "Le Bonneteur",
+  "name_en": "The Shell Gamer",
+  "desc_fr": "Avant chaque tour, échange trois paires de cases sur la roue. L'ordre revient après l'échéance.",
+  "desc_en": "Before each spin, swaps three pairs of pockets on the wheel. The order returns after the deadline.",
+  "flavor_fr": "« Où est la bille ? Où est la bille ? » Toujours ailleurs.",
+  "flavor_en": "\"Where's the ball? Where's the ball?\" Always somewhere else.",
+  "portrait": "cr_bonneteur",
+  "music": "boss",
+  "color": "ff8a3d",
+  "debt_mult": 1.0,
+  "intro_fr": "Suis bien mes mains, mon grand. Non, l'autre. Non, l'autre.",
+  "intro_en": "Follow my hands, pal. No, the other one. No, the other.",
+  "effects": [
+   {
+    "trigger": "on_bet_phase",
+    "do": [
+     {
+      "op": "swap_pockets",
+      "v": 3
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cr_valseuse",
+  "tier_min": 2,
+  "tier_max": 5,
+  "name_fr": "La Valseuse",
+  "name_en": "The Waltzer",
+  "desc_fr": "La roue tourne à l'envers, et un tiers plus vite pendant la visée.",
+  "desc_en": "The wheel turns backwards, a third faster while you aim.",
+  "flavor_fr": "Un, deux, trois. Un, deux, trois. Dans l'autre sens.",
+  "flavor_en": "One, two, three. One, two, three. The other way round.",
+  "portrait": "cr_valseuse",
+  "music": "boss",
+  "color": "b03aff",
+  "debt_mult": 1.0,
+  "wheel_reverse": true,
+  "aim_speed_mult": 1.33,
+  "intro_fr": "Tu me marches sur les pieds, chéri. Tourne dans mon sens.",
+  "intro_en": "You're stepping on my toes, darling. Turn my way."
+ },
+ {
+  "id": "cr_ombre",
+  "tier_min": 1,
+  "tier_max": 8,
+  "secret": true,
+  "name_fr": "L'Ombre du Grand-Père",
+  "name_en": "Grandfather's Shadow",
+  "desc_fr": "Mult ×0,5. Ses dettes deviennent les tiennes.",
+  "desc_en": "Mult ×0.5. His debts become yours.",
+  "flavor_fr": "Il te sourit avec tes dents.",
+  "flavor_en": "He smiles at you with your teeth.",
+  "portrait": "cr_ombre",
+  "music": "boss",
+  "color": "2b2631",
+  "debt_mult": 0.6,
+  "intro_fr": "Tu as mes yeux. Et mon ardoise.",
+  "intro_en": "You have my eyes. And my tab.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 0.5
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cr_croupier_or",
+  "tier_min": 1,
+  "tier_max": 8,
+  "secret": true,
+  "name_fr": "Le Croupier d'Or",
+  "name_en": "The Golden Dealer",
+  "desc_fr": "−3 $ à chaque tour. Le vaincre rapporte une fortune.",
+  "desc_en": "−$3 every spin. Beating him pays a fortune.",
+  "flavor_fr": "Entièrement en or. Même les cils.",
+  "flavor_en": "Solid gold. Even the eyelashes.",
+  "portrait": "cr_croupier_or",
+  "music": "boss",
+  "color": "f2d27a",
+  "debt_mult": 1.2,
+  "intro_fr": "Tout ce qui brille est à moi.",
+  "intro_en": "All that glitters is mine.",
+  "effects": [
+   {
+    "trigger": "on_round_end",
+    "do": [
+     {
+      "op": "add_money",
+      "v": -3
+     }
+    ]
+   },
+   {
+    "trigger": "on_deadline_end",
+    "do": [
+     {
+      "op": "add_money",
+      "v": 25
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cr_patron",
+  "tier_min": 7,
+  "tier_max": 7,
+  "name_fr": "Le Patron",
+  "name_en": "The Boss",
+  "desc_fr": "Interdit une couleur à chaque tour et prélève 20 % des gains.",
+  "desc_en": "Bans a colour each spin and takes 20% of winnings.",
+  "flavor_fr": "Personne n'a vu ses mains. Il porte des gants de toute façon.",
+  "flavor_en": "Nobody's seen his hands. He wears gloves anyway.",
+  "portrait": "cr_patron",
+  "music": "boss",
+  "color": "d4af37",
+  "debt_mult": 1.0,
+  "intro_fr": "Ta famille m'a toujours payé. Avec intérêts.",
+  "intro_en": "Your family always paid me. With interest.",
+  "effects": [
+   {
+    "trigger": "on_bet_phase",
+    "do": [
+     {
+      "op": "ban_random_color"
+     }
+    ]
+   },
+   {
+    "trigger": "on_bet_win",
+    "do": [
+     {
+      "op": "multiply_win",
+      "v": 0.8,
+      "label": "tax"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "cr_la_maison",
+  "tier_min": 8,
+  "tier_max": 8,
+  "name_fr": "La Maison",
+  "name_en": "The House",
+  "desc_fr": "Roue vivante en 3 phases : intérêts, puis interdits et brouillage, puis brasier.",
+  "desc_en": "Living wheel in 3 phases: interest, then bans and jamming, then blaze.",
+  "flavor_fr": "Elle ne s'est jamais arrêtée de tourner. Elle ne sait pas comment.",
+  "flavor_en": "It has never stopped spinning. It doesn't know how.",
+  "portrait": "cr_la_maison",
+  "music": "boss",
+  "color": "ff2e88",
+  "debt_mult": 1.0,
+  "intro_fr": "TU ES LA TRENTE-HUITIÈME CASE.",
+  "intro_en": "YOU ARE THE THIRTY-EIGHTH POCKET.",
+  "effects": [],
+  "phases": [
+   {
+    "name_fr": "L'Éveil",
+    "name_en": "The Waking",
+    "effects": [
+     {
+      "trigger": "on_round_end",
+      "do": [
+       {
+        "op": "debt_add_pct",
+        "v": 0.03
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "name_fr": "La Ronde",
+    "name_en": "The Round",
+    "effects": [
+     {
+      "trigger": "on_bet_phase",
+      "do": [
+       {
+        "op": "ban_random_color"
+       }
+      ]
+     },
+     {
+      "trigger": "on_spin_start",
+      "do": [
+       {
+        "op": "temp_precision",
+        "v": -1
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "name_fr": "Le Brasier",
+    "name_en": "The Blaze",
+    "effects": [
+     {
+      "trigger": "on_round_end",
+      "do": [
+       {
+        "op": "burn_random_pocket",
+        "type": "burnt"
+       }
+      ]
+     },
+     {
+      "trigger": "on_score_calc",
+      "do": [
+       {
+        "op": "mul_mult",
+        "v": 0.8
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
 ]

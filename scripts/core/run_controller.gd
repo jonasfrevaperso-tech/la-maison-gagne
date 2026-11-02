@@ -186,6 +186,9 @@ func debt_for(tier: int, deadline_idx: int) -> int:
 
 
 func start_deadline() -> void:
+	if run.flags.has(EffectRunner.WHEEL_BACKUP_FLAG):
+		run.wheel.reorder_by_uids(run.flags[EffectRunner.WHEEL_BACKUP_FLAG] as Array)
+		run.flags.erase(EffectRunner.WHEEL_BACKUP_FLAG)
 	for f: String in CREDITOR_FLAGS:
 		run.flags.erase(f)
 	run.creditor_id = ""

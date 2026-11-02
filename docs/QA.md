@@ -12,7 +12,8 @@
 | Tests | `tests/run_tests.gd` | 60 tests : règles, score, couverture de 100 % du contenu, sauvegarde, événements/succès/défis, curseur manette, non-régression, multi-résolution, aide aux commandes, télémétrie, historique |
 | Fuzzing | `tools/fuzz.gd` | runs aléatoires, invariants à chaque action, aller-retour de sauvegarde tous les 7 pas |
 | Simulation | `scripts/sim/sim_main.gd` | 40 runs de bout en bout sans erreur |
-| Interface | `-- --dev-ui-check` | 10 écrans + 8 surcouches × 3 tailles logiques (16:9, 16:10, texte agrandi) : un contrôle a le focus manette, aucun bouton hors de l'écran |
+| Interface | `-- --dev-ui-check` | 11 écrans + 8 surcouches + 2 états du run × 4 configurations (16:9, 16:10, petite fenêtre, Steam Deck texte 130 %), en mode manette : un contrôle a le focus, aucun bouton hors de l'écran, aucun texte sous 9 px rendu en 1280×800 |
+| Manette | `-- --dev-pad-run=500 --dev-debt-mult=0.01` | campagne complète jouée uniquement avec des événements de manette simulés (titre → options → Codex → run → boutique → Fortune → pactes → événements → finale → résumé) |
 | Démarrage | `-- --quit-frames=120` | lancement et sortie propres (zéro erreur, zéro fuite) |
 
 ## Tests manuels assistés
@@ -56,6 +57,11 @@ Estimation Steam Deck (GPU ≈ 8× moins puissant) : ≈ 15 ms par image avec to
 
 ### Journal du moteur
 Des lignes « Attempt to disconnect a nonexistent connection from 'root' (focus_entered / tree_exited) » sont apparues dans un journal de session réelle (Wayland). Elles ne viennent d'aucun code du jeu (aucune connexion manuelle à ces signaux) et n'ont pas pu être reproduites par simulation (infobulles, clics, changements d'écran, `--dev-hover`) : erreur interne du moteur liée aux fenêtres popup, sans effet visible. À surveiller.
+
+## Version 1.2
+- Bug majeur trouvé par l'utilisateur : A/B sans effet dans les menus (actions d'interface sans manette en Godot 4.7) → table des commandes réécrite (D-020).
+- Trouvé par la campagne à la manette : focus initial sur un choix d'événement indisponible → premier choix disponible, et la garde de focus quitte tout bouton désactivé.
+- Trouvé à l'œil sur les captures : badges d'invite au-dessus des surcouches (z-index), infobulle de focus en mode clavier, touche « Left » non traduite, libellés non importés.
 
 ## Limites connues
 - Aucun test humain (ressenti, lisibilité, son à l'oreille).

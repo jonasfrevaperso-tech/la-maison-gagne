@@ -38,3 +38,17 @@ func test_no_softlock_when_rules_forbid_everything() -> void:
 	c.run.banned_color = &"red"
 	c._configure_slip(true)
 	check(c.ensure_some_bet(), "un pari reste possible")
+
+
+func test_slip_keeps_consumed_temp_budget_on_reload() -> void:
+	# 1.2 : le bulletin du tour précédent (budget gonflé par un bonus temporaire déjà consommé)
+	# était tronqué au rechargement hors phase de mise.
+	var c: RunController = RunController.new(ContentDB.shared())
+	c.new_run("lea", 0, 7)
+	c.run.slip.budget = c.run.bet_budget + 2
+	for i: int in c.run.slip.budget:
+		c.run.slip.place("straight:%d" % i, 1)
+	eq(c.run.slip.total(), c.run.bet_budget + 2, "bulletin rempli au-delà du budget de base")
+	c.run.temp_budget_bonus = 0
+	var a: String = JSON.stringify(c.run.to_dict())
+	eq(JSON.stringify(_rt(c.run).to_dict()), a, "bulletin identique après rechargement")

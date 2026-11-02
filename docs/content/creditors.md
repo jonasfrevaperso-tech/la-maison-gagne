@@ -1,4 +1,4 @@
-# Créanciers (16)
+# Créanciers (18)
 
 | id | Nom (FR / EN) | Description | Rareté / coût | Tags | Effets | Ambiance |
 |---|---|---|---|---|---|---|
@@ -14,6 +14,8 @@
 | cr_magnetiseur | Le Magnétiseur / The Mesmerist | La zone de visée s'élargit à 9 cases. | paliers 4–6 |  | on_deadline_start→set_flag | Regarde la bille. Regarde-la bien. Tu as sommeil. |
 | cr_notaire | Le Notaire / The Notary | Un tour de moins pour rembourser. | paliers 4–6 |  | on_deadline_start→add_spins | Il a l'acte. Il a toujours l'acte. |
 | cr_prestidigitateur | Le Prestidigitateur / The Conjurer | 30 % de chances que la case touchée change de numéro (définitivement). | paliers 4–6 |  | on_round_end→randomize_pocket | Ton 17 ? Quel 17 ? |
+| cr_bonneteur | Le Bonneteur / The Shell Gamer | Avant chaque tour, échange trois paires de cases sur la roue. L'ordre revient après l'échéance. | paliers 3–6 |  | on_bet_phase→swap_pockets | « Où est la bille ? Où est la bille ? » Toujours ailleurs. |
+| cr_valseuse | La Valseuse / The Waltzer | La roue tourne à l'envers, et un tiers plus vite pendant la visée. | paliers 2–5 |  |  | Un, deux, trois. Un, deux, trois. Dans l'autre sens. |
 | cr_ombre | L'Ombre du Grand-Père / Grandfather's Shadow | Mult ×0,5. Ses dettes deviennent les tiennes. | paliers 1–8 (secret) |  | on_score_calc→mul_mult | Il te sourit avec tes dents. |
 | cr_croupier_or | Le Croupier d'Or / The Golden Dealer | −3 $ à chaque tour. Le vaincre rapporte une fortune. | paliers 1–8 (secret) |  | on_round_end→add_money; on_deadline_end→add_money | Entièrement en or. Même les cils. |
 | cr_patron | Le Patron / The Boss | Interdit une couleur à chaque tour et prélève 20 % des gains. | paliers 7–7 |  | on_bet_phase→ban_random_color; on_bet_win→multiply_win | Personne n'a vu ses mains. Il porte des gants de toute façon. |

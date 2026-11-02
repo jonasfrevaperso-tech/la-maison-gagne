@@ -364,10 +364,15 @@ func _refresh_creditor() -> void:
 		tint.a = BG_TINT_BASE + BG_TINT_PER_PHASE * float(ctl.run.creditor_phase)
 	_bg.set_tint(tint)
 	var r: RunState = ctl.run
-	if r.creditor_id == "" or not r.is_creditor():
+	var active: bool = r.creditor_id != "" and r.is_creditor()
+	var cdef: Dictionary = ctl.db.get_entry("creditors", r.creditor_id) if active else {}
+	# Créanciers de roue : rotation inversée, visée accélérée.
+	wheel_view.direction = -1.0 if bool(cdef.get("wheel_reverse", false)) else 1.0
+	wheel_view.aim_speed_mult = float(cdef.get("aim_speed_mult", 1.0))
+	if not active:
 		_creditor_label.text = ""
 		return
-	var c: Dictionary = ctl.db.get_entry("creditors", r.creditor_id)
+	var c: Dictionary = cdef
 	var col: String = String(c.get("color", "ff2e88"))
 	var phase_txt: String = ""
 	var phases: Array = c.get("phases", [])

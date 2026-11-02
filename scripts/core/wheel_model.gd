@@ -72,6 +72,44 @@ func count_with_edition() -> int:
 	return c
 
 
+## Ordre des cases (identifiants) : sauvegardé avant un mélange temporaire.
+func order_uids() -> Array[int]:
+	var out: Array[int] = []
+	for p: Pocket in pockets:
+		out.append(p.uid)
+	return out
+
+
+## Remet les cases dans l'ordre donné ; les cases absentes de l'ordre gardent leur place relative à la fin.
+func reorder_by_uids(order: Array) -> void:
+	var by_uid: Dictionary = {}
+	for p: Pocket in pockets:
+		by_uid[p.uid] = p
+	var out: Array[Pocket] = []
+	for u: Variant in order:
+		if by_uid.has(int(u)):
+			out.append(by_uid[int(u)])
+			by_uid.erase(int(u))
+	for p2: Pocket in pockets:
+		if by_uid.has(p2.uid):
+			out.append(p2)
+	pockets = out
+
+
+func swap(i: int, j: int) -> void:
+	var t: Pocket = pockets[i]
+	pockets[i] = pockets[j]
+	pockets[j] = t
+
+
+func count_with_seal() -> int:
+	var c: int = 0
+	for p: Pocket in pockets:
+		if p.seal != &"":
+			c += 1
+	return c
+
+
 func count_number(n: int) -> int:
 	var c: int = 0
 	for p: Pocket in pockets:

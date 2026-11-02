@@ -56,6 +56,8 @@ PORTRAITS = {
     "cr_magnetiseur": dict(skin="skin2", hair="black", style="slick", eyes="purple", outfit="black", collar="purple", acc="spiral", bg="smoke_dark", moustache=True),
     "cr_notaire": dict(skin="skin1", hair="grey", style="side", eyes="ink", outfit="black", collar="ivory", acc="glasses", bg="smoke_dark"),
     "cr_prestidigitateur": dict(skin="skin1", hair="black", style="slick", eyes="cyan", outfit="black", collar="red", acc="tophat", bg="velvet", moustache=True),
+    "cr_bonneteur": dict(skin="skin3", hair="brown", style="spiky", eyes="orange", outfit="orange", collar="black", acc="match", bg="smoke_dark", moustache=True),
+    "cr_valseuse": dict(skin="pale", hair="black", style="bun", eyes="purple", outfit="purple", collar="gold", acc="flower", bg="velvet"),
     "cr_ombre": dict(skin="smoke", hair="smoke_dark", style="side", eyes="gold_light", outfit="smoke_dark", collar="smoke", acc="none", bg="black", ghost=True),
     "cr_croupier_or": dict(skin="gold_light", hair="gold", style="slick", eyes="gold_dark", outfit="gold", collar="gold_dark", acc="bowtie", bg="velvet_deep"),
     "cr_patron": dict(skin="skin2", hair="white", style="side", eyes="gold", outfit="black", collar="gold", acc="fedora", bg="velvet_deep", moustache=True),

@@ -1,5 +1,22 @@
 # Équilibrage
 
+## Version 1.2 — Contenu « Tapis de jeu »
+Même protocole que 1.1 (bot expert, 330 runs au Risque 0, graines 101–111) avec les 30 nouveaux grigris (180 au total) et les deux créanciers de roue (Bonneteur, Valseuse).
+
+| | 1.1 (référence) | 1.2, contenu brut | **1.2, après réglages** |
+|---|---|---|---|
+| Victoires | 44,2 % | 37,3 % (123/330) | **38,8 % (128/330)** |
+| Survie par palier | 95/97/94/91/86/82/87/91 % | 95/96/93/87/85/87/82/84 % | 95/96/93/87/85/88/83/85 % |
+| Run gagné (modèle de temps) | 29,1 min | 29,4 min | 29,4 min |
+
+Enseignements :
+- La baisse de 44 → 39 % vient de la dilution des offres (30 grigris de plus, souvent à mise en place) et des créanciers de roue, plus exigeants aux paliers 4–8. Le taux reste dans la cible 35–45 % : dettes inchangées.
+- Nouveaux grigris les plus choisis : **Marathon** (52 %, 53 % de victoires), Charnière (34 %), Recensement (35 %). Aucun n'est dominant (≥ 70 %).
+- Renforts sur six grigris délaissés à mise en place : Couturière ×1,5 → ×2 Jetons sur chevaux, Ligne de tramway ×1,4 → ×1,6, Collectionneur de cendres +2 → +3, Biscuit chinois +2 → +3, Ferrailleur +3 → +4 jetons, Horloge d'éternité +0,2 → +0,3 par échéance. Le bot les choisit toujours peu (son évaluation sur une échéance sous-estime la croissance), mais les runs qui les prennent gagnent autant ou plus que la moyenne : la télémétrie joueurs tranchera.
+- **Règlement intérieur** reste à la limite du dominant (70 %) : surveillé, pas modifié.
+
+---
+
 ## Version 1.1 — Référence « bot expert »
 Bot expert (D-019) : dispositions de paris de tous types évaluées par le moteur de score, utilité plafonnée par le besoin de l'échéance, grigris jugés sur une échéance entière. 330 runs au Risque 0 (11 lots parallèles), télémétrie dans le format joueur, rapport `tools/telemetry_report.py`.
 

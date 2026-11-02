@@ -11,6 +11,7 @@ const SCREEN_CODEX: StringName = &"codex"
 const SCREEN_HALL: StringName = &"hall"
 const SCREEN_ACHIEVEMENTS: StringName = &"achievements"
 const SCREEN_STATS: StringName = &"stats"
+const SCREEN_RACE: StringName = &"seed_race"
 
 ## Délai laissé au thread audio pour libérer les lectures avant de quitter.
 const QUIT_AUDIO_GRACE: float = 0.35

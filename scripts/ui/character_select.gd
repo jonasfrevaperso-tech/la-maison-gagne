@@ -12,11 +12,14 @@ var _detail: RichTextLabel = null
 var _risk_label: Label = null
 var _risk_desc: Label = null
 var _seed_edit: LineEdit = null
+## Graine imposée (Course de graine) : pré-remplie, modifiable.
+var _preset_seed: String = ""
 var _start_btn: Button = null
 
 
 func setup(params: Dictionary) -> void:
 	daily = bool(params.get("daily", false))
+	_preset_seed = String(params.get("seed", ""))
 
 
 func _ready() -> void:
@@ -65,6 +68,8 @@ func _ready() -> void:
 	_seed_edit.set_meta("osk_upper", true)
 	if daily:
 		_seed_edit.text = RngService.seed_to_code(RngService.daily_seed())
+	elif _preset_seed != "":
+		_seed_edit.text = _preset_seed
 	seed_row.add_child(_seed_edit)
 	var actions: HBoxContainer = HBoxContainer.new()
 	actions.alignment = BoxContainer.ALIGNMENT_CENTER

@@ -12,10 +12,17 @@
 - Remplacer les sons marqués « À revoir » (`python3 tools/audio_mix.py` les liste).
 - Bulles du tutoriel ancrées hors des surcouches (elles masquent parfois le titre d'un pacte).
 
-## 1.2 — Contenu
-- 30 grigris supplémentaires autour des mécaniques peu exploitées (sixains, sceaux, Infini).
-- Nouveaux créanciers à mécanique de roue (rotation inversée, cases qui changent de place).
-- Mode « Course de graine » : classement local par graine du jour.
+## 1.2 — Contenu et manette ✅
+- ✅ 30 grigris autour des mécaniques peu exploitées (sceaux, Infini, destructions, relances, Fortune, paris intérieurs, attraction, roue).
+- ✅ Créanciers à mécanique de roue : La Valseuse (rotation inversée), Le Bonneteur (cases qui changent de place).
+- ✅ Course de graine : classement local par graine (du jour ou partagée).
+- ✅ Prise en charge manette complète, glyphes Xbox 360, préparation Steam Deck Vérifié.
+- ⏳ Reste humain : test sur un vrai Steam Deck avant la revue Valve ; sessions de playtest (`docs/PLAYTEST.md`).
+
+## 1.3 — Pistes
+- Glyphes Steam Deck et PlayStation au choix (le Deck accepte déjà les glyphes Xbox).
+- Classement partagé de la Course de graine (export/import d'un fichier de résultats, sans serveur).
+- Animations de cartes à l'achat et à la vente plus marquées ; écran de victoire de campagne dédié.
 
 ## DLC « Les Étages Oubliés »
 Un quatrième acte entre les Salons et la Cave : casino abandonné, roue à 2 zéros, nouveau personnage (la Contrebandière), 3 créanciers, 25 grigris.

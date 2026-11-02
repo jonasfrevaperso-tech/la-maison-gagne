@@ -19,7 +19,39 @@ static func entry(run: RunState, victory: bool, seconds: float, seed_code: Strin
 		"best_spin": run.best_spin,
 		"minutes": snappedf(seconds / 60.0, 0.1),
 		"seed": seed_code,
+		"score_total": total_score(run),
 	}
+
+
+## Score cumulé du run : toutes les échéances terminées + l'échéance en cours.
+static func total_score(run: RunState) -> int:
+	var t: int = run.deadline_score
+	for d: Dictionary in run.deadline_log:
+		t += int(d.get("score", 0))
+	return t
+
+
+## Classement « Course de graine » : tous les runs joués sur cette graine, du meilleur au moins bon
+## (victoire, puis échéances remboursées, puis score cumulé, puis le plus rapide).
+static func leaderboard(profile: Dictionary, seed_code: String) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for e: Variant in profile.get("history", []):
+		if e is Dictionary and String((e as Dictionary).get("seed", "")) == seed_code:
+			out.append(e as Dictionary)
+	out.sort_custom(_better)
+	return out
+
+
+static func _better(a: Dictionary, b: Dictionary) -> bool:
+	var va: int = 1 if bool(a.get("victory", false)) else 0
+	var vb: int = 1 if bool(b.get("victory", false)) else 0
+	if va != vb:
+		return va > vb
+	if int(a.get("deadlines", 0)) != int(b.get("deadlines", 0)):
+		return int(a.get("deadlines", 0)) > int(b.get("deadlines", 0))
+	if int(a.get("score_total", 0)) != int(b.get("score_total", 0)):
+		return int(a.get("score_total", 0)) > int(b.get("score_total", 0))
+	return float(a.get("minutes", 0.0)) < float(b.get("minutes", 0.0))
 
 
 ## Ajoute un run au profil : liste bornée + compteurs « entrés / passés » par palier.

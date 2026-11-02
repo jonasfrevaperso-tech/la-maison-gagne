@@ -61,14 +61,13 @@ func _ready() -> void:
 	# Entrées secondaires sur deux colonnes : le menu tient en 16:9 même avec le texte agrandi.
 	var extras: Array[Array] = _extra_entries()
 	if not extras.is_empty():
-		menu.add_child(UiKit.button(tr(String(extras[0][0])), extras[0][1] as Callable, MENU_BUTTON))
 		var cols: GridContainer = GridContainer.new()
 		cols.columns = 2
 		cols.add_theme_constant_override("h_separation", MENU_GAP)
 		cols.add_theme_constant_override("v_separation", MENU_GAP)
 		menu.add_child(cols)
 		var half: Vector2 = Vector2((MENU_BUTTON.x - float(MENU_GAP)) * 0.5, MENU_BUTTON.y)
-		for i: int in range(1, extras.size()):
+		for i: int in range(0, extras.size()):
 			cols.add_child(UiKit.button(tr(String(extras[i][0])), extras[i][1] as Callable, half))
 	menu.add_child(UiKit.button(tr("MENU_QUIT"), _on_quit, MENU_BUTTON))
 	first.call_deferred("grab_focus")
@@ -108,6 +107,7 @@ func _extra_entries() -> Array[Array]:
 	var out: Array[Array] = []
 	var candidates: Array[Array] = [
 		["MENU_DAILY", _on_daily, &"run"],
+		["MENU_RACE", GameState.goto.bind(GameState.SCREEN_RACE), &"seed_race"],
 		["MENU_HALL", GameState.goto.bind(GameState.SCREEN_HALL), &"hall"],
 		["MENU_CODEX", GameState.goto.bind(GameState.SCREEN_CODEX), &"codex"],
 		["MENU_ACHIEVEMENTS", GameState.goto.bind(GameState.SCREEN_ACHIEVEMENTS), &"achievements"],

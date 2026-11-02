@@ -109,6 +109,9 @@ const VARIABLES: Array[StringName] = [
 	&"number_count",
 	&"debt_progress",
 	&"type_count",
+	&"seal_count",
+	&"landing_copies",
+	&"endless_tiers",
 ]
 const OPS: Array[StringName] = [
 	&"add_chips",
@@ -164,9 +167,15 @@ const OPS: Array[StringName] = [
 	&"add_random_edition_grigri",
 	&"add_fortune_slot",
 	&"next_debt_pct",
+	&"swap_pockets",
 ]
 const MAX_DEPTH: int = 3
 const CMP_DEFAULT: String = ">="
+## Ordre de la roue avant un mélange de créancier (restauré au début de l'échéance suivante).
+const WHEEL_BACKUP_FLAG: String = "wheel_order_backup"
+
+## Profondeur de réaction à une destruction de case (évite les boucles destruction → destruction).
+static var _destroy_depth: int = 0
 
 # --------------------------------------------------------------------------- déclencheurs
 
@@ -235,6 +244,10 @@ static func fire_pocket(trigger: StringName, pocket: Pocket, index: int, run: Ru
 			_fire_entry(
 				&"on_seal", db.get_entry("seals", String(pocket.seal)), base, ScoreEvent.SRC_SEAL, String(pocket.seal), pocket.uid, null
 			)
+			# Les grigris réagissent aussi au sceau (contexte : la case scellée).
+			for g: GrigriInstance in run.grigris.duplicate():
+				if not g.disabled and run.grigris.has(g):
+					fire_grigri(&"on_seal", g, base)
 
 
 static func _fire_entry(
@@ -407,6 +420,21 @@ static func _arr_has_int(arr: Array, n: int) -> bool:
 	return false
 
 
+## Destruction d'une case : les grigris `on_pocket_destroyed` réagissent (sans récursion).
+static func _pocket_destroyed(env: EffectEnv) -> void:
+	if _destroy_depth > 0:
+		return
+	_destroy_depth += 1
+	for g: GrigriInstance in env.run.grigris.duplicate():
+		if not g.disabled and env.run.grigris.has(g):
+			var base: EffectEnv = EffectEnv.new()
+			base.run = env.run
+			base.ctx = env.ctx
+			base.db = env.db
+			fire_grigri(&"on_pocket_destroyed", g, base)
+	_destroy_depth -= 1
+
+
 static func _target_pocket(env: EffectEnv) -> Pocket:
 	if env.pocket != null:
 		return env.pocket
@@ -487,6 +515,12 @@ static func var_value(name: StringName, env: EffectEnv, params: Dictionary = {})
 			return float(run.slip.remaining())
 		&"tier":
 			return float(run.tier)
+		&"seal_count":
+			return float(run.wheel.count_with_seal())
+		&"landing_copies":
+			return float(run.wheel.count_number(ctx.landing.number)) if ctx != null and ctx.landing != null else 0.0
+		&"endless_tiers":
+			return float(maxi(run.tier - Balance.i("run.tiers"), 0))
 		&"act":
 			return float(run.act())
 		&"deadline_index":
@@ -663,6 +697,16 @@ static func apply(a: Dictionary, env: EffectEnv) -> void:
 					_emit(env, ScoreEvent.DESTROY, 0.0, label if label != "" else "pocket_destroyed")
 					if ctx != null and ctx.landing_index == idx:
 						ctx.landing_index = -1
+					_pocket_destroyed(env)
+		&"swap_pockets":
+			# Bonneteau : échange des cases de place jusqu'à la fin de l'échéance (ordre restauré ensuite).
+			if not run.flags.has(WHEEL_BACKUP_FLAG):
+				run.flags[WHEEL_BACKUP_FLAG] = run.wheel.order_uids()
+			for _s: int in int(v):
+				var i1: int = run.rng.randi_range_in(RngStreams.EFFECTS, 0, run.wheel.size() - 1)
+				var i2: int = run.rng.randi_range_in(RngStreams.EFFECTS, 0, run.wheel.size() - 1)
+				run.wheel.swap(i1, i2)
+			_emit(env, ScoreEvent.INFO, v, label if label != "" else "swap_pockets")
 		&"burn_random_pocket":
 			var ri: int = run.rng.randi_range_in(RngStreams.EFFECTS, 0, run.wheel.size() - 1)
 			var target_type: String = String(a.get("type", "burnt"))

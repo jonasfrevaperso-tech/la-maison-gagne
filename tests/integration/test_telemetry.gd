@@ -65,3 +65,21 @@ func test_history_and_survival() -> void:
 	for i: int in RunHistory.MAX_ENTRIES + 5:
 		RunHistory.record(profile, RunHistory.entry(ctl.run, false, 1.0, "C", "d"), 8)
 	eq((profile["history"] as Array).size(), RunHistory.MAX_ENTRIES, "historique borné")
+
+
+func test_seed_race_ranking() -> void:
+	var profile: Dictionary = {
+		"history":
+		[
+			{"seed": "AAA", "victory": false, "deadlines": 9, "score_total": 500, "minutes": 10.0},
+			{"seed": "AAA", "victory": true, "deadlines": 24, "score_total": 100, "minutes": 50.0},
+			{"seed": "BBB", "victory": true, "deadlines": 24, "score_total": 9999, "minutes": 1.0},
+			{"seed": "AAA", "victory": false, "deadlines": 9, "score_total": 500, "minutes": 8.0},
+			{"seed": "AAA", "victory": false, "deadlines": 12, "score_total": 10, "minutes": 60.0},
+		]
+	}
+	var board: Array[Dictionary] = RunHistory.leaderboard(profile, "AAA")
+	eq(board.size(), 4, "seuls les runs de cette graine")
+	check(bool(board[0]["victory"]), "la victoire passe devant")
+	eq(int(board[1]["deadlines"]), 12, "puis le plus d'échéances")
+	eq(float(board[2]["minutes"]), 8.0, "à égalité, le plus rapide")

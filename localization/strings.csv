@@ -430,3 +430,16 @@ SUMMARY_T_ZEROS,Zéros,Zeros
 SUMMARY_T_TIME,Durée,Time
 SUMMARY_BUILD,Ton build,Your build
 HUD_FORTUNE,Fortune,Fortune
+TAG_ENDLESS,Infini,Endless
+TAG_REROLL,Relance,Reroll
+MENU_RACE,Course de graine,Seed race
+RACE_INTRO,"Tous tes runs sur une même graine, classés : victoire, échéances remboursées, score cumulé, puis le plus rapide. Partage un code de graine pour défier quelqu'un sur la même partie.","All your runs on one seed, ranked: victory, deadlines repaid, total score, then fastest. Share a seed code to challenge someone on the very same game."
+RACE_LOAD,Afficher,Show
+RACE_TODAY,Graine du jour,Daily seed
+RACE_PLAY,Jouer cette graine,Play this seed
+RACE_TODAY_SEED,Graine du jour : %s,Daily seed: %s
+RACE_SEED,Graine %s,Seed %s
+RACE_EMPTY,Aucun run sur cette graine pour le moment. À toi de poser le premier temps !,No run on this seed yet. Set the first time!
+RACE_COL_RANK,Rang,Rank
+RACE_COL_DEADLINES,Échéances,Deadlines
+RACE_COL_SCORE,Score cumulé,Total score

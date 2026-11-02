@@ -42,6 +42,9 @@ var flash_index: int = -1
 var hover_index: int = -1
 var probabilities: Array[float] = []
 
+## Sens de rotation (−1 : roue inversée, créancier La Valseuse) et accélération de la visée.
+var direction: float = 1.0
+var aim_speed_mult: float = 1.0
 var _aim_t: float = 0.0
 var _aim_period: float = 2.4
 var _ball_active: bool = false
@@ -157,9 +160,9 @@ func _process(delta: float) -> void:
 	if _ball_active and _ball_near_miss and _ball_t > _ball_duration * 0.8:
 		dt *= NEAR_MISS_SLOWMO if JuiceProfile.intensity() > 0.0 else 1.0
 	if aiming:
-		_wheel_speed = lerpf(_wheel_speed, TAU / (_aim_period * 1.0), delta * 4.0)
+		_wheel_speed = lerpf(_wheel_speed, direction * aim_speed_mult * TAU / _aim_period, delta * 4.0)
 	elif not _ball_active:
-		_wheel_speed = lerpf(_wheel_speed, IDLE_SPEED, delta * 1.5)
+		_wheel_speed = lerpf(_wheel_speed, direction * IDLE_SPEED, delta * 1.5)
 	if _ball_active:
 		_update_ball(dt)
 	else:

@@ -164,6 +164,7 @@ func to_dict() -> Dictionary:
 		"control_bonus": control_bonus,
 		"table_limit_bonus": table_limit_bonus,
 		"temp_budget_bonus": temp_budget_bonus,
+		"slip_budget": slip.budget,
 		"temp_precision_bonus": temp_precision_bonus,
 		"interest_cap_bonus": interest_cap_bonus,
 		"shop_discount": shop_discount,
@@ -305,7 +306,9 @@ static func from_dict(d: Dictionary) -> RunState:
 	s.pending_event_id = String(d.get("pending_event", ""))
 	s.shop_state = intify(d.get("shop_state", {}))
 	# Reconfigure le bulletin exactement comme en jeu avant de reposer les mises.
-	s.slip.budget = maxi(s.bet_budget + s.temp_budget_bonus, 1)
+	# Budget réel du bulletin : hors phase de mise, il peut encore inclure un bonus temporaire
+	# déjà consommé (mises du tour précédent conservées).
+	s.slip.budget = maxi(int(d.get("slip_budget", s.bet_budget + s.temp_budget_bonus)), 1)
 	s.slip.table_limit_bonus = s.table_limit_bonus
 	s.slip.allowed_kinds = s.allowed_kinds.duplicate()
 	if s.banned_color != &"":
