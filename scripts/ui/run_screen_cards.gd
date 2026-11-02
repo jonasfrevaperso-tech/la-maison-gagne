@@ -45,13 +45,14 @@ func show_bet(spot_id: String) -> void:
 		return
 	_bet_card.z_index = 5
 	s._stage.add_child(_bet_card)
+	# Manette : la fiche se range à gauche du tapis (sur la roue, inutile pendant les mises), à
+	# hauteur du curseur ; elle ne couvre jamais le tapis ni l'emplacement sélectionné.
 	var at: Vector2 = s.table_view.position + s.table_view.cursor_point()
 	var sz: Vector2 = _bet_card.get_combined_minimum_size()
-	var pos: Vector2 = Vector2(at.x - sz.x * 0.5, at.y - sz.y - BET_CARD_GAP)
-	if pos.y < s.table_view.position.y - sz.y * 0.6:
-		pos.y = at.y + BET_CARD_GAP
+	var x: float = s.table_view.position.x - sz.x - BET_CARD_GAP
+	var y: float = at.y - sz.y * 0.5
 	var max_y: float = s.grigri_bar.position.y - RunScreen.BAR_CAPTION_Y - sz.y - 8.0
-	_bet_card.position = Vector2(clampf(pos.x, 8.0, UiLayout.DESIGN_SIZE.x - sz.x - 8.0), clampf(pos.y, 8.0, max_y))
+	_bet_card.position = Vector2(maxf(x, 8.0), clampf(y, RunScreen.HUD_STRIP_H + 16.0, max_y))
 
 
 func hide_bet() -> void:

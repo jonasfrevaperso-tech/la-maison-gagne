@@ -10,10 +10,14 @@ extends Node
 ## [taille logique, taille du texte] : 16:9, Steam Deck (16:10), petite fenêtre, Steam Deck texte max.
 const CONFIGS: Array[Array] = [
 	[Vector2i(1920, 1080), 1.0],
+	[Vector2i(1280, 800), 1.0],
 	[Vector2i(1920, 1200), 1.0],
 	[Vector2i(1600, 900), 1.0],
+	[Vector2i(2560, 1080), 1.0],
 	[Vector2i(1920, 1200), 1.3],
 ]
+## Chevauchement toléré entre deux éléments (px) : bords qui se touchent, ombres.
+const OVERLAP_TOLERANCE: float = 3.0
 ## Lisibilité Steam Deck : taille minimale d'un texte rendu en 1280×800 (critère Valve : 9 px).
 const DECK_MIN_PX: float = 9.0
 const DECK_HEIGHT: float = 800.0
@@ -21,7 +25,7 @@ const SETTLE_FRAMES: int = 6
 const EDGE_TOLERANCE: float = 2.0
 ## Écrans pilotés à la manette sans focus d'interface (curseur du tapis, cf. RunScreen._gamepad_table) :
 ## donner le focus à un bouton y ferait déclencher « LANCER » par la touche A (miser).
-const NO_FOCUS_OK: Array[StringName] = [&"run"]
+const NO_FOCUS_OK: Array[StringName] = [&"run", &"intro"]
 
 var problems: Array[String] = []
 var checked: int = 0
@@ -63,7 +67,9 @@ func _run() -> void:
 			var rs: RunScreen = (load(Main.SCREENS[&"run"]) as PackedScene).instantiate() as RunScreen
 			await _check(rs, "run/%s @%dx%d×%.1f" % [RunScreen.UiState.keys()[st], sz.x, sz.y, float(cfg[1])], false, rs._set_state.bind(st))
 		for o: Array in _overlays(db):
-			await _check(o[1] as Control, "%s @%dx%d×%.1f" % [o[0], sz.x, sz.y, float(cfg[1])])
+			var ov: Control = o[1] as Control
+			var prep_o: Callable = (o[2] as Callable).bind(ov) if o.size() > 2 else Callable()
+			await _check(ov, "%s @%dx%d×%.1f" % [o[0], sz.x, sz.y, float(cfg[1])], true, prep_o)
 	Settings.set_value("access", "text_scale", 1.0)
 	Settings.set_value("game", "input_mode", "auto")
 	for p: String in problems:
@@ -103,7 +109,33 @@ func _overlays(db: ContentDB) -> Array[Array]:
 	ev_ctl.new_run("lea", 0, 8)
 	ev_ctl.run.pending_event_id = db.ids("events")[0]
 	out.append(["event", EventOverlay.new().configure(ev_ctl)])
+	for kind: String in ["pocket", "fortune", "occult"]:
+		var pk: RunController = RunController.new(db)
+		pk.new_run("lea", 0, 21)
+		pk.run.money = 50
+		ShopModel.enter(pk.run, db)
+		pk.run.shop_state["open_pack"] = {"kind": kind, "choices": ShopModel.roll_pack_choices(pk.run, db, kind)}
+		out.append(["shop/pack_" + kind, ShopOverlay.new().configure(pk)])
+	var dl_ctl: RunController = RunController.new(db)
+	dl_ctl.new_run("lea", 0, 5)
+	for did: String in ["act1_intro", "act2_intro", "finale"]:
+		out.append(["dialogue/" + did, DialogueOverlay.new().configure(did, dl_ctl.run, db), _to_choice])
+	var slot_spins: Array[Dictionary] = [{"reels": ["seven", "seven", "seven"], "prize": "p_seven3"}]
+	out.append(["slot", SlotOverlay.new().configure(slot_spins, db), _slot_summary])
+	out.append(["creditor_intro", CreditorIntro.new().configure(db.list("creditors")[0])])
 	return out
+
+
+## Fait défiler un dialogue jusqu'à son premier choix (ou sa fin).
+func _to_choice(o: Control) -> void:
+	for _i: int in 80:
+		if bool(o.get("_waiting_choice")):
+			return
+		o.call("_advance")
+
+
+func _slot_summary(o: Control) -> void:
+	o.call("_show_summary")
 
 
 func _check(node: Control, label: String, need_focus: bool = true, prep: Callable = Callable()) -> void:
@@ -127,6 +159,9 @@ func _check(node: Control, label: String, need_focus: bool = true, prep: Callabl
 		if not view.encloses(r):
 			problems.append("%s : bouton « %s » hors de l'écran %s" % [label, _name(btn), r])
 	_check_fonts(node, label)
+	_check_overlaps(node, label)
+	if need_focus:
+		await _check_reach(node, label)
 	frame.remove_child(node)
 	node.queue_free()
 	await get_tree().process_frame
@@ -180,3 +215,111 @@ func _check_fonts(node: Control, label: String) -> void:
 			worst_name = txt.substr(0, 24)
 	if worst < DECK_MIN_PX:
 		problems.append("%s : texte de %.1f px sur Steam Deck (« %s »), minimum %.0f px" % [label, worst, worst_name, DECK_MIN_PX])
+
+
+## Éléments lisibles ou cliquables (boutons, textes, cartes) qui se recouvrent : le texte d'un
+## choix de dialogue sous un autre bloc, un bouton sous un panneau, etc.
+func _check_overlaps(node: Control, label: String) -> void:
+	var items: Array[Control] = []
+	for c: Node in node.find_children("*", "Control", true, false):
+		var ctl: Control = c as Control
+		if not ctl.is_visible_in_tree() or ctl.modulate.a < 0.05 or _in_scroll(ctl, node) or _floating(ctl, node):
+			continue
+		var is_text: bool = ctl is Label and (ctl as Label).text.strip_edges() != ""
+		is_text = is_text or (ctl is RichTextLabel and (ctl as RichTextLabel).text != "")
+		if ctl is BaseButton or is_text or ctl is GrigriCard:
+			items.append(ctl)
+	var rects: Array[Rect2] = []
+	for ctl2: Control in items:
+		rects.append(ctl2.get_global_transform_with_canvas() * Rect2(Vector2.ZERO, ctl2.size))
+	var reported: int = 0
+	for i: int in items.size():
+		for j: int in range(i + 1, items.size()):
+			var a: Control = items[i]
+			var b: Control = items[j]
+			if a.is_ancestor_of(b) or b.is_ancestor_of(a):
+				continue
+			var inter: Rect2 = rects[i].intersection(rects[j])
+			if inter.size.x > OVERLAP_TOLERANCE and inter.size.y > OVERLAP_TOLERANCE:
+				problems.append("%s : « %s » chevauche « %s »" % [label, _desc(a), _desc(b)])
+				reported += 1
+				if reported >= 3:
+					return
+
+
+func _desc(c: Control) -> String:
+	if c is Button and (c as Button).text != "":
+		return (c as Button).text.substr(0, 24)
+	if c is Label:
+		return (c as Label).text.substr(0, 24)
+	if c is RichTextLabel:
+		return (c as RichTextLabel).get_parsed_text().substr(0, 24)
+	var sc: Script = c.get_script() as Script
+	var cls: String = sc.get_global_name() if sc != null else c.get_class()
+	return "%s %s (%s)" % [cls, String(c.name), c.get_parent().get_class() if c.get_parent() != null else ""]
+
+
+## Tous les boutons actifs doivent être atteignables à la croix depuis le focus (onglets : LB/RB).
+func _check_reach(node: Control, label: String) -> void:
+	var tabs: Array[Node] = node.find_children("*", "TabContainer", true, false)
+	var reached: Dictionary[Control, bool] = {}
+	var starts: Array[Control] = []
+	var focus: Control = root.gui_get_focus_owner()
+	if focus != null and node.is_ancestor_of(focus):
+		starts.append(focus)
+	for t: Node in tabs:
+		var tc: TabContainer = t as TabContainer
+		for k: int in tc.get_tab_count():
+			tc.current_tab = k
+			await get_tree().process_frame
+			await get_tree().process_frame
+			var first: Control = PadNavigator.first_focusable(tc.get_current_tab_control())
+			if first != null:
+				_flood(first, reached)
+		if focus != null and node.is_ancestor_of(focus):
+			_flood(focus, reached)
+	for st: Control in starts:
+		_flood(st, reached)
+	var missing: int = 0
+	for b: Node in node.find_children("*", "BaseButton", true, false):
+		var btn: BaseButton = b as BaseButton
+		if not btn.is_visible_in_tree() or btn.disabled or btn.focus_mode == Control.FOCUS_NONE or reached.has(btn):
+			continue
+		if _in_tab_hidden(btn, node):
+			continue
+		problems.append("%s : bouton « %s » inaccessible à la manette" % [label, _name(btn)])
+		missing += 1
+		if missing >= 4:
+			return
+
+
+func _flood(start: Control, reached: Dictionary[Control, bool]) -> void:
+	var todo: Array[Control] = [start]
+	while not todo.is_empty():
+		var c: Control = todo.pop_back()
+		if reached.has(c):
+			continue
+		reached[c] = true
+		for side: Side in [SIDE_LEFT, SIDE_TOP, SIDE_RIGHT, SIDE_BOTTOM]:
+			var n: Control = c.find_valid_focus_neighbor(side)
+			if n != null and not reached.has(n):
+				todo.append(n)
+
+
+func _in_tab_hidden(c: Node, stop: Node) -> bool:
+	var p: Node = c.get_parent()
+	while p != null and p != stop:
+		if p is Control and not (p as Control).visible:
+			return true
+		p = p.get_parent()
+	return false
+
+
+## Infobulles et éléments flottants (top_level) : ils couvrent volontairement le contenu.
+func _floating(c: Node, stop: Node) -> bool:
+	var p: Node = c
+	while p != null and p != stop:
+		if p is CanvasItem and (p as CanvasItem).top_level:
+			return true
+		p = p.get_parent()
+	return false

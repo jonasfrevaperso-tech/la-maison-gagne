@@ -1,21 +1,200 @@
 [
-  {"id": "act1_intro", "act": 1, "trigger": "act_start", "lines": [
-    {"who": "narrator", "text_fr": "Sous la ville, il y a un escalier que personne ne descend deux fois. Au bout, une porte dorée. Derrière, le Grand Zéro.", "text_en": "Beneath the city there is a staircase nobody takes twice. At the bottom, a golden door. Behind it, the Grand Zero."},
-    {"who": "house", "text_fr": "Bienvenue. Votre famille nous doit… voyons… tout.", "text_en": "Welcome. Your family owes us… let me see… everything."},
-    {"who": "hero", "text_fr": "Je viens rembourser.", "text_en": "I've come to pay."},
-    {"who": "house", "text_fr": "Un tour de roue à la fois. Comme votre grand-père. Et le père de votre grand-père. Une tradition charmante.", "text_en": "One spin at a time. Like your grandfather. And his father. A charming tradition."},
-    {"who": "hero", "text_fr": "Et si je gagne ?", "text_en": "And if I win?"},
-    {"who": "house", "text_fr": "Alors vous serez le premier. Le Rez-de-chaussée Doré est à vous. Les tables sont chaudes, la roue ne s'arrête jamais.", "text_en": "Then you'll be the first. The Golden Ground Floor is yours. The tables are warm, the wheel never stops."},
-    {"who": "croupier", "text_fr": "Psst. Petit conseil d'un vieux croupier : regarde la roue, pas tes mains. La bille va où la roue l'emmène.", "text_en": "Psst. A tip from an old dealer: watch the wheel, not your hands. The ball goes where the wheel takes it.",
-     "choices": [
-       {"text_fr": "« Merci. Je m'en souviendrai. »", "text_en": "« Thanks. I'll remember that. »", "effects": [{"trigger": "on_use", "do": [{"op": "perm_control", "v": 0.03}]}]},
-       {"text_fr": "« Gardez vos conseils, donnez-moi plutôt un jeton. »", "text_en": "« Keep the advice, give me a chip instead. »", "effects": [{"trigger": "on_use", "do": [{"op": "add_money", "v": 3}]}]}
-     ]},
-    {"who": "house", "text_fr": "Faites vos jeux.", "text_en": "Place your bets."}
-  ]},
-  {"id": "act1_creditor_won", "act": 1, "trigger": "creditor_won", "lines": [
-    {"who": "house", "text_fr": "Hm. Vous avez payé. C'est… inhabituel. L'ascenseur vous attend. Il ne monte pas.", "text_en": "Hm. You paid. That's… unusual. The lift is waiting. It doesn't go up."},
-    {"who": "hero", "text_fr": "Où mène-t-il ?", "text_en": "Where does it go?"},
-    {"who": "house", "text_fr": "Aux Salons Privés. Là où les dettes ont des prénoms.", "text_en": "To the Private Lounges. Where debts have first names."}
-  ]}
+ {
+  "id": "act1_intro",
+  "act": 1,
+  "trigger": "act_start",
+  "lines": [
+   {
+    "who": "narrator",
+    "text_fr": "La porte dorée se referme derrière toi avec le bruit d'un coffre qu'on verrouille. Le Rez-de-chaussée Doré s'étend à perte de vue : lustres poussiéreux, tapis verts mités, et une roue qui tourne toute seule depuis 1987.",
+    "text_en": "The golden door closes behind you with the sound of a vault being locked. The Golden Ground Floor stretches out of sight: dusty chandeliers, moth-eaten green felt, and a wheel that has been spinning on its own since 1987."
+   },
+   {
+    "who": "house",
+    "text_fr": "Bienvenue au Grand Zéro. Votre famille nous doit… voyons… [froissement de papier] …tout. Intérêts compris. Surtout les intérêts.",
+    "text_en": "Welcome to the Grand Zero. Your family owes us… let's see… [rustle of paper] …everything. Interest included. Especially the interest."
+   },
+   {
+    "who": "hero",
+    "text_fr": "Je viens rembourser.",
+    "text_en": "I'm here to pay it back.",
+    "by_hero": {
+     "lea": {
+      "text_fr": "Je viens rembourser. Et avant que vous demandiez : oui, j'ai été croupière. Je connais vos roues mieux que vous.",
+      "text_en": "I'm here to pay it back. And before you ask: yes, I was a dealer. I know your wheels better than you do."
+     },
+     "vic": {
+      "text_fr": "Je viens rembourser. Et peut-être me refaire un peu au passage. Juste un peu. Promis.",
+      "text_en": "I'm here to pay it back. And maybe win a little extra on the side. Just a little. Promise."
+     },
+     "odile": {
+      "text_fr": "Je viens rembourser. J'ai calculé mes chances : 2,7 % d'avantage pour vous. C'est peu. C'est beaucoup. C'est vexant.",
+      "text_en": "I'm here to pay it back. I've computed my odds: a 2.7% edge for you. That's small. That's huge. That's annoying."
+     },
+     "barnabe": {
+      "text_fr": "Croâ. Je viens rembourser. Mon grand-père était un pigeon. Littéralement. Il a tout perdu ici, plumes comprises.",
+      "text_en": "Caw. I'm here to pay it back. My grandfather was a pigeon. Literally. He lost everything here, feathers included."
+     },
+     "marthe": {
+      "text_fr": "Je viens rembourser. Et sauver quelques âmes, si le temps le permet. Le Seigneur aime les gagnants modestes.",
+      "text_en": "I'm here to pay it back. And save a few souls, time permitting. The Lord loves a humble winner."
+     },
+     "ghost": {
+      "text_fr": "Je viens rembourser. Je suis mort à cette table en 1987. La dette, elle, a survécu. C'est vexant.",
+      "text_en": "I'm here to pay it back. I died at this table in 1987. The debt, sadly, survived. Rude."
+     }
+    }
+   },
+   {
+    "who": "house",
+    "text_fr": "Un tour de roue à la fois. Comme votre grand-père. Et le père de votre grand-père. Une tradition familiale charmante, comme les nez crochus ou la goutte.",
+    "text_en": "One spin at a time. Like your grandfather. And your grandfather's father. A charming family tradition, like hooked noses or gout."
+   },
+   {
+    "who": "hero",
+    "text_fr": "Et si je gagne ?",
+    "text_en": "And if I win?",
+    "by_hero": {
+     "odile": {
+      "text_fr": "Et si je gagne ? Statistiquement, il faut bien que ça arrive à quelqu'un.",
+      "text_en": "And if I win? Statistically, it has to happen to someone."
+     },
+     "ghost": {
+      "text_fr": "Et si je gagne ? Je pourrai enfin reposer en paix ? Ou au moins m'asseoir ?",
+      "text_en": "And if I win? Can I finally rest in peace? Or at least sit down?"
+     }
+    }
+   },
+   {
+    "who": "house",
+    "text_fr": "Alors vous serez le premier. Le Rez-de-chaussée est à vous. Payez chaque échéance avant la fin des tours, et nous descendrons ensemble. Toujours plus bas. C'est l'ascenseur qui veut ça.",
+    "text_en": "Then you'll be the first. The ground floor is yours. Pay each installment before the spins run out, and we'll go down together. Ever lower. The elevator insists."
+   },
+   {
+    "who": "croupier",
+    "text_fr": "Psst. Par ici. Ne fais pas cette tête, je ne mords pas : j'ai plus de dents. Je m'appelle Anselme. Quarante ans derrière cette table.",
+    "text_en": "Psst. Over here. Don't make that face, I don't bite: I'm out of teeth. Name's Anselme. Forty years behind this table."
+   },
+   {
+    "who": "croupier",
+    "text_fr": "J'ai connu ton grand-père. Bon joueur. Mauvais perdant. Excellent pour emprunter. Il m'a laissé une consigne : « S'il vient, aide-le. Sauf s'il ressemble à sa grand-mère. »",
+    "text_en": "I knew your grandfather. Good player. Sore loser. Excellent borrower. He left me one instruction: « If the kid comes, help them. Unless they take after their grandmother. »",
+    "by_hero": {
+     "barnabe": {
+      "text_fr": "J'ai connu ton grand-père. Un pigeon charmant. Il roucoulait à chaque zéro. Il m'a dit : « Si un oiseau vient, aide-le. Sauf si c'est une mouette. »",
+      "text_en": "I knew your grandfather. Charming pigeon. Cooed at every zero. He told me: « If a bird comes, help them. Unless it's a seagull. »"
+     },
+     "ghost": {
+      "text_fr": "Toi… je te reconnais. Tu jouais à la table 3. Tu ne bougeais plus depuis 1987, on croyait que tu réfléchissais.",
+      "text_en": "You… I recognise you. You played table 3. You hadn't moved since 1987, we thought you were thinking."
+     }
+    }
+   },
+   {
+    "who": "croupier",
+    "text_fr": "Petit conseil d'un vieux croupier : regarde la roue, pas tes mains. Le lancer, c'est toi qui le fais, et ce que tu réussis au lancer, la bille s'en souvient.",
+    "text_en": "A bit of advice from an old dealer: watch the wheel, not your hands. You make the throw, and whatever you pull off in the throw, the ball remembers.",
+    "choices": [
+     {
+      "text_fr": "« Merci. Je m'en souviendrai. »",
+      "text_en": "« Thanks. I'll remember that. »",
+      "effects": [
+       {
+        "trigger": "on_use",
+        "do": [
+         {
+          "op": "perm_control",
+          "v": 0.03
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "text_fr": "« Gardez vos conseils, donnez-moi plutôt un jeton. »",
+      "text_en": "« Keep the advice, give me a chip instead. »",
+      "effects": [
+       {
+        "trigger": "on_use",
+        "do": [
+         {
+          "op": "add_money",
+          "v": 3
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "who": "croupier",
+    "text_fr": "Et toi, Vic… on m'a parlé de toi. Si tu commences à embrasser la bille, je te sors moi-même.",
+    "text_en": "And you, Vic… I've heard about you. If you start kissing the ball, I'll throw you out myself.",
+    "heroes": [
+     "vic"
+    ]
+   },
+   {
+    "who": "croupier",
+    "text_fr": "Une religieuse au Grand Zéro… La dernière, c'était en 74. Elle a gagné, puis elle a fondé un couvent à Monaco.",
+    "text_en": "A nun at the Grand Zero… The last one was in '74. She won, then founded a convent in Monaco.",
+    "heroes": [
+     "marthe"
+    ]
+   },
+   {
+    "who": "house",
+    "text_fr": "Assez bavardé, Anselme. Le temps, c'est de l'argent. Et l'argent, c'est à moi. Faites vos jeux.",
+    "text_en": "Enough chatter, Anselme. Time is money. And money is mine. Place your bets."
+   }
+  ]
+ },
+ {
+  "id": "act1_creditor_won",
+  "act": 1,
+  "trigger": "creditor_won",
+  "lines": [
+   {
+    "who": "house",
+    "text_fr": "Hm. Vous avez payé. C'est… inhabituel. J'ai dû recompter trois fois. Mon boulier a fait une crise de nerfs.",
+    "text_en": "Hm. You paid. That's… unusual. I had to count three times. My abacus had a nervous breakdown."
+   },
+   {
+    "who": "croupier",
+    "text_fr": "Ha ! Quarante ans que je n'avais pas vu ça. Je vais m'en souvenir. Enfin, jusqu'à demain, à mon âge.",
+    "text_en": "Ha! Forty years since I've seen that. I'll remember it. Well, until tomorrow, at my age."
+   },
+   {
+    "who": "hero",
+    "text_fr": "Et maintenant ?",
+    "text_en": "Now what?",
+    "by_hero": {
+     "vic": {
+      "text_fr": "Et maintenant ? On double ? On double. Dites-moi qu'on double.",
+      "text_en": "Now what? Double or nothing? Tell me it's double or nothing."
+     },
+     "odile": {
+      "text_fr": "Et maintenant ? Mon modèle prévoyait un ascenseur. Avec une probabilité de 94 %.",
+      "text_en": "Now what? My model predicted an elevator. With 94% probability."
+     }
+    }
+   },
+   {
+    "who": "house",
+    "text_fr": "L'ascenseur vous attend. Il ne monte pas. Il n'a jamais monté. Le bouton « haut » est purement décoratif, comme l'espoir.",
+    "text_en": "The elevator awaits. It doesn't go up. It never has. The « up » button is purely decorative, like hope."
+   },
+   {
+    "who": "hero",
+    "text_fr": "Où mène-t-il ?",
+    "text_en": "Where does it go?"
+   },
+   {
+    "who": "house",
+    "text_fr": "Aux Salons Privés. Là où les dettes ont des prénoms, des surnoms, et parfois des avocats.",
+    "text_en": "To the Private Lounges. Where debts have first names, nicknames, and sometimes lawyers."
+   }
+  ]
+ }
 ]

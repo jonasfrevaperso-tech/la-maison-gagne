@@ -1,61 +1,696 @@
 [
-  {"id": "act2_intro", "act": 2, "lines": [
-    {"who": "narrator", "text_fr": "L'ascenseur descend longtemps. Trop longtemps pour un seul étage. Quand les portes s'ouvrent, ça sent le cigare froid et les secrets chers.", "text_en": "The lift goes down a long time. Too long for one floor. When the doors open, it smells of cold cigars and expensive secrets."},
-    {"who": "house", "text_fr": "Les Salons Privés. Ici, on ne joue pas contre La Maison. On joue contre ceux qui la servent.", "text_en": "The Private Lounges. Here you don't play against the House. You play against those who serve it."},
-    {"who": "croupier", "text_fr": "Toi encore ? Écoute. Ton grand-père venait ici. Il gagnait, parfois. C'était pire.", "text_en": "You again? Listen. Your grandfather used to come here. He won, sometimes. That was worse."},
-    {"who": "hero", "text_fr": "Pourquoi pire ?", "text_en": "Why worse?"},
-    {"who": "croupier", "text_fr": "Parce que La Maison n'aime pas perdre. Elle n'oublie pas non plus. Alors elle prête. Et elle attend.", "text_en": "Because the House doesn't like losing. It doesn't forget either. So it lends. And it waits.",
-     "choices": [
-       {"text_fr": "« Aidez-moi à la battre. »", "text_en": "« Help me beat it. »", "effects": [{"trigger": "on_use", "do": [{"op": "perm_precision", "v": 1}, {"op": "set_flag", "flag": "croupier_ally", "value": true}]}]},
-       {"text_fr": "« Je n'ai besoin de personne. »", "text_en": "« I don't need anyone. »", "effects": [{"trigger": "on_use", "do": [{"op": "add_money", "v": 6}]}]}
-     ]},
-    {"who": "house", "text_fr": "Que les Salons vous soient légers.", "text_en": "May the Lounges rest lightly on you."}
-  ]},
-  {"id": "act2_creditor_won", "act": 2, "lines": [
-    {"who": "house", "text_fr": "Vous avez vidé mes Salons. Les VIP pleurent dans leurs coupes.", "text_en": "You've emptied my Lounges. The VIPs are weeping into their glasses."},
-    {"who": "hero", "text_fr": "Qu'y a-t-il plus bas ?", "text_en": "What's further down?"},
-    {"who": "house", "text_fr": "La Cave. Là où la première bille a été lancée. Là où votre nom a été écrit pour la première fois.", "text_en": "The Cellar. Where the first ball was thrown. Where your name was first written down."}
-  ]},
-  {"id": "act3_intro", "act": 3, "lines": [
-    {"who": "narrator", "text_fr": "Plus de velours, plus de néons. Des murs de brique humide, une seule ampoule. Au centre, une roue immense, noire, qui tourne sans bruit.", "text_en": "No more velvet, no more neon. Damp brick walls, a single bulb. In the centre, a huge black wheel, turning without a sound."},
-    {"who": "patron", "text_fr": "Te voilà enfin. Tu as les yeux de ton grand-père. Il avait les miens.", "text_en": "There you are at last. You have your grandfather's eyes. He had mine."},
-    {"who": "hero", "text_fr": "Qui êtes-vous ?", "text_en": "Who are you?"},
-    {"who": "patron", "text_fr": "Le frère qui a gagné. Celui qui a construit La Maison avec l'argent que ta famille perdait. Chaque dette de ta famille fait tourner cette roue.", "text_en": "The brother who won. The one who built the House with the money your family lost. Every debt of yours keeps this wheel turning."},
-    {"who": "house", "text_fr": "IL M'A NOURRIE. VOUS ME NOURRISSEZ. C'EST UNE AFFAIRE DE FAMILLE.", "text_en": "HE FED ME. YOU FEED ME. IT'S A FAMILY BUSINESS."},
-    {"who": "hero", "text_fr": "Alors c'est ce soir que la famille arrête de payer.", "text_en": "Then tonight the family stops paying."}
-  ]},
-  {"id": "finale", "act": 3, "lines": [
-    {"who": "narrator", "text_fr": "La grande roue noire ralentit. Pour la première fois depuis un siècle, elle hésite.", "text_en": "The great black wheel slows. For the first time in a century, it hesitates."},
-    {"who": "house", "text_fr": "LA DETTE EST… SOLDÉE. C'EST IMPOSSIBLE. C'EST… ARRIVÉ.", "text_en": "THE DEBT IS… SETTLED. THAT IS IMPOSSIBLE. IT HAS… HAPPENED."},
-    {"who": "patron", "text_fr": "Tu as gagné, petit. Maintenant tu dois choisir ce que tu fais de la victoire. C'est la partie que personne ne réussit.", "text_en": "You won, kid. Now you have to choose what to do with winning. That's the part nobody gets right.",
-     "choices": [
-       {"text_fr": "Rembourser jusqu'au dernier centime et rendre la clé.", "text_en": "Pay back every last cent and hand back the key.", "effects": [{"trigger": "on_use", "do": [{"op": "set_flag", "flag": "ending", "value": "end_repay"}]}]},
-       {"text_fr": "Prendre la caisse et s'enfuir par l'escalier de service.", "text_en": "Grab the till and run up the service stairs.", "effects": [{"trigger": "on_use", "do": [{"op": "set_flag", "flag": "ending", "value": "end_flee"}]}]},
-       {"text_fr": "S'asseoir dans le fauteuil du Patron.", "text_en": "Sit in the Boss's chair.", "effects": [{"trigger": "on_use", "do": [{"op": "set_flag", "flag": "ending", "value": "end_take"}]}]},
-       {"text_fr": "Poser la main sur la roue et la retenir.", "text_en": "Put your hand on the wheel and hold it still.", "if": [{"c": "flag", "v": "grandpa_letter"}, {"c": "pacts_used", "op": "==", "v": 0}], "effects": [{"trigger": "on_use", "do": [{"op": "set_flag", "flag": "ending", "value": "end_secret"}]}]}
-     ]}
-  ]},
-  {"id": "ending_repay", "lines": [
-    {"who": "narrator", "text_fr": "Tu comptes chaque jeton sur le comptoir. Le Comptable signe un reçu, les mains tremblantes. Pour la première fois, une ligne de ton nom est barrée.", "text_en": "You count every chip onto the counter. The Accountant signs a receipt, hands shaking. For the first time, a line with your name is crossed out."},
-    {"who": "house", "text_fr": "Revenez quand vous voulez. Les portes sont toujours ouvertes.", "text_en": "Come back any time. The doors are always open."},
-    {"who": "narrator", "text_fr": "Tu remontes l'escalier. Dehors, il pleut. Tu n'as jamais rien entendu d'aussi beau. FIN : REMBOURSER.", "text_en": "You climb the stairs. Outside, it's raining. You've never heard anything so beautiful. ENDING: REPAY."}
-  ]},
-  {"id": "ending_flee", "lines": [
-    {"who": "narrator", "text_fr": "La caisse est lourde. L'escalier de service sent la javel. Derrière toi, une roue se remet à tourner.", "text_en": "The till is heavy. The service stairs smell of bleach. Behind you, a wheel starts turning again."},
-    {"who": "house", "text_fr": "Courez. Nous avons tout le temps. Vos enfants aussi auront de beaux yeux.", "text_en": "Run. We have all the time in the world. Your children will have lovely eyes too."},
-    {"who": "narrator", "text_fr": "Tu es libre, riche, et tu ne dormiras plus jamais sans entendre une bille rouler. FIN : S'ENFUIR.", "text_en": "You are free, rich, and you will never again sleep without hearing a ball roll. ENDING: FLEE."}
-  ]},
-  {"id": "ending_take", "lines": [
-    {"who": "narrator", "text_fr": "Le fauteuil est chaud. Il épouse ta forme comme s'il t'attendait. Le Patron s'incline, et disparaît dans la pénombre.", "text_en": "The chair is warm. It fits you as if it had been waiting. The Boss bows, and vanishes into the gloom."},
-    {"who": "house", "text_fr": "BIENVENUE, PATRON. QUI ALLONS-NOUS ACCUEILLIR CE SOIR ?", "text_en": "WELCOME, BOSS. WHOM SHALL WE WELCOME TONIGHT?"},
-    {"who": "hero", "text_fr": "…Quelqu'un comme moi.", "text_en": "…Someone like me."},
-    {"who": "narrator", "text_fr": "Là-haut, un enfant trouve une carte dorée sous la porte de sa grand-mère. FIN : REPRENDRE LA MAISON.", "text_en": "Up above, a child finds a golden card slipped under his grandmother's door. ENDING: TAKE THE HOUSE."}
-  ]},
-  {"id": "ending_secret", "lines": [
-    {"who": "narrator", "text_fr": "Ta main se pose sur la roue. Elle est tiède, presque vivante. Tu repenses à la lettre : « pardonne-moi ».", "text_en": "Your hand rests on the wheel. It's warm, almost alive. You think of the letter: « forgive me »."},
-    {"who": "grandpa", "text_fr": "Tu n'as signé aucun pacte. Moi, j'en ai signé cent. C'est pour ça qu'elle t'obéit.", "text_en": "You signed no pact. I signed a hundred. That's why it obeys you."},
-    {"who": "house", "text_fr": "…JE SUIS FATIGUÉE.", "text_en": "…I AM TIRED."},
-    {"who": "narrator", "text_fr": "La roue s'arrête. Toutes les cases tombent sur zéro, en même temps, et le zéro ne veut plus rien dire. Les dettes de toutes les familles s'effacent du grand registre. Le Grand Zéro s'éteint, ampoule après ampoule.", "text_en": "The wheel stops. Every pocket lands on zero at once, and zero no longer means anything. Every family's debts vanish from the great ledger. The Grand Zero goes dark, bulb after bulb."},
-    {"who": "narrator", "text_fr": "Au matin, il n'y a plus qu'un escalier qui ne mène nulle part. VRAIE FIN : LA ROUE S'ARRÊTE.", "text_en": "By morning there is only a staircase leading nowhere. TRUE ENDING: THE WHEEL STOPS."}
-  ]}
+ {
+  "id": "act1_mid",
+  "act": 1,
+  "lines": [
+   {
+    "who": "narrator",
+    "text_fr": "Entre deux échéances, Anselme essuie un verre qui n'a pas servi depuis 1987. Il t'en sert un quand même. C'est de l'eau. Il insiste pour dire que c'est du « millésime ».",
+    "text_en": "Between installments, Anselme polishes a glass that hasn't been used since 1987. He pours you one anyway. It's water. He insists it's a « vintage »."
+   },
+   {
+    "who": "croupier",
+    "text_fr": "Tu tiens le coup. Ton grand-père, au deuxième palier, avait déjà vendu sa montre, ses boutons de manchette et le chat.",
+    "text_en": "You're holding up. By the second tier, your grandfather had already sold his watch, his cufflinks and the cat."
+   },
+   {
+    "who": "hero",
+    "text_fr": "Le chat ?",
+    "text_en": "The cat?",
+    "by_hero": {
+     "barnabe": {
+      "text_fr": "Le chat ? Enfin une bonne nouvelle.",
+      "text_en": "The cat? Finally, some good news."
+     }
+    }
+   },
+   {
+    "who": "croupier",
+    "text_fr": "Le chat est toujours là, d'ailleurs. Il appartient à La Maison maintenant. Il dort sur le tapis du 17. Personne n'ose jouer le 17.",
+    "text_en": "The cat's still here, actually. Belongs to the House now. Sleeps on the 17. Nobody dares play the 17."
+   },
+   {
+    "who": "croupier",
+    "text_fr": "Écoute. Les créanciers, au bout de chaque palier… ce ne sont pas des gens. Plus vraiment. Ce sont des dettes qui ont pris forme humaine. Chacune a sa règle tordue. Lis-la avant de miser.",
+    "text_en": "Listen. The creditors, at the end of each tier… they aren't people. Not anymore. They're debts that took human shape. Each one has a twisted rule. Read it before you bet."
+   },
+   {
+    "who": "hero",
+    "text_fr": "Des dettes anthropomorphes. Je le note. Ça ne rentre dans aucune de mes équations, et ça m'énerve.",
+    "text_en": "Anthropomorphic debts. Noted. It fits none of my equations, and that annoys me.",
+    "heroes": [
+     "odile"
+    ]
+   },
+   {
+    "who": "hero",
+    "text_fr": "Je les connais. J'ai servi des cocktails à la moitié d'entre eux. Ils ne laissent jamais de pourboire.",
+    "text_en": "I know them. I served cocktails to half of them. They never tip.",
+    "heroes": [
+     "lea"
+    ]
+   },
+   {
+    "who": "hero",
+    "text_fr": "Des dettes qui ont pris forme humaine… Je suis l'inverse. Un humain qui a pris forme de dette.",
+    "text_en": "Debts that took human form… I'm the opposite. A human who took the form of a debt.",
+    "heroes": [
+     "ghost"
+    ]
+   },
+   {
+    "who": "house",
+    "text_fr": "Anselme. Vous bavardez encore. Je déduis ça de votre salaire.",
+    "text_en": "Anselme. Chattering again. I'm docking your pay."
+   },
+   {
+    "who": "croupier",
+    "text_fr": "Ça fait trente ans qu'on ne me paie plus. Elle déduit quand même. C'est une question de principe.",
+    "text_en": "They haven't paid me in thirty years. She still docks it. It's a matter of principle."
+   }
+  ]
+ },
+ {
+  "id": "act2_intro",
+  "act": 2,
+  "lines": [
+   {
+    "who": "narrator",
+    "text_fr": "L'ascenseur descend longtemps. Trop longtemps pour un seul étage. La musique d'attente joue une valse à l'envers. Quand les portes s'ouvrent, ça sent le cigare froid, le parfum cher et les secrets plus chers encore.",
+    "text_en": "The elevator goes down for a long time. Too long for a single floor. The hold music is a waltz played backwards. When the doors open, it smells of cold cigars, expensive perfume and even more expensive secrets."
+   },
+   {
+    "who": "house",
+    "text_fr": "Les Salons Privés. Ici, on ne joue pas contre La Maison. On joue contre ceux qui la servent. Ils sont plus gourmands que moi. Moi, au moins, je suis polie.",
+    "text_en": "The Private Lounges. Here, you don't play against the House. You play against those who serve it. They're greedier than I am. I, at least, am polite."
+   },
+   {
+    "who": "croupier",
+    "text_fr": "Toi encore ? Je suis descendu par l'escalier, l'ascenseur me donne le mal de mer. Écoute. Ton grand-père venait ici. Il gagnait, parfois. C'était pire.",
+    "text_en": "You again? I took the stairs, the elevator makes me seasick. Listen. Your grandfather used to come here. He'd win, sometimes. That was worse."
+   },
+   {
+    "who": "hero",
+    "text_fr": "Pourquoi pire ?",
+    "text_en": "Why worse?",
+    "by_hero": {
+     "vic": {
+      "text_fr": "Pourquoi pire ? Gagner, c'est jamais pire. C'est… c'est la base, non ?",
+      "text_en": "Why worse? Winning is never worse. It's… it's the whole point, right?"
+     }
+    }
+   },
+   {
+    "who": "croupier",
+    "text_fr": "Parce que quand il gagnait, il revenait. La Maison n'aime pas perdre, petit. Elle n'oublie pas non plus. Alors elle prête. Avec le sourire. Et elle attend.",
+    "text_en": "Because when he won, he came back. The House hates losing, kid. It doesn't forget either. So it lends. With a smile. And it waits."
+   },
+   {
+    "who": "hero",
+    "text_fr": "La parabole du fils prodigue, version casino. Sauf qu'ici, le veau gras, c'est nous.",
+    "text_en": "The parable of the prodigal son, casino edition. Except here, we're the fatted calf.",
+    "heroes": [
+     "marthe"
+    ]
+   },
+   {
+    "who": "hero",
+    "text_fr": "Croâ. Et ces bijoux, sur les VIP ? Ils sont… très brillants. Pour aucune raison particulière.",
+    "text_en": "Caw. And all that jewellery on the VIPs? It's… very shiny. For no particular reason.",
+    "heroes": [
+     "barnabe"
+    ]
+   },
+   {
+    "who": "croupier",
+    "text_fr": "Je peux t'aider. Je connais chaque roue d'ici, chaque bille ébréchée, chaque case qui colle. Mais si La Maison l'apprend…",
+    "text_en": "I can help you. I know every wheel down here, every chipped ball, every sticky pocket. But if the House finds out…",
+    "choices": [
+     {
+      "text_fr": "« Aidez-moi à la battre. »",
+      "text_en": "« Help me beat it. »",
+      "effects": [
+       {
+        "trigger": "on_use",
+        "do": [
+         {
+          "op": "perm_precision",
+          "v": 1
+         },
+         {
+          "op": "set_flag",
+          "flag": "croupier_ally",
+          "value": true
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "text_fr": "« Je n'ai besoin de personne. »",
+      "text_en": "« I don't need anyone. »",
+      "effects": [
+       {
+        "trigger": "on_use",
+        "do": [
+         {
+          "op": "add_money",
+          "v": 6
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "who": "house",
+    "text_fr": "Que les Salons vous soient légers. Et vos poches aussi, bientôt.",
+    "text_en": "May the Lounges treat you lightly. And your pockets, soon enough."
+   }
+  ]
+ },
+ {
+  "id": "act2_mid",
+  "act": 2,
+  "lines": [
+   {
+    "who": "narrator",
+    "text_fr": "Dans un coin du salon, un portrait à l'huile : deux jeunes hommes identiques, bras dessus bras dessous, devant une roue neuve. La plaque dit : « Les frères Zéro, 1952 ».",
+    "text_en": "In a corner of the lounge, an oil portrait: two identical young men, arm in arm, in front of a brand-new wheel. The plaque reads: « The Zero brothers, 1952 »."
+   },
+   {
+    "who": "hero",
+    "text_fr": "C'est… grand-père ? Et l'autre ?",
+    "text_en": "Is that… grandpa? And who's the other one?",
+    "by_hero": {
+     "ghost": {
+      "text_fr": "Je me souviens de ce tableau. J'avais parié qu'il tomberait avant moi. J'ai perdu.",
+      "text_en": "I remember this painting. I bet it would fall before I did. I lost."
+     }
+    }
+   },
+   {
+    "who": "croupier",
+    "text_fr": "Ton grand-père, oui. Et son frère jumeau. Ils ont fondé le Grand Zéro ensemble. Un a eu la chance. L'autre a eu… tout le reste.",
+    "text_en": "Your grandfather, yes. And his twin brother. They founded the Grand Zero together. One got the luck. The other got… everything else."
+   },
+   {
+    "who": "croupier",
+    "text_fr": "Je ne devrais pas t'en dire plus. Les murs écoutent. Les murs, ici, ce sont des oreilles de VIP empaillées. Je plaisante. Presque.",
+    "text_en": "I shouldn't tell you more. The walls are listening. The walls, here, are stuffed VIP ears. I'm joking. Mostly."
+   },
+   {
+    "who": "house",
+    "text_fr": "ANSELME.",
+    "text_en": "ANSELME."
+   },
+   {
+    "who": "croupier",
+    "text_fr": "Je parlais de la météo ! Il pleut, dehors. Comme toujours. Quelle surprise.",
+    "text_en": "I was talking about the weather! It's raining outside. As always. What a surprise."
+   }
+  ]
+ },
+ {
+  "id": "act2_creditor_won",
+  "act": 2,
+  "lines": [
+   {
+    "who": "house",
+    "text_fr": "Vous avez vidé mes Salons. Les VIP pleurent dans leurs coupes. L'un d'eux a mis en gage son yacht. Pour un cocktail.",
+    "text_en": "You've emptied my Lounges. The VIPs are weeping into their glasses. One of them pawned his yacht. For a cocktail."
+   },
+   {
+    "who": "hero",
+    "text_fr": "Qu'y a-t-il plus bas ?",
+    "text_en": "What's further down?",
+    "by_hero": {
+     "vic": {
+      "text_fr": "Plus bas ? Il y a encore plus bas ? Génial. J'adore les sous-sols.",
+      "text_en": "Further down? There's further down? Great. I love basements."
+     }
+    }
+   },
+   {
+    "who": "house",
+    "text_fr": "La Cave. Là où la première bille a été lancée. Là où votre nom a été écrit pour la première fois. À l'encre. Puis au sang. Puis au stylo-bille, c'était plus pratique.",
+    "text_en": "The Cellar. Where the first ball was thrown. Where your name was first written down. In ink. Then in blood. Then in ballpoint, it was more practical."
+   },
+   {
+    "who": "croupier",
+    "text_fr": "Je ne descends pas plus bas, petit. Mes genoux, et… d'autres raisons. Il t'attend, en bas. Celui du tableau.",
+    "text_en": "I'm not going any lower, kid. My knees, and… other reasons. He's waiting for you down there. The one in the painting."
+   }
+  ]
+ },
+ {
+  "id": "act3_intro",
+  "act": 3,
+  "lines": [
+   {
+    "who": "narrator",
+    "text_fr": "Plus de velours, plus de néons. Des murs de brique humide, une seule ampoule qui hésite. Au centre, une roue immense, noire, qui tourne sans bruit. Elle respire. Tu en es presque sûr.",
+    "text_en": "No more velvet, no more neon. Damp brick walls, a single hesitant light bulb. In the middle, a huge black wheel, spinning silently. It breathes. You're almost sure of it."
+   },
+   {
+    "who": "patron",
+    "text_fr": "Te voilà enfin. Tu as les yeux de ton grand-père. Il avait les miens. Nous étions jumeaux : c'était pratique pour les alibis.",
+    "text_en": "There you are at last. You have your grandfather's eyes. He had mine. We were twins: very handy for alibis."
+   },
+   {
+    "who": "hero",
+    "text_fr": "Qui êtes-vous ?",
+    "text_en": "Who are you?",
+    "by_hero": {
+     "ghost": {
+      "text_fr": "Vous… c'est vous qui m'avez prêté de l'argent en 1987. « Rembourse quand tu veux », vous aviez dit.",
+      "text_en": "You… you lent me money in 1987. « Pay me back whenever », you said."
+     }
+    }
+   },
+   {
+    "who": "patron",
+    "text_fr": "Le frère qui a gagné. Celui qui a construit La Maison avec l'argent que ta famille perdait. Chaque dette de ta lignée fait tourner cette roue. Ton grand-père perdait ; moi, j'empochais. Le partage idéal.",
+    "text_en": "The brother who won. The one who built the House with the money your family lost. Every debt in your bloodline turns this wheel. Your grandfather lost; I pocketed. The perfect partnership."
+   },
+   {
+    "who": "patron",
+    "text_fr": "Et toi, mon pauvre… Tu as tellement aimé cette table que tu as oublié de partir. Même mort. C'est presque touchant. Presque.",
+    "text_en": "And you, poor thing… You loved this table so much you forgot to leave. Even dead. It's almost touching. Almost.",
+    "heroes": [
+     "ghost"
+    ]
+   },
+   {
+    "who": "house",
+    "text_fr": "IL M'A NOURRIE. VOUS ME NOURRISSEZ. C'EST UNE AFFAIRE DE FAMILLE. ET LES AFFAIRES DE FAMILLE NE SE RÈGLENT JAMAIS.",
+    "text_en": "HE FED ME. YOU FEED ME. IT IS A FAMILY BUSINESS. AND FAMILY BUSINESS IS NEVER SETTLED."
+   },
+   {
+    "who": "patron",
+    "text_fr": "Elle parle en majuscules depuis qu'elle a absorbé un notaire. On ne s'y fait jamais.",
+    "text_en": "She's spoken in capitals ever since she absorbed a notary. You never get used to it."
+   },
+   {
+    "who": "hero",
+    "text_fr": "Alors c'est ce soir que la famille arrête de payer.",
+    "text_en": "Then tonight is when the family stops paying.",
+    "by_hero": {
+     "lea": {
+      "text_fr": "Je connais toutes les ficelles de ce métier. Ce soir, c'est moi qui distribue.",
+      "text_en": "I know every trick in this trade. Tonight, I'm the one dealing."
+     },
+     "vic": {
+      "text_fr": "Ce soir, on joue tout. Mais genre, tout tout. C'est mon moment, je le sens dans mon petit doigt. Mon petit doigt se trompe rarement. Souvent. Mais pas ce soir.",
+      "text_en": "Tonight, we bet it all. Like, all of it. This is my moment, I feel it in my little finger. My little finger is rarely wrong. Often. But not tonight."
+     },
+     "odile": {
+      "text_fr": "Votre roue suit une loi. Toute loi a ses failles. Ce soir, je publie.",
+      "text_en": "Your wheel follows a law. Every law has loopholes. Tonight, I publish."
+     },
+     "barnabe": {
+      "text_fr": "Ce soir, c'est moi qui vous plume. Croâ.",
+      "text_en": "Tonight, I'm the one doing the plucking. Caw."
+     },
+     "marthe": {
+      "text_fr": "Ce soir, je vous pardonne. Après vous avoir battu. L'ordre compte.",
+      "text_en": "Tonight, I forgive you. After I beat you. The order matters."
+     },
+     "ghost": {
+      "text_fr": "Ce soir, je paie mon ardoise. Et ensuite je hante VOTRE maison.",
+      "text_en": "Tonight, I settle my tab. And then I haunt YOUR house."
+     }
+    }
+   }
+  ]
+ },
+ {
+  "id": "act3_mid",
+  "act": 3,
+  "lines": [
+   {
+    "who": "narrator",
+    "text_fr": "La roue noire grince. Une case se fend, et du papier s'en échappe : des reconnaissances de dette, des milliers, qui tournoient comme des feuilles mortes.",
+    "text_en": "The black wheel creaks. A pocket cracks open and paper spills out: IOUs, thousands of them, swirling like dead leaves."
+   },
+   {
+    "who": "patron",
+    "text_fr": "Tu l'abîmes. Personne ne l'avait jamais abîmée. Tu sais ce que ça fait, à un vieil homme, de voir son œuvre trembler ?",
+    "text_en": "You're damaging it. Nobody has ever damaged it. Do you know what it does to an old man, watching his life's work tremble?"
+   },
+   {
+    "who": "hero",
+    "text_fr": "Vous allez me faire pleurer.",
+    "text_en": "You're going to make me cry.",
+    "by_hero": {
+     "marthe": {
+      "text_fr": "Je prierai pour vous. Brièvement.",
+      "text_en": "I'll pray for you. Briefly."
+     },
+     "odile": {
+      "text_fr": "Ça s'appelle une régression vers la moyenne. Désolée. Non, pas désolée.",
+      "text_en": "It's called regression to the mean. Sorry. No, not sorry."
+     }
+    }
+   },
+   {
+    "who": "grandpa",
+    "text_fr": "…petit…",
+    "text_en": "…kiddo…"
+   },
+   {
+    "who": "patron",
+    "text_fr": "Tu as entendu ? Non. Tu n'as rien entendu. Il n'y a personne d'autre ici. Joue.",
+    "text_en": "Did you hear that? No. You heard nothing. There's no one else here. Play."
+   }
+  ]
+ },
+ {
+  "id": "finale",
+  "act": 3,
+  "lines": [
+   {
+    "who": "narrator",
+    "text_fr": "La grande roue noire ralentit. Pour la première fois depuis un siècle, elle hésite. Les néons du dessus clignotent tous en même temps, comme un casino entier qui retient son souffle.",
+    "text_en": "The great black wheel slows. For the first time in a century, it hesitates. Upstairs, every neon sign flickers at once, like an entire casino holding its breath."
+   },
+   {
+    "who": "house",
+    "text_fr": "LA DETTE EST… SOLDÉE. C'EST IMPOSSIBLE. C'EST… ARRIVÉ. JE VAIS DEVOIR REFAIRE TOUS MES REGISTRES.",
+    "text_en": "THE DEBT IS… SETTLED. THAT IS IMPOSSIBLE. IT HAS… HAPPENED. I WILL HAVE TO REDO ALL MY LEDGERS."
+   },
+   {
+    "who": "croupier",
+    "text_fr": "[depuis l'escalier] JE LE SAVAIS ! Quarante ans ! Je le savais ! Bon, j'avais parié contre toi, mais je le savais !",
+    "text_en": "[from the stairs] I KNEW IT! Forty years! I knew it! Well, I bet against you, but I knew it!"
+   },
+   {
+    "who": "patron",
+    "text_fr": "Tu as gagné, petit. Maintenant tu dois choisir ce que tu fais de la victoire. C'est la partie que personne ne réussit. Ton grand-père non plus.",
+    "text_en": "You won, kid. Now you have to choose what to do with winning. That's the part nobody gets right. Your grandfather didn't either.",
+    "choices": [
+     {
+      "text_fr": "Rembourser jusqu'au dernier centime et rendre la clé.",
+      "text_en": "Pay back every last cent and hand back the key.",
+      "effects": [
+       {
+        "trigger": "on_use",
+        "do": [
+         {
+          "op": "set_flag",
+          "flag": "ending",
+          "value": "end_repay"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "text_fr": "Prendre la caisse et s'enfuir par l'escalier de service.",
+      "text_en": "Grab the till and run up the service stairs.",
+      "effects": [
+       {
+        "trigger": "on_use",
+        "do": [
+         {
+          "op": "set_flag",
+          "flag": "ending",
+          "value": "end_flee"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "text_fr": "S'asseoir dans le fauteuil du Patron.",
+      "text_en": "Sit in the Boss's chair.",
+      "effects": [
+       {
+        "trigger": "on_use",
+        "do": [
+         {
+          "op": "set_flag",
+          "flag": "ending",
+          "value": "end_take"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "text_fr": "Poser la main sur la roue et la retenir.",
+      "text_en": "Put your hand on the wheel and hold it still.",
+      "if": [
+       {
+        "c": "flag",
+        "v": "grandpa_letter"
+       },
+       {
+        "c": "pacts_used",
+        "op": "==",
+        "v": 0
+       }
+      ],
+      "effects": [
+       {
+        "trigger": "on_use",
+        "do": [
+         {
+          "op": "set_flag",
+          "flag": "ending",
+          "value": "end_secret"
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "ending_repay",
+  "lines": [
+   {
+    "who": "narrator",
+    "text_fr": "Tu comptes chaque jeton sur le comptoir. Le Comptable signe un reçu, les mains tremblantes. Pour la première fois, une ligne à ton nom est barrée. Il la barre deux fois, pour être sûr.",
+    "text_en": "You count every chip onto the counter. The Accountant signs a receipt, hands shaking. For the first time, a line with your name is crossed out. He crosses it twice, to be sure."
+   },
+   {
+    "who": "croupier",
+    "text_fr": "Rembourser. Jusqu'au bout. Ton grand-père aurait trouvé ça fou. Moi, je trouve ça classe.",
+    "text_en": "Paying it back. All of it. Your grandfather would have called it madness. I call it class."
+   },
+   {
+    "who": "house",
+    "text_fr": "Revenez quand vous voulez. Les portes sont toujours ouvertes. Enfin, elles s'ouvrent vers l'intérieur.",
+    "text_en": "Come back any time. The doors are always open. Well, they open inwards."
+   },
+   {
+    "who": "narrator",
+    "text_fr": "Tu remontes l'escalier. Cent treize marches, puis cent douze. Dehors, il pleut. Tu n'as jamais rien entendu d'aussi beau. FIN : REMBOURSER.",
+    "text_en": "You climb the stairs. A hundred and thirteen steps, then a hundred and twelve. Outside, it's raining. You've never heard anything so beautiful. ENDING: REPAY."
+   }
+  ]
+ },
+ {
+  "id": "ending_flee",
+  "lines": [
+   {
+    "who": "narrator",
+    "text_fr": "La caisse est lourde. L'escalier de service sent la javel et les regrets. Derrière toi, une roue se remet à tourner. Une seule. Puis deux. Puis toutes.",
+    "text_en": "The till is heavy. The service stairs smell of bleach and regret. Behind you, a wheel starts spinning again. Just one. Then two. Then all of them."
+   },
+   {
+    "who": "house",
+    "text_fr": "Courez. Nous avons tout le temps. Vos enfants aussi auront de beaux yeux. Nous leur enverrons une jolie enveloppe.",
+    "text_en": "Run. We have all the time in the world. Your children will have lovely eyes too. We'll send them a nice envelope."
+   },
+   {
+    "who": "narrator",
+    "text_fr": "Tu es libre, riche, et tu ne dormiras plus jamais sans entendre une bille rouler. FIN : S'ENFUIR.",
+    "text_en": "You are free, rich, and you will never again sleep without hearing a ball rolling. ENDING: FLEE."
+   }
+  ]
+ },
+ {
+  "id": "ending_take",
+  "lines": [
+   {
+    "who": "narrator",
+    "text_fr": "Le fauteuil est chaud. Il épouse ta forme comme s'il t'attendait. Le Patron s'incline, et disparaît dans la pénombre en sifflotant. Il a l'air soulagé. Ça devrait t'inquiéter.",
+    "text_en": "The chair is warm. It fits you as if it had been waiting. The Boss bows and vanishes into the gloom, whistling. He looks relieved. That should worry you."
+   },
+   {
+    "who": "house",
+    "text_fr": "BIENVENUE, PATRON. QUI ALLONS-NOUS ACCUEILLIR CE SOIR ?",
+    "text_en": "WELCOME, BOSS. WHOM SHALL WE WELCOME TONIGHT?"
+   },
+   {
+    "who": "hero",
+    "text_fr": "…Quelqu'un comme moi.",
+    "text_en": "…Someone like me."
+   },
+   {
+    "who": "narrator",
+    "text_fr": "Là-haut, un enfant trouve une enveloppe dorée sous la porte de sa grand-mère. FIN : REPRENDRE LA MAISON.",
+    "text_en": "Upstairs, a child finds a golden envelope under their grandmother's door. ENDING: TAKE THE HOUSE."
+   }
+  ]
+ },
+ {
+  "id": "ending_secret",
+  "lines": [
+   {
+    "who": "narrator",
+    "text_fr": "Ta main se pose sur la roue. Elle est tiède, presque vivante. Tu repenses à la lettre : « pardonne-moi ».",
+    "text_en": "Your hand rests on the wheel. It's warm, almost alive. You think back to the letter: « forgive me »."
+   },
+   {
+    "who": "grandpa",
+    "text_fr": "Tu n'as signé aucun pacte. Moi, j'en ai signé cent. C'est pour ça qu'elle t'obéit. Elle ne connaît que les gens qui lui doivent quelque chose.",
+    "text_en": "You signed no pacts. I signed a hundred. That's why it obeys you. It only knows people who owe it something."
+   },
+   {
+    "who": "patron",
+    "text_fr": "Frère ? …Tu es resté là, tout ce temps ? Dans la roue ?",
+    "text_en": "Brother? …You've been here all this time? Inside the wheel?"
+   },
+   {
+    "who": "grandpa",
+    "text_fr": "Il fallait bien quelqu'un pour souffler la bonne réponse au petit. Anselme ne pouvait pas tout faire.",
+    "text_en": "Someone had to whisper the right answer to the kid. Anselme couldn't do everything."
+   },
+   {
+    "who": "house",
+    "text_fr": "…JE SUIS FATIGUÉE.",
+    "text_en": "…I AM TIRED."
+   },
+   {
+    "who": "narrator",
+    "text_fr": "La roue s'arrête. Toutes les cases tombent sur zéro, en même temps, et le zéro ne veut plus rien dire. Les dettes de toutes les familles s'effacent du grand registre. Le Grand Zéro s'éteint, ampoule après ampoule.",
+    "text_en": "The wheel stops. Every pocket lands on zero, all at once, and zero no longer means anything. Every family's debts fade from the great ledger. The Grand Zero goes dark, bulb by bulb."
+   },
+   {
+    "who": "narrator",
+    "text_fr": "Au matin, il n'y a plus qu'un escalier qui ne mène nulle part, et un vieux croupier qui sifflote en fermant à clé. VRAIE FIN : LA ROUE S'ARRÊTE.",
+    "text_en": "By morning, there is nothing left but a staircase leading nowhere, and an old dealer whistling as he locks up. TRUE ENDING: THE WHEEL STOPS."
+   }
+  ]
+ },
+ {
+  "id": "shop_intro",
+  "once": true,
+  "lines": [
+   {
+    "who": "narrator",
+    "text_fr": "Derrière un paravent troué, une boutique de fortune : des étagères de bric-à-brac, des grigris qui cliquettent, et un homme moustachu qui t'observe par-dessus des lunettes trop grandes.",
+    "text_en": "Behind a moth-eaten screen, a makeshift shop: shelves of bric-a-brac, rattling trinkets, and a moustached man eyeing you over glasses that are too big."
+   },
+   {
+    "who": "brocanteur",
+    "text_fr": "Gaston, brocanteur. Ici, tout se vend, tout s'achète, rien n'est remboursé. Sauf toi, peut-être, si tu choisis bien.",
+    "text_en": "Gaston, junk dealer. Everything's for sale, everything's bought, nothing's refunded. Except you, maybe, if you choose well."
+   },
+   {
+    "who": "brocanteur",
+    "text_fr": "Les grigris, ça reste avec toi toute la partie. Les Fortunes, c'est un coup unique, à garder pour le bon moment. Et les paquets… c'est la surprise. On paie, on ouvre, on choisit un truc dedans. Pas de retour en arrière.",
+    "text_en": "Trinkets stay with you all game. Fortunes are one-shot, keep them for the right moment. And packs… that's the surprise. You pay, you open, you pick one thing inside. No take-backs."
+   },
+   {
+    "who": "hero",
+    "text_fr": "D'où vient tout ce bazar ?",
+    "text_en": "Where does all this junk come from?",
+    "by_hero": {
+     "barnabe": {
+      "text_fr": "Croâ… c'est brillant. Tout est si brillant. Je peux toucher ? Je ne vole rien. Presque jamais.",
+      "text_en": "Caw… it's shiny. It's all so shiny. Can I touch? I won't steal anything. Hardly ever."
+     }
+    }
+   },
+   {
+    "who": "brocanteur",
+    "text_fr": "Des poches des perdants. Ce trèfle était à un champion de belote. Ce dé, à un dentiste. Ce dentier, au dentiste aussi, d'ailleurs.",
+    "text_en": "From the losers' pockets. This clover belonged to a belote champion. This die, to a dentist. These dentures, also the dentist's, as it happens."
+   },
+   {
+    "who": "brocanteur",
+    "text_fr": "Un conseil gratuit, c'est le seul : relancer la vitrine coûte de plus en plus cher. Et l'intérêt, ici, c'est pas qu'une figure de style.",
+    "text_en": "One free tip, the only one: rerolling the shelf costs more each time. And interest, down here, isn't just a figure of speech."
+   }
+  ]
+ },
+ {
+  "id": "slot_intro",
+  "once": true,
+  "lines": [
+   {
+    "who": "narrator",
+    "text_fr": "Dans un fracas de pièces, une vieille machine à sous surgit du sol en grinçant. Ses yeux s'allument. Elle a des yeux.",
+    "text_en": "With a clatter of coins, an old slot machine creaks up out of the floor. Its eyes light up. It has eyes."
+   },
+   {
+    "who": "lucette",
+    "text_fr": "OUIIII ! Un JACKPOT ! Ça faisait trente-neuf ans ! Je m'appelle Lucette, j'ai trois rouleaux, et je suis TELLEMENT contente de te voir !",
+    "text_en": "YESSSS! A JACKPOT! It's been thirty-nine years! I'm Lucette, I have three reels, and I'm SO happy to see you!"
+   },
+   {
+    "who": "lucette",
+    "text_fr": "Plus ton lancer était beau, plus je tourne : une, deux, jusqu'à trois fois ! Chaque combinaison donne un cadeau : des tours gratuits, des bonus provisoires, des jetons…",
+    "text_en": "The better your throw, the more I spin: once, twice, up to three times! Every combination gives a gift: free spins, temporary boosts, chips…"
+   },
+   {
+    "who": "hero",
+    "text_fr": "Une machine qui parle. Bien sûr. Pourquoi pas.",
+    "text_en": "A talking machine. Of course. Why not.",
+    "by_hero": {
+     "odile": {
+      "text_fr": "Une machine à sous qui parle et qui distribue de l'espérance positive. Je dois être en train de rêver.",
+      "text_en": "A talking slot machine with positive expected value. I must be dreaming."
+     },
+     "vic": {
+      "text_fr": "Lucette… Je crois que je suis amoureux.",
+      "text_en": "Lucette… I think I'm in love."
+     }
+    }
+   },
+   {
+    "who": "lucette",
+    "text_fr": "La Maison déteste quand je donne. Alors je donne ENCORE PLUS. Tire le levier, chéri !",
+    "text_en": "The House hates it when I give. So I give EVEN MORE. Pull the lever, sweetie!"
+   }
+  ]
+ },
+ {
+  "id": "pact_intro",
+  "once": true,
+  "lines": [
+   {
+    "who": "narrator",
+    "text_fr": "L'échéance est passée. La roue s'immobilise, et une voix veloutée descend du plafond, accompagnée d'un bruit de plume qui gratte.",
+    "text_en": "The deadline has passed. The wheel stops, and a velvety voice drifts down from the ceiling, along with the scratch of a quill."
+   },
+   {
+    "who": "house",
+    "text_fr": "Voyons, voyons. Nous n'allons pas en rester là entre gens de bonne compagnie. Je vous propose un pacte : on efface le retard, et vous me cédez… un petit quelque chose.",
+    "text_en": "Come now. We won't leave it at that, between good company. I offer you a pact: we wipe the slate, and you give me… a little something."
+   },
+   {
+    "who": "croupier",
+    "text_fr": "[chuchotant] Chaque pacte te sauve une fois et te coûte pour toujours. Ton grand-père en a signé cent. Cent. Réfléchis.",
+    "text_en": "[whispering] Every pact saves you once and costs you forever. Your grandfather signed a hundred. A hundred. Think about it."
+   },
+   {
+    "who": "hero",
+    "text_fr": "Et si je refuse ?",
+    "text_en": "And if I refuse?"
+   },
+   {
+    "who": "house",
+    "text_fr": "Alors la partie s'arrête ici. Mais refuser, c'est tellement… définitif. Signer, c'est tellement… pratique.",
+    "text_en": "Then the game ends here. But refusing is so… final. Signing is so… convenient."
+   }
+  ]
+ }
 ]

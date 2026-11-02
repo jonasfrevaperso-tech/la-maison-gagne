@@ -53,6 +53,17 @@ func _pop() -> void:
 		Tween.EASE_OUT
 	)
 	tw.tween_property(panel, "modulate:a", 1.0, POP_TIME * 0.6)
+	tw.chain().tween_callback(func() -> void: panel.resized.connect(_refit))
+	resized.connect(_refit)
+
+
+## Le contenu a changé de taille (ou la fenêtre) : on recale l'échelle pour rester dans l'écran.
+func _refit() -> void:
+	if not is_inside_tree():
+		return
+	var fit: float = fit_scale()
+	panel.pivot_offset = panel.size * 0.5
+	panel.scale = Vector2(fit, fit)
 
 
 ## Échelle qui fait tenir le panneau dans la fenêtre logique (petites fenêtres, grande police).

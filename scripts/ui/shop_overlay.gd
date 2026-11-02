@@ -22,6 +22,8 @@ var _odds: Label = null
 var _reroll_btn: Button = null
 var _owned: GrigriBar = null
 var _pack_box: VBoxContainer = null
+var _pack_layer: Control = null
+var _pack_panel: PanelContainer = null
 var _float: FloatLayer = null
 var _rerolls_here: int = 0
 var _owned_prompts: PromptBar = null
@@ -67,10 +69,21 @@ func build() -> void:
 	_contract_row = HBoxContainer.new()
 	(ccard.get_meta("body") as VBoxContainer).add_child(_contract_row)
 	mid.add_child(ccard)
+	# Paquet ouvert : fenêtre dédiée au-dessus du Bazar (masqué pendant le choix, obligatoire).
+	_pack_layer = Control.new()
+	_pack_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_pack_layer.mouse_filter = Control.MOUSE_FILTER_STOP
+	_pack_layer.visible = false
+	add_child(_pack_layer)
+	var pack_center: CenterContainer = CenterContainer.new()
+	pack_center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_pack_layer.add_child(pack_center)
+	_pack_panel = UiKit.panel(Palette.VELVET_DEEP, Palette.CYAN)
+	pack_center.add_child(_pack_panel)
 	_pack_box = VBoxContainer.new()
 	_pack_box.alignment = BoxContainer.ALIGNMENT_CENTER
 	_pack_box.add_theme_constant_override("separation", 12)
-	body.add_child(_pack_box)
+	_pack_panel.add_child(_pack_box)
 	# Collection du joueur.
 	var ocard: PanelContainer = UiKit.section_card("")
 	ocard.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
@@ -320,6 +333,8 @@ func _refresh_pack() -> void:
 	for c: Node in _pack_box.get_children():
 		c.queue_free()
 	var pack: Dictionary = ctl.run.shop_state.get("open_pack", {})
+	_pack_layer.visible = not pack.is_empty()
+	panel.visible = pack.is_empty()
 	if pack.is_empty():
 		return
 	_focus_pack.call_deferred()
@@ -361,7 +376,8 @@ func _refresh_pack() -> void:
 				col.add_child(oc)
 				col.add_child(UiKit.button(tr("PACK_TAKE"), _choose.bind(i, "add"), Vector2(150, 44)))
 		_flip_in(col, i)
-	_pack_box.add_child(UiKit.button(tr("PACK_SKIP"), _skip_pack, Vector2(200, 44)))
+	_pack_box.add_child(UiKit.label(tr("PACK_MANDATORY"), UiKit.SIZE_SMALL, Palette.IVORY.darkened(0.2)))
+	_fit_pack.call_deferred()
 
 
 func _choose(i: int, mode: String) -> void:
@@ -373,6 +389,13 @@ func _choose(i: int, mode: String) -> void:
 		EventBus.toast.emit(tr("SHOP_NO_SLOT"), &"error")
 
 
-func _skip_pack() -> void:
-	ShopModel.skip_pack(ctl.run)
-	_refresh()
+## La fenêtre du paquet tient dans l'écran quelle que soit la résolution.
+func _fit_pack() -> void:
+	await get_tree().process_frame
+	if not is_inside_tree():
+		return
+	var need: Vector2 = _pack_panel.size
+	var room: Vector2 = size * FIT_MARGIN
+	var k: float = minf(1.0, minf(room.x / maxf(need.x, 1.0), room.y / maxf(need.y, 1.0)))
+	_pack_panel.pivot_offset = need * 0.5
+	_pack_panel.scale = Vector2(k, k)

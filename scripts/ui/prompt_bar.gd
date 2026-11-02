@@ -9,6 +9,9 @@ const GROUP_GAP: int = 22
 var prompt_height: int = InputGlyphs.PROMPT_H
 var font_size: int = UiKit.SIZE_SMALL
 var text_color: Color = Palette.IVORY
+## Largeur maximale imposée (0 = largeur courante) : la barre ne s'élargit jamais au-delà,
+## même quand ses invites la poussent avant d'être masquées.
+var max_width: float = 0.0
 ## Paires [action ou repère, clé de libellé].
 var _items: Array[Array] = []
 var _sentence: String = ""
@@ -72,12 +75,15 @@ func _rebuild() -> void:
 
 ## Masque les invites de fin tant que la barre dépasse sa largeur.
 func _fit() -> void:
-	if size.x <= 0.0:
+	var limit: float = max_width if max_width > 0.0 else size.x
+	if limit <= 0.0:
 		return
 	var used: float = 0.0
 	var gap: float = float(get_theme_constant("separation"))
 	for c: Node in get_children():
 		var ctl: Control = c as Control
 		var w: float = ctl.get_combined_minimum_size().x
-		ctl.visible = used + w <= size.x
+		ctl.visible = used + w <= limit
 		used += w + gap
+	if max_width > 0.0 and size.x > max_width:
+		set_deferred("size", Vector2(max_width, size.y))

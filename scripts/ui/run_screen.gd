@@ -66,6 +66,7 @@ var _flash_rect: ColorRect = null
 var _shake: float = 0.0
 var _flash: float = 0.0
 var _pending_outcome: RunController.SpinOutcome = null
+var _deferred_closes: Array[Callable] = []
 var _target_fortune_slot: int = -1
 var _overlay_queue: Array[Control] = []
 var _victory_reward: Dictionary = {}
@@ -127,33 +128,7 @@ func _build() -> void:
 		decor.stage = _stage
 	_fit_stage()
 	resized.connect(_fit_stage)
-	# Barre du haut, sur un bandeau.
-	var strip: Panel = Panel.new()
-	strip.position = Vector2(MARGIN * 0.4, 6)
-	strip.size = Vector2(UiLayout.DESIGN_SIZE.x - MARGIN * 0.8 - 80.0, HUD_STRIP_H)
-	strip.add_theme_stylebox_override("panel", UiKit.flat(Color(Palette.INK, 0.72), Palette.GOLD_DARK, 2, 10, 0))
-	strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_stage.add_child(strip)
-	var top: HBoxContainer = HBoxContainer.new()
-	top.position = Vector2(MARGIN, MARGIN * 0.6)
-	top.add_theme_constant_override("separation", 26)
-	_stage.add_child(top)
-	_title_label = UiKit.label("", UiKit.SIZE_H2, Palette.GOLD_LIGHT, "display")
-	top.add_child(_title_label)
-	debt_gauge = DebtGauge.new()
-	top.add_child(debt_gauge)
-	_money_label = UiKit.label("", UiKit.SIZE_H2, Palette.GOLD_LIGHT, "mono")
-	top.add_child(_money_label)
-	_budget_label = UiKit.label("", UiKit.SIZE_BODY, Palette.IVORY, "mono")
-	top.add_child(_budget_label)
-	_info_label = UiKit.rich("", UiKit.SIZE_BODY - 2)
-	_info_label.position = Vector2(MARGIN, 92)
-	_info_label.custom_minimum_size = Vector2(760, 0)
-	_stage.add_child(_info_label)
-	_creditor_label = UiKit.rich("", UiKit.SIZE_BODY - 2)
-	_creditor_label.position = Vector2(820, 92)
-	_creditor_label.custom_minimum_size = Vector2(1060, 0)
-	_stage.add_child(_creditor_label)
+	RunScreenLayout.build_header(self)
 	# Roue
 	wheel_view = WheelView.new()
 	wheel_view.position = Vector2(MARGIN, 150)
@@ -162,6 +137,7 @@ func _build() -> void:
 	wheel_view.ball_settled.connect(_on_ball_settled)
 	wheel_view.pocket_clicked.connect(_on_pocket_clicked)
 	_stage.add_child(wheel_view)
+	_stage.move_child(wheel_view, 0)
 	throw_game = ThrowMinigame.new()
 	throw_game.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	throw_game.position = wheel_view.position
@@ -184,56 +160,7 @@ func _build() -> void:
 	table_view.spot_changed.connect(_on_spot_changed)
 	table_view.spot_hovered.connect(_on_spot_hovered)
 	_stage.add_child(table_view)
-	# Actions
-	var actions: HBoxContainer = HBoxContainer.new()
-	actions.position = Vector2(840, 360 + TABLE_SIZE.y + 22)
-	actions.add_theme_constant_override("separation", 10)
-	_stage.add_child(actions)
-	var small: Vector2 = Vector2(150, 54)
-	_undo_btn = UiKit.button(tr("BTN_UNDO"), _on_undo, small)
-	_repeat_btn = UiKit.button(tr("BTN_REPEAT"), _on_repeat, small)
-	_clear_btn = UiKit.button(tr("BTN_CLEAR"), _on_clear, small)
-	_speed_btn = UiKit.button("", _on_speed, Vector2(90, 54))
-	_spin_btn = UiKit.button(tr("BTN_SPIN"), _on_spin_pressed, Vector2(260, 64))
-	_spin_btn.add_theme_font_size_override("font_size", UiKit.SIZE_H2)
-	_rethrow_btn = UiKit.button(tr("BTN_RETHROW"), _on_rethrow, Vector2(220, 64))
-	_keep_btn = UiKit.button(tr("BTN_KEEP"), _on_keep, Vector2(180, 64))
-	for b: Button in [_undo_btn, _repeat_btn, _clear_btn, _speed_btn, _spin_btn, _rethrow_btn, _keep_btn]:
-		actions.add_child(b)
-	_rethrow_btn.visible = false
-	_keep_btn.visible = false
-	# Boutons actionnés par raccourci : jamais de focus (sinon A / Espace les déclencheraient en double).
-	var badges: Dictionary = {
-		_undo_btn: "bet_undo",
-		_repeat_btn: "bet_repeat",
-		_clear_btn: "bet_clear",
-		_speed_btn: "speed_toggle",
-		_spin_btn: "ui_spin",
-		_rethrow_btn: "ui_spin",
-		_keep_btn: "skip_anim",
-	}
-	for b: Button in badges.keys():
-		b.focus_mode = Control.FOCUS_NONE
-		PromptBadge.attach(b, String(badges[b]))
-	var menu_btn: Button = UiKit.button("☰", _on_menu, Vector2(64, 54))
-	menu_btn.focus_mode = Control.FOCUS_NONE
-	PromptBadge.attach(menu_btn, "pause_menu")
-	menu_btn.position = Vector2(UiLayout.DESIGN_SIZE.x - MARGIN - 64, MARGIN * 0.5)
-	_stage.add_child(menu_btn)
-	# Aide aux commandes : invites du périphérique actif (glyphes manette ou touches), sans débordement.
-	_prompt_bar = PromptBar.new()
-	_prompt_bar.position = Vector2(840, 360 + TABLE_SIZE.y + HINT_OFFSET_Y)
-	_prompt_bar.size = Vector2(TABLE_SIZE.x, InputGlyphs.PROMPT_H + 6)
-	_stage.add_child(_prompt_bar)
-	_hint_label = UiKit.label("", UiKit.SIZE_SMALL, Palette.IVORY)
-	_hint_label.modulate.a = HINT_ALPHA
-	_hint_label.position = Vector2(840, 360 + TABLE_SIZE.y + HINT_OFFSET_Y + InputGlyphs.PROMPT_H + 10)
-	# Jusqu'à la barre de Fortune (à droite) seulement, sur deux lignes au plus.
-	_hint_label.size = Vector2(FORTUNE_X - 840.0 - HINT_GAP, 0)
-	_hint_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_hint_label.max_lines_visible = 2
-	_hint_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	_stage.add_child(_hint_label)
+	RunScreenLayout.build_actions(self)
 	# Grigris et Fortune
 	grigri_bar = GrigriBar.new()
 	grigri_bar.position = Vector2(MARGIN, UiLayout.DESIGN_SIZE.y - GrigriCard.CARD_SIZE.y - MARGIN)
@@ -242,6 +169,7 @@ func _build() -> void:
 	_grigri_caption = UiKit.label("", UiKit.SIZE_SMALL, Palette.GOLD, "display")
 	_grigri_caption.position = grigri_bar.position - Vector2(0, BAR_CAPTION_Y)
 	_stage.add_child(_grigri_caption)
+	_grigri_caption.resized.connect(RunScreenLayout.seat_caption.bind(_grigri_caption, grigri_bar))
 	fortune_bar = HBoxContainer.new()
 	fortune_bar.add_theme_constant_override("separation", 10)
 	fortune_bar.position = Vector2(FORTUNE_X, UiLayout.DESIGN_SIZE.y - GrigriCard.CARD_SIZE.y - MARGIN)
@@ -249,6 +177,13 @@ func _build() -> void:
 	_fortune_caption = UiKit.label("", UiKit.SIZE_SMALL, Palette.CYAN, "display")
 	_fortune_caption.position = fortune_bar.position - Vector2(0, BAR_CAPTION_Y)
 	_stage.add_child(_fortune_caption)
+	_fortune_caption.resized.connect(RunScreenLayout.seat_caption.bind(_fortune_caption, fortune_bar))
+	# Écrans dédiés des épreuves du lancer : au-dessus de tout le plateau.
+	var trial_host: Control = Control.new()
+	trial_host.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	trial_host.size = UiLayout.DESIGN_SIZE
+	_stage.add_child(trial_host)
+	throw_game.full_host = trial_host
 	# Couches d'effets (malus visuels des grigris sous les textes flottants)
 	_curse = CurseFx.new()
 	add_child(_curse)
@@ -503,6 +438,14 @@ func _queue_intros() -> void:
 		var dlg_id: String = "act%d_intro" % r.act()
 		if ctl.db.has_entry("dialogues", dlg_id):
 			_queue(DialogueOverlay.new().configure(dlg_id, r, ctl.db))
+	# Interlude au deuxième palier de chaque acte (scénario entre deux créanciers).
+	var mid_key: String = "act_mid_seen_%d" % r.act()
+	var tiers: Array = Balance.arr("run.acts")[r.act() - 1] as Array
+	if r.deadline_idx == 0 and tiers.size() > 1 and int(tiers[1]) == r.tier and not r.flags.has(mid_key):
+		r.flags[mid_key] = true
+		var mid_id: String = "act%d_mid" % r.act()
+		if ctl.db.has_entry("dialogues", mid_id):
+			_queue(DialogueOverlay.new().configure(mid_id, r, ctl.db))
 	if r.is_creditor() and r.creditor_id != "":
 		_queue(CreditorIntro.new().configure(ctl.db.get_entry("creditors", r.creditor_id)))
 
@@ -762,6 +705,9 @@ func _on_score_finished(total: int) -> void:
 	var out: RunController.SpinOutcome = _pending_outcome
 	# Jackpot : la machine à sous d'abord (gains déjà appliqués par le cœur), puis la suite.
 	if out != null and out.jackpot and not out.slot.is_empty():
+		# Toute première machine à sous : Lucette se présente d'abord.
+		if _story_once("slot_intro", _on_score_finished.bind(total)):
+			return
 		var spins: Array[Dictionary] = out.slot
 		out.slot = []
 		_refresh_all()
@@ -840,11 +786,15 @@ func _on_overlay_closed(o: Control, on_closed: Callable) -> void:
 	o.queue_free()
 	overlay_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	state = UiState.BETTING
+	if on_closed.is_valid():
+		_deferred_closes.append(on_closed)
 	if not _overlay_queue.is_empty():
 		_show_next_queued()
 		return
-	if on_closed.is_valid():
-		on_closed.call()
+	if not _deferred_closes.is_empty():
+		# Les suites des surcouches fermées passent après la file d'attente, dans l'ordre.
+		var next: Callable = _deferred_closes.pop_front()
+		next.call()
 	elif ctl.run.phase == RunState.Phase.BETTING:
 		_set_state(UiState.BETTING)
 	if state == UiState.BETTING:
@@ -852,11 +802,22 @@ func _on_overlay_closed(o: Control, on_closed: Callable) -> void:
 
 
 func _open_shop() -> void:
-	Telemetry.shop_opened(ctl.run)
 	AudioBus.play_music("shop")
+	if _story_once("shop_intro", _open_shop):
+		return
+	Telemetry.shop_opened(ctl.run)
 	GameState.autosave()
 	_show_overlay(ShopOverlay.new().configure(ctl), _on_shop_closed)
 	tutorial.notify("shop")
+
+
+## Scène racontée une seule fois par profil avant une nouveauté (boutique, machine à sous,
+## pacte). Renvoie vrai si la scène est jouée : `then` reprend ensuite le déroulé normal.
+func _story_once(dlg_id: String, then: Callable) -> bool:
+	if DialogueOverlay.seen(dlg_id) or not ctl.db.has_entry("dialogues", dlg_id):
+		return false
+	_show_overlay(DialogueOverlay.new().configure(dlg_id, ctl.run, ctl.db), then)
+	return true
 
 
 func _on_shop_closed() -> void:
@@ -871,6 +832,8 @@ func _on_shop_closed() -> void:
 
 func _open_pact() -> void:
 	GameState.autosave()
+	if _story_once("pact_intro", _open_pact):
+		return
 	_show_overlay(PactOverlay.new().configure(ctl), _on_pact_closed)
 	tutorial.notify("pact")
 

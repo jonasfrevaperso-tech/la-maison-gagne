@@ -35,7 +35,10 @@ La sensibilité du stick gauche se règle dans Options → Commandes (et en cour
 Toutes les commandes sont remappables, au clavier comme à la manette (Options → Commandes). Les champs de texte s'ouvrent au clavier virtuel avec A.
 
 ### Le lancer
-Après la visée, un mini-jeu en trois temps décide de la qualité du lancer : **élan** (maintenir, puis relâcher quand la jauge, qui accélère, traverse la zone dorée — placée différemment à chaque lancer), **effet** (quatre invites défilent vers une ligne : frapper la bonne touche au bon moment) et **lâcher** (frapper quand l'anneau, qui accélère, touche la bille). La qualité ajuste le contrôle de la bille de −10 à +7 points autour de la Précision ; un lancer « moyen » vaut exactement l'ancien lancer. Options → Jeu → Lancer : *Adresse* (mini-jeu) ou *Simple* (appuyer/relâcher, contrôle neutre).
+Après la visée, chaque lancer enchaîne **deux épreuves tirées au hasard** parmi neuf, puis le **lâcher** (frapper quand l'anneau touche la bille) : Élan, Effet (jeu de rythme à 4 pistes sur un groove jazz, funk ou mambo), Les Bouteilles, Mémoire des cartes, Bonneteau, Fléchettes, Coffre-fort, Tour de jetons et Shaker. Chaque épreuve s'annonce avec sa règle et les commandes du périphérique utilisé. La qualité (moyenne des épreuves × 0,65 + lâcher × 0,35) ajuste le contrôle de la bille de −10 à +7 points autour de la Précision ; un lancer « moyen » vaut exactement l'ancien lancer. Options → Jeu → Lancer : *Complet* (2 épreuves), *Rapide* (1 épreuve) ou *Simple* (appuyer/relâcher, contrôle neutre).
+
+### Histoire
+Une cinématique en pixel art ouvre la toute première partie (maintenir une touche 3 s pour la passer ; à revoir depuis Titre → Prologue). Dialogues à chaque acte, interludes, scènes de première rencontre (Bazar, machine à sous, pacte) et répliques propres à chacun des six personnages jouables.
 
 ### Jackpot et machine à sous
 Un **plein gagnant** fait surgir la machine à sous du casino : 1 tirage, 2 après un lancer « Très bien », 3 après un « Parfait ». Paires et brelans rapportent de l'argent, du Mult ou du contrôle pour le tour suivant, des jetons de mise en plus… et le brelan de 7 un **tour offert**. Tout est tiré par le moteur avant l'animation.
@@ -79,6 +82,7 @@ python3 tools/gen_glyphs.py         # glyphes de manette Xbox 360 et souris (pix
 python3 tools/gen_input_map.py      # table des commandes → project.godot
 python3 tools/gen_portraits.py      # portraits animés
 python3 tools/gen_audio.py          # effets, ambiance, musiques (numpy + ffmpeg)
+python3 tools/gen_cutscene.py       # illustrations pixel art de la cinématique d'intro
 blender -b --factory-startup -P tools/blender/render_props.py -- assets/sprites   # roue, jetons, bille
 python3 tools/gen_content_docs.py   # tables docs/content/
 ```

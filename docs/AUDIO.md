@@ -7,6 +7,7 @@ Mesures objectives en l'absence d'écoute humaine. Seuils : saturation > −0,1 
 | Son | Variantes | Crête moy. (dBFS) | RMS moy. (dBFS) | Durée moy. (s) |
 |---|---|---|---|---|
 | ambience_casino | 1 | -6.0 | -22.0 | 23.50 |
+| ambience_rain | 1 | -6.9 | -18.0 | 15.50 |
 | ball_bounce | 5 | -3.6 | -18.7 | 0.13 |
 | ball_glass | 3 | -3.6 | -12.8 | 0.60 |
 | ball_land | 4 | -3.6 | -22.1 | 0.70 |
@@ -66,6 +67,7 @@ Mesures objectives en l'absence d'écoute humaine. Seuils : saturation > −0,1 
 | decor_switch | 3 | -3.6 | -20.2 | 0.30 |
 | decor_topple | 3 | -3.6 | -19.5 | 0.51 |
 | dice | 3 | -3.6 | -22.4 | 0.64 |
+| door_boom | 1 | -3.6 | -19.1 | 5.50 |
 | double | 3 | -3.6 | -17.2 | 0.14 |
 | echo | 3 | -3.6 | -14.4 | 0.75 |
 | error | 3 | -3.6 | -7.4 | 0.18 |
@@ -73,7 +75,11 @@ Mesures objectives en l'absence d'écoute humaine. Seuils : saturation > −0,1 
 | fire | 3 | -3.6 | -16.3 | 0.60 |
 | ghost | 3 | -3.6 | -17.2 | 2.10 |
 | glass | 3 | -3.6 | -18.0 | 0.50 |
+| groove_funk | 1 | -3.6 | -17.7 | 14.40 |
+| groove_jazz | 1 | -3.6 | -16.4 | 12.86 |
+| groove_mambo | 1 | -3.6 | -19.0 | 12.00 |
 | grow | 3 | -3.6 | -14.8 | 1.04 |
+| heartbeat | 2 | -3.6 | -13.9 | 1.00 |
 | hover | 3 | -3.6 | -12.6 | 0.02 |
 | jackpot | 3 | -3.6 | -18.3 | 2.60 |
 | jingle | 3 | -3.6 | -16.3 | 0.60 |
@@ -87,6 +93,10 @@ Mesures objectives en l'absence d'écoute humaine. Seuils : saturation > −0,1 
 | panel_close | 3 | -3.6 | -8.6 | 0.15 |
 | panel_open | 3 | -3.6 | -8.7 | 0.18 |
 | paper | 4 | -3.6 | -17.3 | 0.12 |
+| qte_clap | 3 | -3.6 | -23.8 | 0.43 |
+| qte_hat | 3 | -3.6 | -16.6 | 0.08 |
+| qte_kick | 3 | -3.6 | -11.4 | 0.30 |
+| qte_snare | 3 | -3.6 | -16.3 | 0.18 |
 | quack | 3 | -3.6 | -10.7 | 0.18 |
 | reroll | 3 | -3.6 | -22.9 | 0.61 |
 | sell | 3 | -3.6 | -16.6 | 0.58 |
@@ -102,11 +112,13 @@ Mesures objectives en l'absence d'écoute humaine. Seuils : saturation > −0,1 
 | slot_tease | 2 | -3.6 | -6.7 | 0.90 |
 | slot_win | 3 | -3.6 | -18.3 | 2.18 |
 | stamp | 3 | -3.6 | -13.7 | 0.20 |
+| steps | 3 | -3.6 | -16.4 | 1.76 |
 | sticky | 3 | -3.6 | -18.1 | 0.15 |
 | stinger_defeat | 1 | -3.6 | -14.4 | 4.40 |
 | stinger_victory | 1 | -3.6 | -18.7 | 4.00 |
 | stone | 3 | -3.6 | -12.3 | 0.25 |
 | thorn | 3 | -3.6 | -9.5 | 0.08 |
+| thunder | 2 | -3.6 | -20.8 | 4.60 |
 | tick | 3 | -3.6 | -15.9 | 0.05 |
 | transform | 3 | -3.6 | -15.8 | 1.06 |
 | vault | 3 | -3.6 | -16.2 | 0.80 |
@@ -134,6 +146,9 @@ Mesures objectives en l'absence d'écoute humaine. Seuils : saturation > −0,1 
 | boss_0 | 13.9 | -4.3 | -15.8 | 0.003 |
 | boss_1 | 13.9 | -10.4 | -23.1 | 0.002 |
 | boss_2 | 13.9 | -11.6 | -29.2 | 0.004 |
+| intro_0 | 29.1 | -7.1 | -18.7 | 0.000 |
+| intro_1 | 29.1 | -5.0 | -18.8 | 0.000 |
+| intro_2 | 29.1 | -8.0 | -32.0 | 0.010 |
 | menu_0 | 24.6 | -4.9 | -19.7 | 0.009 |
 | menu_1 | 24.6 | -7.4 | -22.8 | 0.004 |
 | menu_2 | 24.6 | -11.3 | -33.8 | 0.010 |

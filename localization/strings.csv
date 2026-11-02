@@ -105,7 +105,7 @@ FX_ZERO_PROTECTED,Zéro paré !,Zero blocked!
 FX_DEBT,Dette ajustée,Debt adjusted
 FX_BURN,Brûlée !,Burnt!
 HINT_AIMING,Fige la visée quand ta zone passe sous l'aiguille.,Lock your aim when your zone passes under the needle.
-HINT_THROWING,"Élan : maintiens puis relâche dans l'or. Effet : frappe chaque invite sur la ligne. Lâcher : frappe quand l'anneau touche la bille.","Swing: hold, then release in the gold. Spin: hit each prompt on the line. Release: strike when the ring touches the ball."
+HINT_THROWING,Épreuves : suis la consigne de chaque petit jeu (le carton te l'annonce). Lâcher : frappe quand l'anneau touche la bille.,Trials: follow each little game's rule (the title card tells you). Release: strike when the ring touches the ball.
 HINT_K_AIM,viser,aim
 HINT_K_STRIKE,frapper,strike
 BTN_AIM_LOCK,VISER !,AIM!
@@ -128,9 +128,9 @@ THROW_Q_GOOD,CORRECT,DECENT
 THROW_Q_MISS,LANCER RATÉ,BOTCHED THROW
 THROW_CONTROL_DELTA,contrôle %s %%,control %s %%
 OPT_THROW_MODE,Lancer,Throw
-OPT_TM_SKILL,Mini-jeu (élan et lâcher),Mini-game (swing and release)
+OPT_TM_SKILL,Complet (2 épreuves),Full (2 trials)
 OPT_TM_SIMPLE,Simplifié (un appui),Simplified (one press)
-OPT_THROW_MODE_DESC,"Le mini-jeu ajuste le contrôle de la bille selon ton adresse (de −10 % à +10 % environ). Le lancer simplifié joue toujours un lancer moyen.","The mini-game adjusts ball control by your skill (about −10% to +10%). The simplified throw always plays an average throw."
+OPT_THROW_MODE_DESC,"Après la visée, chaque lancer tire des épreuves d'adresse au hasard (bouteilles, fléchettes, bonneteau, coffre-fort…) puis le lâcher. Ton adresse ajuste le contrôle de la bille (de −10 % à +7 % environ). Le mode Rapide ne joue qu'une épreuve ; le lancer simplifié joue toujours un lancer moyen.","After aiming, each throw draws random skill trials (bottles, darts, shell game, safe cracking…) then the release. Your skill adjusts ball control (about −10% to +7%). Quick mode plays a single trial; the simplified throw always plays an average throw."
 HINT_RETHROW,Relance gratuite disponible : relancer ou garder ce résultat ?,Free re-throw available: re-throw or keep this result?
 HINT_TARGETING,Choisis une case sur la roue.,Pick a pocket on the wheel.
 HISTORY_TIP,Numéro %d · score %s · paris gagnés : %d,Number %d · score %s · bets won: %d
@@ -180,7 +180,6 @@ PACK_OCCULT_DESC,"2 grigris rares ou légendaires, garde-en un.","2 rare or lege
 PACK_POCKET,Paquet de cases,Pocket Pack
 PACK_POCKET_DESC,3 cases spéciales : ajoute-en une à la roue ou remplace la case de même numéro.,3 special pockets: add one to the wheel or replace the pocket with that number.
 PACK_REPLACE,Remplacer,Replace
-PACK_SKIP,Passer,Skip
 PACK_TAKE,Prendre,Take
 PACT_BUDGET,"Céder %d jetons de budget, pour toujours","Give up %d bet budget, forever"
 PACT_DECLINE,Refuser. Partir la tête haute (et vide).,Refuse. Leave head held high (and empty).
@@ -470,6 +469,7 @@ SLOT_PULL,TIRE LE LEVIER (%s),PULL THE LEVER (%s)
 OPT_CURSE_FX,Malus visuels des grigris,Grigri visual curses
 OPT_DECOR_3D,Décor 3D du casino (objets interactifs),3D casino decor (interactive props)
 TAG_CURSE_FX,Malus visuel,Visual curse
+PACK_MANDATORY,Le paquet est payé : choisis une carte à garder.,The pack is paid for: pick one card to keep.
 QS_TITLE,Réglages,Settings
 QS_TAB_CONTROLS,Commandes et effets,Controls and effects
 QS_DONE,Terminé,Done
@@ -477,12 +477,12 @@ PAUSE_SETTINGS,Réglages,Settings
 OPT_HANDHELD,Mode Steam Deck / portable,Steam Deck / handheld mode
 OPT_HANDHELD_DESC,"Texte agrandi, bloom coupé, 60 images/s, roue 3D allégée : autonomie et lisibilité sur petit écran. Activé d'office sur Steam Deck, désactivable.","Larger text, bloom off, 60 FPS, lighter 3D wheel: battery life and readability on small screens. On by default on Steam Deck, can be turned off."
 OPT_WHEEL_3D,Roue en 3D,3D wheel
-OPT_WHEEL_3D_DESC,"Désactivée : roue dessinée en 2D (plus léger).","Off: wheel drawn in 2D (lighter)."
+OPT_WHEEL_3D_DESC,Désactivée : roue dessinée en 2D (plus léger).,Off: wheel drawn in 2D (lighter).
 OPT_RENDER_RES,Résolution de rendu,Render resolution
-OPT_RES_NATIVE,"Native : %d × %d  (%s)","Native: %d × %d  (%s)"
+OPT_RES_NATIVE,Native : %d × %d  (%s),Native: %d × %d  (%s)
 OPT_RES_DESC,"Plein écran : le jeu occupe tout l'écran ; une résolution plus basse allège le rendu (image agrandie). Fenêtré : taille de la fenêtre. Formats 16:9, 16:10, 21:9 et 32:9 pris en charge.","Fullscreen: the game fills the screen; a lower resolution lightens rendering (image upscaled). Windowed: window size. 16:9, 16:10, 21:9 and 32:9 supported."
 OPT_STICK_SENS,Sensibilité du stick gauche,Left stick sensitivity
-OPT_STICK_SENS_DESC,"Vitesse de répétition quand on maintient le stick (menus et tapis). La croix avance toujours d'un pas par appui.","Repeat speed while holding the stick (menus and table). The d-pad always moves one step per press."
+OPT_STICK_SENS_DESC,Vitesse de répétition quand on maintient le stick (menus et tapis). La croix avance toujours d'un pas par appui.,Repeat speed while holding the stick (menus and table). The d-pad always moves one step per press.
 OPT_TEXT_SCALE_DESC,S'applique en quittant les options.,Applies when you leave the options.
 SHOP_PACKS,Paquets,Packs
 SHOP_CONTRACT,Contrat,Contract
@@ -507,3 +507,48 @@ RACE_EMPTY,Aucun run sur cette graine pour le moment. À toi de poser le premier
 RACE_COL_RANK,Rang,Rank
 RACE_COL_DEADLINES,Échéances,Deadlines
 RACE_COL_SCORE,Score cumulé,Total score
+TRIAL_TITLE,ÉPREUVE %d,TRIAL %d
+TRIAL_COMBO,COMBO ×%d,COMBO ×%d
+TRIAL_CHARGE_ROUND,Élan %d / %d,Swing %d / %d
+TRIAL_CHARGE_READY,MAINTIENS… RELÂCHE DANS L'OR,HOLD… RELEASE IN THE GOLD
+TRIAL_CHARGE_HINT,"Maintiens {confirm} pour charger, relâche dans l'or","Hold {confirm} to charge, release in the gold"
+TRIAL_RHYTHM_HINT,Frappe {@qte} quand la note passe la ligne,Hit {@qte} as the note crosses the line
+TRIAL_RHYTHM_HINT_MOUSE,Clique {@qte_mouse} quand la note passe la ligne,Click {@qte_mouse} as the note crosses the line
+TRIAL_RHYTHM_GROOVE_JAZZ,♪ « Swing du Sous-sol » ♪,♪ “Basement Swing” ♪
+TRIAL_RHYTHM_GROOVE_FUNK,♪ « Funk de la Dette » ♪,♪ “Debt Funk” ♪
+TRIAL_RHYTHM_GROOVE_MAMBO,♪ « Mambo du Croupier » ♪,♪ “Croupier Mambo” ♪
+THROW_TAP_MISSED,RATÉ,MISSED
+TRIAL_BOTTLES_HINT,"{confirm} fixe la visée, puis {confirm} dans l'or pour la force","{confirm} locks the aim, then {confirm} in the gold for strength"
+TRIAL_BOTTLES_POWER,FORCE,STRENGTH
+TRIAL_MEMORY_HINT,{move} choisir · {confirm} retourner,{move} choose · {confirm} flip
+TRIAL_MEMORY_HINT_MOUSE,{@click} retourner une carte,{@click} flip a card
+TRIAL_MEMORY_BANNER,LA TABLE DE BLACKJACK — FERMÉE DEPUIS 1987,THE BLACKJACK TABLE — CLOSED SINCE 1987
+TRIAL_MEMORY_LOOK,Regarde bien…,Look closely…
+TRIAL_MEMORY_STATUS,Paires %d / %d · erreurs %d,Pairs %d / %d · mistakes %d
+TRIAL_MEMORY_PAIR,PAIRE !,PAIR!
+TRIAL_MEMORY_WRONG,RATÉ,WRONG
+TRIAL_SHELLS_HINT,{move} choisir · {confirm} soulever,{move} choose · {confirm} lift
+TRIAL_SHELLS_HINT_MOUSE,{@click} soulever un gobelet,{@click} lift a cup
+TRIAL_SHELLS_WATCH,Regarde bien la bille…,Watch the ball…
+TRIAL_SHELLS_FOLLOW,Suis-la !,Follow it!
+TRIAL_SHELLS_PICK,Où est la bille ?,Where's the ball?
+TRIAL_SHELLS_FOUND,TROUVÉE !,FOUND IT!
+TRIAL_SHELLS_EMPTY,VIDE…,EMPTY…
+TRIAL_DARTS_HINT,{move} corriger la visée · {confirm} lancer,{move} steady the aim · {confirm} throw
+TRIAL_DARTS_HINT_MOUSE,Bouge {@mouse} pour corriger · {@click} lancer,Move {@mouse} to steady · {@click} throw
+TRIAL_DARTS_BULL,DANS LE MILLE !,BULLSEYE!
+TRIAL_DARTS_SLATE,SCORES,SCORES
+TRIAL_SAFE_HINT,{move} tourner la molette · {confirm} valider le chiffre,{move} turn the dial · {confirm} lock the number
+TRIAL_SAFE_HINT_MOUSE,{@wheel} ou {@right_click} glisser : tourner · {@click} valider,{@wheel} or {@right_click} drag: turn · {@click} lock
+TRIAL_SAFE_LISTEN,Écoute…,Listen…
+TRIAL_TOWER_HINT,{confirm} lâcher le jeton sur la pile,{confirm} drop the chip on the stack
+TRIAL_TOWER_PERFECT,PILE !,SPOT ON!
+TRIAL_TOWER_WIDTH,Largeur %d %%,Width %d %%
+TRIAL_SHAKER_HINT,Alterne {qte_left} et {qte_right} pour secouer,Alternate {qte_left} and {qte_right} to shake
+TRIAL_SHAKER_HINT_MOUSE,Alterne {@click} et {@right_click} pour secouer,Alternate {@click} and {@right_click} to shake
+TRIAL_SHAKER_SPILL,ÇA DÉBORDE !,SPILLAGE!
+TRIAL_SHAKER_IN_BAND,Dans la bande : %d %%,In the band: %d %%
+TRIAL_SHAKER_TIP,"Trop mou, ça retombe. Trop fort, ça déborde.",Too soft and it sinks. Too hard and it spills.
+OPT_TM_QUICK,Rapide (1 épreuve),Quick (1 trial)
+CUTSCENE_HOLD_SKIP,Maintiens une touche pour passer,Hold any button to skip
+MENU_PROLOGUE,Prologue,Prologue

@@ -45,7 +45,9 @@ const PAD_AXIS_GLYPH: Dictionary[int, String] = {
 }
 ## Repères qui ne sont pas des actions : souris côté clavier, croix/sticks côté manette.
 ## Touches nommées dans les repères (« #KEY_SHIFT »).
-const NAMED_KEYS: Dictionary[String, Key] = {"KEY_SHIFT": KEY_SHIFT, "KEY_UP": KEY_UP}
+const NAMED_KEYS: Dictionary[String, Key] = {
+	"KEY_SHIFT": KEY_SHIFT, "KEY_UP": KEY_UP, "KEY_LEFT": KEY_LEFT, "KEY_RIGHT": KEY_RIGHT, "KEY_DOWN": KEY_DOWN
+}
 const MARKERS_KEYS: Dictionary[String, Array] = {
 	"@click": ["mouse_left"],
 	"@shift_click": ["#KEY_SHIFT", "mouse_left"],
@@ -54,11 +56,16 @@ const MARKERS_KEYS: Dictionary[String, Array] = {
 	"@drag": ["mouse_left"],
 	"@wheel": ["mouse_wheel"],
 	"@arrows": ["#KEY_UP"],
+	"@mouse": ["mouse"],
+	"@qte": ["#KEY_LEFT", "#KEY_UP", "#KEY_RIGHT", "#KEY_DOWN"],
+	"@qte_mouse": ["mouse_left", "mouse_right"],
 }
 const MARKERS_PAD: Dictionary[String, Array] = {
 	"@dpad": ["pad_dpad"],
 	"@dpad_lr": ["pad_dpad_lr"],
 	"@rstick": ["pad_rs"],
+	"@lstick": ["pad_ls"],
+	"@qte": ["pad_x", "pad_y", "pad_b", "pad_a"],
 }
 
 static var using_pad: bool = false

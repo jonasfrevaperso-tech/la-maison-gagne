@@ -17,7 +17,7 @@ const REQUIRED_BY_CAT: Dictionary = {
 	"slot_prizes": ["match", "symbol", "do"],
 }
 const RARITIES: Array[String] = ["common", "rare", "legendary", "cursed"]
-const SKIP_DESC: Array[String] = ["dialogues", "achievements", "challenges", "events", "speakers", "tutorial"]
+const SKIP_DESC: Array[String] = ["dialogues", "achievements", "challenges", "events", "speakers", "tutorial", "cutscenes"]
 
 var errors: Array[String] = []
 var warnings: Array[String] = []
@@ -112,6 +112,27 @@ func _validate_entry(db: ContentDB, cat: String, e: Dictionary) -> void:
 		if not db.has_entry("slot_symbols", String(e.get("symbol", ""))):
 			errors.append("%s : symbole inconnu" % eid)
 		_validate_effects(db, eid, [{"trigger": "on_jackpot", "do": e.get("do", [])}])
+	if cat == "cutscenes":
+		for lay: Variant in e.get("layers", []):
+			var img: String = "res://assets/cutscene/%s.png" % String((lay as Dictionary).get("img", ""))
+			if not ResourceLoader.exists(img):
+				errors.append("%s : calque absent %s" % [eid, img])
+		for cap: Variant in e.get("captions", []):
+			var c: Dictionary = cap as Dictionary
+			if not c.has("text_fr") or not c.has("text_en"):
+				errors.append("%s : légende sans text_fr/text_en" % eid)
+			var who: String = String(c.get("who", ""))
+			if who != "hero" and not db.has_entry("speakers", who):
+				errors.append("%s : locuteur inconnu '%s'" % [eid, who])
+	if cat == "throw_trials":
+		if not String(e.get("stage", "")) in ["panel", "full"]:
+			errors.append("%s : stage doit valoir panel ou full" % eid)
+		if not ResourceLoader.exists("res://scripts/presentation/trials/trial_%s.gd" % String(e.get("id", ""))):
+			errors.append("%s : script d'épreuve absent" % eid)
+		if not Balance.data().get("throw_trials", {}).has(String(e.get("id", ""))):
+			errors.append("%s : réglages absents de balance.json (throw_trials)" % eid)
+		if float(e.get("weight", 0)) <= 0.0:
+			errors.append("%s : poids nul" % eid)
 	if cat == "contracts" and String(e.get("requires", "")) != "" and not db.has_entry("contracts", String(e["requires"])):
 		errors.append("%s : prérequis inconnu" % eid)
 

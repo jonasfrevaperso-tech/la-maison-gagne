@@ -4,6 +4,8 @@ extends RefCounted
 ## couleur de la famille de pari, pastilles (cote, gain par jeton, limite de table, jetons posés),
 ## numéros couverts, barre de chance brute et rappel du Zéro pour les paris extérieurs.
 
+## Fond légèrement translucide : le décor et la roue restent devinables derrière la fiche.
+const BG_ALPHA: float = 0.84
 const WIDTH: float = 400.0
 ## Au-delà, les numéros couverts sont résumés par leur nombre.
 const MAX_NUMBER_BADGES: int = 6
@@ -37,7 +39,7 @@ static func build(spot_id: String, hide_odds: bool, wheel: WheelModel, chip_valu
 		return null
 	var col: Color = kind_color(spot.kind)
 	var panel: PanelContainer = PanelContainer.new()
-	panel.add_theme_stylebox_override("panel", UiKit.flat(Palette.INK, col.darkened(0.15), 2, 6, 12))
+	panel.add_theme_stylebox_override("panel", UiKit.flat(Color(Palette.INK, BG_ALPHA), col.darkened(0.15), 2, 6, 12))
 	panel.custom_minimum_size = Vector2(WIDTH, 0)
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var box: VBoxContainer = VBoxContainer.new()

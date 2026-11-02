@@ -61,10 +61,10 @@
   "trigger": "throwing",
   "anchor": "wheel",
   "order": 7,
-  "text_fr": "Le lancer se joue en trois temps. Élan : MAINTIENS {ui_spin} et relâche quand la jauge est dans l'or. Effet : frappe les touches ({@arrows}) quand elles passent la ligne. Lâcher : frappe {ui_spin} quand l'anneau touche la bille. Un beau lancer garde la bille dans ta zone (et offre plus de tirages au jackpot).",
-  "text_en": "A throw takes three beats. Swing: HOLD {ui_spin} and release when the gauge is in the gold. Spin: hit the keys ({@arrows}) as they cross the line. Release: strike {ui_spin} when the ring touches the ball. A good throw keeps the ball in your zone (and earns more jackpot pulls).",
-  "text_pad_fr": "Le lancer se joue en trois temps. Élan : MAINTIENS {ui_spin} et relâche dans l'or. Effet : frappe {qte_left} {qte_up} {qte_right} {qte_down} quand les symboles passent la ligne. Lâcher : {ui_spin} quand l'anneau touche la bille. Un beau lancer garde la bille dans ta zone.",
-  "text_pad_en": "A throw takes three beats. Swing: HOLD {ui_spin} and release in the gold. Spin: hit {qte_left} {qte_up} {qte_right} {qte_down} as the symbols cross the line. Release: {ui_spin} when the ring touches the ball. A good throw keeps the ball in your zone."
+  "text_fr": "Le lancer se joue en trois temps : deux ÉPREUVES d'adresse tirées au hasard parmi neuf (un carton t'annonce la règle, {ui_spin} pour le passer), puis le LÂCHER : frappe {ui_spin} quand l'anneau touche la bille. Un beau lancer garde la bille dans ta zone (et offre plus de tirages au jackpot). Trop long ? Options → Jeu → Lancer : Rapide.",
+  "text_en": "A throw takes three beats: two random skill TRIALS out of nine (a title card explains the rule, {ui_spin} skips it), then the RELEASE: strike {ui_spin} when the ring touches the ball. A good throw keeps the ball in your zone (and earns more jackpot pulls). Too long? Options → Game → Throw: Quick.",
+  "text_pad_fr": "Le lancer se joue en trois temps : deux ÉPREUVES d'adresse tirées au hasard (le carton annonce la règle, {ui_spin} pour le passer), puis le LÂCHER : {ui_spin} quand l'anneau touche la bille. Un beau lancer garde la bille dans ta zone.",
+  "text_pad_en": "A throw takes three beats: two random skill TRIALS (the title card explains the rule, {ui_spin} skips it), then the RELEASE: {ui_spin} when the ring touches the ball. A good throw keeps the ball in your zone."
  },
  {
   "id": "tip_wild",

@@ -118,6 +118,7 @@ func _extra_entries() -> Array[Array]:
 		["MENU_STATS", GameState.goto.bind(GameState.SCREEN_STATS), &"stats"],
 		["MENU_OPTIONS", GameState.goto.bind(GameState.SCREEN_OPTIONS), &"options"],
 		["MENU_CREDITS", GameState.goto.bind(GameState.SCREEN_CREDITS), &"credits"],
+		["MENU_PROLOGUE", GameState.goto.bind(GameState.SCREEN_INTRO, {"next": "title"}), &"intro"],
 	]
 	for c: Array in candidates:
 		if ResourceLoader.exists(Main.SCREENS.get(c[2], "")):

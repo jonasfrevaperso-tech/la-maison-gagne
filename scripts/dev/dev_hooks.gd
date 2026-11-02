@@ -30,6 +30,11 @@ func start() -> bool:
 		add_child(pr)
 		GameState.goto(&"title")
 		return true
+	if args.has("dev-trial-bench"):
+		var tb: DevTrialBench = DevTrialBench.new()
+		tb.runs = maxi(int(String(args["dev-trial-bench"])), 1) if String(args["dev-trial-bench"]) != "true" else 3
+		add_child(tb)
+		return true
 	if args.has("dev-ui-check"):
 		add_child(DevUiCheck.new())
 		return true
@@ -77,6 +82,12 @@ func start() -> bool:
 		GameState.end_run(false)
 	else:
 		GameState.goto(&"run")
+	if String(args.get("dev-phase", "")) == "jackpot":
+		r.flags["act_intro_seen_1"] = true
+		r.flags["dev_rig"] = true
+		r.flags["control_temp"] = 5.0
+		r.flags["zone_width_override"] = 1
+		r.debt = 1
 	if String(args.get("dev-phase", "")) == "decor":
 		r.flags["act_intro_seen_1"] = true
 		_decor_demo.call_deferred()

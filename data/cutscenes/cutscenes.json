@@ -1,0 +1,398 @@
+[
+ {
+  "id": "intro_street",
+  "cutscene": "intro",
+  "order": 1,
+  "layers": [
+   {
+    "img": "street_bg",
+    "depth": 0.15
+   },
+   {
+    "img": "street_mid",
+    "depth": 0.5
+   },
+   {
+    "img": "street_glow",
+    "depth": 0.5,
+    "anim": "flicker"
+   },
+   {
+    "img": "street_fg",
+    "depth": 1.0
+   }
+  ],
+  "camera": {
+   "from": [
+    0.05,
+    0.02,
+    1.12
+   ],
+   "to": [
+    -0.04,
+    0.0,
+    1.02
+   ]
+  },
+  "fx": [
+   "rain"
+  ],
+  "ambience": "ambience_rain",
+  "music": "intro",
+  "sfx": [
+   {
+    "at": 1,
+    "id": "thunder",
+    "flash": true
+   }
+  ],
+  "captions": [
+   {
+    "who": "narrator",
+    "text_fr": "Paris, trois heures du matin. Il pleut comme si le ciel, lui aussi, avait des dettes.",
+    "text_en": "Paris, three in the morning. It's raining as if the sky had debts of its own."
+   },
+   {
+    "who": "narrator",
+    "text_fr": "Le Grand Zéro a fermé ses portes en 1987. Officiellement. Officieusement, son néon grésille encore chaque nuit, pour personne.",
+    "text_en": "The Grand Zero closed its doors in 1987. Officially. Unofficially, its neon still buzzes every night, for nobody."
+   },
+   {
+    "who": "hero",
+    "text_fr": "Grand-père appelait ça « une banque où l'on a le droit de rire ». Il ne riait jamais en le disant.",
+    "text_en": "Grandpa called it « a bank where you're allowed to laugh ». He never laughed when he said it.",
+    "by_hero": {
+     "barnabe": {
+      "text_fr": "Grand-père appelait ça « une volière où l'on a le droit de rire ». Il y a perdu toutes ses plumes.",
+      "text_en": "Grandpa called it « an aviary where you're allowed to laugh ». He lost every feather there."
+     },
+     "ghost": {
+      "text_fr": "J'y suis entré en 1987. Je n'en suis jamais vraiment ressorti. Ce soir, j'y retourne… par la porte, pour changer.",
+      "text_en": "I walked in there in 1987. I never really came out. Tonight I'm going back… through the door, for a change."
+     }
+    }
+   }
+  ]
+ },
+ {
+  "id": "intro_envelope",
+  "cutscene": "intro",
+  "order": 2,
+  "layers": [
+   {
+    "img": "envelope_bg",
+    "depth": 0.2
+   },
+   {
+    "img": "envelope_mid",
+    "depth": 0.6
+   },
+   {
+    "img": "envelope_glow",
+    "depth": 0.6,
+    "anim": "pulse"
+   },
+   {
+    "img": "envelope_fg",
+    "depth": 1.2,
+    "anim": "rise"
+   }
+  ],
+  "camera": {
+   "from": [
+    0.0,
+    -0.03,
+    1.0
+   ],
+   "to": [
+    0.02,
+    0.03,
+    1.12
+   ]
+  },
+  "fx": [
+   "dust"
+  ],
+  "sfx": [
+   {
+    "at": 0,
+    "id": "paper"
+   },
+   {
+    "at": 1,
+    "id": "heartbeat"
+   }
+  ],
+  "captions": [
+   {
+    "who": "narrator",
+    "text_fr": "Trois jours après l'enterrement, une enveloppe glisse sous ta porte. Pas de timbre. Pas d'adresse. Juste un sceau doré en forme de roulette.",
+    "text_en": "Three days after the funeral, an envelope slides under your door. No stamp. No address. Just a golden seal shaped like a roulette wheel."
+   },
+   {
+    "who": "hero",
+    "text_fr": "Qui envoie du courrier à trois heures du matin ? À part les impôts.",
+    "text_en": "Who sends mail at three in the morning? Apart from the tax office."
+   }
+  ]
+ },
+ {
+  "id": "intro_letter",
+  "cutscene": "intro",
+  "order": 3,
+  "layers": [
+   {
+    "img": "letter_bg",
+    "depth": 0.4
+   }
+  ],
+  "camera": {
+   "from": [
+    0.0,
+    0.04,
+    1.15
+   ],
+   "to": [
+    0.0,
+    -0.04,
+    1.05
+   ]
+  },
+  "fx": [
+   "sepia",
+   "letter"
+  ],
+  "sfx": [
+   {
+    "at": 0,
+    "id": "paper"
+   }
+  ],
+  "captions": [
+   {
+    "who": "grandpa",
+    "letter": true,
+    "text_fr": "« Mon petit. Si tu lis ceci, c'est que j'ai enfin arrêté de perdre. »",
+    "text_en": "« My dear. If you're reading this, I've finally stopped losing. »"
+   },
+   {
+    "who": "grandpa",
+    "letter": true,
+    "text_fr": "« J'ai joué tout ce que j'avais. Puis ce que je n'avais pas. Puis… toi. Pardonne-moi. »",
+    "text_en": "« I gambled everything I had. Then what I didn't have. Then… you. Forgive me. »"
+   },
+   {
+    "who": "grandpa",
+    "letter": true,
+    "text_fr": "« La Maison viendra réclamer. Ne la laisse pas gagner. P.-S. : le vieux croupier triche. Pour toi. »",
+    "text_en": "« The House will come to collect. Don't let it win. P.S.: the old dealer cheats. For you. »"
+   }
+  ]
+ },
+ {
+  "id": "intro_ledger",
+  "cutscene": "intro",
+  "order": 4,
+  "layers": [
+   {
+    "img": "ledger_bg",
+    "depth": 0.3
+   },
+   {
+    "img": "ledger_glow",
+    "depth": 0.3,
+    "anim": "pulse"
+   },
+   {
+    "img": "ledger_stamp",
+    "depth": 0.3,
+    "anim": "slam",
+    "at": 1
+   }
+  ],
+  "camera": {
+   "from": [
+    -0.05,
+    0.0,
+    1.2
+   ],
+   "to": [
+    0.03,
+    0.0,
+    1.06
+   ]
+  },
+  "fx": [
+   "vignette"
+  ],
+  "sfx": [
+   {
+    "at": 1,
+    "id": "stamp",
+    "shake": true
+   }
+  ],
+  "captions": [
+   {
+    "who": "house",
+    "text_fr": "REGISTRE DES DETTES. FAMILLE : LA TIENNE. GÉNÉRATIONS : QUATRE. MONTANT DÛ…",
+    "text_en": "LEDGER OF DEBTS. FAMILY: YOURS. GENERATIONS: FOUR. AMOUNT OWED…"
+   },
+   {
+    "who": "house",
+    "text_fr": "TOUT.",
+    "text_en": "EVERYTHING."
+   },
+   {
+    "who": "hero",
+    "text_fr": "Rien que ça. Ils acceptent les tickets-restaurant ?",
+    "text_en": "Is that all. Do they take luncheon vouchers?",
+    "by_hero": {
+     "odile": {
+      "text_fr": "« Tout. » Ce n'est pas un montant, c'est une catégorie. Aucune rigueur comptable.",
+      "text_en": "« Everything. » That's not an amount, it's a category. No accounting rigour whatsoever."
+     },
+     "marthe": {
+      "text_fr": "Tout ? Même mon chapelet ? Ils peuvent toujours prier.",
+      "text_en": "Everything? Even my rosary? They can pray for it."
+     },
+     "vic": {
+      "text_fr": "Tout ? Pff. J'ai déjà dû tout, deux fois. Ça se rejoue, tout.",
+      "text_en": "Everything? Pfft. I've owed everything twice already. Everything can be won back."
+     }
+    }
+   }
+  ]
+ },
+ {
+  "id": "intro_stairs",
+  "cutscene": "intro",
+  "order": 5,
+  "layers": [
+   {
+    "img": "stairs_bg",
+    "depth": 0.1,
+    "anim": "pulse"
+   },
+   {
+    "img": "stairs_mid",
+    "depth": 0.5
+   },
+   {
+    "img": "stairs_fg",
+    "depth": 1.1
+   }
+  ],
+  "camera": {
+   "from": [
+    0.0,
+    -0.06,
+    1.0
+   ],
+   "to": [
+    0.0,
+    0.05,
+    1.3
+   ]
+  },
+  "fx": [
+   "dust"
+  ],
+  "ambience": "",
+  "sfx": [
+   {
+    "at": 0,
+    "id": "steps"
+   },
+   {
+    "at": 1,
+    "id": "steps",
+    "pitch": 0.85
+   }
+  ],
+  "captions": [
+   {
+    "who": "narrator",
+    "text_fr": "Sous la salle abandonnée, derrière le bar, un escalier descend plus bas que la cave, plus bas que le métro, plus bas que le raisonnable.",
+    "text_en": "Beneath the abandoned hall, behind the bar, a staircase goes lower than the cellar, lower than the metro, lower than reason."
+   },
+   {
+    "who": "hero",
+    "text_fr": "Cent douze marches. Cent treize. Je jure que celle-là n'était pas là il y a une seconde.",
+    "text_en": "A hundred and twelve steps. A hundred and thirteen. I swear that one wasn't there a second ago."
+   }
+  ]
+ },
+ {
+  "id": "intro_door",
+  "cutscene": "intro",
+  "order": 6,
+  "layers": [
+   {
+    "img": "door_bg",
+    "depth": 0.3,
+    "anim": "pulse"
+   },
+   {
+    "img": "door_left",
+    "depth": 0.6,
+    "anim": "slide_left",
+    "at": 1
+   },
+   {
+    "img": "door_right",
+    "depth": 0.6,
+    "anim": "slide_right",
+    "at": 1
+   },
+   {
+    "img": "door_fg",
+    "depth": 1.0
+   }
+  ],
+  "camera": {
+   "from": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "to": [
+    0.0,
+    0.0,
+    1.25
+   ]
+  },
+  "fx": [
+   "dust",
+   "title"
+  ],
+  "sfx": [
+   {
+    "at": 1,
+    "id": "door_boom",
+    "shake": true
+   },
+   {
+    "at": 2,
+    "id": "wheel_spin"
+   }
+  ],
+  "captions": [
+   {
+    "who": "narrator",
+    "text_fr": "Au bout, une porte dorée. Elle s'ouvre avant que tu frappes. Évidemment.",
+    "text_en": "At the bottom, a golden door. It opens before you knock. Of course it does."
+   },
+   {
+    "who": "house",
+    "text_fr": "BIENVENUE. NOUS VOUS ATTENDONS DEPUIS QUATRE GÉNÉRATIONS.",
+    "text_en": "WELCOME. WE HAVE BEEN EXPECTING YOU FOR FOUR GENERATIONS."
+   },
+   {
+    "who": "house",
+    "text_fr": "ASSEYEZ-VOUS. LA ROUE EST CHAUDE. ET LA MAISON… GAGNE TOUJOURS.",
+    "text_en": "TAKE A SEAT. THE WHEEL IS WARM. AND THE HOUSE… ALWAYS WINS."
+   }
+  ]
+ }
+]

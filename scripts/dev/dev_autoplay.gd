@@ -72,25 +72,18 @@ func _throw_minigame(rs: RunScreen) -> void:
 	var g: ThrowMinigame = rs.throw_game
 	var shots: Dictionary = {}
 	var t0: int = Time.get_ticks_msec()
-	while Time.get_ticks_msec() - t0 < 30000:
+	while Time.get_ticks_msec() - t0 < 90000:
 		if rs.tutorial.blocking():
 			rs.tutorial.call("_close_current")
 		if not g.active():
 			return
 		var want: Dictionary = g.bot_wants()
 		var act: String = String(want.get("do", ""))
-		if act != "" and not shots.has(act):
-			shots[act] = true
-			await _shot("throw_" + act)
-		match act:
-			"press":
-				g.press_charge()
-			"release":
-				g.release_charge()
-			"tap":
-				g.tap(int(want["symbol"]))
-			"strike":
-				g.strike()
+		var tag: String = "%s_%s" % [g.trial.entry.get("id", "") if g.trial != null else "release", act]
+		if act != "" and not shots.has(tag):
+			shots[tag] = true
+			await _shot("throw_" + tag)
+		g.bot_apply(want)
 		await get_tree().process_frame
 
 
@@ -143,6 +136,12 @@ func _drive() -> void:
 				rs._on_spin_pressed()
 				await _wait(RELEASE_DELAY)
 				await _shot("aim")
+				if rs.ctl.run.flags.has("dev_rig"):
+					# Test du jackpot : viser le 17 (plein misé), contrôle forcé par --dev-phase=jackpot.
+					var t17: float = 0.0
+					while rs.ctl.run.wheel.at(rs.wheel_view.aim_index).number != 17 and t17 < 8.0:
+						await get_tree().process_frame
+						t17 += get_process_delta_time()
 				rs._on_spin_pressed()
 				# Mini-jeu : élan arrêté au centre de la jauge, lâcher au contact de l'anneau.
 				await _throw_minigame(rs)

@@ -34,7 +34,13 @@
 - ✅ Sept grigris à malus visuel (gin, fumée, monocle fêlé…), réglables.
 - ✅ Fiches de paris illustrées, rythme ralenti, écran de démarrage noir, tutoriel complété.
 
-## 1.5 — Pistes
+## 1.5 — Grande Ouverture ✅
+- ✅ Lancer : 9 épreuves (2 tirées par lancer, dont 5 nouvelles en plein écran ou sur le tapis) + lâcher final ; épreuve de rythme enrichie (grooves, accords, bruitages).
+- ✅ Cinématique d'intro en pixel art, passable en maintenant une touche 3 s.
+- ✅ Histoire densifiée : scènes d'interlude, premières rencontres, répliques propres à chaque personnage.
+- ✅ Corrections d'interface (fiche de pari manette, Bazar en 800p, paquets, roue 3D non coupée, jackpot avant le Bazar) et contrôle automatique sur 6 définitions.
+
+## 1.6 — Pistes
 - Glyphes Steam Deck et PlayStation au choix (le Deck accepte déjà les glyphes Xbox).
 - Classement partagé de la Course de graine (export/import d'un fichier de résultats, sans serveur).
 - Animations de cartes à l'achat et à la vente plus marquées ; écran de victoire de campagne dédié.

@@ -209,11 +209,11 @@ func _show_summary() -> void:
 	_summary.custom_minimum_size = Vector2(WINDOW.size.x + 50, 0)
 	_machine.add_child(_summary)
 	var head_txt: String = tr("SLOT_SUMMARY") if not _won.is_empty() else tr("SLOT_SUMMARY_NONE")
-	var head: Label = UiKit.label(head_txt, UiKit.SIZE_BODY, Palette.GOLD_LIGHT, "display")
+	var head: Label = UiKit.label(head_txt, UiKit.SIZE_BODY + 4, Palette.GOLD_LIGHT, "display")
 	head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_summary.add_child(head)
 	for p: Dictionary in _won:
-		var l: Label = UiKit.label("✦ " + Localization.t(p, "name"), UiKit.SIZE_SMALL, Palette.IVORY)
+		var l: Label = UiKit.label("✦ " + Localization.t(p, "name"), UiKit.SIZE_BODY, Palette.IVORY)
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		_summary.add_child(l)

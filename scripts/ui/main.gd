@@ -15,6 +15,7 @@ const SCREENS: Dictionary[StringName, String] = {
 	&"achievements": "res://scenes/meta/achievements_screen.tscn",
 	&"stats": "res://scenes/meta/stats_screen.tscn",
 	&"seed_race": "res://scenes/meta/seed_race_screen.tscn",
+	&"intro": "res://scenes/ui/intro_cutscene.tscn",
 }
 
 ## Surcouches modales qui reçoivent la navigation manette à la place de l'écran.

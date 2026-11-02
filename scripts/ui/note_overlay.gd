@@ -53,10 +53,29 @@ func build() -> void:
 	var h: HBoxContainer = row()
 	var save: Button = UiKit.button(tr("NOTE_SAVE"), _save)
 	h.add_child(save)
-	h.add_child(UiKit.button(tr("MENU_BACK"), close))
+	var back: Button = UiKit.button(tr("MENU_BACK"), close)
+	h.add_child(back)
+	_wire_focus.call_deferred(save, back)
 	# Manette : on commence par l'humeur (le texte s'ouvre au clavier virtuel avec A).
 	(_mood_buttons[MOODS.find(_mood)] if InputGlyphs.using_pad else _text).call_deferred("grab_focus")
 	closed.connect(queue_free)
+
+
+## Voisins de focus explicites : la recherche géométrique ne relie pas la zone de texte aux humeurs.
+func _wire_focus(save: Button, back: Button) -> void:
+	for i: int in _mood_buttons.size():
+		var b: Button = _mood_buttons[i]
+		b.focus_neighbor_left = b.get_path_to(_mood_buttons[posmod(i - 1, _mood_buttons.size())])
+		b.focus_neighbor_right = b.get_path_to(_mood_buttons[posmod(i + 1, _mood_buttons.size())])
+		b.focus_neighbor_bottom = b.get_path_to(_text)
+	_text.focus_neighbor_top = _text.get_path_to(_mood_buttons[0])
+	_text.focus_neighbor_bottom = _text.get_path_to(_attach if not _attach.disabled else save)
+	_attach.focus_neighbor_top = _attach.get_path_to(_text)
+	_attach.focus_neighbor_bottom = _attach.get_path_to(save)
+	for b2: Button in [save, back]:
+		b2.focus_neighbor_top = b2.get_path_to(_attach if not _attach.disabled else _text)
+	save.focus_neighbor_right = save.get_path_to(back)
+	back.focus_neighbor_left = back.get_path_to(save)
 
 
 func _set_mood(mood: String) -> void:

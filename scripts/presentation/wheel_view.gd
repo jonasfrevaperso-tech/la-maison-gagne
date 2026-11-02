@@ -83,7 +83,11 @@ func _apply_renderer() -> void:
 	var want: bool = Settings.b("video", "wheel_3d")
 	if want and _w3d == null:
 		_w3d = Wheel3D.new()
-		_w3d.set_anchors_preset(Control.PRESET_FULL_RECT)
+		_w3d.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		_w3d.offset_left = -Wheel3D.BLEED
+		_w3d.offset_top = -Wheel3D.BLEED
+		_w3d.offset_right = Wheel3D.BLEED
+		_w3d.offset_bottom = Wheel3D.BLEED
 		add_child(_w3d)
 		move_child(_w3d, 0)
 		if wheel != null:

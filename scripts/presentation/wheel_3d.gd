@@ -39,6 +39,9 @@ const CAM_DIVE_FOV: float = 0.86
 const CAM_LAND_PUNCH: float = 0.06
 const CAM_SWAY: float = 0.8
 
+## Débordement du rendu 3D autour du cadre de la roue (px de maquette).
+const BLEED: float = 110.0
+
 var wheel: WheelModel = null
 var db: ContentDB = null
 var camera: Camera3D = null
@@ -631,7 +634,9 @@ func _sync_camera(v: WheelView, delta: float) -> void:
 	var el: float = deg_to_rad(CAM_ELEVATION)
 	var dist: float = _cam_dist * (1.0 - CAM_LAND_PUNCH * _land_t)
 	var dir: Vector3 = Vector3(sin(sway), sin(el), cos(el) * cos(sway)).normalized()
-	camera.fov = _cam_fov
+	# Le conteneur déborde du cadre (BLEED) : champ élargi d'autant, la roue garde sa taille.
+	var widen: float = size.y / maxf(inner_size().y, 1.0)
+	camera.fov = rad_to_deg(2.0 * atan(tan(deg_to_rad(_cam_fov) * 0.5) * widen))
 	camera.position = _cam_target + dir * dist
 	camera.look_at(_cam_target, Vector3.UP)
 
@@ -645,7 +650,8 @@ func land_flash() -> void:
 ## Cadre la roue entière dans le rectangle (aucun débordement quelle que soit la taille).
 func _frame_camera() -> void:
 	_framed_size = size
-	var aspect: float = size.x / maxf(size.y, 1.0)
+	var inner: Vector2 = inner_size()
+	var aspect: float = inner.x / maxf(inner.y, 1.0)
 	var vfov: float = deg_to_rad(CAM_FOV)
 	var hfov: float = 2.0 * atan(tan(vfov * 0.5) * aspect)
 	var el: float = deg_to_rad(CAM_ELEVATION)
@@ -658,18 +664,24 @@ func _frame_camera() -> void:
 # --------------------------------------------------------------------------- écran ↔ roue
 
 
-## Position écran (locale au conteneur) d'un point 3D.
+## Taille du cadre de la roue (le conteneur déborde de BLEED de chaque côté pour que le coffre
+## ne soit jamais coupé net ; l'interface passe par-dessus).
+func inner_size() -> Vector2:
+	return (size - Vector2(BLEED, BLEED) * 2.0).max(Vector2.ONE)
+
+
+## Position écran (locale au cadre de la roue) d'un point 3D.
 func project(p: Vector3) -> Vector2:
 	if camera == null or not is_inside_tree():
-		return size * 0.5
-	return camera.unproject_position(p) * (size / Vector2(_vp.size).max(Vector2.ONE))
+		return inner_size() * 0.5
+	return camera.unproject_position(p) * (size / Vector2(_vp.size).max(Vector2.ONE)) - Vector2(BLEED, BLEED)
 
 
 ## Rayon et angle écran du point du plan des cases sous `local` ; null hors de la roue.
 func pick(local: Vector2) -> Vector2:
 	if camera == null or not is_inside_tree():
 		return Vector2(-1, 0)
-	var vp_pt: Vector2 = local * (Vector2(_vp.size) / size.max(Vector2.ONE))
+	var vp_pt: Vector2 = (local + Vector2(BLEED, BLEED)) * (Vector2(_vp.size) / size.max(Vector2.ONE))
 	var origin: Vector3 = camera.project_ray_origin(vp_pt)
 	var dir: Vector3 = camera.project_ray_normal(vp_pt)
 	if absf(dir.y) < 0.0001:

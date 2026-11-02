@@ -32,6 +32,7 @@ var show_counter: bool = false
 var draggable: bool = true
 
 var _hover: bool = false
+var _mouse_in: bool = false
 var _tilt: Vector2 = Vector2.ZERO
 var _lift: float = 0.0
 var _focus_tip: Control = null
@@ -52,11 +53,13 @@ func _ready() -> void:
 
 func _on_enter() -> void:
 	_hover = true
+	_mouse_in = true
 	AudioBus.ui("card_hover")
 
 
 func _on_exit() -> void:
-	_hover = false
+	_mouse_in = false
+	_hover = has_focus()
 
 
 ## Sélection à la manette ou au clavier : la carte se soulève et son infobulle s'ouvre
@@ -68,7 +71,7 @@ func _on_focus_in() -> void:
 
 
 func _on_focus_out() -> void:
-	_hover = false
+	_hover = _mouse_in
 	if _focus_tip != null:
 		_focus_tip.queue_free()
 		_focus_tip = null
@@ -143,8 +146,9 @@ func _enter_tree() -> void:
 
 func _process(delta: float) -> void:
 	var target_tilt: Vector2 = Vector2.ZERO
-	if _hover and JuiceProfile.intensity() > 0.0:
-		var m: Vector2 = get_local_mouse_position() / CARD_SIZE - Vector2(0.5, 0.5)
+	# Inclinaison seulement sous la souris (au focus manette, la souris peut être n'importe où).
+	if _mouse_in and JuiceProfile.intensity() > 0.0:
+		var m: Vector2 = (get_local_mouse_position() / CARD_SIZE - Vector2(0.5, 0.5)).clamp(Vector2(-0.5, -0.5), Vector2(0.5, 0.5))
 		target_tilt = m * TILT_MAX * 2.0 * JuiceProfile.intensity()
 	_tilt = _tilt.lerp(target_tilt, delta * 12.0)
 	_lift = lerpf(_lift, HOVER_LIFT if _hover else 0.0, delta * 12.0)
@@ -205,7 +209,7 @@ func _draw() -> void:
 	var skew: float = _tilt.x * 14.0
 	var r: Rect2 = Rect2(Vector2(4, 4) + off, CARD_SIZE - Vector2(8, 8))
 	if has_focus():
-		draw_rect(r.grow(5.0), Palette.CYAN, false, FOCUS_RING_W)
+		draw_rect(Rect2(Vector2(4, 4) + Vector2(0, -_lift), CARD_SIZE - Vector2(8, 8)).grow(5.0), Palette.CYAN, false, FOCUS_RING_W)
 	# Ombre
 	draw_rect(Rect2(r.position + Vector2(5, 7 + _lift * 0.5), r.size), Color(0, 0, 0, 0.5))
 	# Corps (légère déformation pseudo-3D par trapèze)

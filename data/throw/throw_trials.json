@@ -1,0 +1,83 @@
+[
+  {
+    "id": "charge",
+    "stage": "panel",
+    "weight": 1.0,
+    "name_fr": "Élan",
+    "name_en": "Swing",
+    "desc_fr": "Maintiens pour charger la jauge, relâche dans la zone dorée. Deux élans, le second plus serré.",
+    "desc_en": "Hold to charge the gauge, release in the gold zone. Two swings, the second one tighter."
+  },
+  {
+    "id": "rhythm",
+    "stage": "panel",
+    "weight": 1.0,
+    "name_fr": "Effet",
+    "name_en": "Spin",
+    "desc_fr": "Un morceau démarre : frappe les notes quand elles passent la ligne, accords compris. Ne tape pas dans le vide.",
+    "desc_en": "A tune kicks in: hit the notes as they cross the line, chords included. Don't hit thin air."
+  },
+  {
+    "id": "bottles",
+    "stage": "full",
+    "weight": 1.0,
+    "name_fr": "Les Bouteilles",
+    "name_en": "The Bottles",
+    "desc_fr": "Au bar abandonné : fixe la direction quand le viseur passe sur la bouteille désignée, puis la force dans l'or. Trois jetons.",
+    "desc_en": "At the abandoned bar: lock the aim when the sight crosses the marked bottle, then the strength in the gold. Three chips."
+  },
+  {
+    "id": "memory",
+    "stage": "full",
+    "weight": 1.0,
+    "name_fr": "Mémoire des cartes",
+    "name_en": "Card Memory",
+    "desc_fr": "Retiens les cartes pendant qu'elles sont visibles, puis retrouve toutes les paires avant la fin du sablier. Chaque erreur coûte.",
+    "desc_en": "Memorise the cards while they're face up, then find every pair before the hourglass runs out. Each mistake costs."
+  },
+  {
+    "id": "shells",
+    "stage": "full",
+    "weight": 1.0,
+    "name_fr": "Bonneteau",
+    "name_en": "Shell Game",
+    "desc_fr": "La bille est sous un gobelet. Suis-le pendant le mélange et désigne-le. Deux manches, la seconde plus vive.",
+    "desc_en": "The ball is under a cup. Follow it through the shuffle and point at it. Two rounds, the second faster."
+  },
+  {
+    "id": "darts",
+    "stage": "full",
+    "weight": 1.0,
+    "name_fr": "Fléchettes",
+    "name_en": "Darts",
+    "desc_fr": "Ta main tangue. Ramène le viseur au centre de la cible et lance au bon moment. Trois fléchettes.",
+    "desc_en": "Your hand sways. Bring the sight back to the bullseye and throw at the right moment. Three darts."
+  },
+  {
+    "id": "safe",
+    "stage": "panel",
+    "weight": 1.0,
+    "name_fr": "Coffre-fort",
+    "name_en": "Safe Cracker",
+    "desc_fr": "Tourne la molette en écoutant les crans : la jauge s'affole près du bon chiffre. Valide les trois chiffres à temps.",
+    "desc_en": "Turn the dial and listen to the clicks: the meter goes wild near the right number. Lock in all three in time."
+  },
+  {
+    "id": "tower",
+    "stage": "panel",
+    "weight": 1.0,
+    "name_fr": "Tour de jetons",
+    "name_en": "Chip Tower",
+    "desc_fr": "Lâche chaque jeton pile sur la pile : ce qui dépasse tombe et le suivant rétrécit. Six jetons, de plus en plus vite.",
+    "desc_en": "Drop each chip right on the stack: overhangs fall off and the next one shrinks. Six chips, faster and faster."
+  },
+  {
+    "id": "shaker",
+    "stage": "panel",
+    "weight": 1.0,
+    "name_fr": "Shaker",
+    "name_en": "Shaker",
+    "desc_fr": "Alterne gauche et droite pour faire mousser, et garde la mousse dans la bande dorée qui se promène.",
+    "desc_en": "Alternate left and right to whip up foam, and keep it inside the wandering gold band."
+  }
+]

@@ -12,6 +12,7 @@ const SCREEN_HALL: StringName = &"hall"
 const SCREEN_ACHIEVEMENTS: StringName = &"achievements"
 const SCREEN_STATS: StringName = &"stats"
 const SCREEN_RACE: StringName = &"seed_race"
+const SCREEN_INTRO: StringName = &"intro"
 
 ## Délai laissé au thread audio pour libérer les lectures avant de quitter.
 const QUIT_AUDIO_GRACE: float = 0.35
@@ -64,7 +65,12 @@ func start_new_run(character_id: String, risk_level: int, seed_value: int, chall
 	SaveSystem.save_profile()
 	autosave()
 	EventBus.run_started.emit(controller.run)
-	goto(SCREEN_RUN)
+	# Toute première partie : la cinématique d'intro avant d'entrer au casino.
+	var seen: bool = int((SaveSystem.profile.get("stats", {}) as Dictionary).get("intro_seen", 0)) > 0
+	if not seen and challenge_id == "" and not daily and not DevMode.active():
+		goto(SCREEN_INTRO, {"next": String(SCREEN_RUN)})
+	else:
+		goto(SCREEN_RUN)
 
 
 func continue_run() -> bool:

@@ -13,6 +13,7 @@ const PITCH_JITTER: float = 0.06
 const MUSIC_LAYERS: int = 3
 const FADE_TIME: float = 1.2
 const SILENT_DB: float = -60.0
+const DUCK_DB: float = -18.0
 const COMPRESSOR_THRESHOLD_DB: float = -14.0
 const COMPRESSOR_RATIO: float = 4.0
 const SIDECHAIN_THRESHOLD_DB: float = -20.0
@@ -29,6 +30,8 @@ var _ambience: AudioStreamPlayer = null
 var _silent: bool = false
 var _music_tweens: Array[Tween] = []
 var _mix: Dictionary = {}
+var _duck: float = 0.0
+var _music_base_db: float = 0.0
 
 
 func _ready() -> void:
@@ -108,7 +111,11 @@ func apply_volumes() -> void:
 func _set_bus_volume(bus_name: String, linear: float) -> void:
 	var idx: int = AudioServer.get_bus_index(bus_name)
 	if idx >= 0:
-		AudioServer.set_bus_volume_db(idx, linear_to_db(maxf(linear, 0.0001)))
+		var db: float = linear_to_db(maxf(linear, 0.0001))
+		if bus_name == "Music":
+			_music_base_db = db
+			db += _duck
+		AudioServer.set_bus_volume_db(idx, db)
 
 
 func _variants(sfx_id: String) -> Array:
@@ -216,6 +223,23 @@ func set_intensity(v: float) -> void:
 		if not is_equal_approx(_music_layers[i].volume_db, target):
 			var tw: Tween = create_tween()
 			tw.tween_property(_music_layers[i], "volume_db", target, FADE_TIME)
+
+
+## Baisse la musique pendant une épreuve qui joue son propre morceau (mini-jeu de rythme).
+func duck_music(on: bool) -> void:
+	var idx: int = AudioServer.get_bus_index("Music")
+	if idx < 0:
+		return
+	var tw: Tween = create_tween()
+	var target: float = DUCK_DB if on else 0.0
+	tw.tween_method(func(v: float) -> void: AudioServer.set_bus_volume_db(idx, _music_base_db + v), _duck, target, 0.4)
+	_duck = target
+
+
+func stop_ambience() -> void:
+	if _ambience != null:
+		_ambience.stop()
+		_ambience.stream = null
 
 
 func play_ambience(amb_id: String) -> void:

@@ -1,3 +1,32 @@
+# Notes de version — 1.5.0 « Grande Ouverture »
+
+## Un prologue
+- **Cinématique d'intro en pixel art** avant la toute première partie : façade du Grand Zéro sous la pluie et son néon qui grésille, l'enveloppe au sceau doré, la lettre de Grand-père, le registre des dettes (« MONTANT DÛ : TOUT »), l'escalier qui descend trop bas, la porte dorée. Parallaxe, travellings, tonnerre, pas, tampon, musique dédiée. Un appui avance le texte ; **maintenir n'importe quelle touche 3 secondes** passe la cinématique. Revoir : Titre → Prologue.
+
+## Le lancer : 9 épreuves
+Chaque lancer tire **2 épreuves différentes au hasard**, puis le lâcher final (l'anneau qui se referme sur la bille) :
+- **Élan** (deux élans) et **Effet**, façon jeu de rythme : 16 notes sur 4 pistes, accords, trois grooves (jazz, funk, mambo) avec batterie et basse, bruitage par piste, pénalité des appuis à vide.
+- Nouvelles, dont plusieurs **en plein écran** : **Les Bouteilles** (lancer des jetons sur des bouteilles de bière au fond du bar), **Mémoire des cartes** (5 paires à retrouver), **Bonneteau** (suivre la bille sous les gobelets), **Fléchettes** (la main tangue, corriger la visée), **Coffre-fort** (écouter le cadran), **Tour de jetons** (empiler sans déborder), **Shaker** (garder la mousse dans la bande dorée).
+- Chaque épreuve s'annonce par une carte de présentation (règle et commandes du périphérique utilisé) ; jouable au clavier, à la souris et à la manette.
+- Options : Complet (2 épreuves), Rapide (1 épreuve), Simple.
+
+## Une histoire plus fournie
+- Dialogues réécrits et densifiés, plus drôles : Anselme le vieux croupier, le Patron et son secret de famille, La Maison qui parle en majuscules depuis qu'elle a absorbé un notaire.
+- **Répliques propres à chaque personnage jouable** (Léa, Vic, Odile, Barnabé, Marthe, le Fantôme) dans tous les actes.
+- **Nouvelles scènes** : interlude au milieu de chaque acte, premier passage au Bazar (Gaston le Brocanteur), premier jackpot (Lucette, la machine à sous qui parle), premier pacte. Fin secrète enrichie.
+
+## Corrections et finitions
+- Fiche de pari à la manette : posée à côté du tapis (plus sur la sélection), fond translucide.
+- Jackpot obtenu sur le tour qui rembourse l'échéance : la machine à sous se lance bien avant le Bazar.
+- Paquet du Bazar : le choix d'un objet est obligatoire (plus de paquet payé sans contrepartie).
+- Animation de la carte survolée au Bazar (plus de carte dédoublée ni de cadre décalé).
+- Roue 3D : passe derrière l'interface, plus jamais coupée.
+- Bazar, dialogues à choix, machine à sous et toutes les surcouches tiennent dans l'écran à toutes les définitions (1280×800 Steam Deck compris), sans chevauchement ; chaque bouton est atteignable à la manette (contrôle automatique sur 6 définitions et 2 tailles de texte).
+- Musique atténuée pendant l'épreuve de rythme.
+
+## Équilibrage
+Bot glouton : 39,8 % (600 parties). Bot expert : 47,1 % au lancer neutre (45,5 % en 1.4, écart dans le bruit statistique), 54,2 % avec des lancers adroits. Chaque épreuve est vérifiée automatiquement : faisable pour un joueur appliqué, perdue si l'on ne fait rien. Détails : `docs/BALANCE.md`.
+
 # Notes de version — 1.4.0 « Le Casino Abandonné »
 
 ## Un décor qui vit

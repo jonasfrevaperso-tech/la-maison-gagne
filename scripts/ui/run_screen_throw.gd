@@ -5,6 +5,8 @@ extends RefCounted
 
 var s: RunScreen = null
 var target: int = 0
+## Dev : épreuves imposées (--dev-trials=a,b,c…), jouées deux par deux dans l'ordre.
+var _forced_i: int = 0
 
 
 func _init(screen: RunScreen) -> void:
@@ -24,7 +26,16 @@ func release() -> void:
 		return
 	s.wheel_view.locked_index = target
 	s.throw_game.release_point = s.wheel_view.release_point()
-	s.throw_game.start(s.ctl.effective_precision(), Settings.b("game", "assist"))
+	var forced: String = String(DevMode.args().get("dev-trials", "")) if DevMode.active() else ""
+	if forced != "":
+		var all: PackedStringArray = forced.split(",")
+		var pair: Array[String] = []
+		for k: int in mini(2, all.size()):
+			pair.append(all[(_forced_i + k) % all.size()])
+		_forced_i += 2
+		s.throw_game.start_with(pair, s.ctl.effective_precision(), Settings.b("game", "assist"))
+	else:
+		s.throw_game.start(s.ctl.effective_precision(), Settings.b("game", "assist"))
 	s._history_box.visible = false
 	AudioBus.play("lock", 1.3, -6.0)
 	s._set_state(RunScreen.UiState.THROWING)

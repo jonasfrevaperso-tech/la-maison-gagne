@@ -508,7 +508,88 @@ def sfx_defs():
     d["decor_topple"] = (lambda k: chip_stack_v(1100 + k, 12, 0.03), 3)
     d["decor_pluck"] = (lambda k: inst_pluck(midi(76 + k), 0.4) * 0.5, 3)
     d["decor_creak"] = (lambda k: fft_filter(saw(90 * v(k), t_axis(0.6)) * (1 + 0.5 * np.sin(2 * np.pi * 7 * t_axis(0.6))), 200, 1600) * env_adsr(int(0.6 * SR), 0.05, 0.1, 0.6, 0.2) * 0.25, 3)
+    # 1.5 — épreuves du lancer : percussions des couloirs du jeu de rythme et morceaux dédiés.
+    d["qte_kick"] = (lambda k: addpad(inst_kick(0.3), inst_click(1800 * v(k), 0.02) * 0.3), 3)
+    d["qte_snare"] = (lambda k: inst_snare(0.18) * (1.0 + 0.05 * k), 3)
+    d["qte_hat"] = (lambda k: addpad(inst_hat(0.08) * 1.6, inst_coin(5200 * v(k), 0.08) * 0.2), 3)
+    d["qte_clap"] = (lambda k: cluster(lambda f, dur=0.05: fft_filter(noise(int(dur * SR)), 900, 5000) * env_exp(int(dur * SR), 0.012), 3, 0.011, 0) * 0.9, 3)
+    # 1.5 — cinématique d'intro.
+    d["thunder"] = (lambda k: reverb(addpad(inst_kick(1.2) * 0.5, fft_filter(noise(int(2.6 * SR)), 30, 900) * env_adsr(int(2.6 * SR), 0.02, 0.4, 0.5, 1.6)), 2.0, 0.4) * 0.9, 2)
+    d["steps"] = (lambda k: np.concatenate([np.pad(addpad(inst_kick(0.12) * 0.5, inst_clack(300 * v(k), 0.06) * 0.5), (0, int(0.32 * SR))) for _ in range(4)]) * 0.7, 3)
+    d["door_boom"] = (lambda k: reverb(addpad(inst_gong(48, 3.0) * 0.6, inst_kick(0.8), fft_filter(saw(55, t_axis(2.0)), 0, 400) * env_adsr(int(2.0 * SR), 0.3, 0.4, 0.5, 0.8) * 0.4), 2.5, 0.45), 1)
+    d["heartbeat"] = (lambda k: np.concatenate([inst_kick(0.18) * 0.8, np.zeros(int(0.12 * SR)), inst_kick(0.2) * 0.6, np.zeros(int(0.5 * SR))]), 2)
+    for style in ("jazz", "funk", "mambo"):
+        d["groove_" + style] = ((lambda st: (lambda k: groove(st)))(style), 1)
     return d
+
+
+GROOVE_BPM = {"jazz": 112, "funk": 100, "mambo": 120}
+
+
+def groove(style: str, bars: int = 4) -> np.ndarray:
+    """Morceau du jeu de rythme : une mesure de décompte (baguettes), `bars` mesures de groove,
+    une mesure de fin. Tempo = GROOVE_BPM (doit correspondre à balance.json → throw_trials.rhythm)."""
+    beat = 60.0 / GROOVE_BPM[style]
+    total = int((bars + 2) * 4 * beat * SR)
+    buf = np.zeros(total)
+
+    def at(bar, b):
+        return int(((bar * 4) + b) * beat * SR)
+
+    for b in range(4):
+        mix_at(buf, inst_clack(2400 if b == 0 else 1900, 0.06) * 0.6, at(0, b), wrap=False)
+    progs = {
+        "jazz": [(50, "m7"), (55, "7"), (48, "maj7"), (45, "7")],
+        "funk": [(45, "m7"), (45, "m7"), (50, "7"), (52, "7")],
+        "mambo": [(48, "maj7"), (53, "maj7"), (55, "7"), (48, "maj7")],
+    }[style]
+    rng = np.random.default_rng({"jazz": 11, "funk": 12, "mambo": 13}[style])
+    for i in range(bars):
+        bar = i + 1
+        root, q = progs[i % len(progs)]
+        tones = chord_tones(root + 12, q)
+        if style == "jazz":
+            for b in range(4):
+                mix_at(buf, inst_ride(0.5) * 0.7, at(bar, b), wrap=False)
+                if b % 2 == 1:
+                    mix_at(buf, inst_ride(0.3) * 0.4, at(bar, b + 0.66), wrap=False)
+                    mix_at(buf, inst_brush(0.15), at(bar, b), wrap=False)
+                walk = [root, root + 4, root + 7, root + 9][b] if b < 3 else root + 11
+                mix_at(buf, inst_bass(midi(walk - 12), beat * 0.9) * 0.9, at(bar, b), wrap=False)
+            for b in (0, 1.66, 2.66):
+                mix_at(buf, chord_hit(tones, inst_ep, beat * 0.8) * 0.35, at(bar, b), wrap=False)
+            for b in (0.66, 2, 3.33):
+                mix_at(buf, inst_vibe(midi(tones[rng.integers(0, 4)] + 12), 0.4) * 0.3, at(bar, b), wrap=False)
+        elif style == "funk":
+            for e in range(8):
+                mix_at(buf, inst_hat(0.05) * (1.0 if e % 2 == 0 else 0.6), at(bar, e * 0.5), wrap=False)
+            for b in (0, 1.5, 2.5):
+                mix_at(buf, inst_kick(0.3) * 0.9, at(bar, b), wrap=False)
+            for b in (1, 3):
+                mix_at(buf, inst_snare(0.2) * 0.8, at(bar, b), wrap=False)
+            for b, n in ((0, 0), (0.75, 12), (1.5, 7), (2, 0), (2.75, 10), (3.5, 12)):
+                mix_at(buf, inst_bass(midi(root - 12 + n), beat * 0.4) * 0.9, at(bar, b), wrap=False)
+            for b in (0.5, 1.25, 2.5, 3.25):
+                mix_at(buf, chord_hit(tones, inst_pluck, beat * 0.3) * 0.35, at(bar, b), wrap=False)
+            mix_at(buf, inst_lead(midi(tones[1] + 12), beat * 1.5, 0.5, "brass") * 0.25, at(bar, 3), wrap=False)
+        else:
+            for b in (0, 1.5, 2, 3.5):
+                mix_at(buf, inst_clack(900, 0.08) * 0.5, at(bar, b), wrap=False)
+            for b in (0.5, 1.0, 2.5, 3.0):
+                mix_at(buf, inst_clack(1500, 0.05) * 0.4, at(bar, b), wrap=False)
+            for e in range(8):
+                mix_at(buf, inst_hat(0.04) * 0.5, at(bar, e * 0.5), wrap=False)
+            for b, n in ((0, 0), (1.5, 7), (2, 7), (3.5, 0)):
+                mix_at(buf, inst_bass(midi(root - 12 + n), beat * 0.45) * 0.9, at(bar, b), wrap=False)
+            for b in (0.5, 1.0, 2.0, 2.5, 3.5):
+                mix_at(buf, chord_hit(tones, inst_ep, beat * 0.25) * 0.3, at(bar, b), wrap=False)
+            for b, n in ((0, 0), (0.5, 2), (1, 4), (2, 7), (3, 4)):
+                mix_at(buf, inst_lead(midi(tones[0] + 12 + n), beat * 0.45, 0.6, "brass") * 0.22, at(bar, b), wrap=False)
+    end = bars + 1
+    mix_at(buf, chord_hit(chord_tones(progs[0][0] + 12, progs[0][1]), inst_ep, beat * 3) * 0.5, at(end, 0), wrap=False)
+    mix_at(buf, inst_kick(0.4), at(end, 0), wrap=False)
+    mix_at(buf, inst_ride(1.0) * 0.6, at(end, 0), wrap=False)
+    return reverb(buf, 1.0, 0.15)[:total]
 
 
 def sweep(f0, f1, dur, wave_="sine"):
@@ -591,7 +672,20 @@ def gen_sfx() -> int:
             count += 1
     amb = ambience(24.0)
     write_wav(SFX_DIR / "ambience_casino.wav", amb)
-    return count + 1
+    write_wav(SFX_DIR / "ambience_rain.wav", rain_loop(16.0))
+    return count + 2
+
+
+def rain_loop(dur):
+    """Pluie sur le pavé : souffle large + gouttes, bouclable."""
+    n = int(dur * SR)
+    buf = fft_filter(noise(n), 400, 9000) * 0.35 + fft_filter(noise(n), 80, 400) * 0.25
+    for _ in range(900):
+        pos = int(RNG.uniform(0, dur - 0.1) * SR)
+        mix_at(buf, inst_click(RNG.uniform(2500, 6000), 0.015) * RNG.uniform(0.02, 0.08), pos)
+    edge = int(0.5 * SR)
+    buf[:edge] = buf[:edge] * np.linspace(0, 1, edge) + buf[-edge:] * np.linspace(1, 0, edge)
+    return normalize(buf[: n - edge], 0.45)
 
 
 def ambience(dur):
@@ -685,6 +779,7 @@ def build_track(name: str) -> list[np.ndarray]:
         "act2": dict(bpm=112, bars=8, swing=0.0, key=50, scale="harmonic", prog=[(0, "m"), (5, "m"), (7, "7"), (0, "m")], lead="clarinet", drums="habanera", dens=0.6),
         "act3": dict(bpm=72, bars=8, swing=0.0, key=48, scale="phrygian", prog=[(0, "m"), (1, "maj7"), (0, "m"), (8, "maj7")], lead="sine", drums="sparse", dens=0.35),
         "boss": dict(bpm=138, bars=8, swing=0.0, key=45, scale="harmonic", prog=[(0, "m"), (0, "m"), (8, "maj7"), (7, "7")], lead="brass", drums="drive", dens=0.7),
+        "intro": dict(bpm=66, bars=8, swing=0.0, key=50, scale="harmonic", prog=[(0, "m"), (8, "maj7"), (5, "m"), (7, "7")], lead="clarinet", drums="sparse", dens=0.3),
         "shop": dict(bpm=120, bars=8, swing=0.25, key=55, scale="major", prog=[(0, "maj7"), (4, "m7"), (5, "maj7"), (7, "7")], lead="vibe", drums="brush", dens=0.55),
     }[name]
     tr = Track(cfg["bpm"], cfg["bars"], 4, cfg["swing"])
@@ -752,7 +847,7 @@ def build_track(name: str) -> list[np.ndarray]:
 def gen_music() -> int:
     MUSIC_DIR.mkdir(parents=True, exist_ok=True)
     count = 0
-    for name in ("menu", "act1", "act2", "act3", "boss", "shop"):
+    for name in ("menu", "act1", "act2", "act3", "boss", "shop", "intro"):
         for i, layer in enumerate(build_track(name)):
             write_ogg(MUSIC_DIR / f"{name}_{i}.ogg", layer)
             count += 1

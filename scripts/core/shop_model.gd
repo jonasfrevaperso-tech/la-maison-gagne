@@ -240,6 +240,11 @@ static func buy_pack(run: RunState, db: ContentDB, index: int) -> BuyResult:
 		return BuyResult.SOLD_OUT
 	if run.money < int(o["price"]):
 		return BuyResult.NO_MONEY
+	# Le choix dans un paquet est obligatoire : on n'achète pas ce qu'on ne pourrait pas garder.
+	if String(o["kind"]) == "occult" and run.empty_grigri_slots() <= 0:
+		return BuyResult.NO_SLOT
+	if String(o["kind"]) == "fortune" and run.fortunes.size() >= run.fortune_slots:
+		return BuyResult.NO_SLOT
 	run.money -= int(o["price"])
 	o["sold"] = true
 	run.shop_state["open_pack"] = {"kind": o["kind"], "choices": roll_pack_choices(run, db, String(o["kind"]))}

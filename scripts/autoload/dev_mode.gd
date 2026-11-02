@@ -9,7 +9,7 @@ const DEV_DIR: String = "user://dev/"
 const HOOKS_SCRIPT: String = "res://scripts/dev/dev_hooks.gd"
 ## Arguments qui font d'un lancement une session de développement.
 const DEV_ARGS: Array[String] = [
-	"dev-run", "dev-screen", "dev-autoplay", "dev-hover", "dev-ui-check", "dev-pad-run", "shot", "quit-frames", "perf"
+	"dev-run", "dev-screen", "dev-autoplay", "dev-hover", "dev-ui-check", "dev-trial-bench", "dev-pad-run", "shot", "quit-frames", "perf"
 ]
 
 static var _args_cache: Dictionary = {}

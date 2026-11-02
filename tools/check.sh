@@ -57,7 +57,12 @@ step "Simulation rapide"
 tail -4 "$LOG_DIR/sim.log"
 scan "$LOG_DIR/sim.log" || status=1
 
-step "Interface (focus manette, débordements, 3 résolutions)"
+step "Épreuves du lancer (bot parfait et joueur inactif)"
+"$GODOT" --headless --path . -- --dev-trial-bench=3 >"$LOG_DIR/trials.log" 2>&1 || status=1
+grep -E "^Épreuve" "$LOG_DIR/trials.log"
+scan "$LOG_DIR/trials.log" || status=1
+
+step "Interface (focus manette, chevauchements, débordements, 6 résolutions)"
 "$GODOT" --headless --path . -- --dev-ui-check >"$LOG_DIR/ui.log" 2>&1 || status=1
 grep -E "^UI :|Interface :" "$LOG_DIR/ui.log"
 scan "$LOG_DIR/ui.log" || status=1

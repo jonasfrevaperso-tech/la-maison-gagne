@@ -58,3 +58,29 @@ func test_free_spin_saves_last_spin() -> void:
 	var before: int = c.run.spins_left
 	SlotMachine.apply(c.run, c.db, c.db.get_entry("slot_prizes", "p_seven3"))
 	eq(c.run.spins_left, before + 1, "tour offert")
+
+
+func test_jackpot_on_deadline_winning_spin() -> void:
+	var found: bool = false
+	for sd: int in range(1, 40):
+		var c: RunController = _ctl(sd)
+		c.run.debt = 1
+		var n: int = c.run.wheel.at(0).number
+		c.place_bet("straight:%d" % n, 1)
+		c.run.flags["control_temp"] = 5.0
+		var out: RunController.SpinOutcome = c.spin(0, 1.0)
+		if out.ctx.landing.number != n:
+			continue
+		found = true
+		check(out.deadline_won, "échéance remboursée")
+		check(out.jackpot and not out.slot.is_empty(), "jackpot conservé quand l'échéance est remboursée")
+		break
+	check(found, "un plein gagnant trouvé")
+
+
+func test_free_spin_carries_over_won_deadline() -> void:
+	var c: RunController = _ctl()
+	c.run.flags["carry_spins"] = 1
+	c.start_deadline()
+	eq(c.run.spins_left, c.run.spins_total + 1, "tour offert reporté")
+	check(not c.run.flags.has("carry_spins"), "report consommé")

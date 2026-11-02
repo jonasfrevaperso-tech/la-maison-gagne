@@ -24,6 +24,7 @@ Tous les assets (icônes, sprites, sons, musiques) sont **générés par les scr
 | Icônes pixel art (`assets/icons/`) | générées par `tools/gen_icons.py` | originales (projet) |
 | Effets sonores et ambiance (`audio/sfx/`) | synthétisés par `tools/gen_audio.py` | originaux (projet) |
 | Portraits (`assets/portraits/`) | générés par `tools/gen_portraits.py` | originaux (projet) |
+| Illustrations de la cinématique (`assets/cutscene/`) | générées par `tools/gen_cutscene.py` | originales (projet) |
 | Props 3D rendus (`assets/sprites/` : roue, jetons, bille) | modélisés et rendus par `tools/blender/render_props.py` (Blender, Cycles) | originaux (projet) |
 | Shaders (`shaders/`) | écrits pour le projet | originaux (projet) |
 | Musiques (`audio/music/`) | composées et synthétisées par `tools/gen_audio.py` | originales (projet) |

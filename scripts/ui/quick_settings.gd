@@ -21,7 +21,7 @@ func build() -> void:
 		_slider(audio, "OPT_VOL_" + k.to_upper(), "audio", k, 0.0, 1.0, 0.05)
 	var game: VBoxContainer = _tab("OPT_TAB_GAME")
 	_choice(game, "OPT_SPEED", "game", "speed", [1, 2, 4], ["SPEED_1", "SPEED_2", "SPEED_4"])
-	_choice(game, "OPT_THROW_MODE", "game", "throw_mode", ["skill", "simple"], ["OPT_TM_SKILL", "OPT_TM_SIMPLE"])
+	_choice(game, "OPT_THROW_MODE", "game", "throw_mode", ["skill", "quick", "simple"], ["OPT_TM_SKILL", "OPT_TM_QUICK", "OPT_TM_SIMPLE"])
 	_check(game, "OPT_ASSIST", "game", "assist")
 	_check(game, "OPT_SHOW_PROBS", "game", "show_probabilities")
 	_check(game, "OPT_TUTORIAL_TIPS", "game", "tutorial_tips")

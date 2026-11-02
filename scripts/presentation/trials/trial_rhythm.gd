@@ -1,0 +1,228 @@
+class_name TrialRhythm
+extends ThrowTrial
+## EFFET : un vrai petit jeu de rythme. Un morceau (jazz, funk ou mambo) démarre après une
+## mesure de décompte ; les notes glissent sur quatre couloirs vers la ligne et tombent sur la
+## grille du morceau (croches), avec des accords (deux couloirs à la fois).
+## Clavier : flèches ; manette : X / Y / B / A ; souris : clics gauche / droit (deux couloirs).
+## Note = moyenne des notes frappées, moins une pénalité par frappe dans le vide.
+
+const LANE_KEYS: Array[String] = ["pad_x", "pad_y", "pad_b", "pad_a"]
+const MOUSE_KEYS: Array[String] = ["mouse_left", "mouse_right"]
+const ARROWS: Array[Vector2] = [Vector2.LEFT, Vector2.UP, Vector2.RIGHT, Vector2.DOWN]
+const LANE_SFX: Array[String] = ["qte_kick", "qte_snare", "qte_hat", "qte_clap"]
+const LANE_COLORS: Array[Color] = [Palette.CYAN, Palette.GOLD_LIGHT, Palette.MAGENTA, Palette.EMERALD]
+const PROMPT: float = 38.0
+const HIT_X: float = 96.0
+const GROOVES: Array[String] = ["jazz", "funk", "mambo"]
+
+var _lanes: int = 4
+var _times: PackedFloat32Array = PackedFloat32Array()
+var _lane_of: PackedInt32Array = PackedInt32Array()
+var _scores: PackedFloat32Array = PackedFloat32Array()
+var _beat: float = 0.5
+var _lead: float = 2.0
+var _end: float = 0.0
+var _stray: int = 0
+var _combo: int = 0
+var _best_combo: int = 0
+var _lane_flash: PackedFloat32Array = PackedFloat32Array([0, 0, 0, 0])
+var _groove: String = "jazz"
+var _last_beat: int = -1
+
+
+func begin() -> void:
+	_lanes = 2 if mouse else 4
+	_groove = GROOVES[rng.randi_range(0, GROOVES.size() - 1)]
+	_beat = 60.0 / Balance.f("throw_trials.rhythm.bpm_" + _groove)
+	_lead = _beat * 4.0
+	var steps: int = pi("bars") * 8
+	var want: int = pi("notes") - (pi("assist_fewer") if assist else 0)
+	var chords: int = 0 if assist else pi("chords")
+	# Croches tirées en privilégiant les temps forts ; jamais deux croches collées sur le même couloir.
+	var slots: Array[int] = []
+	var weights: Array[float] = []
+	for k: int in steps:
+		slots.append(k)
+		weights.append(3.0 if k % 2 == 0 else 1.0)
+	var picked: Array[int] = []
+	while picked.size() < want and not slots.is_empty():
+		var tot: float = 0.0
+		for w: float in weights:
+			tot += w
+		var r: float = rng.randf() * tot
+		var idx: int = 0
+		while idx < weights.size() - 1 and r > weights[idx]:
+			r -= weights[idx]
+			idx += 1
+		picked.append(slots[idx])
+		slots.remove_at(idx)
+		weights.remove_at(idx)
+	picked.sort()
+	var prev_lane: int = -1
+	for i: int in picked.size():
+		var lane: int = rng.randi_range(0, _lanes - 1)
+		if lane == prev_lane:
+			lane = (lane + 1 + rng.randi_range(0, _lanes - 2)) % _lanes
+		prev_lane = lane
+		_add(picked[i], lane)
+		if chords > 0 and picked[i] % 4 == 0 and i > 0:
+			chords -= 1
+			_add(picked[i], (lane + 1 + rng.randi_range(0, _lanes - 2)) % _lanes)
+	_end = _lead + float(steps) * _beat * 0.5 + _window() + 0.3
+	AudioBus.duck_music(true)
+	AudioBus.play("groove_" + _groove, 1.0, -2.0)
+
+
+func _add(step: int, lane: int) -> void:
+	_times.append(_lead + float(step) * _beat * 0.5)
+	_lane_of.append(lane)
+	_scores.append(-1.0)
+
+
+func _window() -> float:
+	return ThrowSkill.tap_window(assist)
+
+
+func handle(event: InputEvent) -> bool:
+	var k: int = sym_pressed(event)
+	if k < 0:
+		return false
+	tap(k)
+	return true
+
+
+func tap(lane: int) -> void:
+	_lane_flash[lane] = 1.0
+	var best: int = -1
+	var best_err: float = 1e9
+	for i: int in _times.size():
+		if _scores[i] >= 0.0 or _lane_of[i] != lane:
+			continue
+		var err: float = t - _times[i]
+		if absf(err) <= _window() and absf(err) < absf(best_err):
+			best = i
+			best_err = err
+	if best < 0:
+		_stray += 1
+		_combo = 0
+		AudioBus.play("click", 0.6, -10.0)
+		return
+	var sc: float = ThrowSkill.tap_score(best_err, assist)
+	_scores[best] = sc
+	pop(Vector2(HIT_X, _lane_y(lane) - 26.0), sc)
+	AudioBus.play(LANE_SFX[lane], 1.0, -3.0)
+	if sc >= 0.45:
+		_combo += 1
+		_best_combo = maxi(_best_combo, _combo)
+		flash = 1.0
+		if _combo > 0 and _combo % 5 == 0:
+			AudioBus.play("chime", 1.0 + 0.08 * float(_combo / 5), -6.0)
+	else:
+		_combo = 0
+
+
+func tick(dt: float) -> void:
+	for l: int in 4:
+		_lane_flash[l] = maxf(_lane_flash[l] - dt * 4.0, 0.0)
+	var b: int = int(floor(t / _beat))
+	if b != _last_beat:
+		_last_beat = b
+	for i: int in _times.size():
+		if _scores[i] < 0.0 and t - _times[i] > _window():
+			_scores[i] = 0.0
+			_combo = 0
+			pop(Vector2(HIT_X, _lane_y(_lane_of[i]) - 26.0), 0.0, "THROW_TAP_MISSED")
+			AudioBus.play("lose_soft", 1.2, -12.0)
+	if t >= _end:
+		AudioBus.duck_music(false)
+		var vals: Array[float] = []
+		for v: float in _scores:
+			vals.append(maxf(v, 0.0))
+		finish(mean(vals) - float(_stray) * p("stray_penalty"))
+
+
+func bot_wants() -> Dictionary:
+	for i: int in _times.size():
+		if _scores[i] < 0.0 and absf(t - _times[i]) < 0.02:
+			return {"do": "sym", "symbol": _lane_of[i]}
+	return {"do": ""}
+
+
+func bot_apply(want: Dictionary) -> void:
+	if String(want.get("do", "")) == "sym":
+		tap(int(want["symbol"]))
+
+
+func _lane_y(lane: int) -> float:
+	var r: Rect2 = play_rect()
+	var top: float = r.position.y + 70.0
+	var h: float = (r.size.y - 90.0) / float(_lanes)
+	return top + h * (float(lane) + 0.5)
+
+
+func paint() -> void:
+	var r: Rect2 = play_rect()
+	var travel: float = p("travel_seconds")
+	var lane_h: float = (r.size.y - 90.0) / float(_lanes)
+	var count_in: int = 4 - int(floor(t / _beat))
+	var title: String = tr("TRIAL_RHYTHM_GROOVE_" + _groove.to_upper())
+	text(Vector2(r.get_center().x, r.position.y + 24.0), title, UiKit.SIZE_BODY, Palette.GOLD_LIGHT)
+	if _combo >= 3:
+		text(Vector2(r.end.x - 90.0, r.position.y + 24.0), tr("TRIAL_COMBO") % _combo, UiKit.SIZE_BODY, Palette.EMERALD)
+	if count_in > 0 and t < _lead:
+		text(Vector2(r.get_center().x, r.position.y + 52.0), str(count_in), UiKit.SIZE_H2, Palette.IVORY)
+	var beat_pulse: float = 1.0 - fposmod(t, _beat) / _beat
+	for l: int in _lanes:
+		var y: float = _lane_y(l)
+		var lane_r: Rect2 = Rect2(r.position.x + 20.0, y - lane_h * 0.42, r.size.x - 40.0, lane_h * 0.84)
+		draw_rect(lane_r, Color(Palette.VELVET_DEEP, 0.9))
+		draw_rect(lane_r, Color(LANE_COLORS[l], 0.15 + 0.5 * _lane_flash[l]), false, 2.0)
+		# Repères de mesure qui défilent avec les notes.
+		var first: int = int(ceil((t - 0.2) / _beat))
+		for bk: int in range(first, first + int(travel / _beat) + 2):
+			var u: float = (float(bk) * _beat - t) / travel
+			if u < 0.0 or u > 1.0:
+				continue
+			var x: float = HIT_X + u * (lane_r.end.x - HIT_X - 10.0)
+			draw_line(Vector2(x, lane_r.position.y), Vector2(x, lane_r.end.y), Color(Palette.GOLD_DARK, 0.5 if bk % 4 == 0 else 0.2), 1.0)
+		var target: Rect2 = Rect2(Vector2(HIT_X, y) - Vector2(PROMPT, PROMPT) * 0.5, Vector2(PROMPT, PROMPT))
+		draw_rect(target.grow(5.0 + 3.0 * beat_pulse), Color(Palette.GOLD, 0.5 + 0.4 * beat_pulse), false, 2.0)
+		if _lane_flash[l] > 0.0:
+			draw_circle(Vector2(HIT_X, y), PROMPT * (0.5 + 0.6 * (1.0 - _lane_flash[l])), Color(LANE_COLORS[l], _lane_flash[l] * 0.35))
+		_prompt(Vector2(HIT_X - PROMPT - 18.0, y), l, 0.55)
+	for i: int in _times.size():
+		if _scores[i] >= 0.0:
+			continue
+		var u2: float = (_times[i] - t) / travel
+		if u2 > 1.0 or u2 < -0.3:
+			continue
+		var x2: float = HIT_X + u2 * (r.end.x - 30.0 - HIT_X)
+		_prompt(Vector2(x2, _lane_y(_lane_of[i])), _lane_of[i], clampf(1.2 - u2, 0.45, 1.0))
+	pips_line(r)
+
+
+## Barre de progression du morceau.
+func pips_line(r: Rect2) -> void:
+	var bar: Rect2 = Rect2(r.position.x + 20.0, r.end.y - 14.0, r.size.x - 40.0, 6.0)
+	draw_rect(bar, Palette.VELVET_DEEP)
+	draw_rect(Rect2(bar.position, Vector2(bar.size.x * clampf(t / maxf(_end, 0.01), 0.0, 1.0), bar.size.y)), Palette.GOLD)
+
+
+## Invite : glyphe de manette, bouton de souris, ou flèche dessinée.
+func _prompt(at: Vector2, sym: int, alpha: float) -> void:
+	var rect: Rect2 = Rect2(at - Vector2(PROMPT, PROMPT) * 0.5, Vector2(PROMPT, PROMPT))
+	var tex: Texture2D = null
+	if InputGlyphs.using_pad:
+		tex = InputGlyphs.texture(LANE_KEYS[sym])
+	elif mouse:
+		tex = InputGlyphs.texture(MOUSE_KEYS[sym % MOUSE_KEYS.size()])
+	if tex != null:
+		draw_texture_rect(tex, rect, false, Color(1, 1, 1, alpha))
+		return
+	draw_rect(rect, Color(LANE_COLORS[sym], alpha))
+	draw_rect(rect.grow(-3), Color(Palette.INK, alpha))
+	var d: Vector2 = ARROWS[sym]
+	var n: Vector2 = Vector2(-d.y, d.x)
+	var tri: PackedVector2Array = PackedVector2Array([at + d * 12.0, at - d * 5.0 + n * 10.0, at - d * 5.0 - n * 10.0])
+	draw_colored_polygon(tri, Color(Palette.GOLD_LIGHT, alpha))
+	draw_line(at - d * 12.0, at - d * 3.0, Color(Palette.GOLD_LIGHT, alpha), 5.0)

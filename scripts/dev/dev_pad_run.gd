@@ -62,25 +62,43 @@ func _axis_set(axis: JoyAxis, v: float) -> void:
 	await get_tree().process_frame
 
 
-## Mini-jeu à la manette seule : RT maintenu pour l'élan, X/Y/B/A pour l'effet, RT au contact.
+## Mini-jeu à la manette seule : chaque geste demandé par l'épreuve devient une vraie commande
+## de manette (RT maintenu / relâché, A, X/Y/B/A, croix, stick gauche).
 func _play_throw(g: ThrowMinigame) -> void:
 	var taps: Array[JoyButton] = [JOY_BUTTON_X, JOY_BUTTON_Y, JOY_BUTTON_B, JOY_BUTTON_A]
+	var dirs: Dictionary[Vector2i, String] = {Vector2i.LEFT: "LEFT", Vector2i.RIGHT: "RIGHT", Vector2i.UP: "UP", Vector2i.DOWN: "DOWN"}
+	var stick: bool = false
 	var t0: int = Time.get_ticks_msec()
-	while Time.get_ticks_msec() - t0 < 30000:
+	while Time.get_ticks_msec() - t0 < 90000:
 		if not g.active():
-			return
+			break
 		var want: Dictionary = g.bot_wants()
-		match String(want.get("do", "")):
-			"press":
+		var act: String = String(want.get("do", ""))
+		if stick and act != "axis":
+			stick = false
+			await _axis_set(JOY_AXIS_LEFT_X, 0.0)
+			await _axis_set(JOY_AXIS_LEFT_Y, 0.0)
+		match act:
+			"hold":
 				await _axis_set(JOY_AXIS_TRIGGER_RIGHT, 1.0)
 			"release":
 				await _axis_set(JOY_AXIS_TRIGGER_RIGHT, 0.0)
-			"tap":
+			"sym":
 				await _button(taps[int(want["symbol"])])
-			"strike":
+			"confirm":
 				await _press("RT")
+			"dir":
+				await _press(dirs[want["dir"] as Vector2i])
+			"axis":
+				stick = true
+				var v: Vector2 = want["v"] as Vector2
+				await _axis_set(JOY_AXIS_LEFT_X, v.x)
+				await _axis_set(JOY_AXIS_LEFT_Y, v.y)
 			_:
 				await get_tree().process_frame
+	if stick:
+		await _axis_set(JOY_AXIS_LEFT_X, 0.0)
+		await _axis_set(JOY_AXIS_LEFT_Y, 0.0)
 
 
 func _press(name: String) -> void:

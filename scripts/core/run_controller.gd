@@ -212,7 +212,8 @@ func start_deadline() -> void:
 		run.debt = maxi(int(round(float(run.debt) * (1.0 + float(run.flags["next_debt_pct"])))), 1)
 		run.flags.erase("next_debt_pct")
 	run.spins_total = maxi(Balance.i("run.spins_per_deadline") + run.extra_spins_per_deadline + int(run.flags.get("spins_mod", 0)), 1)
-	run.spins_left = run.spins_total
+	run.spins_left = run.spins_total + int(run.flags.get("carry_spins", 0))
+	run.flags.erase("carry_spins")
 	run.spin_index = 0
 	run.deadline_score = 0
 	run.free_rethrows = int(run.flags.get("rethrows_per_deadline", 0))
@@ -419,6 +420,7 @@ func _finish_spin(ctx: ScoreContext, out: SpinOutcome) -> void:
 		)
 	)
 	# Jackpot : la machine à sous est résolue avant le bilan de l'échéance (un tour offert compte).
+	var spins_before: int = run.spins_left
 	if SlotMachine.is_jackpot(ctx):
 		out.jackpot = true
 		out.slot = SlotMachine.play(run, db, ThrowSkill.slot_spins(out.throw_result.skill if out.throw_result != null else -1.0))
@@ -426,6 +428,10 @@ func _finish_spin(ctx: ScoreContext, out: SpinOutcome) -> void:
 		EffectRunner.fire(&"on_jackpot", run, null, db)
 	_update_creditor_phase()
 	if run.deadline_score >= run.debt:
+		# Tours offerts par la machine sur le tour qui rembourse : reportés sur l'échéance suivante.
+		var gained: int = run.spins_left - spins_before
+		if gained > 0:
+			run.flags["carry_spins"] = int(run.flags.get("carry_spins", 0)) + gained
 		out.deadline_won = true
 		out.reward = _deadline_won()
 		out.victory = run.phase == RunState.Phase.VICTORY

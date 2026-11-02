@@ -30,7 +30,7 @@ const PROMPTS: Dictionary[String, Array] = {
 		["ui_cancel", "HINT_K_BACK"],
 	],
 	"AIMING": [["ui_spin", "HINT_K_AIM"]],
-	"THROWING": [["ui_spin", "HINT_K_HOLD"], ["qte_left+qte_up+qte_right+qte_down", "HINT_K_QTE"]],
+	"THROWING": [],
 	"BALL": [["skip_anim", "HINT_K_SKIP"], ["speed_toggle", "HINT_K_SPEED"]],
 	"SCORING": [["skip_anim", "HINT_K_SKIP"], ["speed_toggle", "HINT_K_SPEED"]],
 	"TARGETING": [["@dpad_lr", "HINT_K_SELECT"], ["ui_accept", "HINT_K_CONFIRM"], ["ui_cancel", "BTN_CANCEL_TARGET"]],

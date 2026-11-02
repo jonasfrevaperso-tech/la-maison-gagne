@@ -14,6 +14,9 @@ const LINE_FADE: float = 0.35
 const PANEL_H: float = 300.0
 const MARGIN: float = 40.0
 
+## Hauteur minimale de la zone de texte (trois lignes) : le panneau ne saute pas d'une réplique à l'autre.
+const TEXT_MIN_H: float = 120.0
+
 var dialogue: Dictionary = {}
 var run: RunState = null
 var db: ContentDB = null
@@ -35,8 +38,37 @@ func configure(dialogue_id: String, p_run: RunState, p_db: ContentDB) -> Dialogu
 	db = p_db
 	run = p_run
 	dialogue = db.get_entry("dialogues", dialogue_id)
-	_lines = dialogue.get("lines", [])
+	_lines = personalize(dialogue.get("lines", []) as Array, run.character_id if run != null else "")
 	return self
+
+
+## Dialogue déjà vu sur ce profil (scènes « une seule fois » : boutique, machine à sous, pacte).
+static func seen(dialogue_id: String) -> bool:
+	return ((SaveSystem.profile.get("campaign", {}) as Dictionary).get("dialogues_seen", []) as Array).has(dialogue_id)
+
+
+static func _mark_seen(dialogue_id: String) -> void:
+	var camp: Dictionary = SaveSystem.profile.get("campaign", {})
+	var seen_ids: Array = camp.get("dialogues_seen", [])
+	if not seen_ids.has(dialogue_id):
+		seen_ids.append(dialogue_id)
+	camp["dialogues_seen"] = seen_ids
+	SaveSystem.profile["campaign"] = camp
+
+
+## Répliques propres au personnage joué : `heroes` restreint une réplique à certains
+## personnages, `by_hero` remplace son texte (et éventuellement son locuteur) selon le personnage.
+static func personalize(lines: Array, hero: String) -> Array:
+	var out: Array = []
+	for ln: Variant in lines:
+		var line: Dictionary = (ln as Dictionary).duplicate()
+		if line.has("heroes") and not (line["heroes"] as Array).has(hero):
+			continue
+		var by: Dictionary = line.get("by_hero", {})
+		if by.has(hero):
+			line.merge(by[hero] as Dictionary, true)
+		out.append(line)
+	return out
 
 
 func _ready() -> void:
@@ -51,6 +83,8 @@ func _ready() -> void:
 	panel.offset_bottom = -MARGIN
 	panel.offset_left = MARGIN
 	panel.offset_right = -MARGIN
+	# Les choix agrandissent le panneau vers le haut (jamais hors de l'écran ni sur le texte).
+	panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	add_child(panel)
 	var h: HBoxContainer = HBoxContainer.new()
 	h.add_theme_constant_override("separation", 30)
@@ -64,7 +98,8 @@ func _ready() -> void:
 	_name = UiKit.label("", UiKit.SIZE_H2, Palette.GOLD_LIGHT, "display")
 	v.add_child(_name)
 	_text = UiKit.rich("", UiKit.SIZE_H2 - 4)
-	_text.fit_content = false
+	_text.fit_content = true
+	_text.custom_minimum_size = Vector2(0, TEXT_MIN_H)
 	_text.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	v.add_child(_text)
 	_choices = VBoxContainer.new()
@@ -194,11 +229,7 @@ func _choose(i: int) -> void:
 		var mem: Dictionary = run.flags.get("choices", {})
 		mem["%s:%d" % [dialogue.get("id", ""), _index]] = i
 		run.flags["choices"] = mem
-	var camp: Dictionary = SaveSystem.profile.get("campaign", {})
-	var seen: Array = camp.get("dialogues_seen", [])
-	if not seen.has(String(dialogue.get("id", ""))):
-		seen.append(String(dialogue.get("id", "")))
-	camp["dialogues_seen"] = seen
+	_mark_seen(String(dialogue.get("id", "")))
 	AudioBus.ui("click")
 	_next()
 
@@ -234,4 +265,5 @@ func _advance() -> void:
 
 func _finish() -> void:
 	set_process(false)
+	_mark_seen(String(dialogue.get("id", "")))
 	closed.emit()

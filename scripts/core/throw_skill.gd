@@ -1,12 +1,11 @@
 class_name ThrowSkill
 extends RefCounted
-## Mini-jeu de lancer v2 : règles pures (notation des trois gestes et effet sur le contrôle).
+## Mini-jeu de lancer v3 : règles pures (notation des gestes et effet sur le contrôle).
 ## 1. Visée : la roue tourne sous le pointeur, on fige la case visée.
-## 2. Élan : on MAINTIENT pour charger une jauge qui accélère (puis redescend si on tarde) et on
-##    relâche dans la zone dorée, dont la position change à chaque lancer (largeur selon la Précision).
-## 3. Effet : des invites QTE défilent vers une ligne ; on frappe la bonne commande à leur passage.
-## 4. Lâcher : un anneau se referme sur la bille en accélérant ; on frappe au contact.
-## Qualité q = moyenne pondérée des trois notes. Le contrôle (probabilité de tomber dans la zone
+## 2. Deux épreuves tirées au hasard parmi neuf (ThrowTrials) : Élan, Effet, Bouteilles, Mémoire,
+##    Bonneteau, Fléchettes, Coffre-fort, Tour de jetons, Shaker — chacune notée de 0 à 1.
+## 3. Lâcher : un anneau se referme sur la bille en accélérant ; on frappe au contact.
+## Qualité q = moyenne des épreuves, pondérée avec le Lâcher. Le contrôle (probabilité de tomber dans la zone
 ## visée) est ajusté autour de la référence : un lancer de référence rend exactement la
 ## probabilité de la 1.2 ; les bots et le mode Simple jouent à la référence.
 
@@ -115,10 +114,14 @@ static func spin_score(taps: Array[float]) -> float:
 	return s / float(taps.size())
 
 
-static func quality(power: float, spin: float, release: float) -> float:
-	var wp: float = Balance.f("throw_game.weight_power")
-	var ws: float = Balance.f("throw_game.weight_spin")
-	return clampf(power * wp + spin * ws + release * (1.0 - wp - ws), 0.0, 1.0)
+## Qualité du lancer : moyenne des épreuves, puis le Lâcher final avec son propre poids.
+static func quality(trials: Array[float], release: float) -> float:
+	var wr: float = Balance.f("throw_game.weight_release")
+	var m: float = 0.0
+	for v: float in trials:
+		m += clampf(v, 0.0, 1.0)
+	m = m / float(trials.size()) if not trials.is_empty() else release
+	return clampf(m * (1.0 - wr) + release * wr, 0.0, 1.0)
 
 
 static func grade(q: float) -> Grade:

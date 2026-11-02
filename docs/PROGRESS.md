@@ -131,3 +131,16 @@ Plan (chaque étape : code → tests → captures → corrections) :
 9. Équilibrage par simulations (machine à sous incluse), docs, check, exports, tag v1.4.0.
 
 Bilan 1.4 : les 9 étapes sont livrées. `tools/check.sh` vert (83 tests, interface 3 résolutions, campagne manette). Équilibrage : neutre 45,5 %, maladroit 41,7 %, adroit 56,2 % (`docs/BALANCE.md`). Exports Windows, Linux, Flatpak régénérés.
+
+## Version 1.5 — « Grande Ouverture »
+Plan (chaque étape : code → tests → captures → corrections) :
+1. Bugs signalés : fiche de pari manette (placement hors du tapis et de la sélection, fond translucide) ; jackpot perdu quand une échéance est remboursée sur le même tour ; paquet acheté sans choix (choix obligatoire) ; animation de sélection du Bazar ; roue 3D coupée (rendue derrière l'interface, sans bord coupé).
+2. Mise en page : Bazar, dialogues à choix, surcouches et mini-jeux tiennent dans l'écran sans chevauchement à toutes les résolutions (800p compris) ; tous les boutons atteignables à la manette ; contrôle automatique étendu (`--dev-ui-check` : chevauchements, débordements, focus de chaque bouton).
+3. Lancer : 9 épreuves tirées au hasard (2 par lancer, distinctes) + le lâcher final. Existantes améliorées (Élan ; Effet façon DDR : plus de notes, accords, musique dédiée, bruitages). Nouvelles, certaines en plein écran : Jetons sur les bouteilles, Mémoire des cartes, Bonneteau, Fléchettes, Coffre-fort, Tour de jetons, Shaker. Chacune jouable clavier/souris/manette, bot de test, sons.
+4. Cinématique d'intro en pixel art (illustrations générées, parallaxe, pluie, néons, bruitages, musique), passable en maintenant une touche 3 s.
+5. Histoire : dialogues densifiés, plus détaillés et plus drôles ; profondeur des personnages (passé, motivations, répliques propres à chaque personnage jouable) ; partie plus scénarisée (scènes entre les actes et aux moments clés).
+6. Lisibilité à toutes les résolutions, notamment 1280×800.
+7. Campagne de tests (interface, manette, équilibrage), corrections jusqu'au dernier problème, docs, exports, tag v1.5.0.
+
+Bilan 1.5 : les 7 étapes sont livrées. `tools/check.sh` vert (85 tests, banc des 9 épreuves, interface 186 vues sur 6 définitions et 2 tailles de texte sans aucun problème, campagne gagnée à la manette seule). Équilibrage : glouton 39,8 %, expert 47,1 % neutre / 54,2 % adroit (`docs/BALANCE.md`). Exports Windows, Linux et Flatpak 1.5.0 régénérés.
+

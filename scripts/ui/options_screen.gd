@@ -204,7 +204,7 @@ func _game_tab() -> void:
 	_choice(b, "OPT_SPEED", "game", "speed", [1, 2, 4], ["SPEED_1", "SPEED_2", "SPEED_4"])
 	_check(b, "OPT_CONFIRM", "game", "confirm_irreversible")
 	_check(b, "OPT_SHOW_PROBS", "game", "show_probabilities")
-	_choice(b, "OPT_THROW_MODE", "game", "throw_mode", ["skill", "simple"], ["OPT_TM_SKILL", "OPT_TM_SIMPLE"])
+	_choice(b, "OPT_THROW_MODE", "game", "throw_mode", ["skill", "quick", "simple"], ["OPT_TM_SKILL", "OPT_TM_QUICK", "OPT_TM_SIMPLE"])
 	b.add_child(UiKit.label(tr("OPT_THROW_MODE_DESC"), UiKit.SIZE_SMALL, Palette.SMOKE))
 	_check(b, "OPT_ASSIST", "game", "assist")
 	_check(b, "OPT_TUTORIAL_TIPS", "game", "tutorial_tips")

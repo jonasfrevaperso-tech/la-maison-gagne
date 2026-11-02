@@ -6,6 +6,7 @@ Chaque portrait est décrit par un dictionnaire de traits (peau, cheveux, yeux, 
 Sortie : assets/portraits/<id>.png (512×128). Usage : python3 tools/gen_portraits.py
 """
 from __future__ import annotations
+import sys
 
 import pathlib
 
@@ -64,6 +65,8 @@ PORTRAITS = {
     "cr_la_maison": dict(skin="velvet", hair="none", style="none", eyes="magenta", outfit="velvet", collar="gold", acc="wheel_face", bg="black", mouth="grille"),
     # PNJ
     "house": dict(skin="velvet", hair="none", style="none", eyes="magenta", outfit="velvet", collar="gold", acc="wheel_face", bg="black", mouth="grille"),
+    "npc_brocanteur": dict(skin="skin3", hair="brown", style="bald", eyes="gold_light", outfit="brown", collar="gold_dark", acc="glasses", bg="smoke_dark", moustache=True, stubble=True),
+    "npc_lucette": dict(skin="red", hair="none", style="none", eyes="gold_light", outfit="gold", collar="gold_dark", acc="wheel_face", bg="velvet_deep", mouth="grille"),
     "npc_croupier": dict(skin="skin1", hair="grey", style="side", eyes="ink", outfit="black", collar="ivory", acc="visor", bg="velvet", moustache=True),
 }
 
@@ -238,7 +241,10 @@ def draw(t: dict, frame: int) -> Image.Image:
 
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
+    only = set(sys.argv[1:])
     for pid, traits in PORTRAITS.items():
+        if only and pid not in only:
+            continue
         sheet = Image.new("RGBA", (G * SCALE * FRAMES, G * SCALE), (0, 0, 0, 0))
         for f in range(FRAMES):
             sheet.alpha_composite(draw(traits, f), (f * G * SCALE, 0))
