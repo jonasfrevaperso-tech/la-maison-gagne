@@ -1,3 +1,32 @@
+# Notes de version — 1.4.0 « Le Casino Abandonné »
+
+## Un décor qui vit
+- **La table d'un casino abandonné, en 3D, derrière toute l'interface** : feutre délavé, auréoles de verres, brûlures de cigare, poussière qui danse dans la lumière d'un lustre aux mauvais contacts.
+- **Objets interactifs** dans les coins libres, à la manière des plateaux de Hearthstone : lampe de banquier (s'allume… après deux hoquets), verre de whisky qui tinte, bouteille qui finit par tomber, cendrier qui fume, dés qui roulent, cartes qui se retournent, pile de jetons qui s'écroule puis se reforme, enseigne « CASINO » au néon qui grésille et change de couleur. Un rat et une araignée passent de temps en temps : cliquez-les, ils détalent.
+- Manette : une pichenette du stick droit taquine un objet. Options → Vidéo → Décor 3D (désactivable, allégé en mode Steam Deck).
+
+## JACKPOT !
+- Un **plein gagnant** fait surgir une machine à sous : levier, rouleaux qui s'arrêtent un à un (ralenti quand deux symboles s'alignent), ampoules en chenillard puis en stroboscope, pluie de pièces, fanfares.
+- **1 tirage, 2 sur un lancer « Très bien », 3 sur un « Parfait »** : le mini-jeu compte encore plus.
+- Gains : argent, Mult ou contrôle de la bille pour le tour suivant, jetons de mise en plus, et le brelan de 7 offre **un tour supplémentaire**.
+
+## Le mini-jeu de lancer, version 2
+- Trois temps au lieu de deux, plus longs et plus exigeants, toujours dans l'esprit QTE : **Élan** (maintenir, relâcher quand la jauge — qui accélère — traverse la zone dorée, placée ailleurs à chaque lancer), **Effet** (quatre invites défilent : flèches, X/Y/B/A ou clics gauche/droit au bon moment), **Lâcher** (frapper quand l'anneau, qui accélère, touche la bille).
+- Verdict par temps et verdict global ; un lancer moyen vaut toujours l'ancien lancer.
+
+## Grigris à malus visuels
+Sept nouveaux grigris au bonus généreux… et à l'effet secondaire visible pendant les lancers : **Flasque de gin** (la salle tangue, vision double), **Fume-cigarette** (volutes de fumée), **Monocle fêlé** (verre fissuré), **Néon agonisant** (la salle clignote), **Double serré** (tremblote), **Miroir de foire** (tout est à l'envers pendant que la bille roule), **Lunettes de nuit** (on n'y voit presque rien). Réglage : Options → Jus → Malus visuels des grigris.
+
+## Lisibilité et rythme
+- **Fiches de paris illustrées** (souris et manette) : type de pari en couleur, cote, gain par jeton, limite de table, numéros couverts en pastilles, barre de chances, avertissement du zéro. À la manette, la ligne d'aide ne déborde plus sur « FORTUNE ».
+- **Rythme ralenti** : la bille roule plus longtemps, les dialogues s'écrivent plus posément (pauses à la ponctuation, fondus).
+- **Écran de démarrage noir** (plus de logo Godot sur fond gris).
+- **Tutoriel complété** : mini-jeu en trois temps, fiches de paris, taille de la mise, jackpot, décor, malus visuels, menu pause et vitesse.
+- **4 nouveaux succès** : Ding ding ding !, Machine infernale, Main de croupier, Vision trouble.
+
+## Équilibrage
+Bot expert, graines 201–206 : 41,7 % (lancers maladroits), **45,5 % (lancer neutre, contre 45,8 % en 1.3)**, 56,2 % (lancers adroits). Gains de la machine à sous et bonus des grigris à malus réglés par simulation ; un lancer parfait donne désormais +7 points de contrôle (au lieu de +10). Détails : `docs/BALANCE.md`.
+
 # Notes de version — 1.3.0 « Table de casino »
 
 ## Une vraie table de casino

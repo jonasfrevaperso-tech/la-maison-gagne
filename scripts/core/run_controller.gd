@@ -16,6 +16,9 @@ class SpinOutcome:
 	var forgiven: bool = false
 	var reward: Dictionary = {}
 	var victory: bool = false
+	## Plein gagnant : tirages de la machine à sous déjà résolus ([{"reels", "prize"}]).
+	var jackpot: bool = false
+	var slot: Array[Dictionary] = []
 
 
 var run: RunState = null
@@ -317,7 +320,12 @@ func throw_params(target_index: int, skill: float = ThrowSkill.NEUTRAL) -> Throw
 	var p: ThrowResolver.ThrowParams = ThrowResolver.ThrowParams.new()
 	p.target_index = target_index
 	p.precision = effective_precision()
-	p.control_bonus = run.control_bonus + float(run.flags.get("control_temp", 0.0)) + ThrowSkill.control_bonus(skill)
+	p.control_bonus = (
+		run.control_bonus
+		+ float(run.flags.get("control_temp", 0.0))
+		+ float(run.flags.get("temp_control", 0.0))
+		+ ThrowSkill.control_bonus(skill)
+	)
 	p.skill = skill
 	p.zone_width_override = int(run.flags.get("zone_width_override", 0))
 	p.last_landing_index = run.last_landing_index
@@ -368,6 +376,7 @@ func commit_spin() -> SpinOutcome:
 	# Les bonus temporaires ont été consommés (budget à la pose, précision au lancer).
 	run.temp_budget_bonus = 0
 	run.temp_precision_bonus = 0
+	run.flags.erase("temp_control")
 	var ctx: ScoreContext = ScoreEngine.resolve(run, db, pending_throw)
 	out.ctx = ctx
 	pending_throw = null
@@ -409,6 +418,12 @@ func _finish_spin(ctx: ScoreContext, out: SpinOutcome) -> void:
 			}
 		)
 	)
+	# Jackpot : la machine à sous est résolue avant le bilan de l'échéance (un tour offert compte).
+	if SlotMachine.is_jackpot(ctx):
+		out.jackpot = true
+		out.slot = SlotMachine.play(run, db, ThrowSkill.slot_spins(out.throw_result.skill if out.throw_result != null else -1.0))
+		run.flags["jackpots"] = int(run.flags.get("jackpots", 0)) + 1
+		EffectRunner.fire(&"on_jackpot", run, null, db)
 	_update_creditor_phase()
 	if run.deadline_score >= run.debt:
 		out.deadline_won = true

@@ -1,0 +1,47 @@
+[
+ {
+  "id": "cherry",
+  "weight": 28,
+  "icon": "slot_cherry",
+  "name_fr": "Cerise",
+  "name_en": "Cherry",
+  "desc_fr": "La plus fréquente : du Mult pour le prochain tour.",
+  "desc_en": "The most common: Mult for the next spin."
+ },
+ {
+  "id": "bell",
+  "weight": 22,
+  "icon": "slot_bell",
+  "name_fr": "Cloche",
+  "name_en": "Bell",
+  "desc_fr": "De l'argent sonnant et trébuchant.",
+  "desc_en": "Cold, hard cash."
+ },
+ {
+  "id": "clover",
+  "weight": 20,
+  "icon": "slot_clover",
+  "name_fr": "Trèfle",
+  "name_en": "Clover",
+  "desc_fr": "Du contrôle : la bille obéit mieux au prochain lancer.",
+  "desc_en": "Control: the ball obeys better on the next throw."
+ },
+ {
+  "id": "chip",
+  "weight": 20,
+  "icon": "slot_chip",
+  "name_fr": "Jeton",
+  "name_en": "Chip",
+  "desc_fr": "Des jetons de mise en plus au prochain tour.",
+  "desc_en": "Extra betting chips next spin."
+ },
+ {
+  "id": "seven",
+  "weight": 10,
+  "icon": "slot_seven",
+  "name_fr": "Sept",
+  "name_en": "Seven",
+  "desc_fr": "Rare : un tour offert.",
+  "desc_en": "Rare: a free spin."
+ }
+]

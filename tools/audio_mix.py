@@ -44,8 +44,8 @@ TARGETS = {
 FAMILY = {
     "ui": ["click", "hover", "card_hover", "panel_open", "panel_close", "error", "lock", "tick", "curtain", "card_flip", "paper", "cloth", "card_place"],
     "voice": ["blip_"],
-    "table": ["chip_place", "chip_remove", "chip_sweep", "chip_lose", "ball_", "wheel_spin", "lose_soft", "reroll", "dice"],
-    "moment": ["zero", "jackpot", "deadline", "stinger_", "boss_enter", "pact", "curse", "celebrate", "explosion", "shatter", "glass"],
+    "table": ["chip_place", "chip_remove", "chip_sweep", "chip_lose", "ball_", "wheel_spin", "lose_soft", "reroll", "dice", "decor_"],
+    "moment": ["slot_big", "zero", "jackpot", "deadline", "stinger_", "boss_enter", "pact", "curse", "celebrate", "explosion", "shatter", "glass"],
 }
 
 

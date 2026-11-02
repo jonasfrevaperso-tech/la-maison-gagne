@@ -1066,5 +1066,69 @@
   "desc_fr": "Gagner un plein dans la zone visée pour 500 points.",
   "desc_en": "Win a straight in your aimed zone for 500 points.",
   "icon": "eye"
+ },
+ {
+  "id": "ach_jackpot",
+  "on": "spin",
+  "cond": [
+   {
+    "k": "jackpots",
+    "op": ">=",
+    "v": 1
+   }
+  ],
+  "name_fr": "Ding ding ding !",
+  "name_en": "Ding Ding Ding!",
+  "desc_fr": "Faire sonner la machine à sous (plein gagnant).",
+  "desc_en": "Ring the slot machine (winning straight bet).",
+  "icon": "star"
+ },
+ {
+  "id": "ach_jackpot5",
+  "on": "spin",
+  "cond": [
+   {
+    "k": "jackpots",
+    "op": ">=",
+    "v": 5
+   }
+  ],
+  "name_fr": "Machine infernale",
+  "name_en": "Infernal Machine",
+  "desc_fr": "Déclencher 5 jackpots dans la même partie.",
+  "desc_en": "Trigger 5 jackpots in a single run.",
+  "icon": "star"
+ },
+ {
+  "id": "ach_perfect_throw",
+  "on": "spin",
+  "cond": [
+   {
+    "k": "throw_quality",
+    "op": ">=",
+    "v": 0.9
+   }
+  ],
+  "name_fr": "Main de croupier",
+  "name_en": "Croupier's Hand",
+  "desc_fr": "Réussir un lancer « Parfait ».",
+  "desc_en": "Land a « Perfect » throw.",
+  "icon": "star"
+ },
+ {
+  "id": "ach_visual_curses",
+  "on": "spin",
+  "cond": [
+   {
+    "k": "visual_curses",
+    "op": ">=",
+    "v": 3
+   }
+  ],
+  "name_fr": "Vision trouble",
+  "name_en": "Blurred Vision",
+  "desc_fr": "Jouer un tour avec 3 grigris à malus visuel.",
+  "desc_en": "Play a spin with 3 visual-curse charms.",
+  "icon": "star"
  }
 ]

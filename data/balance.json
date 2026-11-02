@@ -184,33 +184,46 @@
     "cursed": 3
   },
   "throw_game": {
-    "_doc": "Mini-jeu de lancer (visée → élan → lâcher). Qualité q (0–1) : au-dessus de reference_quality, le contrôle gagne jusqu'à control_up (lancer parfait) ; en dessous, il perd jusqu'à control_down. Un lancer de référence équivaut au lancer de la 1.2 (bots, mode simplifié).",
+    "_doc": "Mini-jeu de lancer v2 (visée → élan → effet → lâcher). Élan : maintenir pour charger la jauge (de plus en plus vite), relâcher dans la zone dorée (position tirée à chaque lancer). Effet : invites QTE à frapper quand elles passent la ligne. Lâcher : l'anneau se referme sur la bille en accélérant. Qualité q (0–1) = moyenne pondérée ; au-dessus de reference_quality le contrôle gagne jusqu'à control_up, en dessous il perd jusqu'à control_down. Un lancer de référence équivaut au lancer de la 1.2 (bots, mode Simple).",
     "reference_quality": 0.65,
-    "power_weight": 0.55,
-    "power_period_seconds": 1.15,
-    "power_sweet_width_by_precision": [
-      0.14,
-      0.16,
-      0.18,
-      0.2,
-      0.22,
-      0.24,
-      0.26
+    "control_up": 0.07,
+    "control_down": 0.1,
+    "weight_power": 0.35,
+    "weight_spin": 0.3,
+    "charge_seconds": 1.5,
+    "charge_exponent": 1.8,
+    "charge_wait_seconds": 6.0,
+    "power_center_range": [
+      0.55,
+      0.85
     ],
-    "power_perfect_ratio": 0.35,
-    "power_falloff": 2.2,
-    "power_auto_cycles": 3,
-    "release_seconds": 0.85,
-    "release_window_seconds": 0.2,
-    "release_perfect_seconds": 0.045,
+    "power_sweet_width_by_precision": [
+      0.09,
+      0.1,
+      0.11,
+      0.12,
+      0.13,
+      0.14,
+      0.15
+    ],
+    "power_perfect_ratio": 0.3,
+    "power_falloff": 1.6,
+    "spin_prompts": 4,
+    "spin_interval_seconds": 0.62,
+    "spin_travel_seconds": 1.5,
+    "spin_window_seconds": 0.16,
+    "spin_perfect_seconds": 0.04,
+    "release_seconds": 1.3,
+    "release_ease": 1.6,
+    "release_window_seconds": 0.15,
+    "release_perfect_seconds": 0.035,
+    "beat_pause_seconds": 0.7,
     "assist_slowdown": 1.4,
     "assist_widen": 1.3,
     "grade_thresholds": [
       0.9,
       0.7,
       0.45
-    ],
-    "control_up": 0.1,
-    "control_down": 0.1
+    ]
   }
 }

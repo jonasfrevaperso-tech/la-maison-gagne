@@ -19,6 +19,12 @@ static func resolve(run: RunState, db: ContentDB, throw_result: ThrowResolver.Th
 	ctx.near_miss = _is_near_miss(run, ctx)
 
 	EffectRunner.fire(&"on_ball_land", run, ctx, db)
+	# Bonus de Mult temporaire (machine à sous) : consommé par ce tour.
+	var temp_mult: float = float(run.flags.get("temp_mult", 0.0))
+	if temp_mult != 0.0:
+		run.flags.erase("temp_mult")
+		ctx.mult_add += temp_mult
+		ctx.push(ScoreEvent.MULT_ADD, ScoreEvent.SRC_SYSTEM, "slot", temp_mult, "slot_buff")
 
 	var tdef: Dictionary = db.get_entry("pocket_types", String(ctx.landing.type_id))
 	ctx.is_zero = ctx.landing.is_zero() or bool(tdef.get("zero_like", false))

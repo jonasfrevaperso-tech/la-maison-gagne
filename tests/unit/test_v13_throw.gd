@@ -26,8 +26,29 @@ func test_power_and_release_scores() -> void:
 	_near(ThrowSkill.release_score(1.0, false), 0.0, "lâcher très en retard : nul")
 	eq(ThrowSkill.grade(1.0), ThrowSkill.Grade.PERFECT, "note parfaite")
 	eq(ThrowSkill.grade(0.0), ThrowSkill.Grade.MISS, "note ratée")
-	_near(ThrowSkill.power_needle(0.0, 1.0), 0.0, "l'aiguille part du bord")
-	_near(ThrowSkill.power_needle(0.5, 1.0), 1.0, "à mi-période, autre bord")
+	_near(ThrowSkill.charge_level(0.0), 0.0, "la jauge part de zéro")
+	_near(ThrowSkill.charge_level(Balance.f("throw_game.charge_seconds")), 1.0, "pleine au bout de la charge")
+	check(ThrowSkill.charge_level(Balance.f("throw_game.charge_seconds") * 0.5) < 0.5, "la charge accélère")
+	_near(ThrowSkill.charge_level(Balance.f("throw_game.charge_seconds") * 2.0), 0.0, "puis redescend")
+
+
+func test_v14_three_beats() -> void:
+	var c: float = ThrowSkill.sweet_center(0.5)
+	var half: float = ThrowSkill.sweet_half(1, false)
+	_near(ThrowSkill.power_score(c, half, c), 1.0, "zone dorée déplacée : parfait en son centre")
+	check(ThrowSkill.power_score(0.5, half, ThrowSkill.sweet_center(1.0)) < ThrowSkill.EDGE_SCORE, "hors zone")
+	_near(ThrowSkill.tap_score(0.0, false), 1.0, "invite frappée pile")
+	_near(ThrowSkill.tap_score(ThrowSkill.tap_window(false), false), 0.0, "invite au bord de la fenêtre : nulle")
+	_near(ThrowSkill.spin_score([1.0, 0.0, 1.0, 0.0] as Array[float]), 0.5, "effet = moyenne des invites")
+	_near(ThrowSkill.quality(1.0, 1.0, 1.0), 1.0, "trois gestes parfaits")
+	_near(ThrowSkill.quality(0.0, 0.0, 0.0), 0.0, "trois gestes ratés")
+	_near(ThrowSkill.ring_progress(0.0, 1.0), 1.0, "anneau au départ")
+	_near(ThrowSkill.ring_progress(1.0, 1.0), 0.0, "anneau au contact")
+	check(ThrowSkill.ring_progress(0.5, 1.0) > 0.5, "l'anneau accélère vers la fin")
+	eq(ThrowSkill.slot_spins(1.0), 3, "Parfait : trois tirages")
+	eq(ThrowSkill.slot_spins(0.75), 2, "Très bien : deux tirages")
+	eq(ThrowSkill.slot_spins(0.2), 1, "sinon un tirage")
+	eq(ThrowSkill.slot_spins(ThrowSkill.NEUTRAL), 1, "mode Simple : un tirage")
 
 
 func test_reference_throw_matches_previous_distribution() -> void:

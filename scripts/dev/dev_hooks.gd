@@ -47,6 +47,9 @@ func start() -> bool:
 	if args.has("dev-debt-mult"):
 		r.flags["debt_mult"] = float(String(args["dev-debt-mult"]))
 		r.debt = GameState.controller.debt_for(r.tier, r.deadline_idx)
+	if args.has("dev-grigris"):
+		for gid: String in String(args["dev-grigris"]).split(","):
+			ShopModel.acquire_grigri(r, DataRegistry.db, gid, &"")
 	match String(args.get("dev-phase", "")):
 		"shop":
 			r.money = 30
@@ -74,7 +77,26 @@ func start() -> bool:
 		GameState.end_run(false)
 	else:
 		GameState.goto(&"run")
+	if String(args.get("dev-phase", "")) == "decor":
+		r.flags["act_intro_seen_1"] = true
+		_decor_demo.call_deferred()
+	if String(args.get("dev-phase", "")) == "slot":
+		r.flags["act_intro_seen_1"] = true
+		_slot_later.call_deferred()
 	return true
+
+
+## Machine à sous de démonstration : brelan de 7, paire de cerises, rien.
+func _slot_later() -> void:
+	for _i: int in 90:
+		await get_tree().process_frame
+	var rs: RunScreen = get_tree().root.find_children("*", "RunScreen", true, false)[0] as RunScreen
+	var spins: Array[Dictionary] = [
+		{"reels": ["seven", "seven", "seven"], "prize": "p_seven3"},
+		{"reels": ["cherry", "bell", "cherry"], "prize": "p_cherry2"},
+		{"reels": ["chip", "bell", "seven"], "prize": ""},
+	]
+	rs.call("_show_overlay", SlotOverlay.new().configure(spins, DataRegistry.db))
 
 
 func _quit_later(frames: int) -> void:
@@ -114,3 +136,21 @@ func _hover_later(points: String) -> void:
 		ev.relative = Vector2(3, 3)
 		Input.parse_input_event(ev)
 		await get_tree().create_timer(1.5).timeout
+
+
+## Démonstration du décor : chaque objet est secoué tour à tour (bouteille et jetons : jusqu'à la chute).
+func _decor_demo() -> void:
+	for _i: int in 60:
+		await get_tree().process_frame
+	var rs: RunScreen = get_tree().root.find_children("*", "RunScreen", true, false)[0] as RunScreen
+	if rs.decor == null:
+		return
+	for pr: DecorProp in rs.decor.props:
+		if pr is DecorCritter:
+			(pr as DecorCritter).call("set", "_timer", 0.0)
+	for pr2: DecorProp in rs.decor.props:
+		var n: int = 4 if pr2.kind == "bottle" else (3 if pr2.kind == "chips" else 1)
+		for _k: int in n:
+			pr2.poke()
+			await get_tree().create_timer(0.25).timeout
+		await get_tree().create_timer(0.6).timeout

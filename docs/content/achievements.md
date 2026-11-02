@@ -1,4 +1,4 @@
-# Succès (60)
+# Succès (64)
 
 | id | Nom (FR / EN) | Description | Rareté / coût | Tags | Effets | Ambiance |
 |---|---|---|---|---|---|---|
@@ -62,3 +62,7 @@
 | ach_pacts_3 | Pacte faustien / Faustian Bargain | Conclure 3 Pactes en un run. |  |  |  |  |
 | ach_no_zero_win | Jamais de Zéro / Zero Zeros | Gagner un run sans jamais voir le Zéro. |  |  |  |  |
 | ach_perfect_aim | Œil de lynx / Eagle Eye | Gagner un plein dans la zone visée pour 500 points. |  |  |  |  |
+| ach_jackpot | Ding ding ding ! / Ding Ding Ding! | Faire sonner la machine à sous (plein gagnant). |  |  |  |  |
+| ach_jackpot5 | Machine infernale / Infernal Machine | Déclencher 5 jackpots dans la même partie. |  |  |  |  |
+| ach_perfect_throw | Main de croupier / Croupier's Hand | Réussir un lancer « Parfait ». |  |  |  |  |
+| ach_visual_curses | Vision trouble / Blurred Vision | Jouer un tour avec 3 grigris à malus visuel. |  |  |  |  |

@@ -26,6 +26,7 @@ func _ready() -> void:
 
 
 func _input(event: InputEvent) -> void:
+	GameInput.note_device(event)
 	if event is InputEventJoypadMotion:
 		GameInput.observe(event as InputEventJoypadMotion)
 

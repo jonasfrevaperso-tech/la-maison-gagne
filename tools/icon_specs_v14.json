@@ -1,0 +1,37 @@
+{
+ "g_gin_flask": {
+  "motif": "flask",
+  "a": "emerald",
+  "b": "ivory"
+ },
+ "g_cigarette_holder": {
+  "motif": "cigar",
+  "a": "gold",
+  "b": "smoke"
+ },
+ "g_cracked_monocle": {
+  "motif": "monocle",
+  "a": "glass",
+  "b": "gold"
+ },
+ "g_dying_neon": {
+  "motif": "bolt",
+  "a": "magenta",
+  "b": "ink"
+ },
+ "g_double_espresso": {
+  "motif": "bottle",
+  "a": "gold_dark",
+  "b": "ivory"
+ },
+ "g_funhouse_mirror": {
+  "motif": "mirror",
+  "a": "cyan",
+  "b": "magenta"
+ },
+ "g_night_glasses": {
+  "motif": "monocle",
+  "a": "ink",
+  "b": "purple"
+ }
+}

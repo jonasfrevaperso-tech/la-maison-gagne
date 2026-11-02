@@ -42,6 +42,14 @@ BET_ODDS,Cote %d:1 · gain par jeton : %d,Pays %d:1 · win per chip: %d
 BET_ODDS_HIDDEN,Cote : ??? (le Croupier Muet se tait),Odds: ??? (the Mute Dealer says nothing)
 BET_PLACED,Jetons posés : %d,Chips placed: %d
 BET_RAW_CHANCE,Chance brute (sans visée) : %.1f %%,Raw chance (no aiming): %.1f%%
+BET_FAMILY_INSIDE,Pari intérieur · chances sans visée,Inside bet · chances without aiming
+BET_FAMILY_OUTSIDE,Pari extérieur · chances sans visée,Outside bet · chances without aiming
+BET_STAT_ODDS,cote,odds
+BET_STAT_PER_CHIP,par jeton,per chip
+BET_STAT_LIMIT,jetons max,chips max
+BET_STAT_PLACED,posés,placed
+BET_STAT_CHANCE,%.1f %% de chances,%.1f%% chance
+BET_STAT_COVERS,%d numéros couverts,%d numbers covered
 BET_ZERO_WARNING,Perd sur le Zéro.,Loses on Zero.
 BTN_CLEAR,Effacer,Clear
 BTN_CONTINUE,Continuer,Continue
@@ -97,12 +105,22 @@ FX_ZERO_PROTECTED,Zéro paré !,Zero blocked!
 FX_DEBT,Dette ajustée,Debt adjusted
 FX_BURN,Brûlée !,Burnt!
 HINT_AIMING,Fige la visée quand ta zone passe sous l'aiguille.,Lock your aim when your zone passes under the needle.
-HINT_THROWING,"Élan : arrête l'aiguille dans l'or. Lâcher : frappe quand l'anneau touche la bille.","Swing: stop the needle in the gold. Release: strike when the ring touches the ball."
+HINT_THROWING,"Élan : maintiens puis relâche dans l'or. Effet : frappe chaque invite sur la ligne. Lâcher : frappe quand l'anneau touche la bille.","Swing: hold, then release in the gold. Spin: hit each prompt on the line. Release: strike when the ring touches the ball."
 HINT_K_AIM,viser,aim
 HINT_K_STRIKE,frapper,strike
 BTN_AIM_LOCK,VISER !,AIM!
 BTN_STRIKE,FRAPPER !,STRIKE!
 THROW_BEAT_POWER,ÉLAN,SWING
+KEYNAME_LEFT,←,←
+KEYNAME_RIGHT,→,→
+KEYNAME_DOWN,↓,↓
+THROW_BEAT_SPIN,EFFET,SPIN
+THROW_HOLD,MAINTIENS %s… RELÂCHE DANS L'OR,HOLD %s… RELEASE IN THE GOLD
+THROW_CLICK,LE CLIC,THE CLICK
+THROW_STRIKE_ON_CONTACT,FRAPPE (%s) AU CONTACT,STRIKE (%s) ON CONTACT
+THROW_TAP_WRONG,MAUVAISE TOUCHE,WRONG INPUT
+HINT_K_HOLD,maintenir puis relâcher · frapper,hold then release · strike
+HINT_K_QTE,effet,spin
 THROW_BEAT_RELEASE,LÂCHER,RELEASE
 THROW_Q_PERFECT,LANCER PARFAIT,PERFECT THROW
 THROW_Q_GREAT,BEAU LANCER,GREAT THROW
@@ -441,6 +459,17 @@ ACTION_PAUSE_MENU,Pause,Pause
 ACTION_PLAYTEST_NOTE,Note de test,Playtest note
 SPLASH_MADE_WITH,Conçu avec,Made with
 SPLASH_SKIP,Appuyez sur une touche pour passer,Press any key to skip
+SLOT_TITLE,JACKPOT !,JACKPOT!
+SUB_SLOT,[machine à sous : sonnerie et cascade de pièces],[slot machine: bells and coin cascade]
+SLOT_NOTHING,Rien cette fois…,Nothing this time…
+SLOT_SUMMARY,Gains de la machine,Machine winnings
+SLOT_SUMMARY_NONE,La machine garde tout. Pour cette fois.,The machine keeps it all. This time.
+SLOT_CONTINUE,Continuer,Continue
+SLOT_SPIN_COUNT,Tirage %d / %d,Pull %d / %d
+SLOT_PULL,TIRE LE LEVIER (%s),PULL THE LEVER (%s)
+OPT_CURSE_FX,Malus visuels des grigris,Grigri visual curses
+OPT_DECOR_3D,Décor 3D du casino (objets interactifs),3D casino decor (interactive props)
+TAG_CURSE_FX,Malus visuel,Visual curse
 QS_TITLE,Réglages,Settings
 QS_TAB_CONTROLS,Commandes et effets,Controls and effects
 QS_DONE,Terminé,Done

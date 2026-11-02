@@ -1,5 +1,23 @@
 # Équilibrage
 
+## Version 1.4 — Machine à sous, mini-jeu v2, grigris à malus visuel
+Bot expert, Risque 0, graines 201–206 (même protocole que la 1.3). Les bots jouent la machine à sous comme un joueur (1 tirage en neutre, jusqu'à 3 selon la qualité tirée).
+
+| Qualité moyenne du lancer | 1.3 | 1.4, contenu brut (720 runs) | **1.4, après réglages** |
+|---|---|---|---|
+| 0,40 (maladroit) | 42,1 % | 48,6 % | **41,7 %** (420 runs) |
+| neutre (mode Simple) | 45,8 % | 51,5 % | **45,5 %** (600 runs) |
+| 0,90 (adroit) | 50,0 % | 60,7 % | **56,2 %** (420 runs) |
+
+Réglages :
+- Gains de la machine à sous divisés par deux environ : brelan de 7 = tour offert + 5 $ (au lieu de 10 $), cerises ×3 = +6 Mult (10), cloches ×3 = +10 $ (18), trèfles ×3 = +15 % de contrôle (20 %), jetons ×3 = +4 jetons de mise (6) ; paires : 3 $ / +2 Mult / 2 $ / +5 % / +1 jeton. Probabilités par tirage : brelan ≈ 5 %, paire ≈ 50 %.
+- Grigris à malus visuel : Flasque de gin +5 Mult (6), Fume-cigarette +20 Jetons par pari gagnant (25), Double serré +20 Jetons (30), Lunettes de nuit +5 Mult sur noir (6), Néon agonisant +1 $ seulement sur le rouge (à chaque tour).
+- Bonus de contrôle d'un lancer parfait ramené de +10 à +7 points (`throw_game.control_up`).
+
+Enseignements :
+- Le neutre retrouve la 1.3 (45,5 % contre 45,8 %), au bord haut de la cible 35–45 %.
+- L'adresse pèse plus qu'en 1.3 (≈ 15 points entre maladroit et adroit, contre 8) : un lancer parfait ouvre trois tirages de machine à sous. C'est voulu (le mini-jeu doit compter), mais une qualité moyenne de 0,9 sur toute une partie est rare chez un joueur humain : la télémétrie locale (qualité moyenne réelle des lancers) dira s'il faut réduire les tirages « Très bien ».
+
 ## Version 1.2 — Contenu « Tapis de jeu »
 Même protocole que 1.1 (bot expert, 330 runs au Risque 0, graines 101–111) avec les 30 nouveaux grigris (180 au total) et les deux créanciers de roue (Bonneteur, Valseuse).
 

@@ -70,23 +70,27 @@ func _perf_report() -> void:
 ## Joue le mini-jeu proprement : vise le centre de la zone dorée, puis le contact de l'anneau.
 func _throw_minigame(rs: RunScreen) -> void:
 	var g: ThrowMinigame = rs.throw_game
-	if rs.tutorial.blocking():
-		rs.tutorial.call("_close_current")
-	var guard: int = 0
-	while g.beat == ThrowMinigame.Beat.POWER and guard < 400:
-		guard += 1
-		if absf(g.get("_needle") - 0.5) < 0.03:
-			await _shot("throw_power")
-			g.press()
-			break
-		await get_tree().process_frame
-	guard = 0
-	while g.beat == ThrowMinigame.Beat.RELEASE and guard < 400:
-		guard += 1
-		if float(g.get("_t")) >= float(g.get("_release_time")) - 0.01:
-			await _shot("throw_release")
-			g.press()
-			break
+	var shots: Dictionary = {}
+	var t0: int = Time.get_ticks_msec()
+	while Time.get_ticks_msec() - t0 < 30000:
+		if rs.tutorial.blocking():
+			rs.tutorial.call("_close_current")
+		if not g.active():
+			return
+		var want: Dictionary = g.bot_wants()
+		var act: String = String(want.get("do", ""))
+		if act != "" and not shots.has(act):
+			shots[act] = true
+			await _shot("throw_" + act)
+		match act:
+			"press":
+				g.press_charge()
+			"release":
+				g.release_charge()
+			"tap":
+				g.tap(int(want["symbol"]))
+			"strike":
+				g.strike()
 		await get_tree().process_frame
 
 

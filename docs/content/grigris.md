@@ -1,6 +1,6 @@
-# Grigris (180)
+# Grigris (187)
 
-Répartition : common 71, rare 68, legendary 24, cursed 17
+Répartition : common 75, rare 71, legendary 24, cursed 17
 
 | id | Nom (FR / EN) | Description | Rareté / coût | Tags | Effets | Ambiance |
 |---|---|---|---|---|---|---|
@@ -11,12 +11,15 @@ Répartition : common 71, rare 68, legendary 24, cursed 17
 | g_black_cat | Chat noir / Black Cat | +4 Mult si la bille tombe sur du noir. | common | color, mult | on_score_calc→add_mult | Il a traversé ta route. Puis ta roue. |
 | g_boss_cigar | Cigare du Patron / Boss's Cigar | +80 Jetons, −8 à chaque tour. Se consume à 0. | common | chips, decay | on_acquire→counter_set; on_score_calc→add_chips; on_round_end→counter_add; on_round_end→self_destroy | Il était encore chaud dans le cendrier. |
 | g_brass_knuckles | Poing américain / Brass Knuckles | +8 Mult si 3 paris ou plus gagnent. | common | bets, mult | on_score_calc→add_mult | Pour les négociations difficiles. |
+| g_cigarette_holder | Fume-cigarette / Cigarette Holder | +20 Jetons par pari gagnant. Des volutes de fumée voilent la table pendant les lancers. | common | chips, curse_fx | on_bet_win→add_chips | Élégant, mortel, très années trente. |
 | g_coat_check | Vestiaire / Coat Check | +3 Mult par carte Fortune détenue. | common | fortune, mult | on_score_calc→add_mult | Ticket 37. On ne vous rendra rien. |
 | g_column_drummer | Batteur de colonne / Column Drummer | +4 Mult par colonne gagnante. | common | bets, column, mult | on_bet_win→add_mult | Il bat la mesure sur la colonne de gauche. |
 | g_cracked_chip | Jeton fêlé / Cracked Chip | +6 Mult. 1 chance sur 10 de se briser à chaque tour. | common | mult, destroy | on_score_calc→add_mult; on_round_end→self_destroy | Il a déjà survécu à une chute. De justesse. |
 | g_cufflinks | Boutons de manchette / Cufflinks | +3 Mult si la case touchée est une case Standard. | common | pockets, mult | on_score_calc→add_mult | L'élégance, c'est la simplicité. Et le crédit. |
 | g_dice_cup | Cornet à dés / Dice Cup | 1 chance sur 2 : +4 Mult. | common | chance, mult | on_score_calc→add_mult | Secouez. Priez. Renversez. |
 | g_doric_column | Colonne dorique / Doric Column | +60 Jetons par colonne gagnante. | common | bets, column, chips | on_bet_win→add_chips | Volée dans le hall. Personne n'a remarqué. |
+| g_double_espresso | Double serré / Double Espresso | +20 Jetons à chaque tour. Les mains (et l'écran) tremblent pendant les lancers. | common | chips, curse_fx | on_score_calc→add_chips | Le quatrième de la soirée. Ou le cinquième. |
+| g_dying_neon | Néon agonisant / Dying Neon | +1 $ quand la bille tombe sur du rouge. Le néon grésille et la salle clignote pendant les lancers. | common | money, curse_fx | on_ball_land→add_money | Il dit encore « OUVERT ». Plus pour longtemps. |
 | g_egg_box | Boîte d'œufs / Egg Box | +60 Jetons par douzaine gagnante. | common | bets, dozen, chips | on_bet_win→add_chips | Une douzaine, c'est douze. Sauf chez le boulanger. |
 | g_empty_pockets | Vide-poches / Empty Pockets | +4 Mult par emplacement de grigri vide. | common | slots, mult | on_score_calc→add_mult | Le vide, c'est aussi une forme de style. |
 | g_even_sock | Chaussettes paires / Matching Socks | +40 Jetons si le numéro est pair. | common | parity, chips | on_score_calc→add_chips | Les seules de la ville qui vont ensemble. |
@@ -45,6 +48,7 @@ Répartition : common 71, rare 68, legendary 24, cursed 17
 | g_miser | Le Radin / The Miser | +1 Mult par tranche de 5 $ possédés. | common | economy, mult | on_score_calc→add_mult | Il compte ses pièces en dormant. Elles aussi. |
 | g_monocle | Monocle / Monocle | +1 Précision. | common | ball, precision | on_acquire→perm_precision; on_remove→perm_precision | On voit mieux d'un œil. L'autre pleure. |
 | g_neon_sign | Enseigne au néon / Neon Sign | +8 Mult au dernier tour d'une échéance. | common | mult, spins | on_score_calc→add_mult | Elle clignote « OUVERT ». Elle ment. |
+| g_night_glasses | Lunettes de nuit / Night Glasses | +5 Mult si la bille tombe sur du noir. On n'y voit presque rien pendant les lancers. | common | color, mult, curse_fx | on_score_calc→add_mult | Portées à minuit, par principe. |
 | g_odd_duck | Canard impair / Odd Duck | +40 Jetons si le numéro est impair. | common | parity, chips | on_score_calc→add_chips | Il boite. Personne n'ose lui demander pourquoi. |
 | g_odd_pair | Paire dépareillée / Odd Pair | +3 Mult par pari Pair ou Impair gagnant. | common | bets, parity, mult | on_bet_win→add_mult | Une rouge, une verte. Personne n'ose rien dire. |
 | g_outsider | L'Homme de l'extérieur / The Outsider | +3 Mult par pari extérieur gagnant. | common | bets, outside, mult | on_bet_win→add_mult | Il ne s'assoit jamais à la table. Il regarde. |
@@ -90,13 +94,16 @@ Répartition : common 71, rare 68, legendary 24, cursed 17
 | g_compass | Boussole / Compass | Après un rebond fou, +1 Précision pour le lancer suivant. | rare | ball, precision | on_round_end→temp_precision | Le nord, c'est en bas. |
 | g_compound | Intérêts composés / Compound Interest | Plafond des intérêts +5 $. | rare | economy, interest | on_acquire→interest_cap; on_remove→interest_cap | L'arme de La Maison, retournée contre elle. |
 | g_coupon_book | Carnet de bons / Coupon Book | Boutique −2 $ sur tout. | rare | economy | on_acquire→shop_discount; on_remove→shop_discount | Valable jusqu'à la fin des temps. Ou du run. |
+| g_cracked_monocle | Monocle fêlé / Cracked Monocle | ×1,5 Mult si la bille tombe dans la zone visée. Le verre fêlé zèbre la vue pendant les lancers. | rare | xmult, curse_fx | on_score_calc→mul_mult | Il voit juste… d'un seul œil. |
 | g_croupier_wink | Clin d'œil du croupier / Dealer's Wink | 1 chance sur 2 : les paris gagnants paient une seconde fois. | rare | retrigger, bets | on_ball_land→retrigger_bets | Il a une poussière dans l'œil. Tous les soirs. |
 | g_double_or_nothing | Quitte ou double / Double or Nothing | 1 chance sur 2 : ×2 Mult. Puis 1 chance sur 2 : ×0,75 Mult. | rare | chance, xmult | on_score_calc→mul_mult; on_score_calc→mul_mult | Une pièce, deux faces, zéro garantie. |
 | g_forger | Faussaire / Forger | 1 chance sur 5 : la case touchée est dupliquée (la roue grandit). | rare | pockets, chance | on_round_end→add_pocket_copy | Signature parfaite. Encre encore fraîche. |
 | g_fortune_cookie | Biscuit chinois / Fortune Cookie | +3 Mult permanent par carte Fortune utilisée. | rare | fortune, growth, mult | on_fortune_used→counter_add; on_score_calc→add_mult | « Vous allez miser gros. » Évidemment. |
 | g_fortune_teller | Diseuse de bonne aventure / Fortune Teller | Au dernier tour d'une échéance, crée une carte Fortune. | rare | fortune | on_round_end→add_fortune | Elle voit votre avenir. Elle préfère ne rien dire. |
+| g_funhouse_mirror | Miroir de foire / Funhouse Mirror | ×2 Mult si la bille tombe sur un nombre « miroir » (12, 21, 13, 31, 23, 32). Pendant que la bille roule, tout est à l'envers. | rare | xmult, curse_fx | on_score_calc→mul_mult | Vu de l'autre côté, la Maison perd. |
 | g_gardener | Jardinier / Gardener | Si au moins un pari gagne, la case touchée gagne un niveau (+10 Jetons). | rare | pockets, growth | on_round_end→upgrade_pocket | Il arrose les cases avec vos larmes. |
 | g_gilded_cage | Cage dorée / Gilded Cage | Une case Dorée touchée compte une fois de plus. | rare | pockets, golden, retrigger | on_ball_land→retrigger_pocket | Le perroquet ne chante que « mise ». |
+| g_gin_flask | Flasque de gin / Gin Flask | +5 Mult. Pendant les lancers, la salle tangue et on voit double. | rare | mult, curse_fx | on_score_calc→add_mult | « Juste une gorgée pour la main. » |
 | g_glass_cutter | Diamantaire / Glass Cutter | Une case de Verre touchée compte une fois de plus. | rare | pockets, glass, retrigger | on_ball_land→retrigger_pocket | Il taille le verre comme d'autres taillent les cartes. |
 | g_glass_heart | Cœur de verre / Glass Heart | ×2 Mult supplémentaire quand la bille touche une case de Verre. | rare | pockets, glass, xmult | on_score_calc→mul_mult | Il s'est déjà brisé. Il a été recollé à la colle de jeton. |
 | g_gold_tooth | Dent en or / Gold Tooth | +30 Jetons par case Dorée sur la roue. | rare | pockets, golden, chips | on_score_calc→add_chips | Arrachée en garantie. Remboursée en sourire. |

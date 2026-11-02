@@ -19,7 +19,9 @@ Le **mode manette** se règle dans Options → Commandes : *Automatique* (les in
 | Taille de la mise (1, 2, 5, 10) | Q / W | LB / RB |
 | Chevaux, transversales, carrés, sixains | bords et coins des cases | le curseur avance par demi-case : centre = plein, bord = cheval, coin = carré |
 | Annuler · répéter · effacer | Z · R · C | X · Y · L3 |
-| Lancer : viser, puis le mini-jeu (élan, lâcher) | Espace ou clic / bouton LANCER | RT ou A |
+| Lancer : viser, puis le mini-jeu (élan, effet, lâcher) | Espace ou clic / bouton LANCER ; effet : flèches ou clics gauche/droit | RT ou A ; effet : X Y B A |
+| Machine à sous (jackpot) : tirer le levier | Espace, Entrée ou clic | RT ou A |
+| Taquiner le décor | clic sur un objet | pichenette du stick droit |
 | Grigris et cartes Fortune | clic (glisser, double-clic, clic droit) | View : sélection ; A utiliser / vendre ; Y verrouiller ; LB/RB déplacer |
 | Choisir une case (carte Fortune) | clic sur la roue | croix, puis A |
 | Passer une animation · vitesse | Entrée · F | A ou B · LT |
@@ -33,7 +35,15 @@ La sensibilité du stick gauche se règle dans Options → Commandes (et en cour
 Toutes les commandes sont remappables, au clavier comme à la manette (Options → Commandes). Les champs de texte s'ouvrent au clavier virtuel avec A.
 
 ### Le lancer
-Après la visée, un mini-jeu de deux temps décide de la qualité du lancer : **élan** (arrêter l'aiguille dans la zone dorée) puis **lâcher** (frapper quand l'anneau se referme sur la bille). La qualité ajuste le contrôle de la bille de −10 à +10 points autour de la Précision ; un lancer « moyen » vaut exactement l'ancien lancer, l'équilibrage reste donc celui de la 1.2. Options → Jeu → Lancer : *Adresse* (mini-jeu) ou *Simple* (appuyer/relâcher, contrôle neutre).
+Après la visée, un mini-jeu en trois temps décide de la qualité du lancer : **élan** (maintenir, puis relâcher quand la jauge, qui accélère, traverse la zone dorée — placée différemment à chaque lancer), **effet** (quatre invites défilent vers une ligne : frapper la bonne touche au bon moment) et **lâcher** (frapper quand l'anneau, qui accélère, touche la bille). La qualité ajuste le contrôle de la bille de −10 à +7 points autour de la Précision ; un lancer « moyen » vaut exactement l'ancien lancer. Options → Jeu → Lancer : *Adresse* (mini-jeu) ou *Simple* (appuyer/relâcher, contrôle neutre).
+
+### Jackpot et machine à sous
+Un **plein gagnant** fait surgir la machine à sous du casino : 1 tirage, 2 après un lancer « Très bien », 3 après un « Parfait ». Paires et brelans rapportent de l'argent, du Mult ou du contrôle pour le tour suivant, des jetons de mise en plus… et le brelan de 7 un **tour offert**. Tout est tiré par le moteur avant l'animation.
+
+### Le casino abandonné
+La partie se joue sur la table d'un casino laissé à l'abandon, en 3D derrière l'interface : feutre usé, lustre qui grésille, poussière dans la lumière. Les objets posés dans les coins réagissent au clic (lampe, verre de whisky, bouteille, cendrier, dés, cartes, pile de jetons, enseigne au néon), et un rat et une araignée passent de temps en temps. Options → Vidéo → Décor 3D (désactivable).
+
+Certains grigris ont un **malus visuel** pendant les lancers (Flasque de gin : vision double ; Fume-cigarette : fumée ; Monocle fêlé ; Néon agonisant ; Double serré ; Miroir de foire ; Lunettes de nuit), compensé par un bonus. Options → Jus → Malus visuels des grigris pour les atténuer ou les couper (aussi en cours de partie : Pause → Réglages).
 
 ### Affichage
 Plein écran à la définition native ou à une résolution de rendu au choix ; en fenêtré, 17 définitions courantes de 1280×720 à 5120×2880 : 16:9 (720p, 1080p, **1440p**, 4K, 5K), 16:10 (1280×800 Steam Deck, 1440×900, 1680×1050, 1920×1200, 2560×1600, 2880×1800), 21:9 (2560×1080, 3440×1440, 3840×1600) et 32:9 (5120×1440). Options → Vidéo : mode, résolution, limite d'images, **roue en 3D** (désactivable) et **mode Steam Deck / portable** (texte agrandi, bloom coupé, 60 i/s ; activé d'office sur Steam Deck, désactivable, les réglages précédents sont restaurés).

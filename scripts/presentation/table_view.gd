@@ -320,6 +320,19 @@ func _get_tooltip(at_position: Vector2) -> String:
 	return BetInfo.describe(s, hide_odds, wheel, chip_value, int(slip.chips.get(s, 0)) if slip != null else 0)
 
 
+## Infobulle illustrée (BetCard) à la place du texte brut.
+func _make_custom_tooltip(_for_text: String) -> Object:
+	var s: String = spot_at(get_local_mouse_position())
+	if s == "":
+		return null
+	return BetCard.build(s, hide_odds, wheel, chip_value, int(slip.chips.get(s, 0)) if slip != null else 0)
+
+
+## Position du curseur manette (coordonnées locales).
+func cursor_point() -> Vector2:
+	return fine_point(_cx, _cy)
+
+
 # --------------------------------------------------------------------------- dessin
 
 

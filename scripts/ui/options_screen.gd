@@ -183,6 +183,7 @@ func _video_tab() -> void:
 	_slider(b, "OPT_BLOOM", "video", "bloom", 0.0, 1.0, 0.05)
 	_check(b, "OPT_SHOW_FPS", "video", "show_fps")
 	_check(b, "OPT_WHEEL_3D", "video", "wheel_3d")
+	_check(b, "OPT_DECOR_3D", "video", "decor_3d")
 	b.add_child(UiKit.label(tr("OPT_WHEEL_3D_DESC"), UiKit.SIZE_SMALL, Palette.SMOKE))
 	_check(b, "OPT_HANDHELD", "video", "handheld")
 	b.add_child(UiKit.label(tr("OPT_HANDHELD_DESC"), UiKit.SIZE_SMALL, Palette.SMOKE))
@@ -194,6 +195,7 @@ func _juice_tab() -> void:
 	_slider(b, "OPT_SHAKE", "juice", "shake", 0.0, 1.0, 0.05)
 	_check(b, "OPT_FLASHES", "juice", "flashes")
 	_check(b, "OPT_REDUCED_MOTION", "juice", "reduced_motion")
+	_slider(b, "OPT_CURSE_FX", "juice", "curse_fx", 0.0, 1.0, 0.1)
 
 
 func _game_tab() -> void:

@@ -10,6 +10,8 @@ const BADGE: float = 46.0
 const ICON: float = 40.0
 const STAT_ICON: float = 24.0
 const PROB_BAR: Vector2 = Vector2(200, 12)
+## Une case seule dépasse rarement 10 % : la barre est pleine à 10 %.
+const PROB_FULL: float = 0.1
 ## Opérations d'effet montrées en pastilles : [icône, couleur, format].
 const STAT_OPS: Dictionary[String, Array] = {
 	"add_chips": ["chips", Color("3d8bff"), "+%s"],
@@ -49,7 +51,7 @@ static func build(p: Pocket, db: ContentDB, probability: float = -1.0) -> PanelC
 	head.add_child(_number_badge(p))
 	var tex: Texture2D = IconLibrary.icon(String(tdef.get("icon", "")))
 	if tex != null and p.type_id != Pocket.TYPE_STANDARD:
-		head.add_child(_tex(tex, ICON))
+		head.add_child(tex_rect(tex, ICON))
 	var names: VBoxContainer = VBoxContainer.new()
 	names.add_theme_constant_override("separation", 0)
 	names.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -63,9 +65,9 @@ static func build(p: Pocket, db: ContentDB, probability: float = -1.0) -> PanelC
 	box.add_child(stats)
 	var base_chips: int = p.number * Balance.i("score.pocket_number_chips")
 	if base_chips > 0:
-		stats.add_child(_pill("chips", Color("3d8bff"), "+%d" % base_chips, "STAT_BASE_CHIPS"))
+		stats.add_child(pill("chips", Color("3d8bff"), "+%d" % base_chips, "STAT_BASE_CHIPS"))
 	if p.level > 0:
-		stats.add_child(_pill("level", Palette.GOLD_LIGHT, "+%d" % (p.level * Balance.i("score.pocket_level_chips")), "STAT_LEVEL", p.level))
+		stats.add_child(pill("level", Palette.GOLD_LIGHT, "+%d" % (p.level * Balance.i("score.pocket_level_chips")), "STAT_LEVEL", p.level))
 	for eff: Variant in tdef.get("effects", []):
 		for act: Variant in (eff as Dictionary).get("do", []):
 			var a: Dictionary = act as Dictionary
@@ -77,8 +79,8 @@ static func build(p: Pocket, db: ContentDB, probability: float = -1.0) -> PanelC
 			var txt: String = String(spec[2])
 			if txt.contains("%s"):
 				var shown: Variant = float(v) * 100.0 if op == "chance_destroy_pocket" and (v is float or v is int) else v
-				txt = txt % (_num(shown) if (shown is float or shown is int) else "?")
-			stats.add_child(_pill(String(spec[0]), spec[1] as Color, txt, ""))
+				txt = txt % (num(shown) if (shown is float or shown is int) else "?")
+			stats.add_child(pill(String(spec[0]), spec[1] as Color, txt, ""))
 	var desc: Label = UiKit.label(ContentDB.text(tdef, "desc", loc), UiKit.SIZE_SMALL, Palette.IVORY)
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	desc.custom_minimum_size = Vector2(WIDTH - 30, 0)
@@ -92,16 +94,16 @@ static func build(p: Pocket, db: ContentDB, probability: float = -1.0) -> PanelC
 		var scol: Color = PocketInfo.seal_color(p.seal).lightened(0.15)
 		box.add_child(_extra("seal", scol, ContentDB.text(sd, "name", loc), ContentDB.text(sd, "desc", loc)))
 	if probability >= 0.0:
-		box.add_child(_probability(probability))
+		box.add_child(chance_row(probability, PROB_FULL))
 	return panel
 
 
-static func _num(v: Variant) -> String:
+static func num(v: Variant) -> String:
 	var f: float = float(v)
 	return str(int(f)) if is_equal_approx(f, roundf(f)) else ("%.1f" % f).replace(".", "," if Localization.locale() == "fr" else ".")
 
 
-static func _tex(t: Texture2D, sz: float) -> TextureRect:
+static func tex_rect(t: Texture2D, sz: float) -> TextureRect:
 	var r: TextureRect = TextureRect.new()
 	r.texture = t
 	r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -130,7 +132,7 @@ static func _number_badge(p: Pocket) -> Control:
 
 
 ## Pastille : icône + valeur colorée (+ libellé discret).
-static func _pill(icon_id: String, col: Color, value: String, label_key: String, arg: int = -1) -> Control:
+static func pill(icon_id: String, col: Color, value: String, label_key: String, arg: int = -1) -> Control:
 	var pc: PanelContainer = PanelContainer.new()
 	pc.add_theme_stylebox_override("panel", UiKit.flat(Color(col, 0.16), Color(col, 0.7), 1, 4, 4))
 	pc.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -139,7 +141,7 @@ static func _pill(icon_id: String, col: Color, value: String, label_key: String,
 	pc.add_child(h)
 	var t: Texture2D = stat_icon(icon_id)
 	if t != null:
-		h.add_child(_tex(t, STAT_ICON))
+		h.add_child(tex_rect(t, STAT_ICON))
 	h.add_child(UiKit.label(value, UiKit.SIZE_BODY - 2, col.lightened(0.25), "mono"))
 	if label_key != "":
 		var txt: String = TranslationServer.translate(label_key)
@@ -154,29 +156,29 @@ static func _extra(icon_id: String, col: Color, title: String, desc: String) -> 
 	h.add_theme_constant_override("separation", 8)
 	var t: Texture2D = stat_icon(icon_id)
 	if t != null:
-		h.add_child(_tex(t, STAT_ICON))
+		h.add_child(tex_rect(t, STAT_ICON))
 	var l: RichTextLabel = UiKit.rich("[color=#%s]%s[/color] — %s" % [col.to_html(false), title, desc], UiKit.SIZE_SMALL)
 	l.custom_minimum_size = Vector2(WIDTH - 70, 0)
 	h.add_child(l)
 	return h
 
 
-static func _probability(p: float) -> Control:
+## Ligne de chance : icône, barre (pleine à `full`), pourcentage.
+static func chance_row(p: float, full: float, label_key: String = "POCKET_PROBABILITY") -> Control:
 	var h: HBoxContainer = HBoxContainer.new()
 	h.add_theme_constant_override("separation", 8)
 	var t: Texture2D = stat_icon("chance")
 	if t != null:
-		h.add_child(_tex(t, STAT_ICON))
+		h.add_child(tex_rect(t, STAT_ICON))
 	var bar: Control = Control.new()
 	bar.custom_minimum_size = PROB_BAR
 	bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	bar.draw.connect(
 		func() -> void:
 			bar.draw_rect(Rect2(Vector2.ZERO, PROB_BAR), Palette.SMOKE_DARK)
-			# Échelle : 10 % remplit la barre (une case seule dépasse rarement).
-			bar.draw_rect(Rect2(Vector2.ZERO, Vector2(PROB_BAR.x * clampf(p / 0.1, 0.0, 1.0), PROB_BAR.y)), Palette.EMERALD)
+			bar.draw_rect(Rect2(Vector2.ZERO, Vector2(PROB_BAR.x * clampf(p / full, 0.0, 1.0), PROB_BAR.y)), Palette.EMERALD)
 			bar.draw_rect(Rect2(Vector2.ZERO, PROB_BAR), Palette.GOLD_DARK, false, 1.0)
 	)
 	h.add_child(bar)
-	h.add_child(UiKit.label(TranslationServer.translate("POCKET_PROBABILITY") % (p * 100.0), UiKit.SIZE_SMALL, Palette.EMERALD))
+	h.add_child(UiKit.label(TranslationServer.translate(label_key) % (p * 100.0), UiKit.SIZE_SMALL, Palette.EMERALD))
 	return h

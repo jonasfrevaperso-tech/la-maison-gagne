@@ -6,7 +6,7 @@ Mesures objectives en l'absence d'écoute humaine. Seuils : saturation > −0,1 
 
 | Son | Variantes | Crête moy. (dBFS) | RMS moy. (dBFS) | Durée moy. (s) |
 |---|---|---|---|---|
-| ambience_casino | 1 | -6.0 | -22.4 | 23.50 |
+| ambience_casino | 1 | -6.0 | -22.0 | 23.50 |
 | ball_bounce | 5 | -3.6 | -18.7 | 0.13 |
 | ball_glass | 3 | -3.6 | -12.8 | 0.60 |
 | ball_land | 4 | -3.6 | -22.1 | 0.70 |
@@ -54,6 +54,17 @@ Mesures objectives en l'absence d'écoute humaine. Seuils : saturation > −0,1 
 | deadline | 3 | -3.6 | -18.3 | 3.40 |
 | deadline_failed | 3 | -3.6 | -14.3 | 3.20 |
 | deadline_won | 3 | -3.6 | -18.1 | 3.40 |
+| decor_bottle | 3 | -3.6 | -16.9 | 0.50 |
+| decor_creak | 3 | -3.6 | -17.9 | 0.60 |
+| decor_glass | 4 | -3.6 | -15.1 | 0.50 |
+| decor_ice | 3 | -3.6 | -17.7 | 0.60 |
+| decor_neon | 3 | -3.6 | -10.4 | 0.50 |
+| decor_phone | 2 | -3.6 | -20.3 | 2.25 |
+| decor_pluck | 3 | -3.6 | -14.7 | 0.40 |
+| decor_puff | 3 | -3.6 | -16.7 | 0.70 |
+| decor_squeak | 3 | -3.6 | -11.3 | 0.12 |
+| decor_switch | 3 | -3.6 | -20.2 | 0.30 |
+| decor_topple | 3 | -3.6 | -19.5 | 0.51 |
 | dice | 3 | -3.6 | -22.4 | 0.64 |
 | double | 3 | -3.6 | -17.2 | 0.14 |
 | echo | 3 | -3.6 | -14.4 | 0.75 |
@@ -83,6 +94,13 @@ Mesures objectives en l'absence d'écoute humaine. Seuils : saturation > −0,1 
 | shield | 3 | -3.6 | -12.8 | 0.60 |
 | shimmer | 3 | -3.6 | -15.8 | 1.06 |
 | sigh | 2 | -3.6 | -17.2 | 0.50 |
+| slot_big | 2 | -3.6 | -19.1 | 3.80 |
+| slot_lever | 3 | -3.6 | -18.4 | 0.79 |
+| slot_ring | 2 | -3.6 | -16.7 | 1.12 |
+| slot_spin | 3 | -3.6 | -22.7 | 1.52 |
+| slot_stop | 4 | -3.6 | -13.4 | 0.25 |
+| slot_tease | 2 | -3.6 | -6.7 | 0.90 |
+| slot_win | 3 | -3.6 | -18.3 | 2.18 |
 | stamp | 3 | -3.6 | -13.7 | 0.20 |
 | sticky | 3 | -3.6 | -18.1 | 0.15 |
 | stinger_defeat | 1 | -3.6 | -14.4 | 4.40 |

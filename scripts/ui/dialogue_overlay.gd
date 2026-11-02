@@ -5,8 +5,12 @@ extends Control
 
 signal closed
 
-const CHARS_PER_SEC: float = 48.0
+const CHARS_PER_SEC: float = 30.0
 const BLIP_EVERY: int = 2
+## Respiration après la ponctuation (secondes) et fondu d'entrée du panneau et des portraits.
+const PUNCT_PAUSE: float = 0.22
+const COMMA_PAUSE: float = 0.09
+const LINE_FADE: float = 0.35
 const PANEL_H: float = 300.0
 const MARGIN: float = 40.0
 
@@ -16,6 +20,7 @@ var db: ContentDB = null
 var _lines: Array = []
 var _index: int = -1
 var _typed: float = 0.0
+var _pause: float = 0.0
 var _portrait: PortraitView = null
 var _name: Label = null
 var _text: RichTextLabel = null
@@ -114,7 +119,14 @@ func _next() -> void:
 	_text.text = ("[i]%s[/i]" if italic else "%s") % Localization.t(line, "text")
 	_text.visible_characters = 0
 	_typed = 0.0
+	_pause = 0.0
 	_last_blip_char = 0
+	_text.modulate.a = 0.0
+	var tw: Tween = create_tween().set_parallel(true)
+	tw.tween_property(_text, "modulate:a", 1.0, LINE_FADE)
+	if _portrait != null:
+		_portrait.modulate.a = 0.0
+		tw.tween_property(_portrait, "modulate:a", 1.0, LINE_FADE)
 	_waiting_choice = false
 
 
@@ -126,8 +138,18 @@ func _process(delta: float) -> void:
 		_text.visible_characters = -1
 		_on_line_typed()
 		return
+	if _pause > 0.0:
+		_pause -= delta * maxf(Settings.speed(), 1.0)
+		return
 	_typed += delta * CHARS_PER_SEC * maxf(Settings.speed(), 1.0)
-	_text.visible_characters = mini(int(_typed), total)
+	var shown: int = mini(int(_typed), total)
+	if shown > _text.visible_characters and shown < total:
+		var ch: String = _text.get_parsed_text().substr(shown - 1, 1)
+		if ch in [".", "!", "?", "…", ":"]:
+			_pause = PUNCT_PAUSE
+		elif ch in [",", ";"]:
+			_pause = COMMA_PAUSE
+	_text.visible_characters = shown
 	if _text.visible_characters - _last_blip_char >= BLIP_EVERY:
 		_last_blip_char = _text.visible_characters
 		AudioBus.play(_blip, 1.0, -6.0, "UI")

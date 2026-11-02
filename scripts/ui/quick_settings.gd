@@ -29,6 +29,7 @@ func build() -> void:
 	_choice(ctl, "OPT_INPUT_MODE", "game", "input_mode", InputGlyphs.MODES, ["OPT_IM_AUTO", "OPT_IM_KEYBOARD", "OPT_IM_GAMEPAD"])
 	_slider(ctl, "OPT_STICK_SENS", "input", "stick_sensitivity", 0.0, 1.0, 0.05)
 	_slider(ctl, "OPT_JUICE", "juice", "intensity", 0.0, 1.0, 0.05)
+	_slider(ctl, "OPT_CURSE_FX", "juice", "curse_fx", 0.0, 1.0, 0.1)
 	_slider(ctl, "OPT_SHAKE", "juice", "shake", 0.0, 1.0, 0.05)
 	_check(ctl, "OPT_FLASHES", "juice", "flashes")
 	_check(ctl, "OPT_HANDHELD", "video", "handheld")

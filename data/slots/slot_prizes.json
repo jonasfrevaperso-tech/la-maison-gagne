@@ -1,0 +1,160 @@
+[
+ {
+  "id": "p_seven3",
+  "match": "triple",
+  "symbol": "seven",
+  "do": [
+   {
+    "op": "add_spins",
+    "v": 1
+   },
+   {
+    "op": "add_money",
+    "v": 5
+   }
+  ],
+  "name_fr": "TOUR OFFERT ! +1 tour et +5 $",
+  "name_en": "FREE SPIN! +1 spin and +5 $",
+  "desc_fr": "TOUR OFFERT ! +1 tour et +5 $",
+  "desc_en": "FREE SPIN! +1 spin and +5 $"
+ },
+ {
+  "id": "p_cherry3",
+  "match": "triple",
+  "symbol": "cherry",
+  "do": [
+   {
+    "op": "temp_mult",
+    "v": 6
+   }
+  ],
+  "name_fr": "+6 Mult au prochain tour",
+  "name_en": "+6 Mult next spin",
+  "desc_fr": "+6 Mult au prochain tour",
+  "desc_en": "+6 Mult next spin"
+ },
+ {
+  "id": "p_bell3",
+  "match": "triple",
+  "symbol": "bell",
+  "do": [
+   {
+    "op": "add_money",
+    "v": 10
+   }
+  ],
+  "name_fr": "+10 $",
+  "name_en": "+10 $",
+  "desc_fr": "+10 $",
+  "desc_en": "+10 $"
+ },
+ {
+  "id": "p_clover3",
+  "match": "triple",
+  "symbol": "clover",
+  "do": [
+   {
+    "op": "temp_control",
+    "v": 0.15
+   },
+   {
+    "op": "temp_precision",
+    "v": 1
+   }
+  ],
+  "name_fr": "Main de velours : +15 % de contrôle et +1 Précision au prochain lancer",
+  "name_en": "Velvet hand: +15% control and +1 Precision next throw",
+  "desc_fr": "Main de velours : +15 % de contrôle et +1 Précision au prochain lancer",
+  "desc_en": "Velvet hand: +15% control and +1 Precision next throw"
+ },
+ {
+  "id": "p_chip3",
+  "match": "triple",
+  "symbol": "chip",
+  "do": [
+   {
+    "op": "temp_budget",
+    "v": 4
+   }
+  ],
+  "name_fr": "+4 jetons de mise au prochain tour",
+  "name_en": "+4 betting chips next spin",
+  "desc_fr": "+4 jetons de mise au prochain tour",
+  "desc_en": "+4 betting chips next spin"
+ },
+ {
+  "id": "p_seven2",
+  "match": "pair",
+  "symbol": "seven",
+  "do": [
+   {
+    "op": "add_money",
+    "v": 3
+   }
+  ],
+  "name_fr": "+3 $",
+  "name_en": "+3 $",
+  "desc_fr": "+3 $",
+  "desc_en": "+3 $"
+ },
+ {
+  "id": "p_cherry2",
+  "match": "pair",
+  "symbol": "cherry",
+  "do": [
+   {
+    "op": "temp_mult",
+    "v": 2
+   }
+  ],
+  "name_fr": "+2 Mult au prochain tour",
+  "name_en": "+2 Mult next spin",
+  "desc_fr": "+2 Mult au prochain tour",
+  "desc_en": "+2 Mult next spin"
+ },
+ {
+  "id": "p_bell2",
+  "match": "pair",
+  "symbol": "bell",
+  "do": [
+   {
+    "op": "add_money",
+    "v": 2
+   }
+  ],
+  "name_fr": "+2 $",
+  "name_en": "+2 $",
+  "desc_fr": "+2 $",
+  "desc_en": "+2 $"
+ },
+ {
+  "id": "p_clover2",
+  "match": "pair",
+  "symbol": "clover",
+  "do": [
+   {
+    "op": "temp_control",
+    "v": 0.05
+   }
+  ],
+  "name_fr": "+5 % de contrôle au prochain lancer",
+  "name_en": "+5% control next throw",
+  "desc_fr": "+5 % de contrôle au prochain lancer",
+  "desc_en": "+5% control next throw"
+ },
+ {
+  "id": "p_chip2",
+  "match": "pair",
+  "symbol": "chip",
+  "do": [
+   {
+    "op": "temp_budget",
+    "v": 1
+   }
+  ],
+  "name_fr": "+1 jeton de mise au prochain tour",
+  "name_en": "+1 betting chip next spin",
+  "desc_fr": "+1 jeton de mise au prochain tour",
+  "desc_en": "+1 betting chip next spin"
+ }
+]

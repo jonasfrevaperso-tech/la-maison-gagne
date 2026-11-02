@@ -117,3 +117,17 @@ Format : fait / testé / reste à faire / risques.
 - Fait : tout le plan. Nouveaux fichiers : `GameInput`, `StickRepeater`, `ThrowSkill`, `ThrowMinigame`, `RunScreenThrow`, `Wheel3D`, `TitleWheel`, `ChipBurst3D`, `PocketCard`, `QuickSettings`, `SplashScreen`, `tools/gen_stat_icons.py`, `tools/build_release.sh`, `packaging/flatpak/`.
 - Testé : `check.sh` vert (tests manette/curseur/mini-jeu, interface avec réglages rapides, campagne manette avec mini-jeu), captures 3D (roue, titre, gerbes, écran d'ouverture), Flatpak installé et lancé (Vulkan), équilibrage (`docs/BALANCE.md`).
 - Reste humain : jouer le mini-jeu (ressenti des fenêtres), Steam Deck réel, Windows réel.
+
+## Version 1.4 — Le Casino Abandonné ✅ (tag v1.4.0)
+Plan (chaque étape : code → tests → captures → corrections) :
+1. Écran de démarrage Godot noir (pas de logo ni de gris).
+2. Fiches de paris illustrées (icônes, couleurs) en infobulle et à la manette ; correction du débordement sur « FORTUNE ».
+3. Rythme : dialogues, lancer de bille et mini-jeu ralentis (constantes JuiceProfile / balance).
+4. Mini-jeu de lancer v2, plus ambitieux et plus exigeant, esprit QTE : élan maintenu (charger/relâcher), effet (suite d'invites à frapper en rythme), lâcher (anneau). Référence de qualité recalibrée.
+5. Jackpot (plein gagnant) → machine à sous en surcouche, 1 à 3 tirages selon la qualité du lancer ; gains temporaires (Mult, contrôle, budget, tour offert, argent) calculés dans le cœur (flux `effects`), joués en « moment à dopamine » (sons, lumières, pièces).
+6. Grigris à malus visuels (vision alcoolisée, fumée, monocle fêlé, néon qui grésille, tremblements, miroir), effets cohérents avec leur nom ; option d'accessibilité pour les atténuer.
+7. Décor : table de casino d'un casino abandonné en 3D derrière toute l'interface, objets décoratifs interactifs (lampe, verre, bouteille, cendrier, dés, piles de jetons, néon, téléphone, araignée, rat…), sons dédiés ; option pour le désactiver.
+8. Tutoriel : chaque fonctionnalité expliquée au fil de la première partie.
+9. Équilibrage par simulations (machine à sous incluse), docs, check, exports, tag v1.4.0.
+
+Bilan 1.4 : les 9 étapes sont livrées. `tools/check.sh` vert (83 tests, interface 3 résolutions, campagne manette). Équilibrage : neutre 45,5 %, maladroit 41,7 %, adroit 56,2 % (`docs/BALANCE.md`). Exports Windows, Linux, Flatpak régénérés.

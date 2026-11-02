@@ -1,0 +1,250 @@
+[
+ {
+  "id": "g_gin_flask",
+  "rarity": "rare",
+  "tags": [
+   "mult",
+   "curse_fx"
+  ],
+  "icon": "g_gin_flask",
+  "sfx": "glass",
+  "name_fr": "Flasque de gin",
+  "name_en": "Gin Flask",
+  "desc_fr": "+5 Mult. Pendant les lancers, la salle tangue et on voit double.",
+  "desc_en": "+5 Mult. During throws, the room sways and you see double.",
+  "flavor_fr": "« Juste une gorgée pour la main. »",
+  "flavor_en": "\"Just a sip for a steady hand.\"",
+  "visual": {
+   "kind": "drunk",
+   "strength": 0.9
+  },
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 5
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_cigarette_holder",
+  "rarity": "common",
+  "tags": [
+   "chips",
+   "curse_fx"
+  ],
+  "icon": "g_cigarette_holder",
+  "sfx": "fire",
+  "name_fr": "Fume-cigarette",
+  "name_en": "Cigarette Holder",
+  "desc_fr": "+20 Jetons par pari gagnant. Des volutes de fumée voilent la table pendant les lancers.",
+  "desc_en": "+20 Chips per winning bet. Smoke curls veil the table during throws.",
+  "flavor_fr": "Élégant, mortel, très années trente.",
+  "flavor_en": "Elegant, deadly, very nineteen-thirties.",
+  "visual": {
+   "kind": "smoke",
+   "strength": 0.8
+  },
+  "effects": [
+   {
+    "trigger": "on_bet_win",
+    "do": [
+     {
+      "op": "add_chips",
+      "v": 20
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_cracked_monocle",
+  "rarity": "rare",
+  "tags": [
+   "xmult",
+   "curse_fx"
+  ],
+  "icon": "g_cracked_monocle",
+  "sfx": "crack",
+  "name_fr": "Monocle fêlé",
+  "name_en": "Cracked Monocle",
+  "desc_fr": "×1,5 Mult si la bille tombe dans la zone visée. Le verre fêlé zèbre la vue pendant les lancers.",
+  "desc_en": "×1.5 Mult if the ball lands in the aimed zone. The cracked lens streaks your view during throws.",
+  "flavor_fr": "Il voit juste… d'un seul œil.",
+  "flavor_en": "He sees clearly… with one eye.",
+  "visual": {
+   "kind": "crack",
+   "strength": 0.85
+  },
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "in_zone"
+     }
+    ],
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 1.5
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_dying_neon",
+  "rarity": "common",
+  "tags": [
+   "money",
+   "curse_fx"
+  ],
+  "icon": "g_dying_neon",
+  "sfx": "zap",
+  "name_fr": "Néon agonisant",
+  "name_en": "Dying Neon",
+  "desc_fr": "+1 $ quand la bille tombe sur du rouge. Le néon grésille et la salle clignote pendant les lancers.",
+  "desc_en": "+$1 when the ball lands on red. The neon buzzes and the room flickers during throws.",
+  "flavor_fr": "Il dit encore « OUVERT ». Plus pour longtemps.",
+  "flavor_en": "It still says \"OPEN\". Not for long.",
+  "visual": {
+   "kind": "flicker",
+   "strength": 0.8
+  },
+  "effects": [
+   {
+    "trigger": "on_ball_land",
+    "if": [
+     {
+      "c": "color",
+      "v": "red"
+     }
+    ],
+    "do": [
+     {
+      "op": "add_money",
+      "v": 1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_double_espresso",
+  "rarity": "common",
+  "tags": [
+   "chips",
+   "curse_fx"
+  ],
+  "icon": "g_double_espresso",
+  "sfx": "tick",
+  "name_fr": "Double serré",
+  "name_en": "Double Espresso",
+  "desc_fr": "+20 Jetons à chaque tour. Les mains (et l'écran) tremblent pendant les lancers.",
+  "desc_en": "+20 Chips every spin. Your hands (and the screen) shake during throws.",
+  "flavor_fr": "Le quatrième de la soirée. Ou le cinquième.",
+  "flavor_en": "The fourth tonight. Or the fifth.",
+  "visual": {
+   "kind": "jitter",
+   "strength": 0.8
+  },
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "add_chips",
+      "v": 20
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_funhouse_mirror",
+  "rarity": "rare",
+  "tags": [
+   "xmult",
+   "curse_fx"
+  ],
+  "icon": "g_funhouse_mirror",
+  "sfx": "shimmer",
+  "name_fr": "Miroir de foire",
+  "name_en": "Funhouse Mirror",
+  "desc_fr": "×2 Mult si la bille tombe sur un nombre « miroir » (12, 21, 13, 31, 23, 32). Pendant que la bille roule, tout est à l'envers.",
+  "desc_en": "×2 Mult if the ball lands on a \"mirror\" number (12, 21, 13, 31, 23, 32). While the ball rolls, everything is flipped.",
+  "flavor_fr": "Vu de l'autre côté, la Maison perd.",
+  "flavor_en": "Seen from the other side, the House loses.",
+  "visual": {
+   "kind": "mirror",
+   "strength": 1.0
+  },
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "number_in",
+      "v": [
+       12,
+       21,
+       13,
+       31,
+       23,
+       32
+      ]
+     }
+    ],
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": 2
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_night_glasses",
+  "rarity": "common",
+  "tags": [
+   "color",
+   "mult",
+   "curse_fx"
+  ],
+  "icon": "g_night_glasses",
+  "sfx": "sigh",
+  "name_fr": "Lunettes de nuit",
+  "name_en": "Night Glasses",
+  "desc_fr": "+5 Mult si la bille tombe sur du noir. On n'y voit presque rien pendant les lancers.",
+  "desc_en": "+5 Mult if the ball lands on black. You can barely see during throws.",
+  "flavor_fr": "Portées à minuit, par principe.",
+  "flavor_en": "Worn at midnight, on principle.",
+  "visual": {
+   "kind": "dark",
+   "strength": 0.85
+  },
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "if": [
+     {
+      "c": "color",
+      "v": "black"
+     }
+    ],
+    "do": [
+     {
+      "op": "add_mult",
+      "v": 5
+     }
+    ]
+   }
+  ]
+ }
+]

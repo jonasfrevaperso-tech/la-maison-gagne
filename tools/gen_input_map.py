@@ -6,7 +6,7 @@ des commandes). Schéma manette type Xbox 360 / Steam Deck :
                stick droit = défiler
   Tapis      : croix / stick gauche = curseur par demi-case (centre = plein, bord = cheval,
                coin = carré) · A = +1 jeton · B = −1 jeton · X = annuler
-               Y = répéter · LB/RB = taille de la mise · L3 = effacer · RT = lancer / relâcher
+               Y = répéter · LB/RB = taille de la mise · L3 = effacer · RT = lancer (maintenir : élan) · effet : X/Y/B/A
                LT = vitesse · View (Back) = grigris et Fortune · Menu (Start) = pause
   Animations : A ou B = passer
   Astuces    : A = compris · X = couper les conseils
@@ -58,6 +58,12 @@ ACTIONS: dict[str, dict] = {
     "pause_menu": {"keys": ["escape"], "buttons": ["start"]},
     "playtest_note": {"keys": ["f8"], "buttons": ["r3"]},
     "tip_mute": {"keys": ["m"], "buttons": ["x"]},
+    # Mini-jeu de lancer, temps « Effet » : invites QTE. Flèches au clavier, boutons de face à la
+    # manette, placés comme les flèches (X gauche, Y haut, B droite, A bas).
+    "qte_left": {"keys": ["left"], "buttons": ["x"]},
+    "qte_up": {"keys": ["up"], "buttons": ["y"]},
+    "qte_right": {"keys": ["right"], "buttons": ["b"]},
+    "qte_down": {"keys": ["down"], "buttons": ["a"]},
 }
 
 

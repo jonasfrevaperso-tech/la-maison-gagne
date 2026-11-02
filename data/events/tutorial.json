@@ -33,8 +33,8 @@
   "trigger": "bet_placed",
   "anchor": "budget",
   "order": 4,
-  "text_fr": "Tu as 10 jetons par tour. Les paris sur un seul numéro sont limités (2 jetons) : répartis-les.",
-  "text_en": "You have 10 chips per spin. Single-number bets are limited (2 chips): spread them out."
+  "text_fr": "Tu as 10 jetons par tour. {bet_cycle_prev} {bet_cycle_next} changent la mise posée à chaque clic. Les paris sur un seul numéro sont limités : répartis-les.",
+  "text_en": "You have 10 chips per spin. {bet_cycle_prev} {bet_cycle_next} change how many chips each click places. Single-number bets are capped: spread them out."
  },
  {
   "id": "tip_spin",
@@ -61,8 +61,10 @@
   "trigger": "throwing",
   "anchor": "wheel",
   "order": 7,
-  "text_fr": "Le lancer se joue en deux gestes. Élan : arrête l'aiguille dans l'or ({ui_spin}). Lâcher : frappe ({ui_spin}) quand l'anneau touche la bille. Un beau lancer garde la bille dans ta zone plus souvent.",
-  "text_en": "A throw takes two moves. Swing: stop the needle in the gold ({ui_spin}). Release: strike ({ui_spin}) when the ring touches the ball. A good throw keeps the ball in your zone more often."
+  "text_fr": "Le lancer se joue en trois temps. Élan : MAINTIENS {ui_spin} et relâche quand la jauge est dans l'or. Effet : frappe les touches ({@arrows}) quand elles passent la ligne. Lâcher : frappe {ui_spin} quand l'anneau touche la bille. Un beau lancer garde la bille dans ta zone (et offre plus de tirages au jackpot).",
+  "text_en": "A throw takes three beats. Swing: HOLD {ui_spin} and release when the gauge is in the gold. Spin: hit the keys ({@arrows}) as they cross the line. Release: strike {ui_spin} when the ring touches the ball. A good throw keeps the ball in your zone (and earns more jackpot pulls).",
+  "text_pad_fr": "Le lancer se joue en trois temps. Élan : MAINTIENS {ui_spin} et relâche dans l'or. Effet : frappe {qte_left} {qte_up} {qte_right} {qte_down} quand les symboles passent la ligne. Lâcher : {ui_spin} quand l'anneau touche la bille. Un beau lancer garde la bille dans ta zone.",
+  "text_pad_en": "A throw takes three beats. Swing: HOLD {ui_spin} and release in the gold. Spin: hit {qte_left} {qte_up} {qte_right} {qte_down} as the symbols cross the line. Release: {ui_spin} when the ring touches the ball. A good throw keeps the ball in your zone."
  },
  {
   "id": "tip_wild",
@@ -133,5 +135,49 @@
   "order": 15,
   "text_fr": "Raté de peu ? La Maison propose un Pacte : un tour de plus contre un sacrifice. Un seul par acte.",
   "text_en": "Just short? The House offers a Pact: one more spin for a sacrifice. One per act."
+ },
+ {
+  "id": "tip_betcard",
+  "trigger": "bet_placed",
+  "anchor": "table",
+  "order": 4,
+  "text_fr": "Survole un emplacement du tapis : sa fiche montre la cote, le gain par jeton, tes chances et la limite de table, en couleurs.",
+  "text_en": "Hover a spot on the felt: its card shows the odds, payout per chip, your chances and the table limit, colour-coded.",
+  "text_pad_fr": "La fiche de l'emplacement sous ton curseur montre la cote, le gain par jeton, tes chances et la limite de table, en couleurs.",
+  "text_pad_en": "The card of the spot under your cursor shows the odds, payout per chip, your chances and the table limit, colour-coded."
+ },
+ {
+  "id": "tip_jackpot",
+  "trigger": "jackpot",
+  "anchor": "center",
+  "order": 16,
+  "text_fr": "JACKPOT ! Un plein gagnant réveille la vieille machine à sous. Tire le levier ({ui_spin}) : 1 tirage, 2 sur un « Très bien », 3 sur un lancer « Parfait ». Paires et brelans donnent de l'argent, du Mult pour le tour suivant, du contrôle… ou un tour offert.",
+  "text_en": "JACKPOT! A winning straight bet wakes the old slot machine. Pull the lever ({ui_spin}): 1 pull, 2 on a « Great » throw, 3 on a « Perfect » one. Pairs and triples give money, Mult for the next spin, control… or a free spin."
+ },
+ {
+  "id": "tip_decor",
+  "trigger": "scored",
+  "anchor": "center",
+  "order": 11,
+  "text_fr": "Ce vieux casino a encore de la vie : clique sur les objets du décor (lampe, verre, dés, jetons, néon…), et guette les visiteurs.",
+  "text_en": "This old casino still has some life in it: click the props on the table (lamp, glass, dice, chips, neon…), and watch for visitors.",
+  "text_pad_fr": "Ce vieux casino a encore de la vie : une pichenette du joystick droit ({@rstick}) taquine un objet du décor.",
+  "text_pad_en": "This old casino still has some life in it: flick the right stick ({@rstick}) to poke a prop on the table."
+ },
+ {
+  "id": "tip_pause",
+  "trigger": "second_round",
+  "anchor": "center",
+  "order": 17,
+  "text_fr": "{pause_menu} ouvre le menu : volumes et réglages rapides sans quitter la partie. {speed_toggle} accélère les animations.",
+  "text_en": "{pause_menu} opens the menu: volumes and quick settings without leaving the run. {speed_toggle} speeds up animations."
+ },
+ {
+  "id": "tip_curse",
+  "trigger": "curse_owned",
+  "anchor": "grigris",
+  "order": 18,
+  "text_fr": "Ce grigri a un prix pour les yeux : pendant les lancers, la vue se brouille (alcool, fumée, verre fêlé…). Son intensité se règle dans Options › Malus visuels.",
+  "text_en": "This charm comes at a cost to your eyes: during throws your sight gets blurry (booze, smoke, cracked glass…). Its strength can be set in Options › Visual curses."
  }
 ]

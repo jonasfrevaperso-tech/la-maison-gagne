@@ -15,9 +15,10 @@ const DEFAULTS: Dictionary = {
 		"bloom": 0.6,
 		"show_fps": false,
 		"wheel_3d": true,
+		"decor_3d": true,
 		"handheld": false
 	},
-	"juice": {"intensity": 1.0, "shake": 1.0, "flashes": true, "reduced_motion": false},
+	"juice": {"intensity": 1.0, "shake": 1.0, "flashes": true, "reduced_motion": false, "curse_fx": 1.0},
 	"game":
 	{
 		"speed": 1,

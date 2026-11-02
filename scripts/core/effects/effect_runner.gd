@@ -21,6 +21,7 @@ const TRIGGERS: Array[StringName] = [
 	&"on_score_calc",
 	&"on_round_end",
 	&"on_deadline_end",
+	&"on_jackpot",
 	&"on_shop_enter",
 	&"on_reroll",
 	&"on_buy",
@@ -127,6 +128,8 @@ const OPS: Array[StringName] = [
 	&"perm_chip_value",
 	&"perm_precision",
 	&"temp_precision",
+	&"temp_mult",
+	&"temp_control",
 	&"perm_control",
 	&"add_slot",
 	&"retrigger_pocket",
@@ -646,6 +649,12 @@ static func apply(a: Dictionary, env: EffectEnv) -> void:
 			run.chip_value = maxi(run.chip_value + int(v), 1)
 		&"perm_precision":
 			run.precision = clampi(run.precision + int(v), 1, Balance.i("throw.max_precision"))
+		&"temp_mult":
+			run.flags["temp_mult"] = float(run.flags.get("temp_mult", 0.0)) + v
+			_emit(env, ScoreEvent.INFO, v, label if label != "" else "temp_mult")
+		&"temp_control":
+			run.flags["temp_control"] = float(run.flags.get("temp_control", 0.0)) + v
+			_emit(env, ScoreEvent.INFO, v, label if label != "" else "temp_control")
 		&"temp_precision":
 			run.temp_precision_bonus += int(v)
 			_emit(env, ScoreEvent.INFO, v, label if label != "" else ("precision_up" if v > 0.0 else "precision_down"))

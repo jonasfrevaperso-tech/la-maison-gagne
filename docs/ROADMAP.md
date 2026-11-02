@@ -27,11 +27,18 @@
 - ✅ 17 définitions courantes (dont 1440p, 16:10, 21:9, 32:9), résolution de rendu en plein écran, mode Steam Deck réversible.
 - ✅ Écran « Conçu avec Godot, Blender et Claude Code » ; exports Windows, Linux et Flatpak.
 
-## 1.4 — Pistes
+## 1.4 — Le Casino Abandonné ✅
+- ✅ Mini-jeu de lancer v2 en trois temps (élan maintenu, effet QTE, lâcher), plus exigeant et plus long.
+- ✅ Jackpot : machine à sous (1 à 3 tirages selon le lancer), gains temporaires et tour offert.
+- ✅ Décor 3D d'un casino abandonné derrière l'interface, objets interactifs et bestioles.
+- ✅ Sept grigris à malus visuel (gin, fumée, monocle fêlé…), réglables.
+- ✅ Fiches de paris illustrées, rythme ralenti, écran de démarrage noir, tutoriel complété.
+
+## 1.5 — Pistes
 - Glyphes Steam Deck et PlayStation au choix (le Deck accepte déjà les glyphes Xbox).
 - Classement partagé de la Course de graine (export/import d'un fichier de résultats, sans serveur).
 - Animations de cartes à l'achat et à la vente plus marquées ; écran de victoire de campagne dédié.
-- Tapis de jeu en 3D (jetons empilés en relief), comme la roue.
+- Tapis de jeu en 3D (jetons empilés en relief), comme la roue ; objets du décor modélisés dans Blender.
 
 ## DLC « Les Étages Oubliés »
 Un quatrième acte entre les Salons et la Cave : casino abandonné, roue à 2 zéros, nouveau personnage (la Contrebandière), 3 créanciers, 25 grigris.

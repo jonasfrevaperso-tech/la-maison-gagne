@@ -13,6 +13,8 @@ const REQUIRED_BY_CAT: Dictionary = {
 	"creditors": ["tier_min", "tier_max"],
 	"characters": [],
 	"risks": ["level"],
+	"slot_symbols": ["weight", "icon"],
+	"slot_prizes": ["match", "symbol", "do"],
 }
 const RARITIES: Array[String] = ["common", "rare", "legendary", "cursed"]
 const SKIP_DESC: Array[String] = ["dialogues", "achievements", "challenges", "events", "speakers", "tutorial"]
@@ -68,6 +70,13 @@ func _validate_entry(db: ContentDB, cat: String, e: Dictionary) -> void:
 	for k: String in required:
 		if not e.has(k):
 			errors.append("%s : champ requis absent '%s'" % [eid, k])
+	if cat == "grigris" and e.has("visual"):
+		var vis: Dictionary = e["visual"] if e["visual"] is Dictionary else {}
+		if not VisualCurse.KINDS.has(String(vis.get("kind", ""))):
+			errors.append("%s : effet visuel inconnu « %s »" % [eid, String(vis.get("kind", ""))])
+		var st: float = float(vis.get("strength", -1.0))
+		if st <= 0.0 or st > 1.0:
+			errors.append("%s : intensité visuelle hors de ]0, 1]" % eid)
 	if cat == "grigris" and not RARITIES.has(String(e.get("rarity", ""))):
 		errors.append("%s : rareté invalide" % eid)
 	_validate_effects(db, eid, e.get("effects", []) as Array)
@@ -95,6 +104,14 @@ func _validate_entry(db: ContentDB, cat: String, e: Dictionary) -> void:
 		var t: String = String((wop as Dictionary).get("type", ""))
 		if t != "" and not db.has_entry("pocket_types", t):
 			errors.append("%s : type de case inconnu '%s'" % [eid, t])
+	if cat == "slot_symbols" and float(e.get("weight", 0)) <= 0.0:
+		errors.append("%s : poids nul" % eid)
+	if cat == "slot_prizes":
+		if not String(e.get("match", "")) in ["triple", "pair"]:
+			errors.append("%s : combinaison inconnue" % eid)
+		if not db.has_entry("slot_symbols", String(e.get("symbol", ""))):
+			errors.append("%s : symbole inconnu" % eid)
+		_validate_effects(db, eid, [{"trigger": "on_jackpot", "do": e.get("do", [])}])
 	if cat == "contracts" and String(e.get("requires", "")) != "" and not db.has_entry("contracts", String(e["requires"])):
 		errors.append("%s : prérequis inconnu" % eid)
 

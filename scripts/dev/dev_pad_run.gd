@@ -54,6 +54,35 @@ func _axis(axis: JoyAxis) -> void:
 		await get_tree().process_frame
 
 
+func _axis_set(axis: JoyAxis, v: float) -> void:
+	var e: InputEventJoypadMotion = InputEventJoypadMotion.new()
+	e.axis = axis
+	e.axis_value = v
+	Input.parse_input_event(e)
+	await get_tree().process_frame
+
+
+## Mini-jeu à la manette seule : RT maintenu pour l'élan, X/Y/B/A pour l'effet, RT au contact.
+func _play_throw(g: ThrowMinigame) -> void:
+	var taps: Array[JoyButton] = [JOY_BUTTON_X, JOY_BUTTON_Y, JOY_BUTTON_B, JOY_BUTTON_A]
+	var t0: int = Time.get_ticks_msec()
+	while Time.get_ticks_msec() - t0 < 30000:
+		if not g.active():
+			return
+		var want: Dictionary = g.bot_wants()
+		match String(want.get("do", "")):
+			"press":
+				await _axis_set(JOY_AXIS_TRIGGER_RIGHT, 1.0)
+			"release":
+				await _axis_set(JOY_AXIS_TRIGGER_RIGHT, 0.0)
+			"tap":
+				await _button(taps[int(want["symbol"])])
+			"strike":
+				await _press("RT")
+			_:
+				await get_tree().process_frame
+
+
 func _press(name: String) -> void:
 	_log.append(name)
 	match name:
@@ -278,20 +307,7 @@ func _run(rs: RunScreen) -> void:
 			if _aim_wait > 0.6:
 				await _press("RT")
 		RunScreen.UiState.THROWING:
-			# Mini-jeu à la gâchette : on attend le bon moment image par image, puis RT.
-			var g: ThrowMinigame = rs.throw_game
-			for _f: int in 240:
-				var ready: bool = false
-				if g.beat == ThrowMinigame.Beat.POWER:
-					ready = absf(float(g.get("_needle")) - 0.5) < 0.04
-				elif g.beat == ThrowMinigame.Beat.RELEASE:
-					ready = float(g.get("_t")) >= float(g.get("_release_time")) - 0.02
-				else:
-					return
-				if ready:
-					await _press("RT")
-					return
-				await get_tree().process_frame
+			await _play_throw(rs.throw_game)
 		RunScreen.UiState.BALL, RunScreen.UiState.SCORING:
 			await _press("A")
 		RunScreen.UiState.RETHROW:

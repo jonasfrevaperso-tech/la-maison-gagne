@@ -488,6 +488,26 @@ def sfx_defs():
     d["lose_soft"] = d["chip_lose"]
     for who, base in (("lea", 72), ("vic", 62), ("odile", 76), ("barnabe", 57), ("marthe", 69), ("ghost", 81), ("house", 45), ("boss", 50), ("npc", 66)):
         d["blip_" + who] = ((lambda b: (lambda k: blip(b + k)))(base), 5)
+    # 1.4 — machine à sous du jackpot.
+    d["slot_lever"] = (lambda k: np.concatenate([cluster(inst_clack, 6, 0.035, 1400 * v(k)) * 0.7, sweep(500, 180, 0.18, "saw") * 0.3]), 3)
+    d["slot_spin"] = (lambda k: addpad(cluster(inst_click, 28, 0.04, 1700 * v(k)) * 0.5, fft_filter(noise(int(1.2 * SR)), 300, 2400) * 0.12), 3)
+    d["slot_stop"] = (lambda k: inst_kick(0.25) * 0.7 + np.pad(inst_clack(700 * v(k), 0.1), (0, int(0.15 * SR))) * 0.7, 4)
+    d["slot_tease"] = (lambda k: sweep(300 * v(k), 1600, 0.9, "square") * env_adsr(int(0.9 * SR), 0.05, 0.2, 0.7, 0.2) * 0.25, 2)
+    d["slot_win"] = (lambda k: reverb(addpad(arpeggio([76, 79, 84, 88], 0.07, inst_bell) * 0.7, cluster(inst_coin, 10, 0.05, 2800 * v(k)) * 0.5), 1.0, 0.25), 3)
+    d["slot_big"] = (lambda k: reverb(addpad(fanfare([60, 64, 67, 72, 76, 79, 84]) * 0.7, cluster(inst_coin, 30, 0.04, 2600 * v(k)) * 0.5, np.pad(cluster(lambda f, dur=0.6: inst_bell(f, dur, 3, 1.4), 8, 0.12, 1320), (int(0.3 * SR), 0)) * 0.4), 1.4, 0.3), 2)
+    d["slot_ring"] = (lambda k: cluster(lambda f, dur=0.08: inst_bell(f, dur, 4, 3.0), 16, 0.045, 2100 * v(k)) * 0.5, 2)
+    # 1.4 — objets du décor (casino abandonné).
+    d["decor_glass"] = (lambda k: addpad(inst_bell(2900 * v(k), 0.5, 1.5, 2.76) * 0.5, inst_bell(4100 * v(k), 0.35, 1.2, 2.2) * 0.25), 4)
+    d["decor_ice"] = (lambda k: cluster(lambda f, dur=0.06: inst_bell(f, dur, 1.0, 3.1), 4, 0.05, 3600 * v(k)) * 0.4, 3)
+    d["decor_bottle"] = (lambda k: addpad(inst_bell(420 * v(k), 0.5, 1.0, 2.0) * 0.4, inst_clack(900 * v(k), 0.06) * 0.6), 3)
+    d["decor_switch"] = (lambda k: addpad(inst_clack(1500 * v(k), 0.05), np.pad(fft_filter(saw(120, t_axis(0.25)), 0, 800) * env_exp(int(0.25 * SR), 0.1) * 0.25, (int(0.05 * SR), 0))), 3)
+    d["decor_neon"] = (lambda k: fft_filter(square(120 * v(k), t_axis(0.5), 0.5), 0, 1200) * env_adsr(int(0.5 * SR), 0.02, 0.1, 0.6, 0.2) * (0.6 + 0.4 * np.sign(np.sin(2 * np.pi * 9 * t_axis(0.5)))) * 0.25, 3)
+    d["decor_phone"] = (lambda k: np.concatenate([cluster(lambda f, dur=0.04: inst_bell(f, dur, 3.0, 1.0), 20, 0.03, 1400 * v(k)), np.zeros(int(0.25 * SR)), cluster(lambda f, dur=0.04: inst_bell(f, dur, 3.0, 1.0), 20, 0.03, 1400 * v(k))]) * 0.45, 2)
+    d["decor_squeak"] = (lambda k: sweep(2400 * v(k), 3600, 0.12, "sine") * env_adsr(int(0.12 * SR), 0.01, 0.03, 0.6, 0.04) * 0.3, 3)
+    d["decor_puff"] = (lambda k: fft_filter(noise(int(0.7 * SR)), 200, 1800) * env_adsr(int(0.7 * SR), 0.1, 0.2, 0.4, 0.3) * 0.45, 3)
+    d["decor_topple"] = (lambda k: chip_stack_v(1100 + k, 12, 0.03), 3)
+    d["decor_pluck"] = (lambda k: inst_pluck(midi(76 + k), 0.4) * 0.5, 3)
+    d["decor_creak"] = (lambda k: fft_filter(saw(90 * v(k), t_axis(0.6)) * (1 + 0.5 * np.sin(2 * np.pi * 7 * t_axis(0.6))), 200, 1600) * env_adsr(int(0.6 * SR), 0.05, 0.1, 0.6, 0.2) * 0.25, 3)
     return d
 
 

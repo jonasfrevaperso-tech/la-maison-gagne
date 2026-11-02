@@ -30,7 +30,7 @@ const PROMPTS: Dictionary[String, Array] = {
 		["ui_cancel", "HINT_K_BACK"],
 	],
 	"AIMING": [["ui_spin", "HINT_K_AIM"]],
-	"THROWING": [["ui_spin", "HINT_K_STRIKE"]],
+	"THROWING": [["ui_spin", "HINT_K_HOLD"], ["qte_left+qte_up+qte_right+qte_down", "HINT_K_QTE"]],
 	"BALL": [["skip_anim", "HINT_K_SKIP"], ["speed_toggle", "HINT_K_SPEED"]],
 	"SCORING": [["skip_anim", "HINT_K_SKIP"], ["speed_toggle", "HINT_K_SPEED"]],
 	"TARGETING": [["@dpad_lr", "HINT_K_SELECT"], ["ui_accept", "HINT_K_CONFIRM"], ["ui_cancel", "BTN_CANCEL_TARGET"]],
@@ -38,7 +38,12 @@ const PROMPTS: Dictionary[String, Array] = {
 
 const AMOUNTS: Array[int] = [1, 2, 5, 10]
 
+## Pichenette du joystick droit (inutilisé en jeu) : taquine un objet du décor.
+const FLICK: float = 0.85
+const FLICK_RESET: float = 0.3
+
 var s: RunScreen = null
+var _flicked: bool = false
 
 
 func _init(screen: RunScreen) -> void:
@@ -47,6 +52,8 @@ func _init(screen: RunScreen) -> void:
 
 ## Commandes de l'écran de run selon l'état ; vrai si l'événement est consommé.
 func handle(event: InputEvent) -> bool:
+	if event is InputEventJoypadMotion and _decor_flick(event as InputEventJoypadMotion):
+		return true
 	if GameInput.pressed(event, "pause_menu"):
 		if s.state == RunScreen.UiState.TARGETING:
 			cancel_targeting()
@@ -68,9 +75,7 @@ func handle(event: InputEvent) -> bool:
 				s._on_spin_pressed()
 				return true
 		RunScreen.UiState.THROWING:
-			if GameInput.pressed(event, "ui_spin") or GameInput.pressed(event, "bet_place") or GameInput.pressed(event, "ui_accept"):
-				s.throw_game.press()
-				return true
+			return s.throw_game.handle(event)
 		RunScreen.UiState.BALL, RunScreen.UiState.SCORING:
 			if GameInput.pressed(event, "skip_anim"):
 				s._skip_animations()
@@ -137,19 +142,20 @@ func move_target(d: int, n: int) -> void:
 	s.wheel_view.hover_index = posmod(i + d, n)
 	s.wheel_view.queue_redraw()
 	AudioBus.ui("hover")
-	s.show_pocket_card(s.wheel_view.hover_index)
+	s._cards.show_pocket(s.wheel_view.hover_index)
 
 
 func cancel_targeting() -> void:
 	s._target_fortune_slot = -1
 	s.wheel_view.hover_index = -1
-	s.show_pocket_card(-1)
+	s._cards.show_pocket(-1)
 	s._set_state(RunScreen.UiState.BETTING)
 
 
 ## Mode « objets » (manette) : la sélection passe sur les grigris et cartes Fortune.
 func set_items_mode(on: bool) -> void:
 	if on:
+		s._cards.hide_bet()
 		var first: Control = PadNavigator.first_focusable(s.grigri_bar)
 		if first == null:
 			first = PadNavigator.first_focusable(s.fortune_bar)
@@ -199,3 +205,15 @@ func gamepad_table(event: InputEvent) -> bool:
 		s._on_spot_changed(s.table_view.cursor_spot(), s.table_view.bet_amount)
 		return true
 	return false
+
+
+func _decor_flick(m: InputEventJoypadMotion) -> bool:
+	if m.axis != JOY_AXIS_RIGHT_X and m.axis != JOY_AXIS_RIGHT_Y:
+		return false
+	var v: float = absf(m.axis_value)
+	if _flicked and v < FLICK_RESET:
+		_flicked = false
+	elif not _flicked and v > FLICK and s.decor != null:
+		_flicked = true
+		s.decor.poke_random()
+	return true

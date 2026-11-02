@@ -7,7 +7,6 @@ extends Control
 enum UiState { BETTING, AIMING, BALL, RETHROW, SCORING, OVERLAY, TARGETING, THROWING }
 
 const WHEEL_SIZE: Vector2 = Vector2(760, 640)
-const POCKET_CARD_GAP: float = 120.0
 const TABLE_SIZE: Vector2 = Vector2(1040, 360)
 const MARGIN: float = 28.0
 const HISTORY_SHOWN: int = 14
@@ -22,6 +21,8 @@ const TENSION_LAST_SPIN: float = 0.35
 ## Décalage vertical de la ligne d'aide sous le tapis.
 const HINT_OFFSET_Y: float = 106.0
 const HINT_ALPHA: float = 0.72
+const FORTUNE_X: float = 1500.0
+const HINT_GAP: float = 16.0
 const HUD_STRIP_H: float = 120.0
 const BAR_CAPTION_Y: float = 30.0
 ## États dont l'aide commence par une phrase d'explication.
@@ -42,6 +43,7 @@ var float_layer: FloatLayer = null
 var presenter: ScorePresenter = null
 var overlay_root: Control = null
 var tutorial: TutorialDirector = null
+var decor: CasinoDecor = null
 
 var _content: Control = null
 ## Scène de référence 1920×1080, centrée et mise à l'échelle (cf. UiLayout).
@@ -76,8 +78,9 @@ var _fortune_caption: Label = null
 ## Commandes (souris, clavier, manette) selon l'état : RunScreenInput.
 var _input_ctl: RunScreenInput = null
 var _throw: RunScreenThrow = null
-var _pocket_card: PanelContainer = null
-var _bg: DecoBackground = null
+var _cards: RunScreenCards
+var _curse: CurseFx = null
+var _bg: Control = null
 
 
 func setup(_params: Dictionary) -> void:
@@ -89,6 +92,7 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	ctl = GameState.controller
 	_input_ctl = RunScreenInput.new(self)
+	_cards = RunScreenCards.new(self)
 	_throw = RunScreenThrow.new(self)
 	_build()
 	EventBus.juice_shake.connect(_on_shake)
@@ -104,8 +108,13 @@ func _ready() -> void:
 
 
 func _build() -> void:
-	_bg = DecoBackground.new()
-	_bg.origin_ratio = Vector2(0.3, 0.55)
+	if Settings.b("video", "decor_3d"):
+		decor = CasinoDecor.new()
+		_bg = decor
+	else:
+		var deco: DecoBackground = DecoBackground.new()
+		deco.origin_ratio = Vector2(0.3, 0.55)
+		_bg = deco
 	add_child(_bg)
 	_content = Control.new()
 	_content.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -114,6 +123,8 @@ func _build() -> void:
 	_stage = Control.new()
 	_stage.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_content.add_child(_stage)
+	if decor != null:
+		decor.stage = _stage
 	_fit_stage()
 	resized.connect(_fit_stage)
 	# Barre du haut, sur un bandeau.
@@ -217,8 +228,10 @@ func _build() -> void:
 	_hint_label = UiKit.label("", UiKit.SIZE_SMALL, Palette.IVORY)
 	_hint_label.modulate.a = HINT_ALPHA
 	_hint_label.position = Vector2(840, 360 + TABLE_SIZE.y + HINT_OFFSET_Y + InputGlyphs.PROMPT_H + 10)
-	_hint_label.size = Vector2(TABLE_SIZE.x, 0)
-	_hint_label.clip_text = true
+	# Jusqu'à la barre de Fortune (à droite) seulement, sur deux lignes au plus.
+	_hint_label.size = Vector2(FORTUNE_X - 840.0 - HINT_GAP, 0)
+	_hint_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_hint_label.max_lines_visible = 2
 	_hint_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	_stage.add_child(_hint_label)
 	# Grigris et Fortune
@@ -231,12 +244,14 @@ func _build() -> void:
 	_stage.add_child(_grigri_caption)
 	fortune_bar = HBoxContainer.new()
 	fortune_bar.add_theme_constant_override("separation", 10)
-	fortune_bar.position = Vector2(1500, UiLayout.DESIGN_SIZE.y - GrigriCard.CARD_SIZE.y - MARGIN)
+	fortune_bar.position = Vector2(FORTUNE_X, UiLayout.DESIGN_SIZE.y - GrigriCard.CARD_SIZE.y - MARGIN)
 	_stage.add_child(fortune_bar)
 	_fortune_caption = UiKit.label("", UiKit.SIZE_SMALL, Palette.CYAN, "display")
 	_fortune_caption.position = fortune_bar.position - Vector2(0, BAR_CAPTION_Y)
 	_stage.add_child(_fortune_caption)
-	# Couches d'effets
+	# Couches d'effets (malus visuels des grigris sous les textes flottants)
+	_curse = CurseFx.new()
+	add_child(_curse)
 	float_layer = FloatLayer.new()
 	add_child(float_layer)
 	_flash_rect = ColorRect.new()
@@ -322,7 +337,7 @@ func _refresh_buttons() -> void:
 	var r: RunState = ctl.run
 	var betting: bool = state == UiState.BETTING
 	var throwing: bool = state == UiState.AIMING or state == UiState.THROWING
-	_spin_btn.disabled = not (betting and ctl.can_spin()) and not throwing
+	_spin_btn.disabled = (not (betting and ctl.can_spin()) and not throwing) or state == UiState.THROWING
 	_spin_btn.text = tr("BTN_SPIN")
 	if state == UiState.AIMING:
 		_spin_btn.text = tr("BTN_RELEASE") if RunScreenThrow.simple_throw() else tr("BTN_AIM_LOCK")
@@ -386,7 +401,7 @@ func _refresh_creditor() -> void:
 	if ctl.run.is_creditor() and ctl.run.creditor_id != "":
 		tint = Color(String(ctl.db.get_entry("creditors", ctl.run.creditor_id).get("color", "ff2e88")))
 		tint.a = BG_TINT_BASE + BG_TINT_PER_PHASE * float(ctl.run.creditor_phase)
-	_bg.set_tint(tint)
+	_bg.call("set_tint", tint)
 	var r: RunState = ctl.run
 	var active: bool = r.creditor_id != "" and r.is_creditor()
 	var cdef: Dictionary = ctl.db.get_entry("creditors", r.creditor_id) if active else {}
@@ -531,6 +546,10 @@ func _tutorial_betting() -> void:
 	var r: RunState = ctl.run
 	if not r.grigris.is_empty():
 		tutorial.notify("grigri_owned")
+	if not VisualCurse.strengths(r, ctl.db).is_empty():
+		tutorial.notify("curse_owned")
+	if r.total_spins >= 2:
+		tutorial.notify("second_round")
 	if not r.fortunes.is_empty():
 		tutorial.notify("fortune_owned")
 	if r.is_creditor() and r.creditor_id != "":
@@ -561,6 +580,11 @@ func _set_state(s: UiState) -> void:
 	if s == UiState.BETTING and state != UiState.BETTING:
 		Telemetry.betting_started()
 	state = s
+	if s != UiState.BETTING:
+		_cards.hide_bet()
+	var fx_phase: StringName = &"throw" if s == UiState.THROWING else (&"ball" if s == UiState.BALL else &"none")
+	if _curse != null:
+		_curse.set_phase(fx_phase, ctl.run, ctl.db)
 	_refresh_all()
 
 
@@ -580,6 +604,7 @@ func _on_device_changed(pad: bool) -> void:
 		table_view.cursor_active = true
 	else:
 		table_view.cursor_active = false
+		_cards.hide_bet()
 	table_view.queue_redraw()
 	if not pad and _items_mode:
 		_input_ctl.set_items_mode(false)
@@ -634,9 +659,7 @@ func _bet_rejected(res: BetSlip.PlaceResult) -> void:
 func _on_spot_hovered(spot_id: String) -> void:
 	if not table_view.cursor_active or spot_id == "":
 		return
-	var r: RunState = ctl.run
-	var info: String = BetInfo.describe(spot_id, table_view.hide_odds, r.wheel, r.chip_value, int(r.slip.chips.get(spot_id, 0)))
-	_hint_label.text = info.replace("\n", InputGlyphs.SEP)
+	_cards.show_bet(spot_id)
 
 
 func _on_undo() -> void:
@@ -735,8 +758,16 @@ func _commit() -> void:
 	presenter.play(outcome.ctx)
 
 
-func _on_score_finished(_total: int) -> void:
+func _on_score_finished(total: int) -> void:
 	var out: RunController.SpinOutcome = _pending_outcome
+	# Jackpot : la machine à sous d'abord (gains déjà appliqués par le cœur), puis la suite.
+	if out != null and out.jackpot and not out.slot.is_empty():
+		var spins: Array[Dictionary] = out.slot
+		out.slot = []
+		_refresh_all()
+		_show_overlay(SlotOverlay.new().configure(spins, ctl.db), _on_score_finished.bind(total))
+		tutorial.notify("jackpot")
+		return
 	_pending_outcome = null
 	SaveSystem.max_stat("best_spin", out.ctx.total)
 	_refresh_all()
@@ -876,30 +907,12 @@ func _on_fortune_activated(card: GrigriCard) -> void:
 		_use_fortune(slot, -1)
 
 
-## Fiche illustrée d'une case (ciblage à la manette), placée à côté de la case, hors de la roue.
-func show_pocket_card(index: int) -> void:
-	if _pocket_card != null and is_instance_valid(_pocket_card):
-		_pocket_card.queue_free()
-	_pocket_card = null
-	if index < 0:
-		return
-	var probs: Array[float] = wheel_view.probabilities
-	_pocket_card = PocketCard.build(ctl.run.wheel.at(index), ctl.db, probs[index] if index < probs.size() else -1.0)
-	_pocket_card.z_index = 5
-	_stage.add_child(_pocket_card)
-	var at: Vector2 = wheel_view.position + wheel_view.pocket_screen_pos(index)
-	var out: Vector2 = (at - (wheel_view.position + wheel_view.size * 0.5)).normalized()
-	var sz: Vector2 = _pocket_card.get_combined_minimum_size()
-	var pos: Vector2 = at + out * POCKET_CARD_GAP - sz * 0.5 + Vector2(sz.x * 0.5 * signf(out.x), 0.0)
-	_pocket_card.position = pos.clamp(Vector2(8, 8), UiLayout.DESIGN_SIZE - sz - Vector2(8, 8))
-
-
 func _on_pocket_clicked(index: int) -> void:
 	if state == UiState.TARGETING and _target_fortune_slot >= 0:
 		_use_fortune(_target_fortune_slot, index)
 		_target_fortune_slot = -1
 		wheel_view.hover_index = -1
-		show_pocket_card(-1)
+		_cards.show_pocket(-1)
 
 
 func _use_fortune(slot: int, index: int) -> void:

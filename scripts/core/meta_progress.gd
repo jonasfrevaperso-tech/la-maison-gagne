@@ -35,7 +35,18 @@ static func spin_metrics(run: RunState, ctx: ScoreContext) -> Dictionary:
 		"tier": run.tier,
 		"chips_staked": _staked(ctx),
 		"in_zone": 1 if ctx.throw_result != null and ctx.throw_result.in_zone else 0,
+		"jackpots": int(run.flags.get("jackpots", 0)),
+		"throw_quality": ctx.throw_result.skill if ctx.throw_result != null else -1.0,
+		"visual_curses": _visual_curses(run),
 	}
+
+
+static func _visual_curses(run: RunState) -> int:
+	var n: int = 0
+	for g: GrigriInstance in run.grigris:
+		if ContentDB.shared().get_entry("grigris", g.id).has("visual"):
+			n += 1
+	return n
 
 
 static func _staked(ctx: ScoreContext) -> int:
