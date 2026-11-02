@@ -38,6 +38,7 @@ var table_view: TableView = null
 var score_panel: ScorePanel = null
 var debt_gauge: DebtGauge = null
 var grigri_bar: GrigriBar = null
+var family_strip: FamilyStrip = null
 var fortune_bar: HBoxContainer = null
 var float_layer: FloatLayer = null
 var presenter: ScorePresenter = null
@@ -170,6 +171,10 @@ func _build() -> void:
 	_grigri_caption.position = grigri_bar.position - Vector2(0, BAR_CAPTION_Y)
 	_stage.add_child(_grigri_caption)
 	_grigri_caption.resized.connect(RunScreenLayout.seat_caption.bind(_grigri_caption, grigri_bar))
+	# Familles (builds) : pastilles à droite du titre des grigris.
+	family_strip = FamilyStrip.new()
+	_stage.add_child(family_strip)
+	_grigri_caption.resized.connect(RunScreenLayout.seat_family_strip.bind(family_strip, _grigri_caption))
 	fortune_bar = HBoxContainer.new()
 	fortune_bar.add_theme_constant_override("separation", 10)
 	fortune_bar.position = Vector2(FORTUNE_X, UiLayout.DESIGN_SIZE.y - GrigriCard.CARD_SIZE.y - MARGIN)
@@ -202,6 +207,7 @@ func _build() -> void:
 	presenter.score_panel = score_panel
 	presenter.float_layer = float_layer
 	presenter.grigri_bar = grigri_bar
+	presenter.family_strip = family_strip
 	presenter.wheel_view = wheel_view
 	presenter.table_view = table_view
 	presenter.finished.connect(_on_score_finished)
@@ -226,6 +232,7 @@ func _refresh_all() -> void:
 	_refresh_creditor()
 	_refresh_history()
 	grigri_bar.bind(r)
+	family_strip.bind(r)
 	_grigri_caption.text = tr("SHOP_OWNED").to_upper() + "  %d / %d" % [r.grigris.size(), r.grigri_slots]
 	_refresh_fortunes()
 	_fortune_caption.text = tr("HUD_FORTUNE").to_upper() + "  %d / %d" % [r.fortunes.size(), r.fortune_slots]
@@ -489,6 +496,7 @@ func _tutorial_betting() -> void:
 	var r: RunState = ctl.run
 	if not r.grigris.is_empty():
 		tutorial.notify("grigri_owned")
+		tutorial.notify("family_owned")
 	if not VisualCurse.strengths(r, ctl.db).is_empty():
 		tutorial.notify("curse_owned")
 	if r.total_spins >= 2:

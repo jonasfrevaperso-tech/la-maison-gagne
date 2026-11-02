@@ -233,6 +233,12 @@ func _draw() -> void:
 		draw_texture_rect(tex, icon_rect, false)
 	else:
 		_draw_glyph(icon_rect, e, rcol)
+	# Famille : liseré de couleur en bas de carte et pastille en coin.
+	var fid: String = String(e.get("family", "")) if kind == "grigri" else ""
+	if fid != "":
+		var fcol: Color = FamilyUi.color(fid)
+		draw_rect(Rect2(Vector2(r.position.x + 6, r.end.y - 11), Vector2(r.size.x - 12, 5)), Color(fcol, 0.9))
+		FamilyUi.draw_badge(self, Vector2(r.end.x - 15, r.position.y + 15), 13.0, fid)
 	# Édition
 	if edition != &"":
 		var ec: Color = PocketInfo.edition_color(edition)

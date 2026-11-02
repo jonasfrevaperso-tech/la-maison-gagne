@@ -170,3 +170,13 @@ Plan (chaque étape : code → tests → captures → corrections) :
 Bilan 1.5.2 : les 7 étapes sont livrées. Onze épreuves en 3D (`Stage3D.use_3d`, caméra frontale calée au pixel), trois redessinées, 14 illustrations pixel art (`tools/gen_trial_art.py`) sur les cartons d'annonce ; machine à sous 3D à 4 rouleaux (arrêts lents, suspense, carrés) ; écran titre en 3D (salle abandonnée) avec résumé de partie et astuces. Bugs trouvés en test et corrigés : Fléchettes (appui immédiat = centre garanti), machine à sous bloquée si l'on martelait la touche pendant le tirage (accélération limitée à une fois par tirage), astuce de l'écran titre qui chevauchait la mention légale en 1920×1200 avec texte agrandi, test d'un bonus temporaire trop strict. `tools/check.sh` vert (92 tests, banc des 14 épreuves, interface 204 vues, campagne gagnée à la manette seule en 24 tours). Équilibrage : glouton 43,3 % (cible 35–45 %).
 
 Correctif 1.5.3 : rééquilibrage de la machine à sous (expert 56 % → 48 %, glouton ≈ 40 %), voir `docs/BALANCE.md`.
+
+## Version 1.6.0 — « Les Familles »
+Plan :
+1. Épreuves plus abordables : rythme (une note à la fois, notes longues à maintenir), shaker B/A, bouteilles, tri, mémoire ; vérification du tirage des épreuves.
+2. Builds lisibles : 10 familles de grigris à paliers (2/3/5), bandeau, infobulles, Codex, Bazar orienté build.
+3. Économie : moins d'argent tôt, emplacement de grigri achetable.
+4. Décors : tapis de jeu 3D, décors 3D du Bazar et des bilans, cadres art déco des surcouches.
+5. Vérification complète (données, tests, banc des épreuves, interface 6 définitions, campagne manette), simulations, docs, exports, publication.
+
+Bilan 1.6.0 : les 5 étapes sont livrées. Tirage des épreuves vérifié uniforme (3 000 lancers, 7,1 % chacune) ; un lancer évite désormais les épreuves des deux précédents. 196 grigris répartis en 10 familles, 96 tests. Argent à l'entrée du Bazar : 11–21 $ (au lieu de 14–66 $). Équilibrage : glouton 41,5 %, expert 49,0 % (voir `docs/BALANCE.md`). `tools/check.sh` vert (96 tests, banc des 14 épreuves, interface, campagne gagnée à la manette seule en 24 tours).

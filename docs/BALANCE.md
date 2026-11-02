@@ -277,3 +277,16 @@ Mesure experte de la 1.5.2 : **56,0 %** (100 parties) — trop haut. La machine 
 | expert | 1 / 2 | 2 × 100 | 51,0 / 45,0 % (**48,0 %**, erreur type ≈ 3,5 points) |
 
 L'expert reste au niveau des versions précédentes (47,1 % en 1.5, 45,0 % en 1.5.1).
+
+## Version 1.6.0
+
+Les familles de grigris (paliers 2/3/5) renforcent nettement les builds : avec l'économie de la 1.5.3, le bot glouton (qui valorise les grigris de ses familles) gagnait 55–58 % des parties. On garde la force des builds et on réduit l'argent du début de partie : récompenses d'échéance 4 / 5 / 6 $, intérêts plafonnés à 5 $, prix 5 / 7 / 12 $ (maudit 3 $), paquets 5 / 5 / 7 $, gains d'argent de la machine réduits (brelan de 7 +3 $, de cloches +6 $). L'emplacement de grigri achetable (14 $ puis 24 $, deux au plus) donne un débouché à l'argent. Argent à l'entrée du Bazar : 11–21 $ (14–66 $ en 1.5.3).
+
+Épreuves allégées (rythme une note à la fois avec notes longues, bouteilles, tri, mémoire) : banc d'essai vert, bots ≥ 0,94, joueur inactif ≤ 0,16.
+
+| Bot | Graine | Parties | Victoire |
+|---|---|---|---|
+| glouton | 1 / 2 / 3 | 3 × 600 | 42,0 / 41,8 / 40,7 % (**41,5 %**) |
+| expert | 1 / 2 | 2 × 100 | 44,0 / 54,0 % (**49,0 %**, erreur type ≈ 3,5 points) |
+
+Glouton dans la cible (35–45 %), expert au niveau de la 1.5.3 (48,0 %).

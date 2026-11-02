@@ -8,6 +8,7 @@ signal finished(total: int)
 var score_panel: ScorePanel = null
 var float_layer: FloatLayer = null
 var grigri_bar: GrigriBar = null
+var family_strip: FamilyStrip = null
 var wheel_view: WheelView = null
 var table_view: TableView = null
 var debt_remaining: int = 1
@@ -59,6 +60,9 @@ func _source_pos(e: ScoreEvent, ctx: ScoreContext) -> Vector2:
 		ScoreEvent.SRC_EDITION:
 			if grigri_bar.card_for(e.source_uid) != null:
 				return grigri_bar.card_center(e.source_uid)
+		ScoreEvent.SRC_FAMILY:
+			if family_strip != null:
+				return family_strip.chip_center(e.source_id)
 	if ctx.landing_index >= 0 and wheel_view.wheel != null and ctx.landing_index < wheel_view.wheel.size():
 		return UiLayout.canvas_point(wheel_view, wheel_view.pocket_screen_pos(ctx.landing_index))
 	return UiLayout.canvas_point(wheel_view, wheel_view.size * 0.5)
@@ -70,6 +74,8 @@ func _play_event(e: ScoreEvent, ctx: ScoreContext) -> void:
 	var pos: Vector2 = _source_pos(e, ctx)
 	if e.source_kind == ScoreEvent.SRC_GRIGRI or e.source_kind == ScoreEvent.SRC_EDITION:
 		grigri_bar.bump(e.source_uid)
+	elif e.source_kind == ScoreEvent.SRC_FAMILY and family_strip != null:
+		family_strip.bump(e.source_id)
 	match e.kind:
 		ScoreEvent.BET_WIN:
 			score_panel.set_values(e.chips_after, e.mult_after)

@@ -216,6 +216,10 @@ static func fire(trigger: StringName, run: RunState, ctx: ScoreContext, db: Cont
 		if g.disabled or not run.grigris.has(g):
 			continue
 		fire_grigri(trigger, g, base)
+	# Paliers de familles (builds), après les grigris : leurs ×Mult s'appliquent en dernier.
+	for fa: Dictionary in Families.active(run, db):
+		var tier: Dictionary = ((fa["def"] as Dictionary)["tiers"] as Array)[int(fa["tier"])]
+		_fire_entry(trigger, tier, base, ScoreEvent.SRC_FAMILY, String(fa["id"]), 0, null)
 
 
 static func fire_grigri(trigger: StringName, g: GrigriInstance, base: EffectEnv) -> void:

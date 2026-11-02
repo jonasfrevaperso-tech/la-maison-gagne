@@ -1,3 +1,29 @@
+# Notes de version — 1.6.0 « Les Familles »
+
+## Des builds lisibles
+- **Dix familles de grigris** : Rouge & Noir, Le Plein, Les Numéros, La Main, L'Atelier, La Banque, Le Moteur, L'Étoile, L'Arrosage et Le Pacte. Chaque grigri appartient à une famille (pastille de couleur dans le coin de sa carte).
+- **Paliers de build** : 2, 3 puis 5 grigris d'une même famille activent un bonus de plus en plus fort (ex. Rouge & Noir : +3 Mult par chance simple gagnée, puis +6, puis ×1,3 en plus). « Build activé ! » s'affiche quand un palier est franchi.
+- **Bandeau des familles** sous tes grigris : progression de chaque build (2/3, 5 ★…), infobulle détaillée au survol ; l'infobulle d'un grigri montre sa famille et ce qu'il t'apporterait (« 1 → 2 »).
+- **Le Bazar suit ton build** : les grigris de tes familles reviennent plus souvent à l'étal et dans le paquet occulte.
+- **Codex** : les grigris sont rangés par famille, avec le détail des paliers.
+- **Nouveau : +1 emplacement de grigri** à acheter au Bazar (14 $, puis 24 $ ; deux fois au plus).
+
+## Économie
+- Moins d'argent en début de partie : récompenses d'échéance 4 / 5 / 6 $, intérêts plafonnés à 5 $, grigris un peu plus chers (5 / 7 / 12 $), gains d'argent de la machine à sous réduits. À l'entrée du Bazar, on a désormais 11 à 21 $ au lieu de 14 à 66 $.
+
+## Épreuves plus abordables
+- **Effet (rythme)** : une seule note à la fois (plus jamais deux touches ensemble), notes plus espacées, et des **notes longues à maintenir** jusqu'au bout de leur traîne.
+- **Shaker** : on alterne **B et A** à la manette (→ et ↓ au clavier).
+- **Bouteilles**, **Tri des jetons** et **Mémoire des cartes** : plus lents et plus tolérants (balayage plus lent, jetons moins rapides, mémorisation plus longue, plus de temps).
+- **Tirage des épreuves** : vérifié sur 3 000 lancers, chaque épreuve sort 7,1 % du temps (le Bonneteau souvent tiré était une coïncidence). Désormais, un lancer évite aussi les épreuves des deux lancers précédents.
+
+## Décors
+- **Tapis de jeu en 3D** : feutrine éclairée par une suspension, boudin de cuir capitonné et liseré de laiton, filets dorés en relief, pastilles des numéros vernies, losanges rouge et noir en relief, piles de jetons qui projettent leur ombre, numéros gagnants qui s'illuminent. Les zones de mise restent exactement au même endroit.
+- **Bazar** : l'arrière-boutique en 3D derrière l'étal (étagères de bric-à-brac, caisse enregistreuse, ampoules qui se balancent, néon BAZAR).
+- **Victoire et défaite** : la table du triomphe (tours de jetons, champagne, confettis dorés, projecteurs, néon JACKPOT) ou la table désertée (jetons épars, verre renversé, reconnaissances de dette, néon RIEN NE VA PLUS).
+- **Toutes les fenêtres** (Bazar, événements, pacte, pause, récompenses…) reçoivent un cadre art déco : éventails dorés, filets à gradins, fronton.
+- Réglage « 3D » désactivé : retour au décor 2D d'avant.
+
 # Notes de version — 1.5.3 (correctif d'équilibrage)
 
 La machine à sous à quatre rouleaux de la 1.5.2 donnait trop : le bot expert gagnait 56 % des parties (cible 35–45 %, 45 % en 1.5.1).

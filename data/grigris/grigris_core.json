@@ -6,6 +6,7 @@
    "color",
    "mult"
   ],
+  "family": "rouge_noir",
   "icon": "g_red_ribbon",
   "sfx": "chime",
   "name_fr": "Ruban rouge",
@@ -39,6 +40,7 @@
    "color",
    "mult"
   ],
+  "family": "rouge_noir",
   "icon": "g_black_cat",
   "sfx": "meow",
   "name_fr": "Chat noir",
@@ -72,6 +74,7 @@
    "parity",
    "chips"
   ],
+  "family": "rouge_noir",
   "icon": "g_even_sock",
   "sfx": "chips",
   "name_fr": "Chaussettes paires",
@@ -105,6 +108,7 @@
    "parity",
    "chips"
   ],
+  "family": "rouge_noir",
   "icon": "g_odd_duck",
   "sfx": "quack",
   "name_fr": "Canard impair",
@@ -137,6 +141,7 @@
   "tags": [
    "economy"
   ],
+  "family": "banque",
   "icon": "g_lucky_penny",
   "sfx": "coin",
   "name_fr": "Sou fétiche",
@@ -170,6 +175,7 @@
   "tags": [
    "mult"
   ],
+  "family": "moteur",
   "icon": "g_velvet_glove",
   "sfx": "cloth",
   "name_fr": "Gant de velours",
@@ -198,6 +204,7 @@
    "straight",
    "mult"
   ],
+  "family": "plein",
   "icon": "g_straight_razor",
   "sfx": "blade",
   "name_fr": "Rasoir droit",
@@ -232,6 +239,7 @@
    "outside",
    "mult"
   ],
+  "family": "rouge_noir",
   "icon": "g_outsider",
   "sfx": "chime",
   "name_fr": "L'Homme de l'extérieur",
@@ -265,6 +273,7 @@
    "split",
    "mult"
   ],
+  "family": "plein",
   "icon": "g_horseshoe",
   "sfx": "clang",
   "name_fr": "Fer à cheval",
@@ -299,6 +308,7 @@
    "dozen",
    "chips"
   ],
+  "family": "rouge_noir",
   "icon": "g_egg_box",
   "sfx": "crack",
   "name_fr": "Boîte d'œufs",
@@ -333,6 +343,7 @@
    "column",
    "chips"
   ],
+  "family": "rouge_noir",
   "icon": "g_doric_column",
   "sfx": "stone",
   "name_fr": "Colonne dorique",
@@ -366,6 +377,7 @@
    "chips",
    "decay"
   ],
+  "family": "moteur",
   "icon": "g_boss_cigar",
   "sfx": "fire",
   "name_fr": "Cigare du Patron",
@@ -429,6 +441,7 @@
    "growth",
    "mult"
   ],
+  "family": "moteur",
   "icon": "g_piggy_bank",
   "sfx": "coin",
   "name_fr": "Tirelire",
@@ -474,6 +487,7 @@
    "chance",
    "mult"
   ],
+  "family": "etoile",
   "icon": "g_loaded_die",
   "sfx": "dice",
   "name_fr": "Dé pipé",
@@ -507,6 +521,7 @@
    "zero",
    "safety"
   ],
+  "family": "numeros",
   "icon": "g_zero_hero",
   "sfx": "shield",
   "name_fr": "Bouclier du Zéro",
@@ -533,6 +548,7 @@
    "streak",
    "mult"
   ],
+  "family": "rouge_noir",
   "icon": "g_scarlet_streak",
   "sfx": "whoosh",
   "name_fr": "Série écarlate",
@@ -568,6 +584,7 @@
    "chips",
    "safety"
   ],
+  "family": "main",
   "icon": "g_so_close",
   "sfx": "sigh",
   "name_fr": "Presque",
@@ -599,6 +616,7 @@
   "tags": [
    "budget"
   ],
+  "family": "banque",
   "icon": "g_secret_pocket",
   "sfx": "cloth",
   "name_fr": "Poche secrète",
@@ -635,6 +653,7 @@
    "chips",
    "economy"
   ],
+  "family": "banque",
   "icon": "g_weighted_chip",
   "sfx": "chips",
   "name_fr": "Jeton lesté",
@@ -671,6 +690,7 @@
    "ball",
    "precision"
   ],
+  "family": "main",
   "icon": "g_monocle",
   "sfx": "glass",
   "name_fr": "Monocle",
@@ -707,6 +727,7 @@
    "economy",
    "mult"
   ],
+  "family": "banque",
   "icon": "g_miser",
   "sfx": "coin",
   "name_fr": "Le Radin",
@@ -744,6 +765,7 @@
    "slots",
    "mult"
   ],
+  "family": "moteur",
   "icon": "g_empty_pockets",
   "sfx": "cloth",
   "name_fr": "Vide-poches",
@@ -780,6 +802,7 @@
   "tags": [
    "copy"
   ],
+  "family": "moteur",
   "icon": "g_blueprint",
   "sfx": "paper",
   "name_fr": "Plan du casino",
@@ -848,6 +871,7 @@
    "golden",
    "chips"
   ],
+  "family": "atelier",
   "icon": "g_gold_tooth",
   "sfx": "ball_metal",
   "name_fr": "Dent en or",
@@ -880,6 +904,7 @@
    "glass",
    "xmult"
   ],
+  "family": "atelier",
   "icon": "g_glass_heart",
   "sfx": "glass",
   "name_fr": "Cœur de verre",
@@ -913,6 +938,7 @@
    "streak",
    "mult"
   ],
+  "family": "rouge_noir",
   "icon": "g_metronome",
   "sfx": "tick",
   "name_fr": "Métronome",
@@ -943,6 +969,7 @@
    "zero",
    "xmult"
   ],
+  "family": "numeros",
   "icon": "g_zero_lover",
   "sfx": "zero",
   "name_fr": "Amoureux du Zéro",
@@ -983,6 +1010,7 @@
    "economy",
    "interest"
   ],
+  "family": "banque",
   "icon": "g_compound",
   "sfx": "coins",
   "name_fr": "Intérêts composés",
@@ -1020,6 +1048,7 @@
    "straight",
    "mult"
   ],
+  "family": "plein",
   "icon": "g_ladder",
   "sfx": "grow",
   "name_fr": "Échelle de soie",
@@ -1071,6 +1100,7 @@
    "repeat",
    "xmult"
   ],
+  "family": "numeros",
   "icon": "g_twin_dice",
   "sfx": "dice",
   "name_fr": "Dés jumeaux",
@@ -1103,6 +1133,7 @@
    "ball",
    "control"
   ],
+  "family": "main",
   "icon": "g_lodestone",
   "sfx": "magnet",
   "name_fr": "Pierre d'aimant",
@@ -1139,6 +1170,7 @@
    "budget",
    "xmult"
   ],
+  "family": "banque",
   "icon": "g_high_roller",
   "sfx": "chips",
   "name_fr": "Gros Joueur",
@@ -1173,6 +1205,7 @@
    "bets",
    "xmult"
   ],
+  "family": "plein",
   "icon": "g_minimalist",
   "sfx": "chime",
   "name_fr": "Le Minimaliste",
@@ -1207,6 +1240,7 @@
    "retrigger",
    "bets"
   ],
+  "family": "arrosage",
   "icon": "g_croupier_wink",
   "sfx": "wink",
   "name_fr": "Clin d'œil du croupier",
@@ -1239,6 +1273,7 @@
   "tags": [
    "xmult"
   ],
+  "family": "moteur",
   "icon": "g_house_key",
   "sfx": "vault",
   "name_fr": "Clé de La Maison",
@@ -1266,6 +1301,7 @@
    "retrigger",
    "bets"
   ],
+  "family": "arrosage",
   "icon": "g_dealer_hand",
   "sfx": "chips",
   "name_fr": "Main du Croupier",
@@ -1293,6 +1329,7 @@
    "growth",
    "xmult"
   ],
+  "family": "moteur",
   "icon": "g_ouroboros",
   "sfx": "grow",
   "name_fr": "Ouroboros",
@@ -1341,6 +1378,7 @@
    "retrigger",
    "pockets"
   ],
+  "family": "atelier",
   "icon": "g_chandelier",
   "sfx": "chime",
   "name_fr": "Le Lustre",
@@ -1369,6 +1407,7 @@
    "debt",
    "curse"
   ],
+  "family": "pacte",
   "icon": "g_iou",
   "sfx": "paper",
   "name_fr": "Reconnaissance de dette",
@@ -1408,6 +1447,7 @@
    "xmult",
    "curse"
   ],
+  "family": "pacte",
   "icon": "g_vampire",
   "sfx": "curse",
   "name_fr": "Le Vampire",
@@ -1459,6 +1499,7 @@
    "zero",
    "curse"
   ],
+  "family": "pacte",
   "icon": "g_zero_pact",
   "sfx": "zero",
   "name_fr": "Pacte du Zéro",
@@ -1496,6 +1537,7 @@
    "slots",
    "curse"
   ],
+  "family": "pacte",
   "icon": "g_cracked_mirror",
   "sfx": "glass",
   "name_fr": "Miroir fêlé",

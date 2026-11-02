@@ -52,11 +52,17 @@
 - ✅ Menu principal en 3D (salle abandonnée), résumé de la partie, astuces.
 - ✅ Confort : rythme sans accords opposés, bonneteau sans indice, vitesse ×1, pluie adoucie, options lisibles.
 
-## 1.6 — Pistes
+## 1.6 — Les Familles ✅
+- ✅ Dix familles de grigris, paliers de build 2/3/5, bandeau et infobulles, Bazar orienté build, Codex par famille.
+- ✅ Économie resserrée en début de partie ; emplacement de grigri achetable.
+- ✅ Épreuves plus abordables (rythme à notes longues sans accords, shaker B/A, bouteilles, tri, mémoire).
+- ✅ Tapis de jeu en 3D ; décors 3D du Bazar, de la victoire et de la défaite ; cadres art déco.
+
+## 1.7 — Pistes
 - Glyphes Steam Deck et PlayStation au choix (le Deck accepte déjà les glyphes Xbox).
 - Classement partagé de la Course de graine (export/import d'un fichier de résultats, sans serveur).
-- Animations de cartes à l'achat et à la vente plus marquées ; écran de victoire de campagne dédié.
-- Tapis de jeu en 3D (jetons empilés en relief), comme la roue ; objets du décor modélisés dans Blender.
+- Animations de cartes à l'achat et à la vente plus marquées.
+- Un légendaire pour la famille « Le Plein » ; objets du décor modélisés dans Blender.
 
 ## DLC « Les Étages Oubliés »
 Un quatrième acte entre les Salons et la Cave : casino abandonné, roue à 2 zéros, nouveau personnage (la Contrebandière), 3 créanciers, 25 grigris.

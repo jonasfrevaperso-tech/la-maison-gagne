@@ -10,6 +10,7 @@ const CATEGORIES: Dictionary[String, Array] = {
 	"seals": ["res://data/pockets", "seals"],
 	"grigris": ["res://data/grigris", "grigris"],
 	"fortunes": ["res://data/fortunes", "fortunes"],
+	"families": ["res://data/families", "families"],
 	"contracts": ["res://data/contracts", "contracts"],
 	"creditors": ["res://data/creditors", "creditors"],
 	"characters": ["res://data/characters", "characters"],

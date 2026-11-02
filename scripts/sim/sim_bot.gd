@@ -11,6 +11,8 @@ extends RefCounted
 ##              de plus compte enfin).
 ## Les bots ont une visée « humaine » : erreur de ±1 case avec probabilité AIM_ERROR.
 
+## Valeur ajoutée par grigri déjà possédé de la même famille (bot glouton).
+const FAMILY_VALUE: float = 0.6
 const AIM_ERROR: float = 0.35
 const SAVE_FOR_INTEREST: int = 10
 const MC_SPINS: int = 12
@@ -269,6 +271,10 @@ func shop(ctl: RunController) -> void:
 		var c: Dictionary = contracts[i]
 		if not bool(c["sold"]) and run.money - int(c["price"]) >= SAVE_FOR_INTEREST / 2:
 			ShopModel.buy_contract(run, ctl.db, i)
+	# 1 bis. Emplacement de grigri en plus si les emplacements sont pleins et la bourse le permet.
+	var slot_cost: int = ShopModel.slot_upgrade_cost(run)
+	if slot_cost >= 0 and run.empty_grigri_slots() <= 0 and run.money - slot_cost >= SAVE_FOR_INTEREST / 2:
+		ShopModel.buy_slot(run)
 	# 2. Grigris : meilleure valeur, en remplaçant le plus faible si plein.
 	var tries: int = 0
 	while tries < 3:
@@ -400,7 +406,13 @@ func _value_of(ctl: RunController, gid: String) -> float:
 	var v: float = float(RARITY_VALUE.get(String(def.get("rarity", "common")), 1.0))
 	for t: Variant in def.get("tags", []):
 		v += float(TAG_VALUE.get(String(t), 0.2))
-	return v
+	# Familles : un grigri vaut plus s'il complète un build déjà commencé.
+	var fam: String = String(def.get("family", ""))
+	var same: int = 0
+	for g: GrigriInstance in ctl.run.grigris:
+		if g.id != gid and Families.family_of(ctl.db, g.id) == fam:
+			same += 1
+	return v + FAMILY_VALUE * float(same)
 
 
 ## Valeur Monte-Carlo : score moyen sur MC_SPINS tours simulés avec ce grigri en plus.

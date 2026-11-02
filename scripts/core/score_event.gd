@@ -26,6 +26,7 @@ const SRC_CHARACTER: StringName = &"character"
 const SRC_CREDITOR: StringName = &"creditor"
 const SRC_SYSTEM: StringName = &"system"
 const SRC_FORTUNE: StringName = &"fortune"
+const SRC_FAMILY: StringName = &"family"
 
 var kind: StringName = INFO
 var source_kind: StringName = SRC_SYSTEM

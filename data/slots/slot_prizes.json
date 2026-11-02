@@ -10,13 +10,13 @@
    },
    {
     "op": "add_money",
-    "v": 5
+    "v": 3
    }
   ],
-  "name_fr": "TOUR OFFERT ! +1 tour et +5 $",
-  "name_en": "FREE SPIN! +1 spin and +5 $",
-  "desc_fr": "TOUR OFFERT ! +1 tour et +5 $",
-  "desc_en": "FREE SPIN! +1 spin and +5 $"
+  "name_fr": "TOUR OFFERT ! +1 tour et +3 $",
+  "name_en": "FREE SPIN! +1 spin and +3 $",
+  "desc_fr": "TOUR OFFERT ! +1 tour et +3 $",
+  "desc_en": "FREE SPIN! +1 spin and +3 $"
  },
  {
   "id": "p_cherry3",
@@ -44,17 +44,17 @@
   "do": [
    {
     "op": "add_money",
-    "v": 10
+    "v": 6
    },
    {
     "op": "add_random_seal",
     "seal": "seal_bell"
    }
   ],
-  "name_fr": "+10 $ et un Sceau Cloche sur une case",
-  "name_en": "+10 $ and a Bell Seal on a pocket",
-  "desc_fr": "+10 $ et un Sceau Cloche sur une case",
-  "desc_en": "+10 $ and a Bell Seal on a pocket"
+  "name_fr": "+6 $ et un Sceau Cloche sur une case",
+  "name_en": "+6 $ and a Bell Seal on a pocket",
+  "desc_fr": "+6 $ et un Sceau Cloche sur une case",
+  "desc_en": "+6 $ and a Bell Seal on a pocket"
  },
  {
   "id": "p_clover3",
@@ -97,13 +97,13 @@
   "do": [
    {
     "op": "add_money",
-    "v": 3
+    "v": 2
    }
   ],
-  "name_fr": "+3 $",
-  "name_en": "+3 $",
-  "desc_fr": "+3 $",
-  "desc_en": "+3 $"
+  "name_fr": "+2 $",
+  "name_en": "+2 $",
+  "desc_fr": "+2 $",
+  "desc_en": "+2 $"
  },
  {
   "id": "p_cherry2",
@@ -127,13 +127,13 @@
   "do": [
    {
     "op": "add_money",
-    "v": 2
+    "v": 1
    }
   ],
-  "name_fr": "+2 $",
-  "name_en": "+2 $",
-  "desc_fr": "+2 $",
-  "desc_en": "+2 $"
+  "name_fr": "+1 $",
+  "name_en": "+1 $",
+  "desc_fr": "+1 $",
+  "desc_en": "+1 $"
  },
  {
   "id": "p_clover2",
@@ -339,13 +339,13 @@
   "do": [
    {
     "op": "add_money",
-    "v": 6
+    "v": 4
    }
   ],
-  "name_fr": "+6 $",
-  "name_en": "+6 $",
-  "desc_fr": "+6 $",
-  "desc_en": "+6 $"
+  "name_fr": "+4 $",
+  "name_en": "+4 $",
+  "desc_fr": "+4 $",
+  "desc_en": "+4 $"
  },
  {
   "id": "p_lemon4",

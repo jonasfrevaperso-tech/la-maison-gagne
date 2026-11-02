@@ -5,9 +5,12 @@ extends Control
 signal closed
 
 const DIM: Color = Color(0.02, 0.01, 0.03, 0.78)
+const DIM_OVER_BACKDROP: Color = Color(0.02, 0.01, 0.03, 0.42)
 const POP_TIME: float = 0.18
 ## Part de la fenêtre que peut occuper un panneau.
 const FIT_MARGIN: float = 0.96
+## Marge intérieure des panneaux : laisse la place aux ornements art déco.
+const PANEL_PAD: int = 26
 
 var panel: PanelContainer = null
 var body: VBoxContainer = null
@@ -21,16 +24,24 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	theme = UiKit.theme()
+	# Décor plein écran propre à la surcouche (boutique, victoire), sous le voile.
+	var bd: Control = backdrop()
+	if bd != null:
+		add_child(bd)
 	var dim: ColorRect = ColorRect.new()
-	dim.color = DIM
+	dim.color = DIM if bd == null else DIM_OVER_BACKDROP
 	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(dim)
 	var center: CenterContainer = CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(center)
 	panel = UiKit.panel(Palette.VELVET_DEEP, Palette.GOLD)
+	panel.add_theme_stylebox_override("panel", UiKit.flat(Palette.VELVET_DEEP, Palette.GOLD, UiKit.BORDER, UiKit.RADIUS, PANEL_PAD))
 	panel.custom_minimum_size = Vector2(panel_width, 0)
 	center.add_child(panel)
+	var deco: DecoFrame = DecoFrame.new()
+	deco.out = float(PANEL_PAD)
+	panel.add_child(deco)
 	body = VBoxContainer.new()
 	body.add_theme_constant_override("separation", 14)
 	panel.add_child(body)
@@ -73,6 +84,11 @@ func fit_scale() -> float:
 	if need.x <= 0.0 or need.y <= 0.0:
 		return 1.0
 	return minf(1.0, minf(room.x / need.x, room.y / need.y))
+
+
+## À surcharger : décor plein écran derrière le panneau (null : la table reste visible, voilée).
+func backdrop() -> Control:
+	return null
 
 
 ## À surcharger : remplit `body`.

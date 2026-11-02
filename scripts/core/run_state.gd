@@ -75,6 +75,9 @@ var defeat_reason: String = ""
 var deadline_log: Array[Dictionary] = []
 var pending_event_id: String = ""
 var shop_state: Dictionary = {}
+## Cache des paliers de familles (non sauvegardé) : recalculé quand les grigris changent.
+var family_cache_key: int = -1
+var family_cache: Array[Dictionary] = []
 
 
 func act() -> int:

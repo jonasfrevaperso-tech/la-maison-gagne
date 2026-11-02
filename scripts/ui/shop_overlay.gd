@@ -20,6 +20,7 @@ var _offers_row: HBoxContainer = null
 var _packs_row: HBoxContainer = null
 var _odds: Label = null
 var _reroll_btn: Button = null
+var _slot_btn: Button = null
 var _owned: GrigriBar = null
 var _pack_box: VBoxContainer = null
 var _pack_layer: Control = null
@@ -35,6 +36,11 @@ func configure(p_ctl: RunController) -> ShopOverlay:
 	ctl = p_ctl
 	panel_width = 1560.0
 	return self
+
+
+## Arrière-boutique du Bazar en 3D derrière l'étal.
+func backdrop() -> Control:
+	return VenueBackdrop3D.create("bazaar")
 
 
 func build() -> void:
@@ -105,6 +111,8 @@ func build() -> void:
 	actions.add_theme_constant_override("separation", 24)
 	_reroll_btn = UiKit.button("", _on_reroll, Vector2(300, 60))
 	actions.add_child(_reroll_btn)
+	_slot_btn = UiKit.button("", _on_buy_slot, Vector2(340, 60))
+	actions.add_child(_slot_btn)
 	var leave: Button = UiKit.button(tr("SHOP_LEAVE"), close, Vector2(300, 60))
 	actions.add_child(leave)
 	PromptBadge.attach(leave, "pause_menu")
@@ -193,6 +201,10 @@ func _refresh(animate: bool = false) -> void:
 		_contract_row.add_child(cc)
 	_reroll_btn.text = tr("SHOP_REROLL") % int(r.shop_state.get("reroll_cost", 0))
 	_reroll_btn.disabled = r.money < int(r.shop_state.get("reroll_cost", 0))
+	var slot_cost: int = ShopModel.slot_upgrade_cost(r)
+	_slot_btn.text = tr("SHOP_SLOT") % slot_cost if slot_cost >= 0 else tr("SHOP_SLOT_MAX")
+	_slot_btn.disabled = slot_cost < 0 or r.money < slot_cost
+	_slot_btn.tooltip_text = tr("SHOP_SLOT_TIP")
 	_owned.bind(r)
 	_owned_title.text = tr("SHOP_OWNED").to_upper() + "  %d / %d" % [r.grigris.size(), r.grigri_slots]
 	_refresh_pack()
@@ -265,6 +277,16 @@ func _on_buy_pack(i: int) -> void:
 	if _feedback(ShopModel.buy_pack(ctl.run, ctl.db, i), UiLayout.canvas_point(_packs_row, _packs_row.size * 0.5)):
 		AudioBus.play("pack_open")
 		_refresh()
+
+
+func _on_buy_slot() -> void:
+	var res: ShopModel.BuyResult = ShopModel.buy_slot(ctl.run)
+	if res == ShopModel.BuyResult.OK:
+		AudioBus.play("coins")
+		AudioBus.play("chime", 1.1, -4.0)
+		EventBus.grigris_changed.emit()
+	_feedback(res, UiLayout.canvas_point(_slot_btn, _slot_btn.size * 0.5))
+	_refresh()
 
 
 func _on_reroll() -> void:

@@ -59,8 +59,11 @@ func start(precision: int, assist: bool, count: int = -1) -> void:
 	_mouse = GameInput.last_was_mouse and not InputGlyphs.using_pad
 	_release_time = Balance.f("throw_game.release_seconds") * (Balance.f("throw_game.assist_slowdown") if assist else 1.0)
 	var n: int = count if count > 0 else ThrowTrials.count_for(Settings.s("game", "throw_mode"))
+	# Évite les épreuves des deux derniers lancers : plus de variété d'un lancer à l'autre.
 	trial_ids = ThrowTrials.pick(DataRegistry.db, RngService.cosmetic(), n, _last_ids)
-	_last_ids = trial_ids.duplicate()
+	_last_ids.append_array(trial_ids)
+	while _last_ids.size() > n * Balance.i("throw_game.trial_memory_throws"):
+		_last_ids.pop_front()
 	trial_scores.clear()
 	release_score = 0.0
 	_grade_t = 0.0

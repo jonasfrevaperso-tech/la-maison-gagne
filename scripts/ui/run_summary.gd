@@ -18,7 +18,12 @@ func setup(params: Dictionary) -> void:
 func _ready() -> void:
 	theme = UiKit.theme()
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(DecoBackground.new())
+	add_child(VenueBackdrop3D.create("victory" if victory else "defeat"))
+	var veil: ColorRect = ColorRect.new()
+	veil.color = Overlay.DIM_OVER_BACKDROP
+	veil.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	veil.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(veil)
 	var r: RunState = GameState.run()
 	var v: VBoxContainer = VBoxContainer.new()
 	v.set_anchors_preset(Control.PRESET_CENTER)

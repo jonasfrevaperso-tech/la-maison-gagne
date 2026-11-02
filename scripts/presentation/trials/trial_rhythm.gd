@@ -2,9 +2,11 @@ class_name TrialRhythm
 extends ThrowTrial
 ## EFFET : un vrai petit jeu de rythme. Un morceau (jazz, funk ou mambo) démarre après une
 ## mesure de décompte ; les notes glissent sur quatre couloirs vers la ligne et tombent sur la
-## grille du morceau (croches), avec des accords (deux couloirs voisins à la fois).
+## grille du morceau, une à la fois (jamais deux touches ensemble) : notes à frapper et notes
+## longues à maintenir jusqu'au bout de leur traînée.
 ## Clavier : flèches ; manette : X / Y / B / A ; souris : clics gauche / droit (deux couloirs).
-## Note = moyenne des notes frappées, moins une pénalité par frappe dans le vide.
+## Note = moyenne des notes (une note longue lâchée trop tôt ne vaut qu'une partie), moins une
+## pénalité par frappe dans le vide.
 
 const LANE_KEYS: Array[String] = ["pad_x", "pad_y", "pad_b", "pad_a"]
 const MOUSE_KEYS: Array[String] = ["mouse_left", "mouse_right"]
@@ -14,12 +16,18 @@ const LANE_SFX: Array[String] = ["qte_kick", "qte_snare", "qte_hat", "qte_clap"]
 const LANE_COLORS: Array[Color] = [Color("2f7bff"), Color("ffc81e"), Color("e8343e"), Color("38c14a")]
 const PROMPT: float = 38.0
 const HIT_X: float = 96.0
+## Les verdicts s'affichent à droite de la ligne de frappe (pas sur le bord du panneau).
+const POP_DX: float = 110.0
 const GROOVES: Array[String] = ["jazz", "funk", "mambo"]
 
 var _lanes: int = 4
 var _times: PackedFloat32Array = PackedFloat32Array()
 var _lane_of: PackedInt32Array = PackedInt32Array()
 var _scores: PackedFloat32Array = PackedFloat32Array()
+var _dur: PackedFloat32Array = PackedFloat32Array()
+## Note longue en cours de maintien par couloir (-1 : aucune) et note de frappe associée.
+var _holding: PackedInt32Array = PackedInt32Array([-1, -1, -1, -1])
+var _press_sc: PackedFloat32Array = PackedFloat32Array()
 var _beat: float = 0.5
 var _lead: float = 2.0
 var _end: float = 0.0
@@ -38,48 +46,40 @@ func begin() -> void:
 	_lead = _beat * 4.0
 	var steps: int = pi("bars") * 8
 	var want: int = pi("notes") - (pi("assist_fewer") if assist else 0)
-	var chords: int = 0 if assist else pi("chords")
-	# Croches tirées en privilégiant les temps forts ; jamais deux croches collées sur le même couloir.
-	var slots: Array[int] = []
-	var weights: Array[float] = []
-	for k: int in steps:
-		slots.append(k)
-		weights.append(3.0 if k % 2 == 0 else 1.0)
-	var picked: Array[int] = []
-	while picked.size() < want and not slots.is_empty():
-		var tot: float = 0.0
-		for w: float in weights:
-			tot += w
-		var r: float = rng.randf() * tot
-		var idx: int = 0
-		while idx < weights.size() - 1 and r > weights[idx]:
-			r -= weights[idx]
-			idx += 1
-		picked.append(slots[idx])
-		slots.remove_at(idx)
-		weights.remove_at(idx)
-	picked.sort()
+	var holds: int = pi("holds") - (1 if assist else 0)
+	var hold_len: Array = Balance.arr("throw_trials.rhythm.hold_steps")
+	# Une note à la fois, au moins un temps entre deux notes (croches surtout sur les temps).
+	var step: int = 2
 	var prev_lane: int = -1
-	for i: int in picked.size():
+	var made: int = 0
+	while made < want and step < steps:
 		var lane: int = rng.randi_range(0, _lanes - 1)
 		if lane == prev_lane:
 			lane = (lane + 1 + rng.randi_range(0, _lanes - 2)) % _lanes
 		prev_lane = lane
-		_add(picked[i], lane)
-		if chords > 0 and picked[i] % 4 == 0 and i > 0:
-			chords -= 1
-			# Accord : toujours deux boutons voisins (X+Y, Y+B, B+A, A+X), jamais opposés (X+B, Y+A),
-			# qu'un seul pouce ne peut pas presser ensemble à la manette.
-			_add(picked[i], (lane + (1 if rng.randf() < 0.5 else _lanes - 1)) % _lanes)
+		var len_steps: int = 0
+		if holds > 0 and made > 0 and step + 8 < steps and rng.randf() < 0.45:
+			len_steps = int(hold_len[rng.randi_range(0, hold_len.size() - 1)])
+			holds -= 1
+		_add(step, lane, len_steps)
+		made += 1
+		var gap: int = [2, 2, 2, 3, 4][rng.randi_range(0, 4)]
+		step += len_steps + gap
+		if len_steps == 0 and step % 2 == 1 and rng.randf() < 0.6:
+			step += 1
 	_end = _lead + float(steps) * _beat * 0.5 + _window() + 0.3
+	if not _times.is_empty():
+		_end = maxf(_end, _times[_times.size() - 1] + _dur[_dur.size() - 1] + _window() + 0.4)
 	AudioBus.duck_music(true)
 	AudioBus.play("groove_" + _groove, 1.0, -2.0)
 
 
-func _add(step: int, lane: int) -> void:
+func _add(step: int, lane: int, len_steps: int) -> void:
 	_times.append(_lead + float(step) * _beat * 0.5)
 	_lane_of.append(lane)
 	_scores.append(-1.0)
+	_press_sc.append(0.0)
+	_dur.append(float(len_steps) * _beat * 0.5)
 
 
 ## Fenêtre propre au rythme (plus large que l'invite d'effet : on suit une musique).
@@ -93,10 +93,21 @@ func _tap_score(err: float) -> float:
 
 func handle(event: InputEvent) -> bool:
 	var k: int = sym_pressed(event)
-	if k < 0:
-		return false
-	tap(k)
-	return true
+	if k >= 0:
+		tap(k)
+		return true
+	for lane: int in _lanes:
+		if _holding[lane] >= 0 and _released(event, lane):
+			_release(lane)
+			return true
+	return false
+
+
+func _released(event: InputEvent, lane: int) -> bool:
+	var mb: InputEventMouseButton = event as InputEventMouseButton
+	if mb != null:
+		return mouse and not mb.pressed and mb.button_index == (MOUSE_BUTTON_LEFT if lane == 0 else MOUSE_BUTTON_RIGHT)
+	return GameInput.released(event, QTE_ACTIONS[lane])
 
 
 func tap(lane: int) -> void:
@@ -116,8 +127,16 @@ func tap(lane: int) -> void:
 		AudioBus.play("click", 0.6, -10.0)
 		return
 	var sc: float = _tap_score(best_err)
+	if _dur[best] > 0.0:
+		# Note longue : la frappe est jugée maintenant, le maintien à la fin de la traînée.
+		_press_sc[best] = sc
+		_scores[best] = -2.0
+		_holding[lane] = best
+		AudioBus.play(LANE_SFX[lane], 1.0, -3.0)
+		AudioBus.play("whoosh", 0.7, -14.0)
+		return
 	_scores[best] = sc
-	pop(Vector2(HIT_X, _lane_y(lane) - 26.0), sc)
+	pop(Vector2(HIT_X + POP_DX, _lane_y(lane) - 26.0), sc)
 	AudioBus.play(LANE_SFX[lane], 1.0, -3.0)
 	if sc >= 0.45:
 		_combo += 1
@@ -129,19 +148,55 @@ func tap(lane: int) -> void:
 		_combo = 0
 
 
+## Lâcher d'une note longue : pleine valeur si l'on tient jusqu'au bout (à la fenêtre près).
+func _release(lane: int) -> void:
+	var i: int = _holding[lane]
+	_holding[lane] = -1
+	if i < 0:
+		return
+	var tail: float = _times[i] + _dur[i]
+	var held: float = clampf((t - _times[i]) / maxf(_dur[i], 0.01), 0.0, 1.0)
+	if t >= tail - p("release_seconds") * widen():
+		held = 1.0
+	_close_hold(i, held)
+
+
+func _close_hold(i: int, held: float) -> void:
+	var sc: float = _press_sc[i] * (0.35 + 0.65 * held)
+	_scores[i] = sc
+	pop(Vector2(HIT_X + POP_DX, _lane_y(_lane_of[i]) - 26.0), sc, "" if held >= 1.0 else "TRIAL_RHYTHM_LET_GO")
+	if held >= 1.0:
+		AudioBus.play("chime", 1.2, -6.0)
+		_combo += 1
+		_best_combo = maxi(_best_combo, _combo)
+		flash = 1.0
+	else:
+		_combo = 0
+
+
 func tick(dt: float) -> void:
+	# Note longue tenue jusqu'au bout (plus la fenêtre) : validée sans attendre le lâcher.
+	for lane: int in _lanes:
+		var hi: int = _holding[lane]
+		if hi >= 0 and t >= _times[hi] + _dur[hi] + p("release_seconds") * widen():
+			_holding[lane] = -1
+			_close_hold(hi, 1.0)
 	for l: int in 4:
 		_lane_flash[l] = maxf(_lane_flash[l] - dt * 4.0, 0.0)
 	var b: int = int(floor(t / _beat))
 	if b != _last_beat:
 		_last_beat = b
 	for i: int in _times.size():
-		if _scores[i] < 0.0 and t - _times[i] > _window():
+		if _scores[i] == -1.0 and t - _times[i] > _window():
 			_scores[i] = 0.0
 			_combo = 0
-			pop(Vector2(HIT_X, _lane_y(_lane_of[i]) - 26.0), 0.0, "THROW_TAP_MISSED")
+			pop(Vector2(HIT_X + POP_DX, _lane_y(_lane_of[i]) - 26.0), 0.0, "THROW_TAP_MISSED")
 			AudioBus.play("lose_soft", 1.2, -12.0)
 	if t >= _end:
+		for lane: int in _lanes:
+			if _holding[lane] >= 0:
+				_close_hold(_holding[lane], 1.0)
+				_holding[lane] = -1
 		AudioBus.duck_music(false)
 		var vals: Array[float] = []
 		for v: float in _scores:
@@ -150,15 +205,22 @@ func tick(dt: float) -> void:
 
 
 func bot_wants() -> Dictionary:
+	for lane: int in _lanes:
+		var hi: int = _holding[lane]
+		if hi >= 0 and t >= _times[hi] + _dur[hi]:
+			return {"do": "release", "symbol": lane}
 	for i: int in _times.size():
-		if _scores[i] < 0.0 and absf(t - _times[i]) < 0.02:
+		if _scores[i] == -1.0 and absf(t - _times[i]) < 0.02:
 			return {"do": "sym", "symbol": _lane_of[i]}
 	return {"do": ""}
 
 
 func bot_apply(want: Dictionary) -> void:
-	if String(want.get("do", "")) == "sym":
-		tap(int(want["symbol"]))
+	match String(want.get("do", "")):
+		"sym":
+			tap(int(want["symbol"]))
+		"release":
+			_release(int(want["symbol"]))
 
 
 func _lane_y(lane: int) -> float:
@@ -202,6 +264,10 @@ func paint() -> void:
 	for i: int in _times.size():
 		if _scores[i] >= 0.0:
 			continue
+		if _dur[i] > 0.0:
+			_draw_hold(r, i, travel)
+		if _scores[i] == -2.0:
+			continue
 		var u2: float = (_times[i] - t) / travel
 		if u2 > 1.0 or u2 < -0.3:
 			continue
@@ -213,6 +279,30 @@ func paint() -> void:
 		draw_circle(Vector2(x2, ny), PROMPT * 0.72, Color(lc, 0.22))
 		_prompt(Vector2(x2, ny), _lane_of[i], clampf(1.2 - u2, 0.45, 1.0))
 	pips_line(r)
+
+
+## Note longue : traînée colorée jusqu'à sa fin ; elle se consume à mesure qu'on la tient.
+func _draw_hold(r: Rect2, i: int, travel: float) -> void:
+	var lc: Color = LANE_COLORS[_lane_of[i]]
+	var ny: float = _lane_y(_lane_of[i])
+	var span: float = r.end.x - 30.0 - HIT_X
+	var held: bool = _scores[i] == -2.0
+	var u_head: float = maxf((_times[i] - t) / travel, 0.0) if held else (_times[i] - t) / travel
+	var u_tail: float = (_times[i] + _dur[i] - t) / travel
+	if u_tail < -0.1:
+		return
+	var x0: float = HIT_X + clampf(u_head, -0.3, 1.0) * span
+	var x1: float = HIT_X + clampf(u_tail, -0.3, 1.0) * span
+	if x1 <= x0:
+		return
+	var glow: float = 0.75 + 0.25 * sin(t * 18.0) if held else 0.45
+	draw_rect(Rect2(x0, ny - 13.0, x1 - x0, 26.0), Color(lc, 0.25 * glow))
+	draw_rect(Rect2(x0, ny - 7.0, x1 - x0, 14.0), Color(lc, glow))
+	draw_rect(Rect2(x0, ny - 7.0, x1 - x0, 14.0), Color(Palette.IVORY, 0.35 * glow), false, 2.0)
+	draw_circle(Vector2(x1, ny), 12.0, Color(lc, glow))
+	draw_circle(Vector2(x1, ny), 6.0, Color(Palette.IVORY, glow))
+	if held:
+		draw_circle(Vector2(HIT_X, ny), PROMPT * 0.75, Color(lc, 0.25 + 0.15 * sin(t * 20.0)))
 
 
 ## Scène de cabaret : rideau sombre, égaliseur qui bat la mesure, projecteurs colorés.

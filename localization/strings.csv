@@ -512,8 +512,9 @@ TRIAL_COMBO,COMBO ×%d,COMBO ×%d
 TRIAL_CHARGE_ROUND,Élan %d / %d,Swing %d / %d
 TRIAL_CHARGE_READY,MAINTIENS… RELÂCHE DANS L'OR,HOLD… RELEASE IN THE GOLD
 TRIAL_CHARGE_HINT,"Maintiens {confirm} pour charger, relâche dans l'or","Hold {confirm} to charge, release in the gold"
-TRIAL_RHYTHM_HINT,Frappe {@qte} quand la note passe la ligne,Hit {@qte} as the note crosses the line
-TRIAL_RHYTHM_HINT_MOUSE,Clique {@qte_mouse} quand la note passe la ligne,Click {@qte_mouse} as the note crosses the line
+TRIAL_RHYTHM_HINT,"Frappe {@qte} quand la note passe la ligne, maintiens les notes longues","Hit {@qte} as the note crosses the line, hold the long notes"
+TRIAL_RHYTHM_HINT_MOUSE,"Clique {@qte_mouse} quand la note passe la ligne, maintiens les notes longues","Click {@qte_mouse} as the note crosses the line, hold the long notes"
+TRIAL_RHYTHM_LET_GO,TROP TÔT !,LET GO TOO SOON!
 TRIAL_RHYTHM_GROOVE_JAZZ,♪ « Swing du Sous-sol » ♪,♪ “Basement Swing” ♪
 TRIAL_RHYTHM_GROOVE_FUNK,♪ « Funk de la Dette » ♪,♪ “Debt Funk” ♪
 TRIAL_RHYTHM_GROOVE_MAMBO,♪ « Mambo du Croupier » ♪,♪ “Croupier Mambo” ♪
@@ -544,7 +545,7 @@ TRIAL_SAFE_LISTEN,Écoute…,Listen…
 TRIAL_TOWER_HINT,{confirm} lâcher le jeton sur la pile,{confirm} drop the chip on the stack
 TRIAL_TOWER_PERFECT,PILE !,SPOT ON!
 TRIAL_TOWER_WIDTH,Largeur %d %%,Width %d %%
-TRIAL_SHAKER_HINT,Alterne {qte_left} et {qte_right} pour secouer,Alternate {qte_left} and {qte_right} to shake
+TRIAL_SHAKER_HINT,Alterne {qte_right} et {qte_down} pour secouer,Alternate {qte_right} and {qte_down} to shake
 TRIAL_SHAKER_HINT_MOUSE,Alterne {@click} et {@right_click} pour secouer,Alternate {@click} and {@right_click} to shake
 TRIAL_SHAKER_SPILL,ÇA DÉBORDE !,SPILLAGE!
 TRIAL_SHAKER_IN_BAND,Dans la bande : %d %%,In the band: %d %%
@@ -578,3 +579,7 @@ TRIAL_SORT_RIGHT_CLICK,Clic D,R-click
 TAG_JACKPOT,Jackpot,Jackpot
 MENU_TIP,Astuce :,Tip:
 MENU_CONTINUE_INFO,%s · Palier %d · Échéance %d,%s · Tier %d · Deadline %d
+FAMILY_TIER_UP,Build activé ! %s,Build active! %s
+SHOP_SLOT,+1 emplacement · %d $,+1 slot · %d $
+SHOP_SLOT_MAX,Emplacements au maximum,Slots maxed out
+SHOP_SLOT_TIP,"Rénovation : un emplacement de grigri de plus pour toute la partie (deux au maximum).","Renovation: one more charm slot for the rest of the run (two at most)."

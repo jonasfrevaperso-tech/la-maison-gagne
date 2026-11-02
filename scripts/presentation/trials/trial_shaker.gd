@@ -1,6 +1,6 @@
 class_name TrialShaker
 extends ThrowTrial
-## SHAKER : le barman est parti en 1987, c'est toi qui secoues. Alterner gauche / droite pour
+## SHAKER : le barman est parti en 1987, c'est toi qui secoues. Alterner B et A (→ et ↓ au clavier) pour
 ## faire monter la mousse et la garder dans la bande dorée, qui se promène. Trop mou, ça
 ## retombe ; trop fort, ça déborde. Note = part du temps passé dans la bande.
 
@@ -54,9 +54,11 @@ func handle(event: InputEvent) -> bool:
 	var k: int = sym_pressed(event)
 	if k < 0:
 		return false
-	if k == 0:
+	# Manette : B puis A (les deux boutons sous le pouce droit) ; clavier : → puis ↓ ;
+	# souris : clic gauche puis droit.
+	if (mouse and k == 0) or k == 2:
 		shake(0)
-	elif k == 2 or (mouse and k == 1):
+	elif (mouse and k == 1) or k == 3:
 		shake(1)
 	return true
 
@@ -101,13 +103,15 @@ func bot_wants() -> Dictionary:
 	if _end_t >= 0.0 or _level + p("pump") > ahead + _band() * 0.5:
 		return {"do": ""}
 	var side: int = 1 - maxi(_last_side, 0) if _last_side >= 0 else 0
-	return {"do": "sym", "symbol": 0 if side == 0 else (1 if mouse else 2)}
+	if mouse:
+		return {"do": "sym", "symbol": side}
+	return {"do": "sym", "symbol": 2 if side == 0 else 3}
 
 
 func bot_apply(w: Dictionary) -> void:
 	if String(w.get("do", "")) == "sym":
 		var k: int = int(w["symbol"])
-		shake(0 if k == 0 else 1)
+		shake(0 if k == 0 or k == 2 else 1)
 
 
 func paint() -> void:

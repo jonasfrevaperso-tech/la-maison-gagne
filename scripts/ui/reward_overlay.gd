@@ -12,6 +12,11 @@ func configure(p_reward: Dictionary, p_victory: bool) -> RewardOverlay:
 	return self
 
 
+## Victoire finale : la table du triomphe en 3D derrière le décompte.
+func backdrop() -> Control:
+	return VenueBackdrop3D.create("victory") if victory else null
+
+
 func build() -> void:
 	heading(tr("REWARD_VICTORY") if victory else tr("REWARD_TITLE"))
 	var lines: Array[Array] = [

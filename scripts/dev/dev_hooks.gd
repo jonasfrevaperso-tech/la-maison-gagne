@@ -88,6 +88,9 @@ func start() -> bool:
 		r.flags["control_temp"] = 5.0
 		r.flags["zone_width_override"] = 1
 		r.debt = 1
+	if String(args.get("dev-phase", "")) == "hud":
+		r.flags["act_intro_seen_1"] = true
+		r.flags["tutorial_off"] = true
 	if String(args.get("dev-phase", "")) == "decor":
 		r.flags["act_intro_seen_1"] = true
 		_decor_demo.call_deferred()

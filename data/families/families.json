@@ -1,0 +1,172 @@
+[
+ {
+  "id": "rouge_noir",
+  "color": "e04050",
+  "icon": "fam_rouge_noir",
+  "name_fr": "Rouge & Noir",
+  "name_en": "Red & Black",
+  "desc_fr": "Les chances simples : rouge, noir, pair, impair, manque, passe, douzaines et colonnes. Peu de risque, gains réguliers.",
+  "desc_en": "Even-money and outside bets: red, black, odd, even, low, high, dozens and columns. Low risk, steady gains.",
+  "tiers": [
+   {"n": 2, "desc_fr": "+3 Mult par pari extérieur gagnant.", "desc_en": "+3 Mult per winning outside bet.",
+    "effects": [{"trigger": "on_bet_win", "if": [{"c": "bet_outside"}], "do": [{"op": "add_mult", "v": 3}]}]},
+   {"n": 3, "desc_fr": "+6 Mult par pari extérieur gagnant.", "desc_en": "+6 Mult per winning outside bet.",
+    "effects": [{"trigger": "on_bet_win", "if": [{"c": "bet_outside"}], "do": [{"op": "add_mult", "v": 6}]}]},
+   {"n": 5, "desc_fr": "+6 Mult et ×1,3 Mult par pari extérieur gagnant.", "desc_en": "+6 Mult and ×1.3 Mult per winning outside bet.",
+    "effects": [{"trigger": "on_bet_win", "if": [{"c": "bet_outside"}], "do": [{"op": "add_mult", "v": 6}, {"op": "mul_mult", "v": 1.3}]}]}
+  ]
+ },
+ {
+  "id": "plein",
+  "color": "f2e2b0",
+  "icon": "fam_plein",
+  "name_fr": "Le Plein",
+  "name_en": "Straight Up",
+  "desc_fr": "Les mises intérieures : pleins, chevaux, transversales, carrés et sixains. Rares mais énormes.",
+  "desc_en": "Inside bets: straights, splits, streets, corners and six lines. Rare but huge.",
+  "tiers": [
+   {"n": 2, "desc_fr": "+40 Jetons par mise intérieure gagnante.", "desc_en": "+40 Chips per winning inside bet.",
+    "effects": [{"trigger": "on_bet_win", "if": [{"c": "bet_inside"}], "do": [{"op": "add_chips", "v": 40}]}]},
+   {"n": 3, "desc_fr": "+80 Jetons et +4 Mult par mise intérieure gagnante.", "desc_en": "+80 Chips and +4 Mult per winning inside bet.",
+    "effects": [{"trigger": "on_bet_win", "if": [{"c": "bet_inside"}], "do": [{"op": "add_chips", "v": 80}, {"op": "add_mult", "v": 4}]}]},
+   {"n": 5, "desc_fr": "+80 Jetons et ×1,6 Mult par mise intérieure gagnante.", "desc_en": "+80 Chips and ×1.6 Mult per winning inside bet.",
+    "effects": [{"trigger": "on_bet_win", "if": [{"c": "bet_inside"}], "do": [{"op": "add_chips", "v": 80}, {"op": "mul_mult", "v": 1.6}]}]}
+  ]
+ },
+ {
+  "id": "numeros",
+  "color": "2fbf71",
+  "icon": "fam_numeros",
+  "name_fr": "Numérologie",
+  "name_en": "Numerology",
+  "desc_fr": "Le Zéro et les numéros fétiches. On craint le Zéro ? Eux l'attendent.",
+  "desc_en": "The Zero and lucky numbers. Others fear the Zero; they wait for it.",
+  "tiers": [
+   {"n": 2, "desc_fr": "Sur un Zéro : protège les paris et +20 Mult.", "desc_en": "On a Zero: protects bets and +20 Mult.",
+    "effects": [{"trigger": "on_zero", "do": [{"op": "protect_zero"}]}, {"trigger": "on_score_calc", "if": [{"c": "is_zero"}], "do": [{"op": "add_mult", "v": 20}]}]},
+   {"n": 3, "desc_fr": "Sur un Zéro : protège les paris et ×3 Mult. Même numéro deux fois de suite : ×2 Mult.", "desc_en": "On a Zero: protects bets and ×3 Mult. Same number twice in a row: ×2 Mult.",
+    "effects": [{"trigger": "on_zero", "do": [{"op": "protect_zero"}]}, {"trigger": "on_score_calc", "if": [{"c": "is_zero"}], "do": [{"op": "mul_mult", "v": 3}]}, {"trigger": "on_score_calc", "if": [{"c": "number_repeat"}], "do": [{"op": "mul_mult", "v": 2}]}]},
+   {"n": 5, "desc_fr": "×1,5 Mult à chaque tour. Sur un Zéro : protège les paris et ×6 Mult.", "desc_en": "×1.5 Mult every spin. On a Zero: protects bets and ×6 Mult.",
+    "effects": [{"trigger": "on_zero", "do": [{"op": "protect_zero"}]}, {"trigger": "on_score_calc", "do": [{"op": "mul_mult", "v": 1.5}]}, {"trigger": "on_score_calc", "if": [{"c": "is_zero"}], "do": [{"op": "mul_mult", "v": 6}]}]}
+  ]
+ },
+ {
+  "id": "main",
+  "color": "3cc8e0",
+  "icon": "fam_main",
+  "name_fr": "Main sûre",
+  "name_en": "Steady Hand",
+  "desc_fr": "L'adresse au lancer : précision, contrôle et bille qui reste dans la zone visée. Récompense les bons mini-jeux.",
+  "desc_en": "Throwing skill: precision, control and a ball that stays in the aimed zone. Rewards good minigames.",
+  "tiers": [
+   {"n": 2, "desc_fr": "Bille dans la zone visée : +6 Mult.", "desc_en": "Ball in the aimed zone: +6 Mult.",
+    "effects": [{"trigger": "on_score_calc", "if": [{"c": "in_zone"}], "do": [{"op": "add_mult", "v": 6}]}]},
+   {"n": 3, "desc_fr": "Bille dans la zone visée : ×1,4 Mult. Bille qui frôle un de tes numéros : +60 Jetons.", "desc_en": "Ball in the aimed zone: ×1.4 Mult. Near miss on one of your numbers: +60 Chips.",
+    "effects": [{"trigger": "on_score_calc", "if": [{"c": "in_zone"}], "do": [{"op": "mul_mult", "v": 1.4}]}, {"trigger": "on_score_calc", "if": [{"c": "near_miss"}], "do": [{"op": "add_chips", "v": 60}]}]},
+   {"n": 5, "desc_fr": "Bille dans la zone visée : ×2 Mult. Bille qui frôle un de tes numéros : +60 Jetons.", "desc_en": "Ball in the aimed zone: ×2 Mult. Near miss on one of your numbers: +60 Chips.",
+    "effects": [{"trigger": "on_score_calc", "if": [{"c": "in_zone"}], "do": [{"op": "mul_mult", "v": 2}]}, {"trigger": "on_score_calc", "if": [{"c": "near_miss"}], "do": [{"op": "add_chips", "v": 60}]}]}
+  ]
+ },
+ {
+  "id": "atelier",
+  "color": "a878f0",
+  "icon": "fam_atelier",
+  "name_fr": "L'Atelier",
+  "name_en": "The Workshop",
+  "desc_fr": "Transformer la roue : cases Dorées, de Verre, éditions, sceaux, cases détruites ou dupliquées.",
+  "desc_en": "Rebuild the wheel: Golden and Glass pockets, editions, seals, destroyed or copied pockets.",
+  "tiers": [
+   {"n": 2, "desc_fr": "+10 Jetons par case éditée et par case scellée sur la roue.", "desc_en": "+10 Chips per edited pocket and per sealed pocket on the wheel.",
+    "effects": [{"trigger": "on_score_calc", "do": [{"op": "add_chips", "v": {"var": "edition_pockets", "mul": 10}}, {"op": "add_chips", "v": {"var": "seal_count", "mul": 10}}]}]},
+   {"n": 3, "desc_fr": "+20 Jetons par case éditée et par case scellée. Une case éditée ou scellée touchée compte une fois de plus.", "desc_en": "+20 Chips per edited and per sealed pocket. A hit edited or sealed pocket scores once more.",
+    "effects": [{"trigger": "on_score_calc", "do": [{"op": "add_chips", "v": {"var": "edition_pockets", "mul": 20}}, {"op": "add_chips", "v": {"var": "seal_count", "mul": 20}}]}, {"trigger": "on_ball_land", "if": [{"c": "any", "x": [{"c": "pocket_has_edition"}, {"c": "pocket_has_seal"}]}], "do": [{"op": "retrigger_pocket", "v": 1}]}]},
+   {"n": 5, "desc_fr": "Comme au palier 3, et ×Mult = 1 + 0,15 par case éditée ou scellée.", "desc_en": "As tier 3, plus ×Mult = 1 + 0.15 per edited or sealed pocket.",
+    "effects": [{"trigger": "on_score_calc", "do": [{"op": "add_chips", "v": {"var": "edition_pockets", "mul": 20}}, {"op": "add_chips", "v": {"var": "seal_count", "mul": 20}}, {"op": "mul_mult", "v": {"var": "edition_pockets", "mul": 0.15, "add": 1}}, {"op": "mul_mult", "v": {"var": "seal_count", "mul": 0.15, "add": 1}}]}, {"trigger": "on_ball_land", "if": [{"c": "any", "x": [{"c": "pocket_has_edition"}, {"c": "pocket_has_seal"}]}], "do": [{"op": "retrigger_pocket", "v": 1}]}]}
+  ]
+ },
+ {
+  "id": "banque",
+  "color": "f0c040",
+  "icon": "fam_banque",
+  "name_fr": "La Banque",
+  "name_en": "The Bank",
+  "desc_fr": "L'argent travaille pour toi : plus tu gardes de $ en poche, plus tu marques.",
+  "desc_en": "Money works for you: the more $ you keep, the more you score.",
+  "tiers": [
+   {"n": 2, "desc_fr": "+1 Mult par tranche de 5 $ en poche.", "desc_en": "+1 Mult per $5 held.",
+    "effects": [{"trigger": "on_score_calc", "do": [{"op": "add_mult", "v": {"var": "money", "div": 5}}]}]},
+   {"n": 3, "desc_fr": "+1 Mult par tranche de 5 $ et ×Mult = 1 + 0,02 par $ en poche (max ×2).", "desc_en": "+1 Mult per $5 and ×Mult = 1 + 0.02 per $ held (max ×2).",
+    "effects": [{"trigger": "on_score_calc", "do": [{"op": "add_mult", "v": {"var": "money", "div": 5}}, {"op": "mul_mult", "v": {"var": "money", "mul": 0.02, "add": 1, "max": 2}}]}]},
+   {"n": 5, "desc_fr": "+1 Mult par tranche de 5 $ et ×Mult = 1 + 0,04 par $ en poche (max ×4).", "desc_en": "+1 Mult per $5 and ×Mult = 1 + 0.04 per $ held (max ×4).",
+    "effects": [{"trigger": "on_score_calc", "do": [{"op": "add_mult", "v": {"var": "money", "div": 5}}, {"op": "mul_mult", "v": {"var": "money", "mul": 0.04, "add": 1, "max": 4}}]}]}
+  ]
+ },
+ {
+  "id": "moteur",
+  "color": "ff8a2a",
+  "icon": "fam_moteur",
+  "name_fr": "Le Moteur",
+  "name_en": "The Engine",
+  "desc_fr": "Des effets qui grandissent, se copient ou se relancent. Lent au démarrage, monstrueux en fin de partie.",
+  "desc_en": "Effects that grow, copy or retrigger. Slow to start, monstrous late.",
+  "tiers": [
+   {"n": 2, "desc_fr": "+2 Mult par tour déjà joué dans l'échéance.", "desc_en": "+2 Mult per spin already played this deadline.",
+    "effects": [{"trigger": "on_score_calc", "do": [{"op": "add_mult", "v": {"var": "spin_index", "mul": 2, "add": -2, "min": 0}}]}]},
+   {"n": 3, "desc_fr": "×Mult = 1 + 0,02 par tour joué dans la partie (max ×2,5).", "desc_en": "×Mult = 1 + 0.02 per spin played this run (max ×2.5).",
+    "effects": [{"trigger": "on_score_calc", "do": [{"op": "mul_mult", "v": {"var": "total_spins", "mul": 0.02, "add": 1, "max": 2.5}}]}]},
+   {"n": 5, "desc_fr": "×Mult = 1 + 0,05 par tour joué dans la partie (max ×5).", "desc_en": "×Mult = 1 + 0.05 per spin played this run (max ×5).",
+    "effects": [{"trigger": "on_score_calc", "do": [{"op": "mul_mult", "v": {"var": "total_spins", "mul": 0.05, "add": 1, "max": 5}}]}]}
+  ]
+ },
+ {
+  "id": "etoile",
+  "color": "ff5cc0",
+  "icon": "fam_etoile",
+  "name_fr": "Bonne Étoile",
+  "name_en": "Lucky Star",
+  "desc_fr": "Dés pipés, cartes Fortune et machine à sous : tout miser sur la chance.",
+  "desc_en": "Loaded dice, Fortune cards and the slot machine: bet everything on luck.",
+  "tiers": [
+   {"n": 2, "desc_fr": "+4 Mult par jackpot de la partie et par carte Fortune détenue.", "desc_en": "+4 Mult per jackpot this run and per Fortune card held.",
+    "effects": [{"trigger": "on_score_calc", "do": [{"op": "add_mult", "v": {"var": "jackpots", "mul": 4}}, {"op": "add_mult", "v": {"var": "fortune_count", "mul": 4}}]}]},
+   {"n": 3, "desc_fr": "Comme au palier 2, et chaque échéance commence par un tirage de machine à sous offert.", "desc_en": "As tier 2, and each deadline starts with a free slot machine pull.",
+    "effects": [{"trigger": "on_score_calc", "do": [{"op": "add_mult", "v": {"var": "jackpots", "mul": 4}}, {"op": "add_mult", "v": {"var": "fortune_count", "mul": 4}}]}, {"trigger": "on_deadline_start", "do": [{"op": "slot_pull", "v": 1}]}]},
+   {"n": 5, "desc_fr": "Comme au palier 3, et ×Mult = 1 + 0,25 par jackpot de la partie (max ×5).", "desc_en": "As tier 3, plus ×Mult = 1 + 0.25 per jackpot this run (max ×5).",
+    "effects": [{"trigger": "on_score_calc", "do": [{"op": "add_mult", "v": {"var": "jackpots", "mul": 4}}, {"op": "add_mult", "v": {"var": "fortune_count", "mul": 4}}, {"op": "mul_mult", "v": {"var": "jackpots", "mul": 0.25, "add": 1, "max": 5}}]}, {"trigger": "on_deadline_start", "do": [{"op": "slot_pull", "v": 1}]}]}
+  ]
+ },
+ {
+  "id": "arrosage",
+  "color": "4a7cff",
+  "icon": "fam_arrosage",
+  "name_fr": "L'Arrosage",
+  "name_en": "Spread Bets",
+  "desc_fr": "Couvrir le tapis : beaucoup de paris à la fois, et même les mises perdues rapportent.",
+  "desc_en": "Cover the felt: many bets at once, and even losing bets pay something.",
+  "tiers": [
+   {"n": 2, "desc_fr": "+1 Mult par pari gagnant.", "desc_en": "+1 Mult per winning bet.",
+    "effects": [{"trigger": "on_bet_win", "do": [{"op": "add_mult", "v": 1}]}]},
+   {"n": 3, "desc_fr": "+2 Mult par pari gagnant et +8 Jetons par pari perdu.", "desc_en": "+2 Mult per winning bet and +8 Chips per losing bet.",
+    "effects": [{"trigger": "on_bet_win", "do": [{"op": "add_mult", "v": 2}]}, {"trigger": "on_bet_lose", "do": [{"op": "add_chips", "v": 8}]}]},
+   {"n": 5, "desc_fr": "+2 Mult par pari gagnant, +8 Jetons par pari perdu et ×Mult = 1 + 0,15 par pari gagnant.", "desc_en": "+2 Mult per winning bet, +8 Chips per losing bet and ×Mult = 1 + 0.15 per winning bet.",
+    "effects": [{"trigger": "on_bet_win", "do": [{"op": "add_mult", "v": 2}]}, {"trigger": "on_bet_lose", "do": [{"op": "add_chips", "v": 8}]}, {"trigger": "on_score_calc", "do": [{"op": "mul_mult", "v": {"var": "bets_won", "mul": 0.15, "add": 1}}]}]}
+  ]
+ },
+ {
+  "id": "pacte",
+  "color": "b8e030",
+  "icon": "fam_pacte",
+  "name_fr": "Le Pacte",
+  "name_en": "The Pact",
+  "desc_fr": "Les grigris maudits : une puissance énorme, payée en dettes, en cases brûlées ou en emplacements.",
+  "desc_en": "Cursed charms: enormous power, paid for in debt, burnt pockets or slots.",
+  "tiers": [
+   {"n": 2, "desc_fr": "×1,3 Mult.", "desc_en": "×1.3 Mult.",
+    "effects": [{"trigger": "on_score_calc", "do": [{"op": "mul_mult", "v": 1.3}]}]},
+   {"n": 3, "desc_fr": "×1,7 Mult.", "desc_en": "×1.7 Mult.",
+    "effects": [{"trigger": "on_score_calc", "do": [{"op": "mul_mult", "v": 1.7}]}]},
+   {"n": 5, "desc_fr": "×2,5 Mult.", "desc_en": "×2.5 Mult.",
+    "effects": [{"trigger": "on_score_calc", "do": [{"op": "mul_mult", "v": 2.5}]}]}
+  ]
+ }
+]

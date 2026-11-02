@@ -64,6 +64,14 @@ func _apply_quality() -> void:
 	env.glow_intensity = 0.4 + 0.8 * Settings.f("video", "bloom")
 
 
+## Fond transparent : seule la géométrie se dessine (décor 3D posé sur une interface 2D).
+func set_transparent(on: bool) -> void:
+	_vp.transparent_bg = on
+	if on:
+		env.background_mode = Environment.BG_CLEAR_COLOR
+		env.glow_enabled = false
+
+
 func look(from: Vector3, at: Vector3, fov: float = 40.0) -> void:
 	cam.fov = fov
 	cam.look_at_from_position(from, at, Vector3.UP)

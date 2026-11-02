@@ -1,6 +1,6 @@
 class_name CardTooltip
 extends RefCounted
-## Infobulle riche : nom, rareté, description, phrase d'ambiance, tags (glossaire), prix.
+## Infobulle riche : nom, rareté, description, phrase d'ambiance, famille (build) et paliers, prix.
 
 const WIDTH: float = 380.0
 const TAG_GLYPHS: Dictionary = {
@@ -86,15 +86,12 @@ static func build(kind: String, entry_id: String, edition: StringName, counter: 
 	flavor.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	flavor.custom_minimum_size = Vector2(WIDTH, 0)
 	box.add_child(flavor)
-	var tags: Array = e.get("tags", [])
-	if not tags.is_empty():
-		var tl: PackedStringArray = []
-		for t: Variant in tags:
-			tl.append("%s %s" % [TAG_GLYPHS.get(String(t), "·"), TranslationServer.translate("TAG_" + String(t).to_upper())])
-		var tag_label: Label = UiKit.label("  ".join(tl), UiKit.SIZE_SMALL, Palette.CYAN)
-		tag_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		tag_label.custom_minimum_size = Vector2(WIDTH, 0)
-		box.add_child(tag_label)
+	# Famille (build) : plus parlant qu'une liste d'étiquettes.
+	if cat == "grigris" and String(e.get("family", "")) != "":
+		var fid: String = String(e["family"])
+		var mine: bool = GameState.has_active_run() and GameState.run().has_grigri(entry_id)
+		box.add_child(HSeparator.new())
+		box.add_child(FamilyUi.info_block(fid, WIDTH, not mine))
 	if price >= 0:
 		box.add_child(UiKit.label(TranslationServer.translate("CARD_PRICE") % price, UiKit.SIZE_SMALL, Palette.GOLD))
 	return panel

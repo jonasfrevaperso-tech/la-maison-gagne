@@ -36,6 +36,9 @@ var chip_value: int = 1
 var cursor_active: bool = false
 ## Mise posée par un appui (A, clic) : choisie avec LB/RB (Q/W au clavier).
 var bet_amount: int = 1
+## Tapis en 3D (réglage vidéo « 3D ») : le plateau est rendu derrière, le 2D ne dessine plus
+## que les surbrillances, le curseur et les aides.
+var table3d: Table3D = null
 var _pops: Dictionary = {}  # spot_id -> temps restant de l'animation de pose
 var _cx: int = 0
 var _cy: int = 2
@@ -49,6 +52,10 @@ var _out_h: float = 0.0
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
+	if Settings.b("video", "wheel_3d"):
+		table3d = Table3D.new()
+		table3d.view = self
+		add_child(table3d)
 	resized.connect(_layout)
 	_layout()
 
@@ -60,7 +67,25 @@ func _layout() -> void:
 	_zero_w = _cw * ZERO_W_RATIO
 	_out_h = _ch * OUTSIDE_H_RATIO
 	_origin = Vector2(_zero_w, 0.0)
+	if table3d != null and table3d.is_inside_tree():
+		table3d.rebuild()
 	queue_redraw()
+
+
+func zero_width() -> float:
+	return _zero_w
+
+
+func cell_w() -> float:
+	return _cw
+
+
+func cell_h() -> float:
+	return _ch
+
+
+func grid_bottom() -> float:
+	return _grid_bottom()
 
 
 func cell_rect(c: int, r: int) -> Rect2:
@@ -337,6 +362,11 @@ func cursor_point() -> Vector2:
 
 
 func _draw() -> void:
+	if table3d != null:
+		table3d.sync(slip, _pops, flash_t, winning_numbers)
+		_draw_overlays_3d()
+		_draw_aids()
+		return
 	draw_rect(Rect2(Vector2(-12, -12), size + Vector2(24, 24)), Palette.GOLD_DARK)
 	draw_rect(Rect2(Vector2(-8, -8), size + Vector2(16, 16)), Palette.FELT)
 	var hover_nums: Dictionary = {}
@@ -378,14 +408,43 @@ func _draw() -> void:
 			draw_colored_polygon(PackedVector2Array([cc + Vector2(0, -h), cc + Vector2(w, 0), cc + Vector2(0, h), cc + Vector2(-w, 0)]), dc)
 		else:
 			_text_center(f, tr("BET_" + k.to_upper()), er.get_center(), UiKit.fs(int(fs * 0.62)), Palette.IVORY)
-		if slip != null and slip.banned_spots.has(k):
-			draw_line(er.position, er.end, Palette.DANGER, 4.0)
-			draw_line(Vector2(er.position.x, er.end.y), Vector2(er.end.x, er.position.y), Palette.DANGER, 4.0)
+	_draw_banned()
 	if slip != null:
 		for spot_id: String in slip.order:
 			var pop: float = float(_pops.get(spot_id, 0.0)) / CHIP_POP_TIME
 			var lift: float = sin(pop * PI) * CHIP_POP_HEIGHT * JuiceProfile.intensity()
 			_draw_chip(spot_anchor(spot_id) - Vector2(0, lift), int(slip.chips[spot_id]))
+	_draw_aids()
+
+
+## Chances simples interdites (créancier) : croix rouge.
+func _draw_banned() -> void:
+	if slip == null:
+		return
+	for k: String in EVEN_ORDER:
+		if slip.banned_spots.has(k):
+			var er: Rect2 = outside_rect(k)
+			draw_line(er.position, er.end, Palette.DANGER, 4.0)
+			draw_line(Vector2(er.position.x, er.end.y), Vector2(er.end.x, er.position.y), Palette.DANGER, 4.0)
+
+
+## Tapis 3D : seules les cases survolées (et les gagnantes) s'éclairent par-dessus le plateau.
+func _draw_overlays_3d() -> void:
+	var hspot: BetSpot = BetCatalog.get_spot(hover_spot) if hover_spot != "" else null
+	if hspot != null:
+		if hspot.outside:
+			draw_rect(outside_rect(hover_spot), Color(Palette.GOLD_LIGHT, 0.16))
+		else:
+			for n: int in hspot.numbers:
+				var r: Rect2 = Rect2(Vector2.ZERO, Vector2(_zero_w, _grid_bottom()))
+				if n != 0:
+					r = cell_rect(WheelLayout.table_col(n), WheelLayout.table_row(n))
+				draw_rect(r, Color(Palette.GOLD_LIGHT, 0.16))
+	_draw_banned()
+
+
+## Aides communes : curseur manette, mise multiple, jeton fantôme.
+func _draw_aids() -> void:
 	if cursor_active and hover_spot != "":
 		var cp: Vector2 = spot_anchor(hover_spot)
 		draw_arc(cp, minf(_cw, _ch) * 0.42, 0.0, TAU, 32, Palette.CYAN, 4.0, true)

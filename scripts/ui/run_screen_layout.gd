@@ -104,5 +104,10 @@ static func place_hints(s: RunScreen, actions: Control) -> void:
 
 
 ## Légende posée juste au-dessus de sa barre, quelle que soit la taille du texte.
+## Pastilles des familles : sur la ligne du titre des grigris, juste après lui.
+static func seat_family_strip(strip: Control, cap: Control) -> void:
+	strip.position = Vector2(cap.position.x + cap.size.x + 14.0, cap.position.y + (cap.size.y - FamilyChip.SIZE.y) * 0.5)
+
+
 static func seat_caption(cap: Control, bar: Control) -> void:
 	cap.position.y = bar.position.y - maxf(RunScreen.BAR_CAPTION_Y, cap.size.y + 2.0)

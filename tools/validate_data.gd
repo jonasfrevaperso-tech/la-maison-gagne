@@ -6,7 +6,8 @@ extends SceneTree
 
 const REQUIRED_COMMON: Array[String] = ["id", "name_fr", "name_en", "desc_fr", "desc_en"]
 const REQUIRED_BY_CAT: Dictionary = {
-	"grigris": ["rarity", "tags", "flavor_fr", "flavor_en", "icon", "sfx"],
+	"grigris": ["rarity", "tags", "family", "flavor_fr", "flavor_en", "icon", "sfx"],
+	"families": ["color", "icon", "tiers"],
 	"pocket_types": ["flavor_fr", "flavor_en", "icon"],
 	"fortunes": ["flavor_fr", "flavor_en", "icon", "cost"],
 	"contracts": ["cost", "flavor_fr", "flavor_en"],
@@ -79,6 +80,20 @@ func _validate_entry(db: ContentDB, cat: String, e: Dictionary) -> void:
 			errors.append("%s : intensité visuelle hors de ]0, 1]" % eid)
 	if cat == "grigris" and not RARITIES.has(String(e.get("rarity", ""))):
 		errors.append("%s : rareté invalide" % eid)
+	if cat == "grigris" and not db.has_entry("families", String(e.get("family", ""))):
+		errors.append("%s : famille inconnue « %s »" % [eid, String(e.get("family", ""))])
+	if cat == "families":
+		var last_n: int = 0
+		for td: Variant in e.get("tiers", []):
+			var tier: Dictionary = td as Dictionary
+			if int(tier.get("n", 0)) <= last_n:
+				errors.append("%s : paliers non croissants" % eid)
+			last_n = int(tier.get("n", 0))
+			if not tier.has("desc_fr") or not tier.has("desc_en"):
+				errors.append("%s : palier sans desc_fr/desc_en" % eid)
+			_validate_effects(db, eid + "/tier", tier.get("effects", []) as Array)
+		if not ResourceLoader.exists("res://assets/families/%s.png" % String(e.get("icon", ""))):
+			errors.append("%s : icône absente" % eid)
 	_validate_effects(db, eid, e.get("effects", []) as Array)
 	for ph: Variant in e.get("phases", []):
 		_validate_effects(db, eid + "/phase", (ph as Dictionary).get("effects", []) as Array)

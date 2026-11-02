@@ -6,6 +6,7 @@
    "seal",
    "jackpot"
   ],
+  "family": "etoile",
   "icon": "g_groom_bell",
   "sfx": "jackpot",
   "name_fr": "Groom à clochette",
@@ -34,6 +35,7 @@
    "xmult",
    "jackpot"
   ],
+  "family": "etoile",
   "icon": "g_lucette_photo",
   "sfx": "grow",
   "name_fr": "Photo dédicacée de Lucette",
@@ -73,6 +75,7 @@
    "jackpot",
    "bets"
   ],
+  "family": "etoile",
   "icon": "g_pocket_slot",
   "sfx": "chime",
   "name_fr": "Machine à sous de poche",
@@ -110,6 +113,7 @@
    "mult",
    "jackpot"
   ],
+  "family": "etoile",
   "icon": "g_jackpot_tokens",
   "sfx": "chime",
   "name_fr": "Jetons commémoratifs",
@@ -140,6 +144,7 @@
    "money",
    "jackpot"
   ],
+  "family": "etoile",
   "icon": "g_coin_bucket",
   "sfx": "coins",
   "name_fr": "Seau à pièces",
@@ -167,6 +172,7 @@
    "growth",
    "xmult"
   ],
+  "family": "moteur",
   "icon": "g_double_down",
   "sfx": "grow",
   "name_fr": "Quitte ou double",
@@ -242,6 +248,7 @@
    "xmult",
    "retrigger"
   ],
+  "family": "moteur",
   "icon": "g_chain_reaction",
   "sfx": "double",
   "name_fr": "Réaction en chaîne",
@@ -274,6 +281,7 @@
    "xmult",
    "seal"
   ],
+  "family": "atelier",
   "icon": "g_bell_choir",
   "sfx": "chime",
   "name_fr": "Chorale de clochettes",
@@ -305,6 +313,7 @@
    "xmult",
    "money"
   ],
+  "family": "banque",
   "icon": "g_compound_interest",
   "sfx": "coins",
   "name_fr": "Intérêts composés",

@@ -81,6 +81,19 @@ static func _pool(run: RunState, db: ContentDB, rarity: String, exclude: Array[S
 	return pool
 
 
+## Tirage dans un pool : les familles déjà commencées sortent plus souvent (les builds se
+## construisent), sans jamais exclure les autres.
+static func _pick_from_pool(run: RunState, db: ContentDB, pool: Array[String]) -> String:
+	var owned: Dictionary = Families.counts(run, db)
+	var bias: float = Balance.f("shop.family_bias")
+	var cap: float = Balance.f("shop.family_bias_cap")
+	var weights: Array[float] = []
+	for gid: String in pool:
+		var n: float = float(owned.get(Families.family_of(db, gid), 0))
+		weights.append(1.0 + minf(bias * n, cap))
+	return pool[maxi(run.rng.weighted_index(RngStreams.SHOP, weights), 0)]
+
+
 static func _roll_grigris(run: RunState, db: ContentDB) -> Array:
 	var offers: Array = []
 	var taken: Array[String] = []
@@ -93,7 +106,7 @@ static func _roll_grigris(run: RunState, db: ContentDB) -> Array:
 			pool = _pool(run, db, "common", taken)
 		if pool.is_empty():
 			continue
-		var gid: String = pool[run.rng.randi_range_in(RngStreams.SHOP, 0, pool.size() - 1)]
+		var gid: String = _pick_from_pool(run, db, pool)
 		taken.append(gid)
 		if rarity != "common":
 			got_rare = true
@@ -151,6 +164,27 @@ static func reroll(run: RunState, db: ContentDB) -> bool:
 	run.shop_state["reroll_cost"] = cost + Balance.i("shop.reroll_cost_step")
 	EffectRunner.fire(&"on_reroll", run, null, db)
 	return true
+
+
+## Prix du prochain emplacement de grigri (-1 si le plafond de la partie est atteint).
+static func slot_upgrade_cost(run: RunState) -> int:
+	var bought: int = int(run.flags.get("slots_bought", 0))
+	if bought >= Balance.i("shop.slot_upgrade_max"):
+		return -1
+	return price_of(run, Balance.i("shop.slot_upgrade_base") + Balance.i("shop.slot_upgrade_step") * bought)
+
+
+## Rénovation : un emplacement de grigri de plus (place pour un build complet).
+static func buy_slot(run: RunState) -> BuyResult:
+	var cost: int = slot_upgrade_cost(run)
+	if cost < 0:
+		return BuyResult.SOLD_OUT
+	if run.money < cost:
+		return BuyResult.NO_MONEY
+	run.money -= cost
+	run.grigri_slots += 1
+	run.flags["slots_bought"] = int(run.flags.get("slots_bought", 0)) + 1
+	return BuyResult.OK
 
 
 static func buy_grigri(run: RunState, db: ContentDB, index: int) -> BuyResult:
@@ -299,7 +333,7 @@ static func roll_pack_choices(run: RunState, db: ContentDB, kind: String) -> Arr
 					pool = _pool(run, db, "rare", taken)
 				if pool.is_empty():
 					continue
-				var gid: String = pool[run.rng.randi_range_in(RngStreams.SHOP, 0, pool.size() - 1)]
+				var gid: String = _pick_from_pool(run, db, pool)
 				taken.append(gid)
 				out.append({"grigri": gid})
 	return out
