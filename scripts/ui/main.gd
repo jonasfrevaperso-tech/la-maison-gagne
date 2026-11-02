@@ -53,8 +53,18 @@ func _ready() -> void:
 	nav.frame_layer = _overlay_layer
 	add_child(nav)
 	move_child(nav, 0)  # reçoit les entrées non consommées en dernier
+	# Dernier nœud de l'arbre : voit chaque entrée avant tous les écrans (stick, gâchettes).
+	get_tree().root.add_child.call_deferred(StickRepeater.new())
 	if not _dev_hooks():
-		GameState.goto(&"title")
+		_splash()
+
+
+## Écran « Conçu avec… » au lancement, puis l'écran titre (chargé derrière le fondu).
+func _splash() -> void:
+	var sp: SplashScreen = SplashScreen.new()
+	_overlay_layer.add_child(sp)
+	_overlay_layer.move_child(sp, 0)
+	sp.finished.connect(func() -> void: GameState.goto(&"title"))
 
 
 ## Options de développement : chargées dynamiquement, absentes des exports (cf. DevMode).
@@ -83,7 +93,7 @@ func _active_root() -> Control:
 func _input(event: InputEvent) -> void:
 	if InputGlyphs.note_event(event):
 		EventBus.input_device_changed.emit(InputGlyphs.using_pad)
-	if event.is_action_pressed("playtest_note"):
+	if GameInput.pressed(event, "playtest_note"):
 		_open_note()
 		get_viewport().set_input_as_handled()
 		return

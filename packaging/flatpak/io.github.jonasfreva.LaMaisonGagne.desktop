@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=La Maison Gagne
+Comment=Roguelite de roulette européenne (jeu de hasard simulé, monnaie fictive)
+Comment[en]=European roulette roguelite (simulated gambling, fictional money)
+Exec=la-maison-gagne
+Icon=io.github.jonasfreva.LaMaisonGagne
+Categories=Game;BoardGame;
+Keywords=roulette;roguelite;casino;
+PrefersNonDefaultGPU=true

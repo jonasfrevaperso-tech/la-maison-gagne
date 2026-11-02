@@ -23,6 +23,9 @@ const BALL_SPIN_TIME: float = 3.1
 const BALL_SLOWMO_FACTOR: float = 0.35
 const PARTICLE_COUNT_MAX: int = 90
 const CELEBRATION_TIERS: Array[float] = [0.25, 0.5, 1.0, 3.0]  # fraction de la dette restante
+## Jetons 3D par palier de célébration, pièces 3D quand une échéance est remboursée.
+const CHIPS_3D_PER_TIER: int = 28
+const COINS_3D_DEADLINE: int = 70
 const CELEBRATION_KEYS: Array[String] = ["CELEB_GOOD", "CELEB_HUGE", "CELEB_JACKPOT", "CELEB_BANK"]
 
 

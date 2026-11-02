@@ -1,3 +1,36 @@
+# Notes de version — 1.3.0 « Table de casino »
+
+## Une vraie table de casino
+- **Roue en 3D** : cabinet en bois verni, rotor doré, déflecteurs, bille qui roule sur la piste avec sa traînée, caméra qui plonge sur la case gagnante, éclairs de lumière à l'arrivée. La roue tourne aussi en 3D à l'écran titre.
+- **Gerbes de jetons et de pièces en 3D** sur les gros gains et quand une échéance est remboursée.
+- L'ancienne roue 2D reste disponible (Options → Vidéo → Roue en 3D).
+
+## Le lancer devient un mini-jeu
+- Après la visée, deux temps de quelques secondes : **ÉLAN** (arrêter l'aiguille dans la zone dorée, plus large avec la Précision) puis **LÂCHER** (frapper quand l'anneau se referme sur la bille). Verdict : Parfait, Très bien, Bien ou Raté.
+- La qualité ajuste le contrôle de la bille de −10 à +10 points. Un lancer moyen vaut exactement l'ancien lancer : l'équilibre global est conservé (voir Équilibrage).
+- Même geste au clavier (Espace), à la souris (clic) et à la manette (RT ou A). Mode Simple (appuyer/relâcher) dans les options.
+
+## Manette
+- **Stick gauche bien moins sensible**, et réglable : Options → Commandes → Sensibilité du stick (aussi en cours de partie).
+- **Gâchettes** : un appui = une action (LT comptait des dizaines d'entrées).
+- **Curseur par demi-case** : centre = plein, bord = cheval, coin = carré, bord du tapis = transversale ou sixain. Fini les quatre appuis sur LB/RB pour atteindre un carré.
+- **LB / RB règlent la taille de la mise** (1, 2, 5, 10 jetons), affichée sur le curseur.
+
+## Lisibilité
+- **Fiches de cases illustrées** (infobulle à la souris, ciblage à la manette) : pastille du numéro, icônes pixel art et couleurs par statistique (jetons en bleu, Mult en rouge, ×Mult, argent, niveau), édition, sceau, barre de chance.
+
+## Réglages et affichage
+- **Réglages en cours de partie** : Pause → Réglages (volumes, vitesse, lancer, aides, mode manette, sensibilité du stick, effets, mode Steam Deck).
+- **17 définitions courantes** de 1280×720 à 5120×2880, dont **2560×1440**, 16:10, 21:9 et 32:9 ; en plein écran, rendu à la définition native ou à une résolution plus basse.
+- **Mode Steam Deck / portable** : un interrupteur (texte agrandi, bloom coupé, 60 i/s, roue 3D allégée), activé d'office sur Deck ; le couper restaure les réglages précédents.
+- Écran d'ouverture **« Conçu avec Godot, Blender et Claude Code »** (passer : n'importe quelle touche ou bouton).
+
+## Distribution
+- Exports autonomes : **Windows** (`.exe`), **Linux** (binaire) et **Flatpak** (`.flatpak`), produits par `tools/build_release.sh`.
+
+## Équilibrage
+Bot expert, 330 runs par niveau d'adresse : 42,1 % (lancers maladroits), 45,8 % (lancer neutre = 1.2), 50,0 % (lancers adroits). Le neutre est identique à la 1.2 ; sur les deux protocoles réunis, 42,3 % (cible 35–45 %). Détails : `docs/BALANCE.md`.
+
 # Notes de version — 1.2.0 « Tapis de jeu »
 
 ## Manette, de bout en bout

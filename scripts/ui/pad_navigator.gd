@@ -123,13 +123,13 @@ func _input(event: InputEvent) -> void:
 		return
 	if f is LineEdit and not (f as LineEdit).editable:
 		return
-	if event.is_action_pressed("ui_accept"):
+	if GameInput.pressed(event, "ui_accept"):
 		open_keyboard(f)
 		get_viewport().set_input_as_handled()
 		return
 	var sides: Dictionary[String, Side] = {"ui_up": SIDE_TOP, "ui_down": SIDE_BOTTOM, "ui_left": SIDE_LEFT, "ui_right": SIDE_RIGHT}
 	for a: String in sides.keys():
-		if event.is_action_pressed(a):
+		if GameInput.pressed(event, a):
 			var n: Control = f.find_valid_focus_neighbor(sides[a])
 			if n != null:
 				n.grab_focus()
@@ -150,17 +150,17 @@ func _unhandled_input(event: InputEvent) -> void:
 	var root: Control = _root()
 	if root == null:
 		return
-	if event.is_action_pressed("bet_cycle_prev") or event.is_action_pressed("bet_cycle_next"):
+	if GameInput.pressed(event, "bet_cycle_prev") or GameInput.pressed(event, "bet_cycle_next"):
 		var tabs: TabContainer = _find(root, "TabContainer") as TabContainer
 		if tabs != null and tabs.is_visible_in_tree():
-			var d: int = -1 if event.is_action_pressed("bet_cycle_prev") else 1
+			var d: int = -1 if GameInput.pressed(event, "bet_cycle_prev") else 1
 			tabs.current_tab = posmod(tabs.current_tab + d, tabs.get_tab_count())
 			AudioBus.ui("click")
 			var first: Control = first_focusable(tabs.get_current_tab_control())
 			if first != null:
 				first.grab_focus()
 			get_viewport().set_input_as_handled()
-	elif event.is_action_pressed("ui_cancel"):
+	elif GameInput.pressed(event, "ui_cancel"):
 		if root.has_method("go_back"):
 			root.call("go_back")
 			get_viewport().set_input_as_handled()

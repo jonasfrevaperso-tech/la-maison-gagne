@@ -25,8 +25,8 @@ Critères publics de Valve pour la note **Vérifié**, et comment le jeu les rem
 | Pas de lanceur externe | ✅ | Le binaire lance directement le jeu |
 | Fonctionne sous SteamOS | ✅ | Binaire Linux x86_64 natif (Vulkan), aucun intergiciel propriétaire |
 | Mise en veille / reprise | ✅ | Sauvegarde automatique à la perte de focus et à la mise en pause de l'application (`GameState._notification`), reprise exacte d'un run |
-| Performances | ⚠️ estimé | GPU mesuré sur RX 6700 (`--perf`) : 1,94 ms à 1280×800 avec tous les effets ; Deck ≈ 8× moins puissant → ≈ 15 ms, ≈ 10 ms en préréglage économie (appliqué d'office sur Deck, 60 i/s). **À mesurer sur un vrai Deck.** |
-| Autonomie | ✅ | Limite d'images réglable (30/60/90/120/144), préréglage économie |
+| Performances | ⚠️ estimé | GPU mesuré sur RX 6700 (`--perf`) : 1,94 ms à 1280×800 avec tous les effets ; Deck ≈ 8× moins puissant → ≈ 15 ms, ≈ 10 ms en mode Steam Deck (activé d'office sur Deck, désactivable : 60 i/s, bloom coupé, roue 3D en MSAA 2× sans ombres). **À mesurer sur un vrai Deck.** |
+| Autonomie | ✅ | Limite d'images réglable (30/60/90/120/144), mode Steam Deck / portable (interrupteur, réglages précédents restaurés), roue 3D désactivable |
 
 ## À faire hors code (publication Steam)
 - Configuration Steam Input par défaut : « Manette » (gamepad), pas de couche souris.

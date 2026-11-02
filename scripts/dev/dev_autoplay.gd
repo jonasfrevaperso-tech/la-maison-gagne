@@ -67,6 +67,29 @@ func _perf_report() -> void:
 	)
 
 
+## Joue le mini-jeu proprement : vise le centre de la zone dorée, puis le contact de l'anneau.
+func _throw_minigame(rs: RunScreen) -> void:
+	var g: ThrowMinigame = rs.throw_game
+	if rs.tutorial.blocking():
+		rs.tutorial.call("_close_current")
+	var guard: int = 0
+	while g.beat == ThrowMinigame.Beat.POWER and guard < 400:
+		guard += 1
+		if absf(g.get("_needle") - 0.5) < 0.03:
+			await _shot("throw_power")
+			g.press()
+			break
+		await get_tree().process_frame
+	guard = 0
+	while g.beat == ThrowMinigame.Beat.RELEASE and guard < 400:
+		guard += 1
+		if float(g.get("_t")) >= float(g.get("_release_time")) - 0.01:
+			await _shot("throw_release")
+			g.press()
+			break
+		await get_tree().process_frame
+
+
 func _screen() -> RunScreen:
 	for n: Node in get_tree().root.find_children("*", "RunScreen", true, false):
 		return n as RunScreen
@@ -117,8 +140,12 @@ func _drive() -> void:
 				await _wait(RELEASE_DELAY)
 				await _shot("aim")
 				rs._on_spin_pressed()
+				# Mini-jeu : élan arrêté au centre de la jauge, lâcher au contact de l'anneau.
+				await _throw_minigame(rs)
 				await _wait(1.2)
 				await _shot("ball")
+			RunScreen.UiState.THROWING:
+				await _throw_minigame(rs)
 			RunScreen.UiState.SCORING:
 				await _wait(0.6)
 				await _shot("scoring")

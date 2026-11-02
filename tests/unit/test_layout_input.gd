@@ -18,9 +18,14 @@ func test_stage_fits_common_resolutions() -> void:
 
 func test_window_sizes_filtered_by_screen() -> void:
 	var deck: Array[Vector2i] = UiLayout.window_sizes_for(Vector2i(1280, 800))
-	eq(deck.size(), 1, "Steam Deck : seule la plus petite fenêtre tient")
+	eq(deck, [Vector2i(1280, 720), Vector2i(1280, 800)] as Array[Vector2i], "Steam Deck : 720p et 800p")
 	var qhd: Array[Vector2i] = UiLayout.window_sizes_for(Vector2i(2560, 1440))
-	check(qhd.has(Vector2i(1920, 1080)) and not qhd.has(Vector2i(2560, 1440)), "1440p : jusqu'à 1080p fenêtré")
+	check(qhd.has(Vector2i(2560, 1440)) and qhd.has(Vector2i(1920, 1080)), "1440p proposé sur un écran 1440p")
+	check(not qhd.has(Vector2i(3840, 2160)), "pas de 4K sur un écran 1440p")
+	var render: Array[Vector2i] = UiLayout.render_sizes_for(Vector2i(3840, 2160))
+	check(render.has(Vector2i(2560, 1440)) and not render.has(Vector2i(3840, 2160)), "rendu plein écran : définitions inférieures à la native")
+	eq(UiLayout.aspect_label(Vector2i(3440, 1440)), "21:9", "format ultra-large")
+	eq(UiLayout.aspect_label(Vector2i(1280, 800)), "16:10", "format Steam Deck")
 	eq(Settings.parse_size("2560x1440"), Vector2i(2560, 1440), "lecture d'une taille")
 	eq(Settings.parse_size("n'importe"), UiLayout.DEFAULT_WINDOW, "taille illisible : défaut")
 

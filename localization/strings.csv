@@ -96,7 +96,23 @@ FX_POCKET_DESTROYED,Case détruite,Pocket destroyed
 FX_ZERO_PROTECTED,Zéro paré !,Zero blocked!
 FX_DEBT,Dette ajustée,Debt adjusted
 FX_BURN,Brûlée !,Burnt!
-HINT_AIMING,Relâche quand ta zone passe sous l'aiguille.,Release when your zone passes under the needle.
+HINT_AIMING,Fige la visée quand ta zone passe sous l'aiguille.,Lock your aim when your zone passes under the needle.
+HINT_THROWING,"Élan : arrête l'aiguille dans l'or. Lâcher : frappe quand l'anneau touche la bille.","Swing: stop the needle in the gold. Release: strike when the ring touches the ball."
+HINT_K_AIM,viser,aim
+HINT_K_STRIKE,frapper,strike
+BTN_AIM_LOCK,VISER !,AIM!
+BTN_STRIKE,FRAPPER !,STRIKE!
+THROW_BEAT_POWER,ÉLAN,SWING
+THROW_BEAT_RELEASE,LÂCHER,RELEASE
+THROW_Q_PERFECT,LANCER PARFAIT,PERFECT THROW
+THROW_Q_GREAT,BEAU LANCER,GREAT THROW
+THROW_Q_GOOD,CORRECT,DECENT
+THROW_Q_MISS,LANCER RATÉ,BOTCHED THROW
+THROW_CONTROL_DELTA,contrôle %s %%,control %s %%
+OPT_THROW_MODE,Lancer,Throw
+OPT_TM_SKILL,Mini-jeu (élan et lâcher),Mini-game (swing and release)
+OPT_TM_SIMPLE,Simplifié (un appui),Simplified (one press)
+OPT_THROW_MODE_DESC,"Le mini-jeu ajuste le contrôle de la bille selon ton adresse (de −10 % à +10 % environ). Le lancer simplifié joue toujours un lancer moyen.","The mini-game adjusts ball control by your skill (about −10% to +10%). The simplified throw always plays an average throw."
 HINT_RETHROW,Relance gratuite disponible : relancer ou garder ce résultat ?,Free re-throw available: re-throw or keep this result?
 HINT_TARGETING,Choisis une case sur la roue.,Pick a pocket on the wheel.
 HISTORY_TIP,Numéro %d · score %s · paris gagnés : %d,Number %d · score %s · bets won: %d
@@ -161,7 +177,12 @@ PAUSE_SAVE_QUIT,Sauvegarder et quitter,Save and quit
 PAUSE_SEED,Graine : %s,Seed: %s
 PAUSE_TITLE,Pause,Pause
 POCKET_LEVEL,Niveau %d (+%d Jetons),Level %d (+%d Chips)
-POCKET_PROBABILITY,Probabilité d'arrêt : %.1f %%,Landing chance: %.1f%%
+STAT_BASE_CHIPS,jetons du numéro,number chips
+STAT_LEVEL,niveau %d,level %d
+COLOR_RED,Rouge,Red
+COLOR_BLACK,Noir,Black
+COLOR_GREEN,Vert,Green
+POCKET_PROBABILITY,%.1f %% de chances,%.1f%% chance
 RARITY_COMMON,Commun,Common
 RARITY_RARE,Rare,Rare
 RARITY_LEGENDARY,Légendaire,Legendary
@@ -331,11 +352,12 @@ ACTION_BET_PLACE,Miser sous le curseur,Bet under cursor
 ACTION_BET_CYCLE_PREV,Pari intérieur précédent,Previous inside bet
 ACTION_BET_CYCLE_NEXT,Pari intérieur suivant,Next inside bet
 CONFIRM_NEW_OVER_SAVE,Un run est en cours. L'abandonner pour en commencer un nouveau ?,A run is in progress. Abandon it and start a new one?
-HINT_K_ADD,+1 jeton,+1 chip
+HINT_K_ADD,miser,place chips
 HINT_K_ADD5,+5 jetons,+5 chips
 HINT_K_REMOVE,−1 jeton,−1 chip
 HINT_K_CURSOR,curseur,cursor
-HINT_K_INSIDE,chevaux/carrés,splits/corners
+HINT_K_AMOUNT,mise −/+,stake −/+
+HUD_AMOUNT,mise ×%d,stake ×%d
 HINT_K_SKIP,passer,skip
 HINT_K_SPEED,vitesse,speed
 BTN_CANCEL_TARGET,annuler,cancel
@@ -387,8 +409,6 @@ SOUNDBOARD_INTRO,Chaque son est joué au volume du jeu (une variante au hasard).
 SOUNDBOARD_PLAY,Écouter,Play
 SOUNDBOARD_GOOD,Bien,Good
 SOUNDBOARD_BAD,À revoir,Needs work
-OPT_ECO_PRESET,"Préréglage économie (Steam Deck, portable)","Battery saver preset (Steam Deck, laptop)"
-TOAST_ECO_PRESET,"Préréglage économie appliqué : bloom coupé, 60 images/s.","Battery saver applied: bloom off, 60 FPS cap."
 HINT_K_ITEMS,grigris et Fortune,charms and Fortune
 HINT_K_SELECT,choisir,select
 HINT_K_USE,utiliser,use
@@ -419,6 +439,21 @@ ACTION_BET_REMOVE,Retirer un jeton,Remove a chip
 ACTION_ITEM_PANEL,Grigris et Fortune,Charms and Fortune
 ACTION_PAUSE_MENU,Pause,Pause
 ACTION_PLAYTEST_NOTE,Note de test,Playtest note
+SPLASH_MADE_WITH,Conçu avec,Made with
+SPLASH_SKIP,Appuyez sur une touche pour passer,Press any key to skip
+QS_TITLE,Réglages,Settings
+QS_TAB_CONTROLS,Commandes et effets,Controls and effects
+QS_DONE,Terminé,Done
+PAUSE_SETTINGS,Réglages,Settings
+OPT_HANDHELD,Mode Steam Deck / portable,Steam Deck / handheld mode
+OPT_HANDHELD_DESC,"Texte agrandi, bloom coupé, 60 images/s, roue 3D allégée : autonomie et lisibilité sur petit écran. Activé d'office sur Steam Deck, désactivable.","Larger text, bloom off, 60 FPS, lighter 3D wheel: battery life and readability on small screens. On by default on Steam Deck, can be turned off."
+OPT_WHEEL_3D,Roue en 3D,3D wheel
+OPT_WHEEL_3D_DESC,"Désactivée : roue dessinée en 2D (plus léger).","Off: wheel drawn in 2D (lighter)."
+OPT_RENDER_RES,Résolution de rendu,Render resolution
+OPT_RES_NATIVE,"Native : %d × %d  (%s)","Native: %d × %d  (%s)"
+OPT_RES_DESC,"Plein écran : le jeu occupe tout l'écran ; une résolution plus basse allège le rendu (image agrandie). Fenêtré : taille de la fenêtre. Formats 16:9, 16:10, 21:9 et 32:9 pris en charge.","Fullscreen: the game fills the screen; a lower resolution lightens rendering (image upscaled). Windowed: window size. 16:9, 16:10, 21:9 and 32:9 supported."
+OPT_STICK_SENS,Sensibilité du stick gauche,Left stick sensitivity
+OPT_STICK_SENS_DESC,"Vitesse de répétition quand on maintient le stick (menus et tapis). La croix avance toujours d'un pas par appui.","Repeat speed while holding the stick (menus and table). The d-pad always moves one step per press."
 OPT_TEXT_SCALE_DESC,S'applique en quittant les options.,Applies when you leave the options.
 SHOP_PACKS,Paquets,Packs
 SHOP_CONTRACT,Contrat,Contract

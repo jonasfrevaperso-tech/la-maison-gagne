@@ -17,6 +17,20 @@ Enseignements :
 
 ---
 
+## Version 1.3 — Mini-jeu de lancer
+Bot expert, 330 runs par niveau (graines 201–206 × 55), Risque 0. La qualité du lancer (`--throw-skill`, tirée autour de la moyenne indiquée, écart-type 0,15) module le contrôle de −10 à +10 points autour de la référence 0,65 (`balance.json` → `throw_game`).
+
+| Qualité moyenne du lancer | Victoires |
+|---|---|
+| 0,40 (maladroit) | 42,1 % |
+| neutre (= lancer 1.2, mode Simple) | 45,8 % |
+| 0,65 (référence) | 45,8 % |
+| 0,85 | 45,2 % |
+| 0,90 (adroit) | 50,0 % |
+
+- Le neutre est mathématiquement identique à la 1.2 (test `test_v13_throw`) : l'écart avec les 38,8 % de la 1.2 vient des graines (101–111 contre 201–206). Sur les 660 runs neutres des deux protocoles : **42,3 %**, dans la cible 35–45 %.
+- L'adresse compte (≈ 8 points entre maladroit et adroit) sans remplacer les décisions de mise et de grigris. Aucun réglage modifié.
+
 ## Version 1.1 — Référence « bot expert »
 Bot expert (D-019) : dispositions de paris de tous types évaluées par le moteur de score, utilité plafonnée par le besoin de l'échéance, grigris jugés sur une échéance entière. 330 runs au Risque 0 (11 lots parallèles), télémétrie dans le format joueur, rapport `tools/telemetry_report.py`.
 

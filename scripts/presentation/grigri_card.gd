@@ -160,14 +160,14 @@ func _gui_input(event: InputEvent) -> void:
 		elif mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT and (mb.double_click or kind != "grigri"):
 			activated.emit(self)
 			accept_event()
-	elif event.is_action_pressed("ui_accept"):
+	elif GameInput.pressed(event, "ui_accept"):
 		activated.emit(self)
 		accept_event()
-	elif kind == "grigri" and event.is_action_pressed("bet_repeat"):
+	elif kind == "grigri" and GameInput.pressed(event, "bet_repeat"):
 		lock_toggled.emit(self)
 		accept_event()
-	elif kind == "grigri" and draggable and (event.is_action_pressed("bet_cycle_prev") or event.is_action_pressed("bet_cycle_next")):
-		move_requested.emit(self, -1 if event.is_action_pressed("bet_cycle_prev") else 1)
+	elif kind == "grigri" and draggable and (GameInput.pressed(event, "bet_cycle_prev") or GameInput.pressed(event, "bet_cycle_next")):
+		move_requested.emit(self, -1 if GameInput.pressed(event, "bet_cycle_prev") else 1)
 		accept_event()
 
 

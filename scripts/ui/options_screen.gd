@@ -25,8 +25,11 @@ var _remap_buttons: Dictionary[String, Button] = {}
 var _remap_box: VBoxContainer = null
 
 
-func setup(_params: Dictionary) -> void:
-	pass
+var _start_tab: int = 0
+
+
+func setup(params: Dictionary) -> void:
+	_start_tab = int(params.get("tab", 0))
 
 
 func _ready() -> void:
@@ -51,6 +54,7 @@ func _ready() -> void:
 	_game_tab()
 	_access_tab()
 	_input_tab()
+	_tabs.current_tab = clampi(_start_tab, 0, _tabs.get_tab_count() - 1)
 	var back: Button = UiKit.button(tr("MENU_BACK"), _back)
 	back.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	v.add_child(back)
@@ -116,8 +120,16 @@ func _check(box: VBoxContainer, label_key: String, section: String, key: String)
 	var h: HBoxContainer = _row(box, label_key)
 	var c: CheckBox = CheckBox.new()
 	c.button_pressed = Settings.b(section, key)
-	c.toggled.connect(func(on: bool) -> void: Settings.set_value(section, key, on))
+	c.toggled.connect(func(on: bool) -> void: _on_check(section, key, on))
 	h.add_child(c)
+
+
+## Le mode portable change d'autres réglages (bloom, images/s, texte) : l'écran se recharge.
+func _on_check(section: String, key: String, on: bool) -> void:
+	Settings.set_value(section, key, on)
+	if section == "video" and key == "handheld":
+		UiKit.clear_cache()
+		GameState.goto(&"options", {"tab": _tabs.current_tab})
 
 
 func _choice(box: VBoxContainer, label_key: String, section: String, key: String, values: Array, label_keys: Array) -> void:
@@ -128,8 +140,15 @@ func _choice(box: VBoxContainer, label_key: String, section: String, key: String
 		o.add_item(tr(String(label_keys[i])), i)
 		if str(values[i]) == str(cur):
 			o.select(i)
-	o.item_selected.connect(func(i: int) -> void: Settings.set_value(section, key, values[i]))
+	o.item_selected.connect(func(i: int) -> void: _on_choice(section, key, values[i]))
 	h.add_child(o)
+
+
+## Changer de mode d'affichage change la liste des résolutions : l'écran se recharge.
+func _on_choice(section: String, key: String, value: Variant) -> void:
+	Settings.set_value(section, key, value)
+	if section == "video" and key == "window_mode":
+		GameState.goto(&"options", {"tab": _tabs.current_tab})
 
 
 func _audio_tab() -> void:
@@ -142,19 +161,31 @@ func _audio_tab() -> void:
 func _video_tab() -> void:
 	var b: VBoxContainer = _tab("OPT_TAB_VIDEO")
 	_choice(b, "OPT_WINDOW_MODE", "video", "window_mode", Settings.WINDOW_MODES, ["OPT_WM_WINDOWED", "OPT_WM_FULLSCREEN", "OPT_WM_EXCLUSIVE"])
+	var screen: Vector2i = DisplayServer.screen_get_size(DisplayServer.window_get_current_screen())
 	var sizes: Array = []
 	var size_labels: Array = []
-	var usable: Vector2i = DisplayServer.screen_get_usable_rect(DisplayServer.window_get_current_screen()).size
-	for r: Vector2i in UiLayout.window_sizes_for(usable):
-		sizes.append("%dx%d" % [r.x, r.y])
-		size_labels.append("%d × %d" % [r.x, r.y])
-	_choice(b, "OPT_WINDOW_SIZE", "video", "window_size", sizes, size_labels)
+	if Settings.s("video", "window_mode") == "windowed":
+		for r: Vector2i in UiLayout.window_sizes_for(screen):
+			sizes.append("%dx%d" % [r.x, r.y])
+			size_labels.append("%d × %d  (%s)" % [r.x, r.y, UiLayout.aspect_label(r)])
+		_choice(b, "OPT_WINDOW_SIZE", "video", "window_size", sizes, size_labels)
+	else:
+		sizes.append("native")
+		size_labels.append(tr("OPT_RES_NATIVE") % [screen.x, screen.y, UiLayout.aspect_label(screen)])
+		for r2: Vector2i in UiLayout.render_sizes_for(screen):
+			sizes.append("%dx%d" % [r2.x, r2.y])
+			size_labels.append("%d × %d  (%s)" % [r2.x, r2.y, UiLayout.aspect_label(r2)])
+		_choice(b, "OPT_RENDER_RES", "video", "render_resolution", sizes, size_labels)
+	b.add_child(UiKit.label(tr("OPT_RES_DESC"), UiKit.SIZE_SMALL, Palette.SMOKE))
 	_choice(b, "OPT_FPS_CAP", "video", "fps_cap", [0, 30, 60, 90, 120, 144], ["OPT_FPS_UNLIMITED", "30", "60", "90", "120", "144"])
 	_check(b, "OPT_VSYNC", "video", "vsync")
 	_slider(b, "OPT_CRT", "video", "crt", 0.0, 1.0, 0.05)
 	_slider(b, "OPT_BLOOM", "video", "bloom", 0.0, 1.0, 0.05)
 	_check(b, "OPT_SHOW_FPS", "video", "show_fps")
-	b.add_child(UiKit.button(tr("OPT_ECO_PRESET"), _eco_preset))
+	_check(b, "OPT_WHEEL_3D", "video", "wheel_3d")
+	b.add_child(UiKit.label(tr("OPT_WHEEL_3D_DESC"), UiKit.SIZE_SMALL, Palette.SMOKE))
+	_check(b, "OPT_HANDHELD", "video", "handheld")
+	b.add_child(UiKit.label(tr("OPT_HANDHELD_DESC"), UiKit.SIZE_SMALL, Palette.SMOKE))
 
 
 func _juice_tab() -> void:
@@ -171,6 +202,8 @@ func _game_tab() -> void:
 	_choice(b, "OPT_SPEED", "game", "speed", [1, 2, 4], ["SPEED_1", "SPEED_2", "SPEED_4"])
 	_check(b, "OPT_CONFIRM", "game", "confirm_irreversible")
 	_check(b, "OPT_SHOW_PROBS", "game", "show_probabilities")
+	_choice(b, "OPT_THROW_MODE", "game", "throw_mode", ["skill", "simple"], ["OPT_TM_SKILL", "OPT_TM_SIMPLE"])
+	b.add_child(UiKit.label(tr("OPT_THROW_MODE_DESC"), UiKit.SIZE_SMALL, Palette.SMOKE))
 	_check(b, "OPT_ASSIST", "game", "assist")
 	_check(b, "OPT_TUTORIAL_TIPS", "game", "tutorial_tips")
 	_check(b, "OPT_TELEMETRY", "game", "telemetry")
@@ -199,6 +232,8 @@ func _input_tab() -> void:
 	var b: VBoxContainer = _tab("OPT_TAB_INPUT")
 	_choice(b, "OPT_INPUT_MODE", "game", "input_mode", InputGlyphs.MODES, ["OPT_IM_AUTO", "OPT_IM_KEYBOARD", "OPT_IM_GAMEPAD"])
 	b.add_child(UiKit.label(tr("OPT_INPUT_MODE_DESC"), UiKit.SIZE_SMALL, Palette.SMOKE))
+	_slider(b, "OPT_STICK_SENS", "input", "stick_sensitivity", 0.0, 1.0, 0.05)
+	b.add_child(UiKit.label(tr("OPT_STICK_SENS_DESC"), UiKit.SIZE_SMALL, Palette.SMOKE))
 	_remap_box = VBoxContainer.new()
 	_remap_box.add_theme_constant_override("separation", 12)
 	b.add_child(_remap_box)
@@ -269,12 +304,6 @@ func _input(event: InputEvent) -> void:
 func _reset_input() -> void:
 	Settings.reset_bindings()
 	_build_remap_rows()
-
-
-func _eco_preset() -> void:
-	Settings.apply_eco_preset()
-	EventBus.toast.emit(tr("TOAST_ECO_PRESET"), &"success")
-	GameState.goto(GameState.SCREEN_OPTIONS)
 
 
 func _open_soundboard() -> void:

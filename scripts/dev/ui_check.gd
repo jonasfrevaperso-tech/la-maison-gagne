@@ -90,6 +90,7 @@ func _overlays(db: ContentDB) -> Array[Array]:
 	var out: Array[Array] = [
 		["shop", ShopOverlay.new().configure(ctl)],
 		["pause", PauseMenu.new()],
+		["quick_settings", QuickSettings.new()],
 		["confirm", ConfirmBox.new().configure("?")],
 		["note", NoteOverlay.new().configure(Image.create(8, 8, false, Image.FORMAT_RGB8), "run")],
 		["soundboard", SoundboardOverlay.new()],

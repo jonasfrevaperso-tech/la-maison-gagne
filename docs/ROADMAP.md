@@ -19,10 +19,19 @@
 - ✅ Prise en charge manette complète, glyphes Xbox 360, préparation Steam Deck Vérifié.
 - ⏳ Reste humain : test sur un vrai Steam Deck avant la revue Valve ; sessions de playtest (`docs/PLAYTEST.md`).
 
-## 1.3 — Pistes
+## 1.3 — Table de casino ✅
+- ✅ Roue en 3D (cabinet en bois, rotor, bille, caméra qui plonge), roue 3D à l'écran titre, gerbes de jetons 3D.
+- ✅ Mini-jeu de lancer (élan + lâcher) qui module le contrôle, équilibre préservé ; mode Simple en option.
+- ✅ Manette : stick gauche réglable, gâchettes à un seul appui, curseur par demi-case, taille de la mise sur LB/RB.
+- ✅ Fiches de cases illustrées (icônes et couleurs des statistiques), réglages en cours de partie.
+- ✅ 17 définitions courantes (dont 1440p, 16:10, 21:9, 32:9), résolution de rendu en plein écran, mode Steam Deck réversible.
+- ✅ Écran « Conçu avec Godot, Blender et Claude Code » ; exports Windows, Linux et Flatpak.
+
+## 1.4 — Pistes
 - Glyphes Steam Deck et PlayStation au choix (le Deck accepte déjà les glyphes Xbox).
 - Classement partagé de la Course de graine (export/import d'un fichier de résultats, sans serveur).
 - Animations de cartes à l'achat et à la vente plus marquées ; écran de victoire de campagne dédié.
+- Tapis de jeu en 3D (jetons empilés en relief), comme la roue.
 
 ## DLC « Les Étages Oubliés »
 Un quatrième acte entre les Salons et la Cave : casino abandonné, roue à 2 zéros, nouveau personnage (la Contrebandière), 3 créanciers, 25 grigris.

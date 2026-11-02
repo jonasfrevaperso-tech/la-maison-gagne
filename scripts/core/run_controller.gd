@@ -312,11 +312,13 @@ func effective_precision() -> int:
 	return clampi(run.precision + run.temp_precision_bonus, 1, Balance.i("throw.max_precision"))
 
 
-func throw_params(target_index: int) -> ThrowResolver.ThrowParams:
+## `skill` : qualité du mini-jeu de lancer (0–1), ThrowSkill.NEUTRAL pour un lancer simplifié.
+func throw_params(target_index: int, skill: float = ThrowSkill.NEUTRAL) -> ThrowResolver.ThrowParams:
 	var p: ThrowResolver.ThrowParams = ThrowResolver.ThrowParams.new()
 	p.target_index = target_index
 	p.precision = effective_precision()
-	p.control_bonus = run.control_bonus + float(run.flags.get("control_temp", 0.0))
+	p.control_bonus = run.control_bonus + float(run.flags.get("control_temp", 0.0)) + ThrowSkill.control_bonus(skill)
+	p.skill = skill
 	p.zone_width_override = int(run.flags.get("zone_width_override", 0))
 	p.last_landing_index = run.last_landing_index
 	for i: int in run.wheel.size():
@@ -336,13 +338,13 @@ func landing_distribution(target_index: int) -> Array[float]:
 
 
 ## Étape 1 : la bille est lancée ; le résultat est tiré immédiatement.
-func throw_ball(target_index: int) -> ThrowResolver.ThrowResult:
+func throw_ball(target_index: int, skill: float = ThrowSkill.NEUTRAL) -> ThrowResolver.ThrowResult:
 	assert(can_spin(), "throw_ball hors phase de paris")
 	if not _spin_started:
 		_spin_started = true
 		run.spin_index += 1
 		EffectRunner.fire(&"on_spin_start", run, null, db)
-	pending_throw = ThrowResolver.resolve(run.wheel.size(), throw_params(target_index), run.rng)
+	pending_throw = ThrowResolver.resolve(run.wheel.size(), throw_params(target_index, skill), run.rng)
 	return pending_throw
 
 
@@ -351,10 +353,10 @@ func can_rethrow() -> bool:
 
 
 ## Relance gratuite (Léa) : avant le calcul du score, uniquement.
-func rethrow(target_index: int) -> ThrowResolver.ThrowResult:
+func rethrow(target_index: int, skill: float = ThrowSkill.NEUTRAL) -> ThrowResolver.ThrowResult:
 	assert(can_rethrow(), "relance indisponible")
 	run.free_rethrows -= 1
-	pending_throw = ThrowResolver.resolve(run.wheel.size(), throw_params(target_index), run.rng)
+	pending_throw = ThrowResolver.resolve(run.wheel.size(), throw_params(target_index, skill), run.rng)
 	return pending_throw
 
 
@@ -373,8 +375,8 @@ func commit_spin() -> SpinOutcome:
 	return out
 
 
-func spin(target_index: int) -> SpinOutcome:
-	throw_ball(target_index)
+func spin(target_index: int, skill: float = ThrowSkill.NEUTRAL) -> SpinOutcome:
+	throw_ball(target_index, skill)
 	return commit_spin()
 
 

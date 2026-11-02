@@ -18,20 +18,24 @@ func _ready() -> void:
 	theme = UiKit.theme()
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(DecoBackground.new())
-	var hero_tex: Texture2D = IconLibrary.sprite("title_wheel")
-	if hero_tex != null:
-		var hero: TextureRect = TextureRect.new()
-		hero.texture = hero_tex
-		hero.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		hero.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		hero.size = Vector2(HERO_SIZE, HERO_SIZE)
-		hero.position = HERO_POS
-		hero.modulate = Color(1, 1, 1, HERO_ALPHA)
-		hero.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		add_child(hero)
-		var tw: Tween = hero.create_tween().set_loops()
-		tw.tween_property(hero, "position:y", HERO_POS.y - 14.0, 3.0).set_trans(Tween.TRANS_SINE)
-		tw.tween_property(hero, "position:y", HERO_POS.y, 3.0).set_trans(Tween.TRANS_SINE)
+	# Roue 3D en décor (repli : image fixe si la roue 3D est désactivée).
+	var hero: Control
+	if Settings.b("video", "wheel_3d"):
+		hero = TitleWheel.new()
+	else:
+		var tr_hero: TextureRect = TextureRect.new()
+		tr_hero.texture = IconLibrary.sprite("title_wheel")
+		tr_hero.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		tr_hero.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		hero = tr_hero
+	hero.size = Vector2(HERO_SIZE, HERO_SIZE)
+	hero.position = HERO_POS
+	hero.modulate = Color(1, 1, 1, HERO_ALPHA)
+	hero.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(hero)
+	var tw: Tween = hero.create_tween().set_loops()
+	tw.tween_property(hero, "position:y", HERO_POS.y - 14.0, 3.0).set_trans(Tween.TRANS_SINE)
+	tw.tween_property(hero, "position:y", HERO_POS.y, 3.0).set_trans(Tween.TRANS_SINE)
 	var center: VBoxContainer = VBoxContainer.new()
 	center.set_anchors_preset(Control.PRESET_CENTER)
 	center.alignment = BoxContainer.ALIGNMENT_CENTER

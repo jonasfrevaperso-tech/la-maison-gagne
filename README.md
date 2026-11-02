@@ -6,7 +6,7 @@ Roguelite de roulette européenne art déco, Godot 4.7. Tu hérites de la dette 
 
 ## Jouer
 - **Depuis les sources** : installer Godot 4.7.x, puis `godot --path .` à la racine (ou ouvrir `project.godot` dans l'éditeur et appuyer sur F5).
-- **Exports** : `build/linux/LaMaisonGagne.x86_64` et `build/windows/LaMaisonGagne.exe` (voir « Exporter »).
+- **Exports** : Windows (`.exe`), Linux (binaire `x86_64`) et **Flatpak** (`.flatpak`), tous autonomes — `tools/build_release.sh` (voir « Exporter »).
 
 ### Commandes
 Le **mode manette** se règle dans Options → Commandes : *Automatique* (les indications suivent le dernier appareil utilisé), *Activé* (tout à la manette, curseur masqué) ou *Désactivé* (clavier et souris). Seules les indications de l'appareil actif sont affichées, avec des glyphes Xbox 360 en pixel art pour la manette.
@@ -15,10 +15,11 @@ Le **mode manette** se règle dans Options → Commandes : *Automatique* (les in
 |---|---|---|
 | Naviguer · valider · retour | souris · Entrée · Échap | croix ou stick gauche · A · B |
 | Onglets · défiler | clic · molette | LB / RB · stick droit |
-| Miser · retirer un jeton | clic gauche (+1), Maj+clic (+5) · clic droit ou Retour arr. | curseur à la croix · A · B |
-| Chevaux, transversales, carrés, sixains | bords et coins des cases | LB / RB autour du curseur |
+| Miser · retirer un jeton | clic gauche, Maj+clic (+5) · clic droit ou Retour arr. | curseur (croix ou stick gauche) · A · B |
+| Taille de la mise (1, 2, 5, 10) | Q / W | LB / RB |
+| Chevaux, transversales, carrés, sixains | bords et coins des cases | le curseur avance par demi-case : centre = plein, bord = cheval, coin = carré |
 | Annuler · répéter · effacer | Z · R · C | X · Y · L3 |
-| Lancer puis relâcher | Espace / bouton LANCER | RT |
+| Lancer : viser, puis le mini-jeu (élan, lâcher) | Espace ou clic / bouton LANCER | RT ou A |
 | Grigris et cartes Fortune | clic (glisser, double-clic, clic droit) | View : sélection ; A utiliser / vendre ; Y verrouiller ; LB/RB déplacer |
 | Choisir une case (carte Fortune) | clic sur la roue | croix, puis A |
 | Passer une animation · vitesse | Entrée · F | A ou B · LT |
@@ -27,10 +28,15 @@ Le **mode manette** se règle dans Options → Commandes : *Automatique* (les in
 | Note de test | F8 | R3 |
 | Plein écran | F11 · Alt+Entrée | — |
 
+La sensibilité du stick gauche se règle dans Options → Commandes (et en cours de partie : Pause → Réglages).
+
 Toutes les commandes sont remappables, au clavier comme à la manette (Options → Commandes). Les champs de texte s'ouvrent au clavier virtuel avec A.
 
+### Le lancer
+Après la visée, un mini-jeu de deux temps décide de la qualité du lancer : **élan** (arrêter l'aiguille dans la zone dorée) puis **lâcher** (frapper quand l'anneau se referme sur la bille). La qualité ajuste le contrôle de la bille de −10 à +10 points autour de la Précision ; un lancer « moyen » vaut exactement l'ancien lancer, l'équilibrage reste donc celui de la 1.2. Options → Jeu → Lancer : *Adresse* (mini-jeu) ou *Simple* (appuyer/relâcher, contrôle neutre).
+
 ### Affichage
-16:9 à toute définition (720p, 1080p, 1440p, 4K), 16:10 (Steam Deck 1280×800) et ultra-larges. Options → Vidéo : mode (fenêtré, plein écran, plein écran exclusif), taille de fenêtre, limite d'images par seconde, préréglage économie (bloom coupé, 60 i/s ; appliqué d'office au premier lancement sur Steam Deck).
+Plein écran à la définition native ou à une résolution de rendu au choix ; en fenêtré, 17 définitions courantes de 1280×720 à 5120×2880 : 16:9 (720p, 1080p, **1440p**, 4K, 5K), 16:10 (1280×800 Steam Deck, 1440×900, 1680×1050, 1920×1200, 2560×1600, 2880×1800), 21:9 (2560×1080, 3440×1440, 3840×1600) et 32:9 (5120×1440). Options → Vidéo : mode, résolution, limite d'images, **roue en 3D** (désactivable) et **mode Steam Deck / portable** (texte agrandi, bloom coupé, 60 i/s ; activé d'office sur Steam Deck, désactivable, les réglages précédents sont restaurés).
 
 ## Contenu
 3 actes, 8 paliers, 24 échéances · 180 grigris · 24 cases spéciales, 4 éditions, 6 sceaux · 30 cartes Fortune · 20 contrats · 14 créanciers (dont 2 qui manipulent la roue) + 2 secrets + Le Patron + La Maison (3 phases) · 6 personnages · 8 niveaux de Risque · 20 événements · 60 succès · 20 défis · graine du jour et **Course de graine** (classement local par graine) · mode Infini · 3 fins + une vraie fin secrète · FR/EN.
@@ -73,9 +79,10 @@ Tout le contenu est en JSON dans `data/` (une entrée = un objet avec `id`), ave
 ### Exporter
 Installer les modèles d'export de Godot 4.7.2 (Éditeur → Gérer les modèles d'export), puis :
 ```bash
-godot --headless --path . --export-release "Linux" build/linux/LaMaisonGagne.x86_64
-godot --headless --path . --export-release "Windows" build/windows/LaMaisonGagne.exe
+tools/build_release.sh            # Windows + Linux + Flatpak → build/
+tools/build_release.sh --no-flatpak
 ```
+Produit `build/LaMaisonGagne-<version>-windows-x86_64.zip` (un `.exe` autonome, données embarquées), `build/LaMaisonGagne-<version>-linux-x86_64.tar.gz` (un binaire autonome) et `build/LaMaisonGagne-<version>-x86_64.flatpak` (paquet `packaging/flatpak/`, runtime `org.freedesktop.Platform` 25.08 ; prérequis : `flatpak-builder` et `flatpak install --user flathub org.freedesktop.Platform//25.08 org.freedesktop.Sdk//25.08`). Installer le Flatpak : `flatpak install --user LaMaisonGagne-<version>-x86_64.flatpak`.
 
 Les options de développement n'existent que depuis les sources (binaire éditeur) : `scripts/dev/` et `scripts/sim/` sont exclus des exports, et une session de développement écrit dans `user://dev/`, jamais dans la sauvegarde du joueur.
 

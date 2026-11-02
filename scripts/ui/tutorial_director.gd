@@ -45,12 +45,17 @@ static func tip_text(entry: Dictionary) -> String:
 func _input(event: InputEvent) -> void:
 	if _bubble == null or _current.is_empty():
 		return
-	if event.is_action_pressed("tip_mute"):
+	if GameInput.pressed(event, "tip_mute"):
 		_skip_all()
 		get_viewport().set_input_as_handled()
-	elif not _current.has("until") and (event.is_action_pressed("ui_accept") or event.is_action_pressed("bet_place")):
+	elif not _current.has("until") and (GameInput.pressed(event, "ui_accept") or GameInput.pressed(event, "bet_place")):
 		_close_current()
 		get_viewport().set_input_as_handled()
+
+
+## Une astuce à valider est ouverte : le jeu attend (mini-jeu de lancer figé).
+func blocking() -> bool:
+	return _bubble != null and not _current.is_empty() and not _current.has("until")
 
 
 static func enabled() -> bool:

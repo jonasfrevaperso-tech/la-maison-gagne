@@ -135,6 +135,11 @@ static func _handheld() -> bool:
 ## « mouse_left ») ou « #<Touche> » pour une touche de clavier. Vide si non assignée.
 static func parts_for(action: String) -> Array[String]:
 	var out: Array[String] = []
+	# « a+b » : les deux commandes à la suite (ex. LB RB pour −/+).
+	if action.contains("+"):
+		for part: String in action.split("+"):
+			out.append_array(parts_for(part))
+		return out
 	if action.begins_with("@"):
 		var table: Dictionary[String, Array] = MARKERS_PAD if using_pad else MARKERS_KEYS
 		for p: Variant in table.get(action, []):

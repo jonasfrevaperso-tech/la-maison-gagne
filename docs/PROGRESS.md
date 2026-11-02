@@ -3,8 +3,8 @@
 > Reprise après coupure : lire ce fichier, `CLAUDE.md`, puis `docs/DECISIONS.md`. Lancer `tools/check.sh`.
 
 ## État courant
-- Phase en cours : **Livré (1.2.0)** — suite : test sur un vrai Steam Deck (`docs/STEAM_DECK.md`), sessions humaines (`docs/PLAYTEST.md`), `docs/ROADMAP.md` (1.3)
-- Dernier tag : `v1.2.0`
+- Phase en cours : **Livré (1.3.0)** — suite : test sur un vrai Steam Deck (`docs/STEAM_DECK.md`), sessions humaines (`docs/PLAYTEST.md`), `docs/ROADMAP.md` (1.4)
+- Dernier tag : `v1.3.0`
 
 ## Phase 0 — Reconnaissance ✅
 - Environnement : Godot 4.7.2 (MCP godot OK), Blender 5.2.2, Python 3.14 + numpy 2.4 + Pillow 12, uv, gdtoolkit 4 (installé via uv), git 2.53, 12 cœurs.
@@ -111,3 +111,9 @@ Plan : (1) entrées : mode manette, schéma complet, glyphes Xbox 360, invites d
 
 ## Rapport de phase
 Format : fait / testé / reste à faire / risques.
+
+## Version 1.3 — Table de casino ✅
+- Plan : (1) manette : stick → appuis de croix réglables, gâchettes à un appui, curseur par demi-case, mise sur LB/RB ; (2) mini-jeu de lancer + équilibrage par simulations ; (3) roue 3D, roue de titre, gerbes 3D ; (4) fiches de cases illustrées ; (5) réglages en jeu ; (6) résolutions et mode Steam Deck ; (7) écran d'ouverture ; (8) exports Windows / Linux / Flatpak ; (9) docs, check, tag.
+- Fait : tout le plan. Nouveaux fichiers : `GameInput`, `StickRepeater`, `ThrowSkill`, `ThrowMinigame`, `RunScreenThrow`, `Wheel3D`, `TitleWheel`, `ChipBurst3D`, `PocketCard`, `QuickSettings`, `SplashScreen`, `tools/gen_stat_icons.py`, `tools/build_release.sh`, `packaging/flatpak/`.
+- Testé : `check.sh` vert (tests manette/curseur/mini-jeu, interface avec réglages rapides, campagne manette avec mini-jeu), captures 3D (roue, titre, gerbes, écran d'ouverture), Flatpak installé et lancé (Vulkan), équilibrage (`docs/BALANCE.md`).
+- Reste humain : jouer le mini-jeu (ressenti des fenêtres), Steam Deck réel, Windows réel.

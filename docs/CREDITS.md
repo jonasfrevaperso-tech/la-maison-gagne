@@ -9,6 +9,8 @@ Conçu et développé avec Claude Code (Anthropic) pour jonasfreva.
 - Godot Engine 4.7 — licence MIT — https://godotengine.org
 - gdtoolkit (gdlint/gdformat) — licence MIT
 - Blender 5.2 — GPL (outil uniquement, aucun code Blender n'est distribué)
+- Claude Code (Anthropic) — conception et programmation assistées
+- Écran d'ouverture (`assets/splash/`) : logo Godot par Andrea Calabró (CC BY 4.0, godotengine.org/press) ; logo Blender (Blender Foundation, usage « made with Blender » selon blender.org/about/logo) ; symbole Claude (Anthropic). Marques de leurs propriétaires respectifs, utilisées pour créditer les outils.
 - Python 3, numpy, Pillow — outillage hors jeu
 
 ## Assets

@@ -14,6 +14,11 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
+## Gerbe de jetons (ou de pièces) en 3D ; `at` en coordonnées de canevas.
+func burst_3d(at: Vector2, amount: int, coins: bool = false) -> void:
+	ChipBurst3D.spawn(self, get_global_transform().affine_inverse() * at, amount, coins)
+
+
 ## `at` est en coordonnées de canevas (cf. UiLayout.canvas_point) : converti en local, le
 ## calque pouvant être mis à l'échelle par le cadre des écrans.
 func pop_text(text: String, at: Vector2, color: Color, size_px: int = UiKit.SIZE_H2) -> void:

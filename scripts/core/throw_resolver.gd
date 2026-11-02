@@ -17,6 +17,8 @@ class ThrowParams:
 	var sticky_index: int = -1
 	var sticky_chance: float = 0.0
 	var last_landing_index: int = -1
+	## Qualité du mini-jeu (0–1) ou −1 (lancer simplifié) : déjà incluse dans control_bonus.
+	var skill: float = -1.0
 
 
 class ThrowResult:
@@ -28,9 +30,11 @@ class ThrowResult:
 	var stuck: bool = false
 	var zone: Array[int] = []
 	var control: float = 0.0
+	var skill: float = -1.0
 
 	func to_dict() -> Dictionary:
 		return {
+			"skill": snappedf(skill, 0.01),
 			"target": target_index,
 			"landing": landing_index,
 			"in_zone": in_zone,
@@ -100,6 +104,7 @@ static func resolve(wheel_size: int, params: ThrowParams, rng: RngStreams) -> Th
 	var r: ThrowResult = ThrowResult.new()
 	r.target_index = posmod(params.target_index, wheel_size)
 	r.control = control_for(params.precision, params.control_bonus)
+	r.skill = params.skill
 	var width: int = zone_width_for(params.precision, params.zone_width_override)
 	var half: int = width / 2
 	for o: int in range(-half, half + 1):

@@ -25,8 +25,8 @@
   "order": 3,
   "text_fr": "Un numéro seul (plein) paie ×36. Vise les bords et les coins entre deux numéros pour les chevaux (×18) et carrés (×9). {@right_click} retire un jeton.",
   "text_en": "A single number (straight) pays ×36. Aim at edges and corners between numbers for splits (×18) and corners (×9). {@right_click} removes a chip.",
-  "text_pad_fr": "Un numéro seul (plein) paie ×36. {bet_cycle_prev} {bet_cycle_next} passent aux chevaux (×18), transversales et carrés (×9) autour du curseur. {bet_remove} retire un jeton.",
-  "text_pad_en": "A single number (straight) pays ×36. {bet_cycle_prev} {bet_cycle_next} cycle through splits (×18), streets and corners (×9) around the cursor. {bet_remove} removes a chip."
+  "text_pad_fr": "Un numéro seul (plein) paie ×36. La croix avance d'une demi-case : un pas vers le bord donne un cheval (×18), un pas de plus en diagonale un carré (×9), le bas du tapis les transversales. {bet_cycle_prev} {bet_cycle_next} règlent la mise, {bet_remove} retire un jeton.",
+  "text_pad_en": "A single number (straight) pays ×36. The d-pad moves half a cell: one step onto an edge gives a split (×18), one more step diagonally a corner (×9), the bottom edge streets. {bet_cycle_prev} {bet_cycle_next} set the stake, {bet_remove} removes a chip."
  },
  {
   "id": "tip_budget",
@@ -52,15 +52,23 @@
   "trigger": "aiming",
   "anchor": "wheel",
   "order": 6,
-  "until": "ball",
-  "text_fr": "La roue tourne sous l'aiguille. L'arc cyan montre la zone où la bille tombera le plus souvent. Relâche ({ui_spin}) quand tes numéros y sont !",
-  "text_en": "The wheel turns under the needle. The cyan arc shows where the ball will most often land. Release ({ui_spin}) when your numbers are in it!"
+  "until": "throwing",
+  "text_fr": "La roue tourne sous l'aiguille. L'arc cyan montre la zone où la bille tombera le plus souvent. Vise ({ui_spin}) quand tes numéros y sont !",
+  "text_en": "The wheel turns under the needle. The cyan arc shows where the ball will most often land. Aim ({ui_spin}) when your numbers are in it!"
+ },
+ {
+  "id": "tip_throw",
+  "trigger": "throwing",
+  "anchor": "wheel",
+  "order": 7,
+  "text_fr": "Le lancer se joue en deux gestes. Élan : arrête l'aiguille dans l'or ({ui_spin}). Lâcher : frappe ({ui_spin}) quand l'anneau touche la bille. Un beau lancer garde la bille dans ta zone plus souvent.",
+  "text_en": "A throw takes two moves. Swing: stop the needle in the gold ({ui_spin}). Release: strike ({ui_spin}) when the ring touches the ball. A good throw keeps the ball in your zone more often."
  },
  {
   "id": "tip_wild",
   "trigger": "ball",
   "anchor": "wheel",
-  "order": 7,
+  "order": 8,
   "text_fr": "Parfois la bille fait un « rebond fou » et sort de la zone. La Précision réduit ce risque.",
   "text_en": "Sometimes the ball takes a « wild bounce » out of the zone. Precision reduces that risk."
  },
@@ -68,7 +76,7 @@
   "id": "tip_score",
   "trigger": "scoring",
   "anchor": "score",
-  "order": 8,
+  "order": 9,
   "text_fr": "Le score = Jetons × Mult. Les paris gagnants et le numéro de la case donnent des Jetons ; les grigris et cases spéciales ajoutent du Mult.",
   "text_en": "Score = Chips × Mult. Winning bets and the pocket number give Chips; charms and special pockets add Mult."
  },
@@ -76,7 +84,7 @@
   "id": "tip_history",
   "trigger": "scored",
   "anchor": "history",
-  "order": 9,
+  "order": 10,
   "text_fr": "Ici, l'historique des derniers numéros. Survole une case de la roue pour lire ses effets.",
   "text_en": "Here's the history of recent numbers. Hover a wheel pocket to read its effects.",
   "text_pad_fr": "Ici, l'historique des derniers numéros. Les effets des cases s'affichent quand tu cibles la roue avec une carte Fortune.",
@@ -86,7 +94,7 @@
   "id": "tip_shop",
   "trigger": "shop",
   "anchor": "center",
-  "order": 10,
+  "order": 11,
   "text_fr": "Le Bazar ! Achète des grigris (bonus permanents), des paquets (cases spéciales, cartes Fortune) et des contrats. Garde un peu d'argent : chaque tranche de 5 $ rapporte des intérêts.",
   "text_en": "The Bazaar! Buy charms (permanent bonuses), packs (special pockets, Fortune cards) and contracts. Save some money: every $5 earns interest."
  },
@@ -94,7 +102,7 @@
   "id": "tip_grigri",
   "trigger": "grigri_owned",
   "anchor": "grigris",
-  "order": 11,
+  "order": 12,
   "text_fr": "Tes grigris se déclenchent de gauche à droite. Glisse-les pour changer l'ordre, {@right_click} pour les verrouiller.",
   "text_en": "Your charms trigger left to right. Drag them to reorder, {@right_click} to lock them.",
   "text_pad_fr": "Tes grigris se déclenchent de gauche à droite. {item_panel} pour les sélectionner, {bet_cycle_prev} {bet_cycle_next} pour les déplacer, {bet_repeat} pour les verrouiller.",
@@ -104,7 +112,7 @@
   "id": "tip_fortune",
   "trigger": "fortune_owned",
   "anchor": "fortunes",
-  "order": 12,
+  "order": 13,
   "text_fr": "Une carte Fortune ! Clique-la ({@click}), puis clique la case de la roue à transformer.",
   "text_en": "A Fortune card! Click it ({@click}), then click the wheel pocket to transform.",
   "text_pad_fr": "Une carte Fortune ! {item_panel} pour la sélectionner, {ui_accept} pour l'utiliser, puis choisis la case sur la roue ({@dpad_lr}) et valide ({ui_accept}).",
@@ -114,7 +122,7 @@
   "id": "tip_creditor",
   "trigger": "creditor",
   "anchor": "creditor",
-  "order": 13,
+  "order": 14,
   "text_fr": "Un Créancier impose une règle spéciale, rappelée ici. Sa dette est double.",
   "text_en": "A Creditor imposes a special rule, shown here. Its debt is doubled."
  },
@@ -122,7 +130,7 @@
   "id": "tip_pact",
   "trigger": "pact",
   "anchor": "center",
-  "order": 14,
+  "order": 15,
   "text_fr": "Raté de peu ? La Maison propose un Pacte : un tour de plus contre un sacrifice. Un seul par acte.",
   "text_en": "Just short? The House offers a Pact: one more spin for a sacrifice. One per act."
  }

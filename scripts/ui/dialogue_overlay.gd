@@ -192,10 +192,10 @@ func _gui_input(event: InputEvent) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_accept") or event.is_action_pressed("ui_spin"):
+	if GameInput.pressed(event, "ui_accept") or GameInput.pressed(event, "ui_spin"):
 		_advance()
 		get_viewport().set_input_as_handled()
-	elif event.is_action_pressed("ui_cancel"):
+	elif GameInput.pressed(event, "ui_cancel"):
 		_finish()
 		get_viewport().set_input_as_handled()
 

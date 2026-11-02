@@ -8,11 +8,14 @@ const DEFAULTS: Dictionary = {
 	{
 		"window_mode": "fullscreen",
 		"window_size": "1600x900",
+		"render_resolution": "native",
 		"vsync": true,
 		"fps_cap": 0,
 		"crt": 0.5,
 		"bloom": 0.6,
-		"show_fps": false
+		"show_fps": false,
+		"wheel_3d": true,
+		"handheld": false
 	},
 	"juice": {"intensity": 1.0, "shake": 1.0, "flashes": true, "reduced_motion": false},
 	"game":
@@ -22,6 +25,7 @@ const DEFAULTS: Dictionary = {
 		"auto_repeat": false,
 		"confirm_irreversible": true,
 		"assist": false,
+		"throw_mode": "skill",
 		"show_probabilities": false,
 		"tutorial_tips": true,
 		"input_mode": "auto",
@@ -29,12 +33,15 @@ const DEFAULTS: Dictionary = {
 		"telemetry_asked": false
 	},
 	"access": {"colorblind": "off", "text_scale": 1.0, "high_contrast": false, "subtitles": true},
-	"input": {"bindings": {}, "pad_bindings": {}},
+	"input": {"bindings": {}, "pad_bindings": {}, "stick_sensitivity": 0.35},
 }
 
 ## Échelle de texte par défaut sur Steam Deck (écran 7 pouces, 1280×800).
 const HANDHELD_TEXT_SCALE: float = 1.15
 const ECO_PRESET: Dictionary = {"bloom": 0.0, "fps_cap": 60}
+## Mode Steam Deck / portable : préréglage économie + texte agrandi. Les valeurs remplacées
+## sont gardées (video/handheld_saved) et restaurées quand on désactive le mode.
+const HANDHELD_KEYS: Array[String] = ["video/bloom", "video/fps_cap", "access/text_scale"]
 const WINDOW_MODES: Array[String] = ["windowed", "fullscreen", "exclusive"]
 
 ## Surcharge de vitesse non persistée (QA automatisée) ; 0 = utiliser l'option du joueur.
@@ -43,6 +50,7 @@ var _cfg: ConfigFile = ConfigFile.new()
 var _path: String = ""
 var _applied_mode: String = ""
 var _applied_size: String = ""
+var _applied_render: String = ""
 
 
 func _ready() -> void:
@@ -136,19 +144,34 @@ func _migrate() -> void:
 ## Premier lancement sur console portable (Steam Deck) : texte un peu plus grand et
 ## préréglage économie (autonomie, 60 images/s tenues).
 func _detect_handheld() -> void:
-	if OS.get_environment("SteamDeck") == "1" or OS.has_feature("steamdeck"):
-		_cfg.set_value("access", "text_scale", HANDHELD_TEXT_SCALE)
+	if is_steam_deck():
+		_set_handheld(true)
+
+
+static func is_steam_deck() -> bool:
+	return OS.get_environment("SteamDeck") == "1" or OS.has_feature("steamdeck")
+
+
+## Active / désactive le mode portable en gardant (puis en restaurant) les réglages touchés.
+func _set_handheld(on: bool) -> void:
+	if on:
+		var saved: Dictionary = {}
+		for path: String in HANDHELD_KEYS:
+			var parts: PackedStringArray = path.split("/")
+			saved[path] = get_value(parts[0], parts[1])
+		_cfg.set_value("video", "handheld_saved", saved)
+		_cfg.set_value("access", "text_scale", maxf(f("access", "text_scale"), HANDHELD_TEXT_SCALE))
 		for key: String in ECO_PRESET.keys():
 			_cfg.set_value("video", key, ECO_PRESET[key])
-
-
-## Préréglage économie : le bloom est l'effet le plus coûteux (≈ 35 % du GPU mesuré).
-func apply_eco_preset() -> void:
-	for key: String in ECO_PRESET.keys():
-		_cfg.set_value("video", key, ECO_PRESET[key])
-	save_settings()
-	apply()
-	EventBus.settings_changed.emit()
+	else:
+		var back: Variant = _cfg.get_value("video", "handheld_saved", {})
+		if back is Dictionary:
+			for path: Variant in (back as Dictionary).keys():
+				var parts2: PackedStringArray = String(path).split("/")
+				_cfg.set_value(parts2[0], parts2[1], (back as Dictionary)[path])
+		if _cfg.has_section_key("video", "handheld_saved"):
+			_cfg.erase_section_key("video", "handheld_saved")
+	_cfg.set_value("video", "handheld", on)
 
 
 func save_settings() -> void:
@@ -161,6 +184,9 @@ func get_value(section: String, key: String) -> Variant:
 
 
 func set_value(section: String, key: String, value: Variant) -> void:
+	if section == "video" and key == "handheld" and bool(value) != b("video", "handheld"):
+		_set_handheld(bool(value))
+		UiKit.clear_cache()
 	_cfg.set_value(section, key, value)
 	save_settings()
 	apply()
@@ -196,12 +222,14 @@ func apply() -> void:
 		return
 	if not DevMode.active():
 		_apply_window()
+		_apply_render_resolution()
 	Engine.max_fps = int(get_value("video", "fps_cap"))
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if b("video", "vsync") else DisplayServer.VSYNC_DISABLED)
 	TranslationServer.set_locale(s("game", "locale"))
 	var tree: SceneTree = get_tree()
 	if tree != null and tree.root != null:
-		tree.root.content_scale_factor = 1.0  # la taille du texte agit sur les polices (UiKit.fs)
+		if tree.root.content_scale_mode == Window.CONTENT_SCALE_MODE_CANVAS_ITEMS:
+			tree.root.content_scale_factor = 1.0  # la taille du texte agit sur les polices (UiKit.fs)
 
 
 ## Mode d'affichage et taille de fenêtre (appliqués seulement s'ils changent, pour ne pas
@@ -231,6 +259,29 @@ func _apply_window() -> void:
 	DisplayServer.window_set_size(wanted)
 	var usable: Rect2i = DisplayServer.screen_get_usable_rect(screen)
 	DisplayServer.window_set_position(usable.position + (usable.size - wanted) / 2)
+
+
+## Plein écran à une définition inférieure à celle de l'écran : la fenêtre racine est rendue à
+## cette définition (étirement « viewport ») puis agrandie ; l'échelle du contenu garde la scène
+## logique de référence (1920×1080). « native » : rendu à la définition de l'écran.
+func _apply_render_resolution() -> void:
+	var tree: SceneTree = get_tree()
+	if tree == null or tree.root == null:
+		return
+	var fullscreen: bool = s("video", "window_mode") != "windowed"
+	var res: String = s("video", "render_resolution") if fullscreen else "native"
+	if res == _applied_render:
+		return
+	_applied_render = res
+	var root: Window = tree.root
+	if res == "native":
+		root.content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
+		root.content_scale_size = Vector2i(UiLayout.DESIGN_SIZE)
+		return
+	var r: Vector2i = parse_size(res)
+	root.content_scale_mode = Window.CONTENT_SCALE_MODE_VIEWPORT
+	root.content_scale_size = r
+	root.content_scale_factor = minf(float(r.x) / UiLayout.DESIGN_SIZE.x, float(r.y) / UiLayout.DESIGN_SIZE.y)
 
 
 ## « 1600x900 » → Vector2i(1600, 900) ; taille par défaut si illisible.

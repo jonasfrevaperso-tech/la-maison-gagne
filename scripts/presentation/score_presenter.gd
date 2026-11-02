@@ -183,6 +183,7 @@ func _play_total(total: int) -> void:
 		)
 		if tier >= 1:
 			float_layer.burst("confetti", center, 30 * (tier + 1))
+			float_layer.burst_3d(center, JuiceProfile.CHIPS_3D_PER_TIER * tier)
 			EventBus.juice_shake.emit(0.2 * float(tier + 1))
 		if tier >= 2:
 			EventBus.juice_hitstop.emit(JuiceProfile.HITSTOP_MAX * float(tier - 1) * 0.5)

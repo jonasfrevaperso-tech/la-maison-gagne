@@ -277,6 +277,21 @@ func _run(rs: RunScreen) -> void:
 			_aim_wait += STEP
 			if _aim_wait > 0.6:
 				await _press("RT")
+		RunScreen.UiState.THROWING:
+			# Mini-jeu à la gâchette : on attend le bon moment image par image, puis RT.
+			var g: ThrowMinigame = rs.throw_game
+			for _f: int in 240:
+				var ready: bool = false
+				if g.beat == ThrowMinigame.Beat.POWER:
+					ready = absf(float(g.get("_needle")) - 0.5) < 0.04
+				elif g.beat == ThrowMinigame.Beat.RELEASE:
+					ready = float(g.get("_t")) >= float(g.get("_release_time")) - 0.02
+				else:
+					return
+				if ready:
+					await _press("RT")
+					return
+				await get_tree().process_frame
 		RunScreen.UiState.BALL, RunScreen.UiState.SCORING:
 			await _press("A")
 		RunScreen.UiState.RETHROW:

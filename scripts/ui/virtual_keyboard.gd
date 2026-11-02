@@ -114,9 +114,9 @@ func go_back() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("pause_menu"):
+	if GameInput.pressed(event, "pause_menu"):
 		_submit()
 		get_viewport().set_input_as_handled()
-	elif event.is_action_pressed("bet_repeat"):
+	elif GameInput.pressed(event, "bet_repeat"):
 		_type(" ")
 		get_viewport().set_input_as_handled()

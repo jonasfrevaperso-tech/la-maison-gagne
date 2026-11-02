@@ -1,6 +1,8 @@
 class_name WheelView
 extends Control
-## Roue dessinée en vectoriel (pseudo-3D : anneaux, reflets, ombrage), taille variable.
+## Roue de jeu : rendu 3D temps réel (Wheel3D) ou, en repli (Options → Vidéo), vectoriel
+## pseudo-3D. La chronologie (rotation, visée, trajectoire de la bille) est calculée ici dans
+## les deux cas ; Wheel3D ne fait que l'afficher.
 ## Modes : repos (rotation lente), visée (aiguille qui balaie), lancer (la bille raconte
 ## un résultat DÉJÀ tiré : décélération, rebonds, quasi-ratés au ralenti).
 
@@ -36,6 +38,8 @@ var db: ContentDB = null
 var rotation_angle: float = 0.0
 var aiming: bool = false
 var aim_index: int = 0
+## Case figée par la visée pendant l'élan et le lâcher (−1 : aucune).
+var locked_index: int = -1
 var zone_width: int = 7
 var highlight_numbers: Dictionary = {}  # numéro -> true (paris posés)
 var flash_index: int = -1
@@ -44,6 +48,8 @@ var probabilities: Array[float] = []
 
 ## Sens de rotation (−1 : roue inversée, créancier La Valseuse) et accélération de la visée.
 var direction: float = 1.0
+## Sans bruitages (roue de décor de l'écran titre).
+var muted: bool = false
 var aim_speed_mult: float = 1.0
 var _aim_t: float = 0.0
 var _aim_period: float = 2.4
@@ -59,6 +65,8 @@ var _ball_resting: bool = false
 var _trail: Array[Vector2] = []
 var _wheel_speed: float = IDLE_SPEED
 var _flash_t: float = 0.0
+var _ball_bounce: float = 0.0
+var _w3d: Wheel3D = null
 
 
 func _ready() -> void:
@@ -66,11 +74,35 @@ func _ready() -> void:
 	resized.connect(func() -> void: pivot_offset = size * 0.5)
 	pivot_offset = size * 0.5
 	_aim_period = Balance.f("throw.pointer_period_seconds")
+	EventBus.settings_changed.connect(_apply_renderer)
+	_apply_renderer()
+
+
+## Roue 3D (par défaut) ou vectorielle selon les options vidéo.
+func _apply_renderer() -> void:
+	var want: bool = Settings.b("video", "wheel_3d")
+	if want and _w3d == null:
+		_w3d = Wheel3D.new()
+		_w3d.set_anchors_preset(Control.PRESET_FULL_RECT)
+		add_child(_w3d)
+		move_child(_w3d, 0)
+		if wheel != null:
+			_w3d.setup(wheel, db)
+	elif not want and _w3d != null:
+		_w3d.queue_free()
+		_w3d = null
+	queue_redraw()
+
+
+func is_3d() -> bool:
+	return _w3d != null
 
 
 func setup(p_wheel: WheelModel, p_db: ContentDB) -> void:
 	wheel = p_wheel
 	db = p_db
+	if _w3d != null:
+		_w3d.setup(wheel, db)
 	queue_redraw()
 
 
@@ -91,7 +123,11 @@ func pocket_angle(i: int) -> float:
 	return rotation_angle + (float(i) + 0.5) * pocket_angle_span() - PI * 0.5
 
 
+## Point écran (local) d'un angle et d'un rayon (en pixels du rendu 2D, rapportés à radius()).
 func to_screen(angle: float, r: float) -> Vector2:
+	if _w3d != null:
+		var rr: float = r / maxf(radius(), 1.0)
+		return _w3d.project(_w3d.to_3d(angle, rr, _w3d._track_y(rr) + Wheel3D.BALL_R))
 	return center() + Vector2(cos(angle) * r, sin(angle) * r * TILT)
 
 
@@ -120,6 +156,11 @@ func stop_aim() -> int:
 	return aim_index
 
 
+## Point où la bille est lâchée (sous le pointeur), en coordonnées locales.
+func release_point() -> Vector2:
+	return to_screen(-PI * 0.5, radius() * BALL_ORBIT)
+
+
 # --------------------------------------------------------------------------- lancer
 
 
@@ -133,11 +174,41 @@ func play_throw(landing_index: int, near_miss: bool) -> void:
 	_ball_angle_start = -PI * 0.5
 	_trail.clear()
 	_wheel_speed = SPIN_SPEED
-	AudioBus.play("ball_roll")
+	if not muted:
+		AudioBus.play("ball_roll")
 
 
 func is_ball_active() -> bool:
 	return _ball_active
+
+
+func is_ball_resting() -> bool:
+	return _ball_resting
+
+
+func ball_landing() -> int:
+	return _ball_landing
+
+
+func ball_screen_angle() -> float:
+	return _ball_angle
+
+
+## Rayon de la bille (fraction du rayon de la roue), rebonds exclus.
+func ball_radius_ratio() -> float:
+	return _ball_radius
+
+
+func ball_bounce() -> float:
+	return _ball_bounce
+
+
+func ball_progress() -> float:
+	return clampf(_ball_t / maxf(_ball_duration, 0.001), 0.0, 1.0)
+
+
+func flash_amount() -> float:
+	return _flash_t if flash_index >= 0 else 0.0
 
 
 func skip_ball() -> void:
@@ -171,7 +242,10 @@ func _process(delta: float) -> void:
 		aim_index = index_at_angle(-PI * 0.5)
 	if _flash_t > 0.0:
 		_flash_t = maxf(_flash_t - delta * 1.5, 0.0)
-	queue_redraw()
+	if _w3d != null:
+		_w3d.sync(self, delta)
+	else:
+		queue_redraw()
 
 
 ## La bille fait BALL_REVS tours en décélérant pendant que la roue ralentit par saccades,
@@ -195,10 +269,12 @@ func _update_ball(dt: float) -> void:
 	if u > 0.7 and u < 0.97:
 		var bu: float = (u - 0.7) / 0.27
 		bounce = absf(sin(bu * PI * float(BOUNCE_COUNT))) * BOUNCE_HEIGHT * (1.0 - bu)
-	_ball_radius = lerpf(BALL_ORBIT, r_in, drop) + bounce
-	var z: float = 1.0 + ZOOM_MAX * smoothstep(ZOOM_START, 1.0, u) * JuiceProfile.intensity()
+	_ball_radius = lerpf(BALL_ORBIT, r_in, drop) + (0.0 if _w3d != null else bounce)
+	_ball_bounce = bounce
+	# Rendu 2D : zoom de la roue ; rendu 3D : c'est la caméra qui plonge.
+	var z: float = 1.0 + ZOOM_MAX * smoothstep(ZOOM_START, 1.0, u) * JuiceProfile.intensity() * (0.0 if _w3d != null else 1.0)
 	scale = Vector2(z, z)
-	if u > 0.7 and _trail.size() > 0 and bounce < 0.004 and RngService.cosmetic().randf() < 0.08:
+	if not muted and u > 0.7 and _trail.size() > 0 and bounce < 0.004 and RngService.cosmetic().randf() < 0.08:
 		AudioBus.play("ball_bounce", 1.0 + RngService.cosmetic().randf_range(-0.1, 0.2))
 	var p: Vector2 = to_screen(_ball_angle, radius() * _ball_radius)
 	_trail.push_front(p)
@@ -209,7 +285,11 @@ func _update_ball(dt: float) -> void:
 		_ball_resting = true
 		_trail.clear()
 		flash_pocket(_ball_landing)
-		AudioBus.play("ball_land")
+		_ball_bounce = 0.0
+		if _w3d != null:
+			_w3d.land_flash()
+		if not muted:
+			AudioBus.play("ball_land")
 		create_tween().tween_property(self, "scale", Vector2.ONE, 0.6).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 		ball_settled.emit(_ball_landing)
 
@@ -234,6 +314,11 @@ func _gui_input(event: InputEvent) -> void:
 
 
 func _index_at_point(p: Vector2) -> int:
+	if _w3d != null:
+		var hit: Vector2 = _w3d.pick(p)
+		if hit.x < POCKET_INNER or hit.x > POCKET_OUTER:
+			return -1
+		return index_at_angle(hit.y)
 	var d: Vector2 = p - center()
 	d.y /= TILT
 	var r: float = d.length() / maxf(radius(), 1.0)
@@ -249,11 +334,18 @@ func _get_tooltip(at_position: Vector2) -> String:
 	return PocketInfo.describe(wheel.at(i), db, probabilities[i] if i < probabilities.size() else -1.0)
 
 
+## Infobulle illustrée (PocketCard) à la place du texte brut.
+func _make_custom_tooltip(_for_text: String) -> Object:
+	if hover_index < 0 or wheel == null or db == null or hover_index >= wheel.size():
+		return null
+	return PocketCard.build(wheel.at(hover_index), db, probabilities[hover_index] if hover_index < probabilities.size() else -1.0)
+
+
 # --------------------------------------------------------------------------- dessin
 
 
 func _draw() -> void:
-	if wheel == null:
+	if wheel == null or _w3d != null:
 		return
 	var c: Vector2 = center()
 	var r: float = radius()
@@ -292,11 +384,12 @@ func _draw() -> void:
 			_draw_type_icon(i, p, r)
 		if p.seal != &"":
 			draw_circle(to_screen(a0 + span * 0.5, r * (POCKET_INNER + 0.04)), r * 0.016, PocketInfo.seal_color(p.seal))
-	# Zone de visée
-	if aiming:
+	# Zone de visée (qui suit la case figée pendant l'élan et le lâcher)
+	if aiming or locked_index >= 0:
+		var center_idx: int = aim_index if aiming else locked_index
 		var half: int = zone_width / 2
 		for o: int in range(-half, half + 1):
-			var ii: int = posmod(aim_index + o, n)
+			var ii: int = posmod(center_idx + o, n)
 			var a0z: float = rotation_angle + float(ii) * span - PI * 0.5
 			var zc: Color = Palette.CYAN
 			zc.a = 0.45 if o == 0 else 0.22
@@ -305,8 +398,9 @@ func _draw() -> void:
 				zc = Palette.GOLD_LIGHT
 				zc.a = 0.75
 			_draw_ring_sector(c, r * POCKET_OUTER, r * (POCKET_OUTER + 0.06), a0z, a0z + span, zc)
-		var tip: Vector2 = to_screen(-PI * 0.5, r * (POCKET_OUTER + 0.02))
-		draw_colored_polygon(PackedVector2Array([tip, tip + Vector2(-14, -30), tip + Vector2(14, -30)]), Palette.CYAN)
+		if aiming:
+			var tip: Vector2 = to_screen(-PI * 0.5, r * (POCKET_OUTER + 0.02))
+			draw_colored_polygon(PackedVector2Array([tip, tip + Vector2(-14, -30), tip + Vector2(14, -30)]), Palette.CYAN)
 	# Probabilités (Dr Khan / option)
 	if not probabilities.is_empty() and not _ball_active:
 		var pmax: float = 0.0

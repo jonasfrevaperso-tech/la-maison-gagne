@@ -4,8 +4,9 @@ des commandes). Schéma manette type Xbox 360 / Steam Deck :
 
   Menus      : croix / stick gauche = naviguer · A = valider · B = retour · LB/RB = onglets
                stick droit = défiler
-  Tapis      : croix / stick gauche = curseur · A = +1 jeton · B = −1 jeton · X = annuler
-               Y = répéter · LB/RB = paris intérieurs · L3 = effacer · RT = lancer / relâcher
+  Tapis      : croix / stick gauche = curseur par demi-case (centre = plein, bord = cheval,
+               coin = carré) · A = +1 jeton · B = −1 jeton · X = annuler
+               Y = répéter · LB/RB = taille de la mise · L3 = effacer · RT = lancer / relâcher
                LT = vitesse · View (Back) = grigris et Fortune · Menu (Start) = pause
   Animations : A ou B = passer
   Astuces    : A = compris · X = couper les conseils
@@ -25,15 +26,23 @@ PROJECT = ROOT / "project.godot"
 K = {
     "space": 32, "enter": 4194309, "kp_enter": 4194310, "escape": 4194305, "tab": 4194306,
     "f8": 4194339, "e": 69, "z": 90, "r": 82, "c": 67, "f": 70, "q": 81, "w": 87, "i": 73, "m": 77, "backspace": 4194308,
+    "left": 4194319, "up": 4194320, "right": 4194321, "down": 4194322,
 }
 # Boutons (JoyButton) et axes (JoyAxis).
-B = {"a": 0, "b": 1, "x": 2, "y": 3, "back": 4, "start": 6, "l3": 7, "r3": 8, "lb": 9, "rb": 10}
+B = {"a": 0, "b": 1, "x": 2, "y": 3, "back": 4, "start": 6, "l3": 7, "r3": 8, "lb": 9, "rb": 10,
+     "dpad_up": 11, "dpad_down": 12, "dpad_left": 13, "dpad_right": 14}
 AX = {"lt": 4, "rt": 5}
 
 ACTIONS: dict[str, dict] = {
     # Actions d'interface intégrées : réécrites pour ajouter la manette (absente par défaut en 4.7).
     "ui_accept": {"keys": ["enter", "kp_enter", "space"], "buttons": ["a"]},
     "ui_cancel": {"keys": ["escape"], "buttons": ["b"]},
+    # Directions : croix seulement. Le stick gauche est converti en appuis de croix avec
+    # répétition réglable (StickRepeater), sinon chaque micro-mouvement compterait.
+    "ui_left": {"keys": ["left"], "buttons": ["dpad_left"]},
+    "ui_right": {"keys": ["right"], "buttons": ["dpad_right"]},
+    "ui_up": {"keys": ["up"], "buttons": ["dpad_up"]},
+    "ui_down": {"keys": ["down"], "buttons": ["dpad_down"]},
     # Jeu
     "ui_spin": {"keys": ["space"], "axes": ["rt"]},
     "bet_place": {"keys": ["e"], "buttons": ["a"]},

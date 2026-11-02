@@ -3,15 +3,19 @@ extends SceneTree
 ## Usage : godot --headless --path . -s res://scripts/sim/sim_main.gd -- --runs=500 --bot=greedy
 ##         [--character=lea|all] [--risk=0] [--seed=1] [--out=user://dev/sim] [--quiet] [--report]
 ##         [--telemetry=user://dev/sim_telemetry]  (même format que la télémétrie joueur)
+##         [--throw-skill=0.8]  qualité moyenne du mini-jeu de lancer (écart-type THROW_SKILL_SD) ;
+##                              absent : lancer de référence (équilibre de la 1.2)
 
 const SECONDS_PER_SPIN: float = 20.0
 const SECONDS_PER_SHOP: float = 35.0
 const MAX_SPINS_PER_RUN: int = 400
 const MIN_OFFERS: int = 8
+const THROW_SKILL_SD: float = 0.15
 
 var opts: Dictionary = {
 	"runs": "100", "bot": "greedy", "character": "all", "risk": "0", "seed": "1", "out": "user://dev/sim", "quiet": "false", "report": "false"
 }
+var _skill_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 
 func _initialize() -> void:
@@ -20,6 +24,7 @@ func _initialize() -> void:
 			var kv: PackedStringArray = a.substr(2).split("=", true, 1)
 			opts[kv[0]] = kv[1] if kv.size() > 1 else "true"
 	_apply_overrides()
+	_skill_rng.seed = int(opts["seed"]) * 7 + 1
 	var db: ContentDB = ContentDB.shared()
 	var n: int = int(opts["runs"])
 	var chars: Array[String] = db.ids("characters") if opts["character"] == "all" else [String(opts["character"])]
@@ -49,6 +54,13 @@ func _initialize() -> void:
 		)
 	)
 	quit(0)
+
+
+## Qualité d'un lancer simulé : référence (neutre) ou tirage autour de --throw-skill.
+func _throw_skill() -> float:
+	if not opts.has("throw-skill"):
+		return ThrowSkill.NEUTRAL
+	return clampf(_skill_rng.randfn(float(opts["throw-skill"]), THROW_SKILL_SD), 0.0, 1.0)
 
 
 ## Surcharges de tuning pour les balayages : --set=run.tier_debts=[...];economy.start_money=6
@@ -85,7 +97,7 @@ func play_run(db: ContentDB, cid: String, risk: int, seed_value: int, bot_kind: 
 			RunState.Phase.BETTING:
 				bot.place_bets(ctl)
 				var pre: Dictionary = RunTelemetry.snapshot(run)
-				var out: RunController.SpinOutcome = ctl.spin(bot.aim(ctl))
+				var out: RunController.SpinOutcome = ctl.spin(bot.aim(ctl), _throw_skill())
 				if with_tel:
 					tel.append(RunTelemetry.spin(pre, ctl.run, out.ctx, SECONDS_PER_SPIN))
 					if out.deadline_won or out.deadline_failed:

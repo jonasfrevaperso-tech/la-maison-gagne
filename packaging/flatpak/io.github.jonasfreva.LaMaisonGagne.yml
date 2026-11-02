@@ -1,0 +1,30 @@
+# Flatpak de La Maison Gagne : empaquette l'export Linux de Godot (pck embarqué).
+# Construit par tools/build_release.sh (flatpak-builder puis build-bundle → build/flatpak/).
+app-id: io.github.jonasfreva.LaMaisonGagne
+runtime: org.freedesktop.Platform
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk
+command: la-maison-gagne
+finish-args:
+  - --share=ipc
+  - --socket=x11
+  - --socket=wayland
+  - --socket=pulseaudio
+  - --device=all # manettes (evdev) et GPU
+modules:
+  - name: la-maison-gagne
+    buildsystem: simple
+    build-commands:
+      - install -Dm755 LaMaisonGagne.x86_64 /app/bin/la-maison-gagne
+      - install -Dm644 io.github.jonasfreva.LaMaisonGagne.desktop /app/share/applications/io.github.jonasfreva.LaMaisonGagne.desktop
+      - install -Dm644 io.github.jonasfreva.LaMaisonGagne.metainfo.xml /app/share/metainfo/io.github.jonasfreva.LaMaisonGagne.metainfo.xml
+      - install -Dm644 io.github.jonasfreva.LaMaisonGagne.png /app/share/icons/hicolor/256x256/apps/io.github.jonasfreva.LaMaisonGagne.png
+    sources:
+      - type: file
+        path: ../../build/linux/LaMaisonGagne.x86_64
+      - type: file
+        path: io.github.jonasfreva.LaMaisonGagne.desktop
+      - type: file
+        path: io.github.jonasfreva.LaMaisonGagne.metainfo.xml
+      - type: file
+        path: io.github.jonasfreva.LaMaisonGagne.png

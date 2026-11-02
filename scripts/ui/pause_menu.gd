@@ -1,6 +1,6 @@
 class_name PauseMenu
 extends Overlay
-## Menu en cours de run : reprendre, options rapides, graine, abandon.
+## Menu en cours de run : reprendre, réglages (volumes, rythme, commandes), graine, abandon.
 
 
 func build() -> void:
@@ -14,6 +14,9 @@ func build() -> void:
 	var resume: Button = UiKit.button(tr("PAUSE_RESUME"), close)
 	resume.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	body.add_child(resume)
+	var settings_btn: Button = UiKit.button(tr("PAUSE_SETTINGS"), _settings)
+	settings_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	body.add_child(settings_btn)
 	var copy: Button = UiKit.button(tr("PAUSE_COPY_SEED"), _copy_seed)
 	copy.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	body.add_child(copy)
@@ -28,6 +31,13 @@ func build() -> void:
 	abandon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	body.add_child(abandon)
 	resume.call_deferred("grab_focus")
+
+
+## Réglages rapides par-dessus la pause (retour à la pause en les fermant).
+func _settings() -> void:
+	var qs: QuickSettings = QuickSettings.new()
+	qs.closed.connect(qs.queue_free)
+	add_child(qs)
 
 
 func _note() -> void:

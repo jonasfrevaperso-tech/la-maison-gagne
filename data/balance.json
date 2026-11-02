@@ -182,5 +182,35 @@
     "rare": 6,
     "legendary": 10,
     "cursed": 3
+  },
+  "throw_game": {
+    "_doc": "Mini-jeu de lancer (visée → élan → lâcher). Qualité q (0–1) : au-dessus de reference_quality, le contrôle gagne jusqu'à control_up (lancer parfait) ; en dessous, il perd jusqu'à control_down. Un lancer de référence équivaut au lancer de la 1.2 (bots, mode simplifié).",
+    "reference_quality": 0.65,
+    "power_weight": 0.55,
+    "power_period_seconds": 1.15,
+    "power_sweet_width_by_precision": [
+      0.14,
+      0.16,
+      0.18,
+      0.2,
+      0.22,
+      0.24,
+      0.26
+    ],
+    "power_perfect_ratio": 0.35,
+    "power_falloff": 2.2,
+    "power_auto_cycles": 3,
+    "release_seconds": 0.85,
+    "release_window_seconds": 0.2,
+    "release_perfect_seconds": 0.045,
+    "assist_slowdown": 1.4,
+    "assist_widen": 1.3,
+    "grade_thresholds": [
+      0.9,
+      0.7,
+      0.45
+    ],
+    "control_up": 0.1,
+    "control_down": 0.1
   }
 }

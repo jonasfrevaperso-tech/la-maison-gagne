@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.jonasfreva.LaMaisonGagne</id>
+  <name>La Maison Gagne</name>
+  <summary xml:lang="fr">Roguelite de roulette européenne</summary>
+  <summary>European roulette roguelite</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>LicenseRef-proprietary</project_license>
+  <developer id="io.github.jonasfreva">
+    <name>jonasfreva</name>
+  </developer>
+  <description>
+    <p>Pariez, visez, frappez : chaque lancer de bille est un petit jeu d'adresse. Améliorez la roue case par case, collectionnez des objets et remboursez la Maison avant l'échéance. Jeu de hasard simulé : monnaie fictive, aucun achat.</p>
+    <p>Bet, aim, strike: every ball throw is a small skill game. Upgrade the wheel pocket by pocket, collect items and pay the House back before the deadline. Simulated gambling: fictional money, no purchases.</p>
+  </description>
+  <launchable type="desktop-id">io.github.jonasfreva.LaMaisonGagne.desktop</launchable>
+  <content_rating type="oars-1.1">
+    <content_attribute id="social-chat">none</content_attribute>
+  </content_rating>
+  <supports>
+    <control>keyboard</control>
+    <control>pointing</control>
+    <control>gamepad</control>
+  </supports>
+  <releases>
+    <release version="1.3.0" date="2026-11-02"/>
+    <release version="1.2.0" date="2026-10-20"/>
+  </releases>
+</component>

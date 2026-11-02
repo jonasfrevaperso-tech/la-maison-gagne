@@ -4,9 +4,10 @@ extends Control
 ## PARIS → VISÉE → BILLE → (RELANCE ?) → SCORE → paris suivants / boutique / pacte / fin.
 ## Toute la logique passe par RunController ; cet écran ne fait que présenter et relayer.
 
-enum UiState { BETTING, AIMING, BALL, RETHROW, SCORING, OVERLAY, TARGETING }
+enum UiState { BETTING, AIMING, BALL, RETHROW, SCORING, OVERLAY, TARGETING, THROWING }
 
 const WHEEL_SIZE: Vector2 = Vector2(760, 640)
+const POCKET_CARD_GAP: float = 120.0
 const TABLE_SIZE: Vector2 = Vector2(1040, 360)
 const MARGIN: float = 28.0
 const HISTORY_SHOWN: int = 14
@@ -24,12 +25,14 @@ const HINT_ALPHA: float = 0.72
 const HUD_STRIP_H: float = 120.0
 const BAR_CAPTION_Y: float = 30.0
 ## États dont l'aide commence par une phrase d'explication.
-const HINT_SENTENCES: Array[String] = ["AIMING", "RETHROW", "TARGETING"]
+const HINT_SENTENCES: Array[String] = ["AIMING", "RETHROW", "TARGETING", "THROWING"]
 
 var ctl: RunController = null
 var state: UiState = UiState.BETTING
 
 var wheel_view: WheelView = null
+## Mini-jeu du lancer (élan, lâcher), par-dessus la roue.
+var throw_game: ThrowMinigame = null
 var table_view: TableView = null
 var score_panel: ScorePanel = null
 var debt_gauge: DebtGauge = null
@@ -72,6 +75,8 @@ var _grigri_caption: Label = null
 var _fortune_caption: Label = null
 ## Commandes (souris, clavier, manette) selon l'état : RunScreenInput.
 var _input_ctl: RunScreenInput = null
+var _throw: RunScreenThrow = null
+var _pocket_card: PanelContainer = null
 var _bg: DecoBackground = null
 
 
@@ -84,6 +89,7 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	ctl = GameState.controller
 	_input_ctl = RunScreenInput.new(self)
+	_throw = RunScreenThrow.new(self)
 	_build()
 	EventBus.juice_shake.connect(_on_shake)
 	EventBus.juice_flash.connect(_on_flash)
@@ -145,6 +151,13 @@ func _build() -> void:
 	wheel_view.ball_settled.connect(_on_ball_settled)
 	wheel_view.pocket_clicked.connect(_on_pocket_clicked)
 	_stage.add_child(wheel_view)
+	throw_game = ThrowMinigame.new()
+	throw_game.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	throw_game.position = wheel_view.position
+	throw_game.size = WHEEL_SIZE
+	throw_game.finished.connect(func(q: float) -> void: _throw.on_quality(q))
+	throw_game.hold = func() -> bool: return tutorial != null and tutorial.blocking()
+	_stage.add_child(throw_game)
 	_history_box = HBoxContainer.new()
 	_history_box.position = Vector2(MARGIN, 150 + WHEEL_SIZE.y + 6)
 	_history_box.add_theme_constant_override("separation", 4)
@@ -281,6 +294,12 @@ func _refresh_all() -> void:
 func _refresh_budget() -> void:
 	var r: RunState = ctl.run
 	_budget_label.text = tr("HUD_BUDGET") % [r.slip.total(), r.slip.budget]
+	if table_view != null and table_view.bet_amount > 1:
+		_budget_label.text += InputGlyphs.SEP + tr("HUD_AMOUNT") % table_view.bet_amount
+
+
+func _refresh_amount() -> void:
+	_refresh_budget()
 
 
 func _refresh_table() -> void:
@@ -302,8 +321,13 @@ func _refresh_table() -> void:
 func _refresh_buttons() -> void:
 	var r: RunState = ctl.run
 	var betting: bool = state == UiState.BETTING
-	_spin_btn.disabled = not (betting and ctl.can_spin()) and state != UiState.AIMING
-	_spin_btn.text = tr("BTN_RELEASE") if state == UiState.AIMING else tr("BTN_SPIN")
+	var throwing: bool = state == UiState.AIMING or state == UiState.THROWING
+	_spin_btn.disabled = not (betting and ctl.can_spin()) and not throwing
+	_spin_btn.text = tr("BTN_SPIN")
+	if state == UiState.AIMING:
+		_spin_btn.text = tr("BTN_RELEASE") if RunScreenThrow.simple_throw() else tr("BTN_AIM_LOCK")
+	elif state == UiState.THROWING:
+		_spin_btn.text = tr("BTN_STRIKE")
 	_undo_btn.disabled = not betting or r.slip.history.is_empty()
 	_repeat_btn.disabled = not betting or r.last_layout.is_empty()
 	_clear_btn.disabled = not betting or r.slip.is_empty()
@@ -662,71 +686,18 @@ func _on_spin_pressed() -> void:
 			_set_state(UiState.AIMING)
 			tutorial.notify("aiming")
 		UiState.AIMING:
-			_release_throw()
-
-
-func _release_throw() -> void:
-	var target: int = wheel_view.stop_aim()
-	GameState.log_input({"t": "throw", "target": target, "ms": Time.get_ticks_msec()})
-	var tr_res: ThrowResolver.ThrowResult
-	if has_meta("rethrowing"):
-		remove_meta("rethrowing")
-		tr_res = ctl.rethrow(target)
-	else:
-		tr_res = ctl.throw_ball(target)
-	_start_ball(tr_res)
-
-
-func _start_ball(tr_res: ThrowResolver.ThrowResult) -> void:
-	AudioBus.play("ball_launch")
-	wheel_view.play_throw(tr_res.landing_index, _predict_near_miss(tr_res.landing_index))
-	_set_state(UiState.BALL)
-
-
-func _predict_near_miss(landing: int) -> bool:
-	var covered: Dictionary = {}
-	for spot_id: String in ctl.run.slip.order:
-		var s: BetSpot = BetCatalog.get_spot(spot_id)
-		if not s.outside:
-			for n: int in s.numbers:
-				covered[n] = true
-	if covered.has(ctl.run.wheel.at(landing).number):
-		return true  # suspense aussi quand on gagne
-	for ni: int in ctl.run.wheel.neighbors(landing, 1):
-		if covered.has(ctl.run.wheel.at(ni).number):
-			return true
-	return false
+			_throw.release()
+		UiState.THROWING:
+			throw_game.press()
 
 
 func _on_ball_settled(landing: int) -> void:
-	_announce_throw(ctl.pending_throw, landing)
+	_throw.announce(ctl.pending_throw, landing)
 	tutorial.notify("ball")
 	if ctl.can_rethrow():
 		_set_state(UiState.RETHROW)
 	else:
 		_commit()
-
-
-## Lecture du lancer pour le joueur : dans la zone, rebond fou, aimanté, collé.
-func _announce_throw(t: ThrowResolver.ThrowResult, landing: int) -> void:
-	if t == null:
-		return
-	var key: String = "THROW_IN_ZONE"
-	var col: Color = Palette.CYAN
-	if t.stuck:
-		key = "THROW_STUCK"
-		col = Palette.GOLD_LIGHT
-	elif t.attracted_from >= 0:
-		key = "THROW_ATTRACTED"
-		col = Palette.GOLD_LIGHT
-	elif not t.in_zone:
-		key = "THROW_WILD"
-		col = Palette.MAGENTA
-	elif landing == t.target_index:
-		key = "THROW_PERFECT"
-		col = Palette.EMERALD
-	var pos: Vector2 = UiLayout.canvas_point(wheel_view, wheel_view.pocket_screen_pos(landing)) + Vector2(0, -60)
-	float_layer.pop_text(tr(key), pos, col, UiKit.SIZE_BODY)
 
 
 func _on_rethrow() -> void:
@@ -777,6 +748,7 @@ func _on_score_finished(_total: int) -> void:
 		return
 	if out.deadline_won:
 		AudioBus.play("deadline_won")
+		float_layer.burst_3d(UiLayout.canvas_point(_stage, Vector2(UiLayout.DESIGN_SIZE.x * 0.5, 120)), JuiceProfile.COINS_3D_DEADLINE, true)
 		EventBus.subtitle.emit(tr("SUB_DEADLINE_WON"))
 		if bool(ctl.run.flags.get("act_changed", false)):
 			var outro: String = "act%d_creditor_won" % (ctl.run.act() - 1)
@@ -904,11 +876,30 @@ func _on_fortune_activated(card: GrigriCard) -> void:
 		_use_fortune(slot, -1)
 
 
+## Fiche illustrée d'une case (ciblage à la manette), placée à côté de la case, hors de la roue.
+func show_pocket_card(index: int) -> void:
+	if _pocket_card != null and is_instance_valid(_pocket_card):
+		_pocket_card.queue_free()
+	_pocket_card = null
+	if index < 0:
+		return
+	var probs: Array[float] = wheel_view.probabilities
+	_pocket_card = PocketCard.build(ctl.run.wheel.at(index), ctl.db, probs[index] if index < probs.size() else -1.0)
+	_pocket_card.z_index = 5
+	_stage.add_child(_pocket_card)
+	var at: Vector2 = wheel_view.position + wheel_view.pocket_screen_pos(index)
+	var out: Vector2 = (at - (wheel_view.position + wheel_view.size * 0.5)).normalized()
+	var sz: Vector2 = _pocket_card.get_combined_minimum_size()
+	var pos: Vector2 = at + out * POCKET_CARD_GAP - sz * 0.5 + Vector2(sz.x * 0.5 * signf(out.x), 0.0)
+	_pocket_card.position = pos.clamp(Vector2(8, 8), UiLayout.DESIGN_SIZE - sz - Vector2(8, 8))
+
+
 func _on_pocket_clicked(index: int) -> void:
 	if state == UiState.TARGETING and _target_fortune_slot >= 0:
 		_use_fortune(_target_fortune_slot, index)
 		_target_fortune_slot = -1
 		wheel_view.hover_index = -1
+		show_pocket_card(-1)
 
 
 func _use_fortune(slot: int, index: int) -> void:

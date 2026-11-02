@@ -119,7 +119,7 @@ func _focus_first_offer() -> void:
 
 ## Menu (Start) / Échap : retour à la table.
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("pause_menu") and (_pack_box.get_child_count() == 0):
+	if GameInput.pressed(event, "pause_menu") and (_pack_box.get_child_count() == 0):
 		close()
 		get_viewport().set_input_as_handled()
 
