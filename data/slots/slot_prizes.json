@@ -29,13 +29,13 @@
    },
    {
     "op": "temp_xmult",
-    "v": 2
+    "v": 1.5
    }
   ],
-  "name_fr": "×2 et +6 Mult au prochain tour",
-  "name_en": "×2 and +6 Mult next spin",
-  "desc_fr": "×2 et +6 Mult au prochain tour",
-  "desc_en": "×2 and +6 Mult next spin"
+  "name_fr": "×1,5 et +6 Mult au prochain tour",
+  "name_en": "×1.5 and +6 Mult next spin",
+  "desc_fr": "×1,5 et +6 Mult au prochain tour",
+  "desc_en": "×1.5 and +6 Mult next spin"
  },
  {
   "id": "p_bell3",
@@ -112,13 +112,13 @@
   "do": [
    {
     "op": "temp_mult",
-    "v": 2
+    "v": 1
    }
   ],
-  "name_fr": "+2 Mult au prochain tour",
-  "name_en": "+2 Mult next spin",
-  "desc_fr": "+2 Mult au prochain tour",
-  "desc_en": "+2 Mult next spin"
+  "name_fr": "+1 Mult au prochain tour",
+  "name_en": "+1 Mult next spin",
+  "desc_fr": "+1 Mult au prochain tour",
+  "desc_en": "+1 Mult next spin"
  },
  {
   "id": "p_bell2",
@@ -191,13 +191,13 @@
   "do": [
    {
     "op": "temp_xmult",
-    "v": 1.5
+    "v": 1.25
    }
   ],
-  "name_fr": "×1,5 Mult au prochain tour",
-  "name_en": "×1.5 Mult next spin",
-  "desc_fr": "×1,5 Mult au prochain tour",
-  "desc_en": "×1.5 Mult next spin"
+  "name_fr": "×1,25 Mult au prochain tour",
+  "name_en": "×1.25 Mult next spin",
+  "desc_fr": "×1,25 Mult au prochain tour",
+  "desc_en": "×1.25 Mult next spin"
  },
  {
   "id": "p_seven4",
@@ -229,13 +229,13 @@
    },
    {
     "op": "temp_xmult",
-    "v": 3
+    "v": 2
    }
   ],
-  "name_fr": "×3 et +12 Mult au prochain tour",
-  "name_en": "×3 and +12 Mult next spin",
-  "desc_fr": "×3 et +12 Mult au prochain tour",
-  "desc_en": "×3 and +12 Mult next spin"
+  "name_fr": "×2 et +12 Mult au prochain tour",
+  "name_en": "×2 and +12 Mult next spin",
+  "desc_fr": "×2 et +12 Mult au prochain tour",
+  "desc_en": "×2 and +12 Mult next spin"
  },
  {
   "id": "p_bell4",
@@ -407,16 +407,16 @@
   "do": [
    {
     "op": "temp_xmult",
-    "v": 2
+    "v": 1.5
    },
    {
     "op": "temp_control",
     "v": 0.2
    }
   ],
-  "name_fr": "×2 Mult et +20 % de contrôle au prochain tour",
-  "name_en": "×2 Mult and +20% control next spin",
-  "desc_fr": "×2 Mult et +20 % de contrôle au prochain tour",
-  "desc_en": "×2 Mult and +20% control next spin"
+  "name_fr": "×1,5 Mult et +20 % de contrôle au prochain tour",
+  "name_en": "×1.5 Mult and +20% control next spin",
+  "desc_fr": "×1,5 Mult et +20 % de contrôle au prochain tour",
+  "desc_en": "×1.5 Mult and +20% control next spin"
  }
 ]

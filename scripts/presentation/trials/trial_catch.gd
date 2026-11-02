@@ -10,10 +10,12 @@ const TRAY_Y: float = 900.0
 const CHIP_R: float = 22.0
 const FIELD_X: Vector2 = Vector2(300.0, 1620.0)
 const FAKE: Color = Color("b03aff")
+const REACH_FRAC: float = 0.7
 
 var _x: float = 960.0
 var _chips: Array[Dictionary] = []
 var _spawn_t: float = 0.0
+var _last_good_x: float = (FIELD_X.x + FIELD_X.y) * 0.5
 var _good_total: int = 0
 var _caught: int = 0
 var _bad: int = 0
@@ -135,6 +137,12 @@ func _spawn() -> void:
 	var bad: bool = rng.randf() < p("bad_ratio")
 	var x: float = rng.randf_range(FIELD_X.x, FIELD_X.y)
 	var sp: float = lerpf(p("fall_speed_start"), p("fall_speed_end"), _progress()) / slow
+	if not bad:
+		# Jeton doré toujours atteignable depuis le précédent : une partie parfaite reste possible.
+		var gap: float = lerpf(p("spawn_start"), p("spawn_end"), _progress()) * slow
+		var reach: float = p("tray_speed") * gap * REACH_FRAC
+		x = clampf(x, _last_good_x - reach, _last_good_x + reach)
+		_last_good_x = x
 	_chips.append({"p": Vector2(x, 150.0), "v": sp, "bad": bad, "spin": rng.randf() * TAU})
 	if not bad:
 		_good_total += 1

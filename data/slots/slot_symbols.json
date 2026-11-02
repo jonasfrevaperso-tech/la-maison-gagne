@@ -37,7 +37,7 @@
  },
  {
   "id": "seven",
-  "weight": 9,
+  "weight": 7,
   "icon": "slot_seven",
   "name_fr": "Sept",
   "name_en": "Seven",
@@ -46,7 +46,7 @@
  },
  {
   "id": "diamond",
-  "weight": 5,
+  "weight": 4,
   "icon": "slot_diamond",
   "name_fr": "Diamant",
   "name_en": "Diamond",

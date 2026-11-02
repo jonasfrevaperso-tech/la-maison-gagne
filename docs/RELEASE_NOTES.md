@@ -1,3 +1,12 @@
+# Notes de version — 1.5.3 (correctif d'équilibrage)
+
+La machine à sous à quatre rouleaux de la 1.5.2 donnait trop : le bot expert gagnait 56 % des parties (cible 35–45 %, 45 % en 1.5.1).
+
+- Lots multiplicatifs réduits : brelan de cerises ×1,5 (au lieu de ×2) et +6 Mult, carré de cerises ×2 (au lieu de ×3) et +12 Mult, paire de cerises +1 Mult (au lieu de +2), paire de diamants ×1,25 (au lieu de ×1,5), carré de fers à cheval ×1,5 (au lieu de ×2).
+- 7 et diamant un peu plus rares sur les rouleaux.
+- Pluie de jetons plus juste : un jeton doré n'apparaît plus hors de portée du précédent (deux jetons aux deux bouts du tapis étaient impossibles à attraper ensemble) ; une partie parfaite est toujours possible.
+- Résultat : bot glouton ≈ 40 % (moyenne de 3 × 600 parties), bot expert 48 % (200 parties).
+
 # Notes de version — 1.5.2 « Lumières sur la table »
 
 ## Les épreuves en 3D

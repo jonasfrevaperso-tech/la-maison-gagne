@@ -168,3 +168,5 @@ Plan (chaque étape : code → tests → captures → corrections) :
 7. Docs, `tools/check.sh`, exports, tag v1.5.2, publication GitHub (release).
 
 Bilan 1.5.2 : les 7 étapes sont livrées. Onze épreuves en 3D (`Stage3D.use_3d`, caméra frontale calée au pixel), trois redessinées, 14 illustrations pixel art (`tools/gen_trial_art.py`) sur les cartons d'annonce ; machine à sous 3D à 4 rouleaux (arrêts lents, suspense, carrés) ; écran titre en 3D (salle abandonnée) avec résumé de partie et astuces. Bugs trouvés en test et corrigés : Fléchettes (appui immédiat = centre garanti), machine à sous bloquée si l'on martelait la touche pendant le tirage (accélération limitée à une fois par tirage), astuce de l'écran titre qui chevauchait la mention légale en 1920×1200 avec texte agrandi, test d'un bonus temporaire trop strict. `tools/check.sh` vert (92 tests, banc des 14 épreuves, interface 204 vues, campagne gagnée à la manette seule en 24 tours). Équilibrage : glouton 43,3 % (cible 35–45 %).
+
+Correctif 1.5.3 : rééquilibrage de la machine à sous (expert 56 % → 48 %, glouton ≈ 40 %), voir `docs/BALANCE.md`.

@@ -266,3 +266,14 @@ La machine à sous passe à quatre rouleaux avec deux symboles de plus (citron, 
 | glouton | 600 | **43,3 %** | 39,0 % |
 
 La hausse (+4,3 points) vient des lots de la machine à sous, plus variés et plus fréquents (paires à 4 rouleaux) ; elle reste dans la cible de 35–45 %, aucun réglage modifié. Correction qui touche l'adresse : aux Fléchettes, un appui immédiat ne tombe plus au centre (le banc des épreuves reste vert : bot ≥ 0,8, inactif ≤ 0,4 sur les 14 épreuves).
+
+### Correctif 1.5.3
+
+Mesure experte de la 1.5.2 : **56,0 %** (100 parties) — trop haut. La machine à sous pèse ≈ 17 points (glouton 25,8 % avec `slot.max_pulls=0`) ; le plafond de tirages et le seuil du « gros coup » n'ont pas d'effet mesurable, ce sont les lots ×Mult qui comptent. Réglages : brelan/carré/paire de cerises ×1,5 / ×2 / +1, paire de diamants ×1,25, carré de fers ×1,5 ; poids du 7 9 → 7, du diamant 5 → 4.
+
+| Bot | Graine | Parties | Victoire |
+|---|---|---|---|
+| glouton | 1 / 2 / 3 | 3 × 600 | 44,2 / 37,0 / 40,0 % (**40,4 %**) |
+| expert | 1 / 2 | 2 × 100 | 51,0 / 45,0 % (**48,0 %**, erreur type ≈ 3,5 points) |
+
+L'expert reste au niveau des versions précédentes (47,1 % en 1.5, 45,0 % en 1.5.1).

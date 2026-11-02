@@ -41,8 +41,8 @@ func test_temp_xmult_consumed() -> void:
 	SlotMachine.apply(c.run, c.db, c.db.get_entry("slot_prizes", "p_cherry3"))
 	c.place_bet("red", 1)
 	var out: RunController.SpinOutcome = c.spin(0)
-	check(out.ctx.mult_mul >= 2.0 - 0.0001, "×Mult temporaire appliqué")
-	check(float(c.run.flags.get("temp_xmult", 1.0)) != 2.0 or out.jackpot, "×Mult temporaire consommé (ou regagné au jackpot)")
+	check(out.ctx.mult_mul >= 1.5 - 0.0001, "×Mult temporaire appliqué")
+	check(float(c.run.flags.get("temp_xmult", 1.0)) != 1.5 or out.jackpot, "×Mult temporaire consommé (ou regagné au jackpot)")
 
 
 func test_total_never_overflows() -> void:
