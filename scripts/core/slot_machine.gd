@@ -17,6 +17,19 @@ static func is_jackpot(ctx: ScoreContext) -> bool:
 	return false
 
 
+## Nombre de tirages offerts par ce tour : plein gagnant ou « gros coup » (le tour solde à lui
+## seul l'échéance restante et pèse au moins `slot.big_win_debt_frac` de la dette) → selon la
+## qualité du lancer ; plus les tirages gratuits gagnés pendant le score (Sceau Cloche, grigris).
+## Consomme le compteur `slot_pulls`. Plafonné à `slot.max_pulls`.
+static func pulls(run: RunState, ctx: ScoreContext, quality: float, remaining_before: int) -> int:
+	var n: int = int(run.flags.get("slot_pulls", 0))
+	run.flags.erase("slot_pulls")
+	var big: bool = ctx.total >= remaining_before and float(ctx.total) >= float(run.debt) * Balance.f("slot.big_win_debt_frac")
+	if is_jackpot(ctx) or big:
+		n += ThrowSkill.slot_spins(quality)
+	return mini(n, Balance.i("slot.max_pulls"))
+
+
 ## Tire `spins` combinaisons et applique leurs gains. Retourne [{"reels": [ids], "prize": id}].
 static func play(run: RunState, db: ContentDB, spins: int) -> Array[Dictionary]:
 	var symbols: Array[Dictionary] = db.list("slot_symbols")

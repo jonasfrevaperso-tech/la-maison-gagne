@@ -113,6 +113,8 @@ const VARIABLES: Array[StringName] = [
 	&"seal_count",
 	&"landing_copies",
 	&"endless_tiers",
+	&"jackpots",
+	&"pocket_passes",
 ]
 const OPS: Array[StringName] = [
 	&"add_chips",
@@ -171,6 +173,8 @@ const OPS: Array[StringName] = [
 	&"add_fortune_slot",
 	&"next_debt_pct",
 	&"swap_pockets",
+	&"slot_pull",
+	&"temp_xmult",
 ]
 const MAX_DEPTH: int = 3
 const CMP_DEFAULT: String = ">="
@@ -520,6 +524,10 @@ static func var_value(name: StringName, env: EffectEnv, params: Dictionary = {})
 			return float(run.tier)
 		&"seal_count":
 			return float(run.wheel.count_with_seal())
+		&"jackpots":
+			return float(run.flags.get("jackpots", 0))
+		&"pocket_passes":
+			return float(ctx.pocket_pass) if ctx != null else 0.0
 		&"landing_copies":
 			return float(run.wheel.count_number(ctx.landing.number)) if ctx != null and ctx.landing != null else 0.0
 		&"endless_tiers":
@@ -652,6 +660,12 @@ static func apply(a: Dictionary, env: EffectEnv) -> void:
 		&"temp_mult":
 			run.flags["temp_mult"] = float(run.flags.get("temp_mult", 0.0)) + v
 			_emit(env, ScoreEvent.INFO, v, label if label != "" else "temp_mult")
+		&"slot_pull":
+			run.flags["slot_pulls"] = int(run.flags.get("slot_pulls", 0)) + int(v)
+			_emit(env, ScoreEvent.INFO, v, label if label != "" else "slot_pull")
+		&"temp_xmult":
+			run.flags["temp_xmult"] = float(run.flags.get("temp_xmult", 1.0)) * v
+			_emit(env, ScoreEvent.INFO, v, label if label != "" else "temp_xmult")
 		&"temp_control":
 			run.flags["temp_control"] = float(run.flags.get("temp_control", 0.0)) + v
 			_emit(env, ScoreEvent.INFO, v, label if label != "" else "temp_control")
@@ -743,9 +757,21 @@ static func apply(a: Dictionary, env: EffectEnv) -> void:
 				p4.seal = StringName(String(a.get("seal", "")))
 				_emit(env, ScoreEvent.TRANSFORM, float(p4.number), label)
 		&"add_random_seal":
+			# `seal` : sceau imposé (sinon au hasard) ; vise d'abord une case sans sceau.
 			var seals: Array[String] = env.db.ids("seals")
+			if a.has("seal"):
+				seals = [String(a["seal"])]
 			if not seals.is_empty():
-				var target: Pocket = run.wheel.at(run.rng.randi_range_in(RngStreams.EFFECTS, 0, run.wheel.size() - 1))
+				var free: Array[int] = []
+				for k: int in run.wheel.size():
+					if run.wheel.at(k).seal == &"":
+						free.append(k)
+				var idx: int = (
+					free[run.rng.randi_range_in(RngStreams.EFFECTS, 0, free.size() - 1)]
+					if not free.is_empty()
+					else run.rng.randi_range_in(RngStreams.EFFECTS, 0, run.wheel.size() - 1)
+				)
+				var target: Pocket = run.wheel.at(idx)
 				target.seal = StringName(seals[run.rng.randi_range_in(RngStreams.EFFECTS, 0, seals.size() - 1)])
 				_emit(env, ScoreEvent.TRANSFORM, float(target.number), label)
 		&"upgrade_pocket":

@@ -40,7 +40,7 @@ const CAM_LAND_PUNCH: float = 0.06
 const CAM_SWAY: float = 0.8
 
 ## Débordement du rendu 3D autour du cadre de la roue (px de maquette).
-const BLEED: float = 110.0
+const BLEED: float = 280.0
 
 var wheel: WheelModel = null
 var db: ContentDB = null

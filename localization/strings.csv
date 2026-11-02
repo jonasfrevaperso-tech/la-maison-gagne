@@ -552,3 +552,27 @@ TRIAL_SHAKER_TIP,"Trop mou, ça retombe. Trop fort, ça déborde.",Too soft and 
 OPT_TM_QUICK,Rapide (1 épreuve),Quick (1 trial)
 CUTSCENE_HOLD_SKIP,Maintiens une touche pour passer,Hold any button to skip
 MENU_PROLOGUE,Prologue,Prologue
+FX_SLOT_PULL,Tirage offert !,Free pull!
+FX_TEMP_XMULT,×Mult au prochain tour,×Mult next spin
+CELEB_MASSIVE,COLOSSAL !,COLOSSAL!
+TRIAL_POUR_HINT,"Maintiens {confirm} pour verser, relâche avant le trait","Hold {confirm} to pour, release before the line"
+TRIAL_POUR_SPILL,Ça déborde !,Spilled!
+TRIAL_SIMON_HINT,Rejoue la mélodie avec {@qte},Play the melody back with {@qte}
+TRIAL_SIMON_HINT_MOUSE,Rejoue la mélodie en cliquant sur les touches,Play the melody back by clicking the keys
+TRIAL_SIMON_LISTEN,Écoute…,Listen…
+TRIAL_SIMON_PLAY,À toi : %d / %d,Your turn: %d / %d
+TRIAL_CATCH_HINT,{move} déplacer le plateau,{move} move the tray
+TRIAL_CATCH_HINT_MOUSE,Bouge {@mouse} pour déplacer le plateau,Move {@mouse} to move the tray
+TRIAL_CATCH_FAKE,Fausse pièce !,Fake coin!
+TRIAL_CATCH_STATUS,Jetons %d / %d · fausses pièces %d,Chips %d / %d · fakes %d
+TRIAL_HIGHLOW_HINT,{ui_up} plus haut · {ui_down} plus bas,{ui_up} higher · {ui_down} lower
+TRIAL_HIGHLOW_HINT_MOUSE,{@click} plus haut · {@right_click} plus bas,{@click} higher · {@right_click} lower
+TRIAL_HIGHLOW_UP,▲ Plus haut,▲ Higher
+TRIAL_HIGHLOW_DOWN,▼ Plus bas,▼ Lower
+TRIAL_HIGHLOW_GOOD,Bon calcul,Good call
+TRIAL_HIGHLOW_BAD,Mauvais pari,Bad call
+TRIAL_SORT_HINT,"Trie avec {@qte} : rouge, vert, or, noir","Sort with {@qte}: red, green, gold, black"
+TRIAL_SORT_HINT_MOUSE,{@click} rouge · {@right_click} noir,{@click} red · {@right_click} black
+TRIAL_SORT_LEFT_CLICK,Clic G,L-click
+TRIAL_SORT_RIGHT_CLICK,Clic D,R-click
+TAG_JACKPOT,Jackpot,Jackpot

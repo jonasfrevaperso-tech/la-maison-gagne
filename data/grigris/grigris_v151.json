@@ -1,0 +1,332 @@
+[
+ {
+  "id": "g_groom_bell",
+  "rarity": "common",
+  "tags": [
+   "seal",
+   "jackpot"
+  ],
+  "icon": "g_groom_bell",
+  "sfx": "jackpot",
+  "name_fr": "Groom à clochette",
+  "name_en": "Bellhop's Bell",
+  "desc_fr": "Début d'échéance : pose un Sceau Cloche sur une case sans sceau.",
+  "desc_en": "Deadline start: puts a Bell Seal on an unsealed pocket.",
+  "flavor_fr": "« Vous avez sonné ? » Toujours.",
+  "flavor_en": "« You rang? » Always.",
+  "effects": [
+   {
+    "trigger": "on_deadline_start",
+    "do": [
+     {
+      "op": "add_random_seal",
+      "seal": "seal_bell"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_lucette_photo",
+  "rarity": "rare",
+  "tags": [
+   "growth",
+   "xmult",
+   "jackpot"
+  ],
+  "icon": "g_lucette_photo",
+  "sfx": "grow",
+  "name_fr": "Photo dédicacée de Lucette",
+  "name_en": "Signed Photo of Lucette",
+  "desc_fr": "×Mult qui gagne +0,2 à chaque jackpot (départ ×1).",
+  "desc_en": "×Mult that gains +0.2 on every jackpot (starts ×1).",
+  "flavor_fr": "« À mon joueur préféré. Bisous, L. »",
+  "flavor_en": "« To my favourite player. Kisses, L. »",
+  "effects": [
+   {
+    "trigger": "on_jackpot",
+    "do": [
+     {
+      "op": "counter_add",
+      "v": 0.2
+     }
+    ]
+   },
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": {
+       "var": "counter",
+       "add": 1
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_pocket_slot",
+  "rarity": "common",
+  "tags": [
+   "jackpot",
+   "bets"
+  ],
+  "icon": "g_pocket_slot",
+  "sfx": "chime",
+  "name_fr": "Machine à sous de poche",
+  "name_en": "Pocket Slot Machine",
+  "desc_fr": "1 chance sur 3 : un tirage de machine à sous quand un pari Cheval gagne.",
+  "desc_en": "1 in 3: a slot pull when a Split bet wins.",
+  "flavor_fr": "Elle tient dans la main et mange les pièces quand même.",
+  "flavor_en": "Fits in your hand and still eats coins.",
+  "effects": [
+   {
+    "trigger": "on_bet_win",
+    "if": [
+     {
+      "c": "bet_kind",
+      "v": "split"
+     },
+     {
+      "c": "chance",
+      "v": 0.33
+     }
+    ],
+    "do": [
+     {
+      "op": "slot_pull",
+      "v": 1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_jackpot_tokens",
+  "rarity": "rare",
+  "tags": [
+   "mult",
+   "jackpot"
+  ],
+  "icon": "g_jackpot_tokens",
+  "sfx": "chime",
+  "name_fr": "Jetons commémoratifs",
+  "name_en": "Commemorative Tokens",
+  "desc_fr": "+3 Mult par jackpot obtenu dans la partie.",
+  "desc_en": "+3 Mult per jackpot hit this run.",
+  "flavor_fr": "Frappés pour chaque victoire. La Maison en a très peu.",
+  "flavor_en": "Minted for every win. The House has very few.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "add_mult",
+      "v": {
+       "var": "jackpots",
+       "mul": 3
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_coin_bucket",
+  "rarity": "common",
+  "tags": [
+   "money",
+   "jackpot"
+  ],
+  "icon": "g_coin_bucket",
+  "sfx": "coins",
+  "name_fr": "Seau à pièces",
+  "name_en": "Coin Bucket",
+  "desc_fr": "+4 $ à chaque jackpot.",
+  "desc_en": "+4 $ on every jackpot.",
+  "flavor_fr": "Le fond est troué. Exprès.",
+  "flavor_en": "The bottom has a hole. On purpose.",
+  "effects": [
+   {
+    "trigger": "on_jackpot",
+    "do": [
+     {
+      "op": "add_money",
+      "v": 4
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_double_down",
+  "rarity": "legendary",
+  "tags": [
+   "growth",
+   "xmult"
+  ],
+  "icon": "g_double_down",
+  "sfx": "grow",
+  "name_fr": "Quitte ou double",
+  "name_en": "Double or Nothing",
+  "desc_fr": "×Mult qui double à chaque tour où un pari gagne (jusqu'à ×32) ; retombe à ×1 sur un tour sans gain.",
+  "desc_en": "×Mult that doubles each spin with a winning bet (up to ×32); falls back to ×1 on a spin with no win.",
+  "flavor_fr": "Vic l'a gagné, perdu, regagné, reperdu…",
+  "flavor_en": "Vic won it, lost it, won it, lost it…",
+  "effects": [
+   {
+    "trigger": "on_acquire",
+    "do": [
+     {
+      "op": "counter_set",
+      "v": 1
+     }
+    ]
+   },
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": {
+       "var": "counter",
+       "min": 1
+      }
+     }
+    ]
+   },
+   {
+    "trigger": "on_round_end",
+    "if": [
+     {
+      "c": "won_nothing"
+     }
+    ],
+    "do": [
+     {
+      "op": "counter_set",
+      "v": 1
+     }
+    ]
+   },
+   {
+    "trigger": "on_round_end",
+    "if": [
+     {
+      "c": "not",
+      "x": {
+       "c": "won_nothing"
+      }
+     },
+     {
+      "c": "counter",
+      "op": "<",
+      "v": 32
+     }
+    ],
+    "do": [
+     {
+      "op": "counter_mul",
+      "v": 2
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_chain_reaction",
+  "rarity": "rare",
+  "tags": [
+   "xmult",
+   "retrigger"
+  ],
+  "icon": "g_chain_reaction",
+  "sfx": "double",
+  "name_fr": "Réaction en chaîne",
+  "name_en": "Chain Reaction",
+  "desc_fr": "×0,35 Mult de plus pour chaque fois que la case touchée compte à nouveau (relances).",
+  "desc_en": "+×0.35 Mult for every extra time the landing pocket scores (retriggers).",
+  "flavor_fr": "Un domino, puis tous les autres.",
+  "flavor_en": "One domino, then all the others.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": {
+       "var": "pocket_passes",
+       "mul": 0.35,
+       "add": 0.65,
+       "min": 1
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_bell_choir",
+  "rarity": "rare",
+  "tags": [
+   "xmult",
+   "seal"
+  ],
+  "icon": "g_bell_choir",
+  "sfx": "chime",
+  "name_fr": "Chorale de clochettes",
+  "name_en": "Bell Choir",
+  "desc_fr": "×Mult = 1 + 0,2 par case scellée sur la roue.",
+  "desc_en": "×Mult = 1 + 0.2 per sealed pocket on the wheel.",
+  "flavor_fr": "Chaque sceau chante sa note.",
+  "flavor_en": "Every seal sings its note.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": {
+       "var": "seal_count",
+       "mul": 0.2,
+       "add": 1
+      }
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "g_compound_interest",
+  "rarity": "rare",
+  "tags": [
+   "xmult",
+   "money"
+  ],
+  "icon": "g_compound_interest",
+  "sfx": "coins",
+  "name_fr": "Intérêts composés",
+  "name_en": "Compound Interest",
+  "desc_fr": "×Mult = 1 + 0,1 par tranche de 10 $ en poche.",
+  "desc_en": "×Mult = 1 + 0.1 per $10 in your pocket.",
+  "flavor_fr": "Le Comptable en a pleuré de jalousie.",
+  "flavor_en": "The Accountant wept with envy.",
+  "effects": [
+   {
+    "trigger": "on_score_calc",
+    "do": [
+     {
+      "op": "mul_mult",
+      "v": {
+       "var": "money",
+       "mul": 0.01,
+       "add": 1
+      }
+     }
+    ]
+   }
+  ]
+ }
+]

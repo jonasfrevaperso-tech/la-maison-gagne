@@ -152,5 +152,32 @@
     ]
    }
   ]
+ },
+ {
+  "id": "seal_bell",
+  "name_fr": "Sceau Cloche",
+  "name_en": "Bell Seal",
+  "desc_fr": "Un tirage gratuit de machine à sous quand la bille tombe ici.",
+  "desc_en": "A free slot machine pull when the ball lands here.",
+  "flavor_fr": "Lucette l'entend sonner depuis l'autre bout de la salle.",
+  "flavor_en": "Lucette can hear it ring from across the room.",
+  "icon": "seal_bell",
+  "sfx": "jackpot",
+  "effects": [
+   {
+    "trigger": "on_seal",
+    "if": [
+     {
+      "c": "first_pass"
+     }
+    ],
+    "do": [
+     {
+      "op": "slot_pull",
+      "v": 1
+     }
+    ]
+   }
+  ]
  }
 ]

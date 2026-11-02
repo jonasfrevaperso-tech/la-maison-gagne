@@ -421,9 +421,12 @@ func _finish_spin(ctx: ScoreContext, out: SpinOutcome) -> void:
 	)
 	# Jackpot : la machine à sous est résolue avant le bilan de l'échéance (un tour offert compte).
 	var spins_before: int = run.spins_left
-	if SlotMachine.is_jackpot(ctx):
+	var quality: float = out.throw_result.skill if out.throw_result != null else -1.0
+	var remaining_before: int = run.debt - (run.deadline_score - ctx.total)
+	var pulls: int = SlotMachine.pulls(run, ctx, quality, remaining_before)
+	if pulls > 0:
 		out.jackpot = true
-		out.slot = SlotMachine.play(run, db, ThrowSkill.slot_spins(out.throw_result.skill if out.throw_result != null else -1.0))
+		out.slot = SlotMachine.play(run, db, pulls)
 		run.flags["jackpots"] = int(run.flags.get("jackpots", 0)) + 1
 		EffectRunner.fire(&"on_jackpot", run, null, db)
 	_update_creditor_phase()

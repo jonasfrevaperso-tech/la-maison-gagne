@@ -40,6 +40,12 @@
 - ✅ Histoire densifiée : scènes d'interlude, premières rencontres, répliques propres à chaque personnage.
 - ✅ Corrections d'interface (fiche de pari manette, Bazar en 800p, paquets, roue 3D non coupée, jackpot avant le Bazar) et contrôle automatique sur 6 définitions.
 
+## 1.5.1 — Faites chauffer la machine ✅
+- ✅ Machine à sous plus fréquente et fiable (gros coups, Sceau Cloche, tirages gratuits), refaite graphiquement.
+- ✅ 14 épreuves (5 nouvelles), épreuves durcies, visée plus lente.
+- ✅ Super builds : ×Mult croissants, nombres abrégés, Mult en feu ; courbe de dettes façon Balatro.
+- ✅ Dépôt GitHub public et releases.
+
 ## 1.6 — Pistes
 - Glyphes Steam Deck et PlayStation au choix (le Deck accepte déjà les glyphes Xbox).
 - Classement partagé de la Course de graine (export/import d'un fichier de résultats, sans serveur).

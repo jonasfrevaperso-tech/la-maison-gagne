@@ -1,3 +1,31 @@
+# Notes de version — 1.5.1 « Faites chauffer la machine »
+
+## La machine à sous tourne plus souvent
+- **Plus aucun jackpot perdu** : « JACKPOT ! » s'affiche seulement quand la machine se lance, et elle se lance aussi sur un **coup énorme qui solde l'échéance** d'un seul tir, y compris juste avant une fin de session. Sinon, la célébration devient « COLOSSAL ! ».
+- **Sceau Cloche** : une case scellée offre un **tirage gratuit** quand la bille s'y arrête. Posé par la fortune *Cordon de sonnette*, le grigri *Groom à clochette*, et par le brelan de cloches de la machine.
+- **Nouveaux gains** : symbole Diamant (brelan = un grigri rare + 5 $, paire = ×1,5 Mult au tour suivant), brelan de cerises = Mult +6 **et ×2**, brelan de cloches = argent + Sceau Cloche.
+- **Machine refaite** : rayons de lumière tournants, laque à bandes, chenillards lumineux, rivets, Lucette qui cligne des yeux (et a des cœurs dans les yeux quand tu gagnes), bac à pièces où les gains tombent et s'empilent, gerbes d'étincelles.
+
+## Le lancer : 14 épreuves
+- **Cinq nouvelles** : **Le Verre parfait** (verser jusqu'au trait, la mousse monte encore après), **Le Juke-box** (rejouer une mélodie de lumières, en plein écran), **Pluie de jetons** (attraper les jetons dorés, éviter les fausses pièces, en plein écran), **Plus haut, plus bas** (le bon calcul compte, pas la chance), **Tri des jetons** (tapis roulant qui accélère).
+- **Plus exigeantes** : Bonneteau en 3 manches avec 4 gobelets au dernier tour et plus de mélanges ; Mémoire à 6 paires ; Effet à 20 notes ; Bouteilles, Fléchettes, Coffre-fort, Tour de jetons et Shaker resserrés ; fenêtres du lâcher réduites.
+- **Visée plus lente** : le curseur de choix de la case parcourt la roue plus lentement, on vise plus facilement la case voulue.
+- Mémoire des cartes : les symboles s'affichent (plus de carrés blancs).
+
+## Super builds
+- **9 nouveaux grigris** autour du jackpot et du ×Mult : *Quitte ou double* (×Mult qui double à chaque tour gagnant jusqu'à ×32), *Réaction en chaîne*, *Chorale de clochettes*, *Intérêts composés*, *Photo dédicacée de Lucette*, *Jetons commémoratifs*, *Seau à pièces*, *Machine à sous de poche*, *Groom à clochette*.
+- **Grands nombres** : au-delà de 100 000, affichage abrégé (« 12,3 M », « 4,56 Md » ; en anglais « 12.3M », « 4.56B »), puis notation scientifique.
+- **Mult en feu** : plus le Mult (et les Jetons) grimpe, plus sa case tremble, se dore puis change de couleur, et s'embrase.
+
+## Difficulté façon Balatro
+Premiers paliers plus doux (180 au lieu de 240), fin de partie bien plus exigeante (37 000 au dernier palier au lieu de 21 000) : il faut construire un vrai moteur. Bot glouton 39,0 %, bot expert 45,0 % (cible 35–45 %). Détails : `docs/BALANCE.md`.
+
+## Corrections
+- Roue 3D : plus jamais coupée par la barre des grigris (marge de rendu agrandie).
+- Bazar à la manette : le bouton Contrat est atteignable même quand le paquet de droite est vendu (les boutons désactivés sont enjambés).
+- Barre d'invites qui chevauchait « FORTUNE » avec une grande taille de texte.
+- La fiche de pari ne s'affiche plus par-dessus la machine à sous.
+
 # Notes de version — 1.5.0 « Grande Ouverture »
 
 ## Un prologue

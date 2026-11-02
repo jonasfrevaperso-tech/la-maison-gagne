@@ -11,6 +11,8 @@ var grigri_bar: GrigriBar = null
 var wheel_view: WheelView = null
 var table_view: TableView = null
 var debt_remaining: int = 1
+## Ce tour déclenche la machine à sous : « JACKPOT ! » n'est affiché que dans ce cas.
+var jackpot: bool = false
 
 var _skip: bool = false
 var _playing: bool = false
@@ -171,12 +173,17 @@ func _play_total(total: int) -> void:
 	for i: int in JuiceProfile.CELEBRATION_TIERS.size():
 		if ratio >= JuiceProfile.CELEBRATION_TIERS[i]:
 			tier = i
+	if jackpot:
+		tier = maxi(tier, 2)
 	await _wait(count_time)
 	if tier >= 0:
 		var center: Vector2 = UiLayout.canvas_point(score_panel, score_panel.size * 0.5) + Vector2(0, 120)
 		var sizes: Array[int] = [UiKit.SIZE_H2, UiKit.SIZE_H1, UiKit.SIZE_TITLE, UiKit.SIZE_TITLE]
+		var key: String = JuiceProfile.CELEBRATION_KEYS[tier]
+		if key == "CELEB_JACKPOT" and not jackpot:
+			key = "CELEB_MASSIVE"
 		float_layer.pop_text(
-			tr(JuiceProfile.CELEBRATION_KEYS[tier]),
+			tr(key),
 			center,
 			[Palette.EMERALD, Palette.CYAN, Palette.GOLD_LIGHT, Palette.MAGENTA][tier],
 			sizes[tier]
@@ -188,8 +195,9 @@ func _play_total(total: int) -> void:
 		if tier >= 2:
 			EventBus.juice_hitstop.emit(JuiceProfile.HITSTOP_MAX * float(tier - 1) * 0.5)
 			EventBus.juice_flash.emit(Palette.GOLD_LIGHT, 0.3 * float(tier - 1))
-			AudioBus.play("jackpot")
-			EventBus.subtitle.emit(tr("SUB_JACKPOT"))
+			AudioBus.play("jackpot" if jackpot else "celebrate")
+			if jackpot:
+				EventBus.subtitle.emit(tr("SUB_JACKPOT"))
 		else:
 			AudioBus.play("celebrate")
 		await _wait(JuiceProfile.step_time() * 2.0)

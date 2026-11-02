@@ -689,6 +689,7 @@ func _commit() -> void:
 	GameState.record_spin(outcome)
 	table_view.flash_winners(outcome.ctx.landing_numbers)
 	presenter.debt_remaining = maxi(ctl.run.debt - (ctl.run.deadline_score - outcome.ctx.total), 1)
+	presenter.jackpot = outcome.jackpot
 	# La logique a déjà avancé : on fige l'affichage (mises posées, jauge) le temps du score.
 	var shown: BetSlip = BetSlip.new()
 	shown.budget = 1 << 20
@@ -776,6 +777,9 @@ func _on_victory_closed() -> void:
 
 func _show_overlay(o: Control, on_closed: Callable = Callable()) -> void:
 	state = UiState.OVERLAY
+	# Fiches flottantes (pari, case) : jamais par-dessus une surcouche.
+	_cards.hide_bet()
+	_cards.show_pocket(-1)
 	overlay_root.mouse_filter = Control.MOUSE_FILTER_STOP
 	overlay_root.add_child(o)
 	if o.has_signal("closed"):

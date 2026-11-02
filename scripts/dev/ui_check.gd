@@ -116,6 +116,17 @@ func _overlays(db: ContentDB) -> Array[Array]:
 		ShopModel.enter(pk.run, db)
 		pk.run.shop_state["open_pack"] = {"kind": kind, "choices": ShopModel.roll_pack_choices(pk.run, db, kind)}
 		out.append(["shop/pack_" + kind, ShopOverlay.new().configure(pk)])
+	# Paquets vendus / indisponibles : le contrat et le reste doivent rester atteignables.
+	for sold: Array in [[1], [0], [0, 1]]:
+		var sc: RunController = RunController.new(db)
+		sc.new_run("lea", 0, 22)
+		sc.run.money = 3
+		ShopModel.enter(sc.run, db)
+		var packs: Array = sc.run.shop_state.get("packs", [])
+		for k: Variant in sold:
+			if int(k) < packs.size():
+				(packs[int(k)] as Dictionary)["sold"] = true
+		out.append(["shop/sold_" + "_".join(sold.map(func(v: Variant) -> String: return str(v))), ShopOverlay.new().configure(sc)])
 	var dl_ctl: RunController = RunController.new(db)
 	dl_ctl.new_run("lea", 0, 5)
 	for did: String in ["act1_intro", "act2_intro", "finale"]:
@@ -176,7 +187,9 @@ func _in_scroll(c: Node, stop: Node) -> bool:
 	return false
 
 
-func _name(b: BaseButton) -> String:
+func _name(b: Control) -> String:
+	if b is GrigriCard:
+		return "carte %s" % (b as GrigriCard).entry_id
 	return (b as Button).text if b is Button and (b as Button).text != "" else String(b.name)
 
 
@@ -281,9 +294,12 @@ func _check_reach(node: Control, label: String) -> void:
 	for st: Control in starts:
 		_flood(st, reached)
 	var missing: int = 0
-	for b: Node in node.find_children("*", "BaseButton", true, false):
-		var btn: BaseButton = b as BaseButton
-		if not btn.is_visible_in_tree() or btn.disabled or btn.focus_mode == Control.FOCUS_NONE or reached.has(btn):
+	var targets: Array[Node] = node.find_children("*", "BaseButton", true, false)
+	targets.append_array(node.find_children("*", "GrigriCard", true, false))
+	for b: Node in targets:
+		var btn: Control = b as Control
+		var off: bool = btn is BaseButton and (btn as BaseButton).disabled
+		if not btn.is_visible_in_tree() or off or btn.focus_mode == Control.FOCUS_NONE or reached.has(btn):
 			continue
 		if _in_tab_hidden(btn, node):
 			continue
@@ -301,8 +317,13 @@ func _flood(start: Control, reached: Dictionary[Control, bool]) -> void:
 			continue
 		reached[c] = true
 		for side: Side in [SIDE_LEFT, SIDE_TOP, SIDE_RIGHT, SIDE_BOTTOM]:
+			# Comme PadNavigator : un bouton désactivé est enjambé dans la même direction.
 			var n: Control = c.find_valid_focus_neighbor(side)
-			if n != null and not reached.has(n):
+			var hops: int = 0
+			while n != null and n is BaseButton and (n as BaseButton).disabled and hops < 8:
+				n = n.find_valid_focus_neighbor(side)
+				hops += 1
+			if n != null and not reached.has(n) and not (n is BaseButton and (n as BaseButton).disabled):
 				todo.append(n)
 
 

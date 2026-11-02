@@ -301,6 +301,12 @@ func _run(rs: RunScreen) -> void:
 				_bets_this_spin += 1
 				var moves: Array[String] = ["RIGHT", "DOWN", "LEFT", "UP", "RB", "RIGHT", "LB"]
 				await _press(moves[_bets_this_spin % moves.size()])
+				# Créancier restrictif (ex. carrés seulement) : chercher à la croix une mise autorisée.
+				var sweep: Array[String] = ["RIGHT", "DOWN", "RIGHT", "UP"]
+				for k: int in 24:
+					if r.slip.check(rs.table_view.cursor_spot()) != BetSlip.PlaceResult.FORBIDDEN:
+						break
+					await _press(sweep[k % sweep.size()])
 				await _press("A")
 				if _bets_this_spin == 3:
 					await _press("B")  # retirer un jeton

@@ -2,11 +2,11 @@ class_name TrialShells
 extends ThrowTrial
 ## BONNETEAU (écran dédié) : un croupier fantôme cache la bille sous l'un de trois gobelets de
 ## cuivre et les mélange, de plus en plus vite. Suivre le bon gobelet et le désigner
-## (gauche / droite puis confirmer, ou cliquer). Deux manches ; le temps de réflexion est compté.
+## (gauche / droite puis confirmer, ou cliquer). Trois manches, la dernière avec un quatrième
+## gobelet ; le temps de réflexion est compté.
 
 enum Phase { SHOW, HIDE, SHUFFLE, PICK, REVEAL }
 
-const CUPS: int = 3
 const CUP: Vector2 = Vector2(190.0, 210.0)
 const TABLE_Y: float = 700.0
 const SPACING: float = 380.0
@@ -15,6 +15,7 @@ var _phase: Phase = Phase.SHOW
 var _round: int = 0
 ## Position (créneau 0..2) de chaque gobelet ; la bille est sous le gobelet _ball.
 var _slot: Array[int] = [0, 1, 2]
+var _cups: int = 3
 var _ball: int = 0
 var _swaps: Array[Vector2i] = []
 var _swap_i: int = 0
@@ -31,8 +32,11 @@ func begin() -> void:
 
 
 func _new_round() -> void:
-	_ball = rng.randi_range(0, CUPS - 1)
-	_slot = [0, 1, 2]
+	_cups = int(pk("cups", _round))
+	_ball = rng.randi_range(0, _cups - 1)
+	_slot.clear()
+	for k: int in _cups:
+		_slot.append(k)
 	_picked = -1
 	_phase = Phase.SHOW
 	_phase_t = 0.0
@@ -40,8 +44,8 @@ func _new_round() -> void:
 	_swaps.clear()
 	var n: int = int(pk("swaps", _round))
 	for k: int in n:
-		var a: int = rng.randi_range(0, CUPS - 1)
-		var b: int = (a + 1 + rng.randi_range(0, CUPS - 2)) % CUPS
+		var a: int = rng.randi_range(0, _cups - 1)
+		var b: int = (a + 1 + rng.randi_range(0, _cups - 2)) % _cups
 		_swaps.append(Vector2i(a, b))
 	_swap_i = 0
 	_swap_t = 0.0
@@ -52,7 +56,7 @@ func _swap_time() -> float:
 
 
 func _slot_x(s: float) -> float:
-	return size.x * 0.5 + (s - 1.0) * SPACING
+	return size.x * 0.5 + (s - float(_cups - 1) * 0.5) * SPACING
 
 
 ## Position animée du gobelet c (créneau courant, ou en plein échange).
@@ -97,14 +101,14 @@ func handle(event: InputEvent) -> bool:
 
 
 func _slot_at(pt: Vector2) -> int:
-	for s: int in CUPS:
+	for s: int in _cups:
 		if absf(pt.x - _slot_x(float(s))) < CUP.x * 0.6 and pt.y > TABLE_Y - CUP.y - 40.0 and pt.y < TABLE_Y + 40.0:
 			return s
 	return -1
 
 
 func move(dx: int) -> void:
-	_cursor = clampi(_cursor + dx, 0, CUPS - 1)
+	_cursor = clampi(_cursor + dx, 0, _cups - 1)
 	AudioBus.play("hover", 1.0, -8.0)
 
 
@@ -141,7 +145,7 @@ func tick(dt: float) -> void:
 			_swap_t += dt
 			if _swap_t >= _swap_time():
 				var sw: Vector2i = _swaps[_swap_i]
-				for c: int in CUPS:
+				for c: int in _cups:
 					if _slot[c] == sw.x:
 						_slot[c] = sw.y
 					elif _slot[c] == sw.y:
@@ -212,7 +216,7 @@ func paint() -> void:
 		var bp: Vector2 = Vector2(_slot_x(float(_slot[_ball])), TABLE_Y - 18.0)
 		draw_circle(bp, 20.0, Palette.IVORY)
 		draw_circle(bp + Vector2(-6, -6), 6.0, Color(1, 1, 1, 0.8))
-	for c: int in CUPS:
+	for c: int in _cups:
 		var lifted: float = _lift if (_phase != Phase.REVEAL or _slot[c] == _picked or _slot[c] == _slot[_ball]) else 0.0
 		_draw_cup(_cup_pos(c) + Vector2(0, -lifted * 150.0), _phase == Phase.PICK and _slot[c] == _cursor)
 	if _phase == Phase.PICK:

@@ -412,5 +412,29 @@
     ]
    }
   ]
+ },
+ {
+  "id": "f_bell_rope",
+  "target": "pocket",
+  "cost": 4,
+  "icon": "f_bell_rope",
+  "sfx": "jackpot",
+  "name_fr": "Cordon de sonnette",
+  "name_en": "Bell Pull",
+  "desc_fr": "Appose un Sceau Cloche sur une case : tirage de machine à sous gratuit quand la bille y tombe.",
+  "desc_en": "Puts a Bell Seal on a pocket: a free slot pull when the ball lands there.",
+  "flavor_fr": "Tirez. Lucette accourt.",
+  "flavor_en": "Pull it. Lucette comes running.",
+  "effects": [
+   {
+    "trigger": "on_use",
+    "do": [
+     {
+      "op": "set_pocket_seal",
+      "seal": "seal_bell"
+     }
+    ]
+   }
+  ]
  }
 ]

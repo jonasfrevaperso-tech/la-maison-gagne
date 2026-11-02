@@ -2,6 +2,8 @@ class_name ScoreContext
 extends RefCounted
 ## Accumulateur d'un tour : Jetons × (base + Σ Mult additifs) × Π Mult multiplicatifs.
 
+const MAX_TOTAL: float = 1.0e18
+
 var chips: float = 0.0
 var mult_add: float = 0.0
 var mult_mul: float = 1.0
@@ -38,7 +40,8 @@ func mult() -> float:
 
 
 func compute_total() -> int:
-	return int(floor(maxf(chips, 0.0) * maxf(mult(), 0.0)))
+	# Plafond : les builds extrêmes ne doivent jamais déborder l'entier 64 bits.
+	return int(floor(minf(maxf(chips, 0.0) * maxf(mult(), 0.0), MAX_TOTAL)))
 
 
 func push(kind: StringName, src_kind: StringName, src_id: String, amount: float, text: String = "", src_uid: int = 0) -> ScoreEvent:

@@ -144,3 +144,15 @@ Plan (chaque étape : code → tests → captures → corrections) :
 
 Bilan 1.5 : les 7 étapes sont livrées. `tools/check.sh` vert (85 tests, banc des 9 épreuves, interface 186 vues sur 6 définitions et 2 tailles de texte sans aucun problème, campagne gagnée à la manette seule). Équilibrage : glouton 39,8 %, expert 47,1 % neutre / 54,2 % adroit (`docs/BALANCE.md`). Exports Windows, Linux et Flatpak 1.5.0 régénérés.
 
+
+## Version 1.5.1 — « Faites chauffer la machine »
+Plan (chaque étape : code → tests → captures → corrections) :
+1. Bugs signalés : cartes de la Mémoire blanches (texture libérée avant affichage) ✅ ; roue 3D coupée par la barre des grigris (marge de rendu portée à 280 px) ✅ ; manette au Bazar : un bouton désactivé (paquet vendu) renvoyait au début du menu, il est désormais enjambé ✅ (contrôle automatique étendu aux cartes et aux paquets vendus).
+2. Jackpots fiables et plus fréquents : « JACKPOT ! » affiché = machine à sous lancée (plein gagnant, ou coup qui solde l'échéance d'un seul tir) ; nouveau Sceau Cloche (case qui offre un tirage gratuit) et objets qui le posent ; opérations `slot_pull` et `temp_xmult`.
+3. Machine à sous plus belle et plus généreuse en variété : nouveaux gains (×Mult, grigri, sceau Cloche, amélioration de case), animations et effets renforcés ; fréquence et gains calés par simulation.
+4. Visée plus lente (sélection de la case), mini-jeux plus exigeants pour toucher la case visée ; Bonneteau et autres épreuves durcies ; 5 nouvelles épreuves (14 au total).
+5. Super builds façon Balatro : grigris à ×Mult croissant, relances, synergies ; nombres compacts (K, M, Md, T…) ; affichage du Mult animé selon sa grandeur.
+6. Courbe de difficulté façon Balatro (dettes à croissance accélérée), équilibrage par simulations (cible 35–45 % bot compétent).
+7. Contrôle complet de l'interface (manette, 6 définitions) ; dépôt GitHub public avec les releases ; docs, exports, tag v1.5.1.
+
+Bilan 1.5.1 : les 7 étapes sont livrées. `tools/check.sh` vert (92 tests, banc des 14 épreuves, interface 204 vues sur 6 définitions et 2 tailles de texte sans problème, campagne gagnée à la manette seule). Équilibrage : glouton 39,0 %, expert 45,0 % (`docs/BALANCE.md`). Exports Windows, Linux et Flatpak 1.5.1 régénérés ; dépôt GitHub public avec les releases.

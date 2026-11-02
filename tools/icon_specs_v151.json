@@ -1,0 +1,57 @@
+{
+ "seal_bell": {
+  "motif": "bell",
+  "a": "gold",
+  "b": "red"
+ },
+ "f_bell_rope": {
+  "motif": "bell",
+  "a": "red",
+  "b": "gold"
+ },
+ "g_groom_bell": {
+  "motif": "bell",
+  "a": "gold",
+  "b": "ivory"
+ },
+ "g_lucette_photo": {
+  "motif": "heart",
+  "a": "red",
+  "b": "gold"
+ },
+ "g_pocket_slot": {
+  "motif": "bars",
+  "a": "red",
+  "b": "gold"
+ },
+ "g_jackpot_tokens": {
+  "motif": "coin",
+  "a": "gold",
+  "b": "red"
+ },
+ "g_coin_bucket": {
+  "motif": "bag",
+  "a": "gold",
+  "b": "smoke"
+ },
+ "g_double_down": {
+  "motif": "times",
+  "a": "magenta",
+  "b": "gold"
+ },
+ "g_chain_reaction": {
+  "motif": "bolt",
+  "a": "orange",
+  "b": "red"
+ },
+ "g_bell_choir": {
+  "motif": "bell",
+  "a": "purple",
+  "b": "gold"
+ },
+ "g_compound_interest": {
+  "motif": "piggy",
+  "a": "emerald",
+  "b": "gold"
+ }
+}

@@ -94,7 +94,22 @@ func start() -> bool:
 	if String(args.get("dev-phase", "")) == "slot":
 		r.flags["act_intro_seen_1"] = true
 		_slot_later.call_deferred()
+	if String(args.get("dev-phase", "")) == "bigscore":
+		r.flags["act_intro_seen_1"] = true
+		_bigscore_later.call_deferred()
 	return true
+
+
+## Super build simulé : Jetons et Mult gigantesques, pour vérifier formats compacts et flammes.
+func _bigscore_later() -> void:
+	for _i: int in 60:
+		await get_tree().process_frame
+	var panel: ScorePanel = get_tree().root.find_children("*", "ScorePanel", true, false)[0] as ScorePanel
+	panel.set_values(48250.0, 12.0)
+	for _i: int in 30:
+		await get_tree().process_frame
+	panel.set_values(3.2e6, 4800.0)
+	panel.show_total(int(3.2e6 * 4800.0), 1.0)
 
 
 ## Machine à sous de démonstration : brelan de 7, paire de cerises, rien.
@@ -104,7 +119,7 @@ func _slot_later() -> void:
 	var rs: RunScreen = get_tree().root.find_children("*", "RunScreen", true, false)[0] as RunScreen
 	var spins: Array[Dictionary] = [
 		{"reels": ["seven", "seven", "seven"], "prize": "p_seven3"},
-		{"reels": ["cherry", "bell", "cherry"], "prize": "p_cherry2"},
+		{"reels": ["diamond", "diamond", "diamond"], "prize": "p_diamond3"},
 		{"reels": ["chip", "bell", "seven"], "prize": ""},
 	]
 	rs.call("_show_overlay", SlotOverlay.new().configure(spins, DataRegistry.db))

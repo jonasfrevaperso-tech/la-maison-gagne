@@ -5,7 +5,7 @@ extends ThrowTrial
 ## puis retournées. Retrouver toutes les paires avant la fin du sablier : chaque erreur coûte.
 ## Croix / flèches / stick pour choisir, confirmer pour retourner ; à la souris, cliquer.
 
-const SYMBOLS: Array[String] = ["cherry", "bell", "clover", "chip", "seven"]
+const SYMBOLS: Array[String] = ["cherry", "bell", "clover", "chip", "seven", "diamond"]
 const SYMBOL_PATH: String = "res://assets/slot/slot_%s.png"
 const CARD: Vector2 = Vector2(170.0, 236.0)
 const GAP: Vector2 = Vector2(36.0, 40.0)
@@ -22,6 +22,8 @@ var _preview: bool = true
 var _close_t: float = 0.0
 var _flip: PackedFloat32Array = PackedFloat32Array()
 var _done_t: float = -1.0
+## Textures gardées en vie : une texture chargée dans _draw puis libérée s'affiche en blanc.
+var _textures: Array[Texture2D] = []
 
 
 func begin() -> void:
@@ -39,6 +41,14 @@ func begin() -> void:
 		_found.append(false)
 		_flip.append(1.0)
 	AudioBus.play("card_flip", 1.0, -4.0)
+
+
+func _symbol(k: int) -> Texture2D:
+	if _textures.is_empty():
+		for id: String in SYMBOLS:
+			var path: String = SYMBOL_PATH % id
+			_textures.append(load(path) as Texture2D if ResourceLoader.exists(path) else null)
+	return _textures[k]
 
 
 func _card_rect(i: int) -> Rect2:
@@ -221,8 +231,7 @@ func _draw_card(i: int) -> void:
 	if face_up:
 		draw_rect(rr, Palette.IVORY if not _found[i] else Palette.IVORY.lerp(Palette.GOLD_LIGHT, 0.35))
 		draw_rect(rr.grow(-6.0), Palette.GOLD_DARK, false, 2.0)
-		var path: String = SYMBOL_PATH % SYMBOLS[_faces[i]]
-		var tex: Texture2D = load(path) as Texture2D if ResourceLoader.exists(path) else null
+		var tex: Texture2D = _symbol(_faces[i])
 		if tex != null and squash > 0.2:
 			var s: float = minf(rr.size.x - 24.0, 120.0)
 			draw_texture_rect(tex, Rect2(rr.get_center() - Vector2(s, s) * 0.5, Vector2(s, s)), false)

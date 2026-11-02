@@ -16,12 +16,20 @@ const FRAME_GROW: float = 6.0
 const FRAME_W: float = 3.0
 const STICK_DEADZONE: float = 0.25
 
+const SKIP_WINDOW_MS: int = 400
+const SKIP_HOPS: int = 8
+
 ## Renvoie la zone active (Control) : fournie par Main.
 var active_root: Callable = Callable()
 ## Calque (CanvasLayer de Main) où dessiner le cadre de sélection.
 var frame_layer: CanvasLayer = null
 var _tip: Control = null
 var _frame: Control = null
+## Dernière direction demandée et focus précédent : un bouton désactivé est enjambé dans
+## la même direction (sinon ensure_focus le jugerait périmé et ramènerait au début du menu).
+var _last_side: int = -1
+var _last_side_ms: int = 0
+var _prev_focus: Control = null
 
 
 func _ready() -> void:
@@ -82,6 +90,10 @@ func _draw_frame() -> void:
 
 ## Infobulle au focus (manette) pour tout contrôle qui porte une infobulle texte.
 func _on_focus_changed(c: Control) -> void:
+	if c is BaseButton and (c as BaseButton).disabled and _last_side >= 0 and Time.get_ticks_msec() - _last_side_ms < SKIP_WINDOW_MS:
+		_skip_disabled.call_deferred(c)
+		return
+	_prev_focus = c
 	if _tip != null and is_instance_valid(_tip):
 		_tip.queue_free()
 	_tip = null
@@ -115,7 +127,26 @@ func _place_tip(c: Control, panel: Control) -> void:
 
 ## Champs de texte à la manette : A ouvre le clavier à l'écran, la croix quitte le champ
 ## (sinon elle déplacerait seulement le curseur de saisie).
+## Enjambe les boutons désactivés dans la direction demandée ; sinon reste où l'on était.
+func _skip_disabled(from: Control) -> void:
+	var n: Control = from
+	for _i: int in SKIP_HOPS:
+		n = n.find_valid_focus_neighbor(_last_side as Side)
+		if n == null or n == from:
+			break
+		if not (n is BaseButton and (n as BaseButton).disabled) and n.is_visible_in_tree():
+			n.grab_focus()
+			return
+	if _prev_focus != null and is_instance_valid(_prev_focus) and _prev_focus.is_visible_in_tree():
+		_prev_focus.grab_focus()
+
+
 func _input(event: InputEvent) -> void:
+	var dirs: Dictionary[String, Side] = {"ui_up": SIDE_TOP, "ui_down": SIDE_BOTTOM, "ui_left": SIDE_LEFT, "ui_right": SIDE_RIGHT}
+	for a: String in dirs.keys():
+		if GameInput.pressed(event, a):
+			_last_side = dirs[a]
+			_last_side_ms = Time.get_ticks_msec()
 	if not InputGlyphs.using_pad:
 		return
 	var f: Control = get_viewport().gui_get_focus_owner()

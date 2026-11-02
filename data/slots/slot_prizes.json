@@ -26,12 +26,16 @@
    {
     "op": "temp_mult",
     "v": 6
+   },
+   {
+    "op": "temp_xmult",
+    "v": 2
    }
   ],
-  "name_fr": "+6 Mult au prochain tour",
-  "name_en": "+6 Mult next spin",
-  "desc_fr": "+6 Mult au prochain tour",
-  "desc_en": "+6 Mult next spin"
+  "name_fr": "×2 et +6 Mult au prochain tour",
+  "name_en": "×2 and +6 Mult next spin",
+  "desc_fr": "×2 et +6 Mult au prochain tour",
+  "desc_en": "×2 and +6 Mult next spin"
  },
  {
   "id": "p_bell3",
@@ -41,12 +45,16 @@
    {
     "op": "add_money",
     "v": 10
+   },
+   {
+    "op": "add_random_seal",
+    "seal": "seal_bell"
    }
   ],
-  "name_fr": "+10 $",
-  "name_en": "+10 $",
-  "desc_fr": "+10 $",
-  "desc_en": "+10 $"
+  "name_fr": "+10 $ et un Sceau Cloche sur une case",
+  "name_en": "+10 $ and a Bell Seal on a pocket",
+  "desc_fr": "+10 $ et un Sceau Cloche sur une case",
+  "desc_en": "+10 $ and a Bell Seal on a pocket"
  },
  {
   "id": "p_clover3",
@@ -156,5 +164,39 @@
   "name_en": "+1 betting chip next spin",
   "desc_fr": "+1 jeton de mise au prochain tour",
   "desc_en": "+1 betting chip next spin"
+ },
+ {
+  "id": "p_diamond3",
+  "match": "triple",
+  "symbol": "diamond",
+  "do": [
+   {
+    "op": "add_grigri",
+    "rarity": "rare"
+   },
+   {
+    "op": "add_money",
+    "v": 5
+   }
+  ],
+  "name_fr": "Un grigri rare offert (si place libre) et +5 $",
+  "name_en": "A free rare charm (if a slot is free) and +5 $",
+  "desc_fr": "Un grigri rare offert (si place libre) et +5 $",
+  "desc_en": "A free rare charm (if a slot is free) and +5 $"
+ },
+ {
+  "id": "p_diamond2",
+  "match": "pair",
+  "symbol": "diamond",
+  "do": [
+   {
+    "op": "temp_xmult",
+    "v": 1.5
+   }
+  ],
+  "name_fr": "×1,5 Mult au prochain tour",
+  "name_en": "×1.5 Mult next spin",
+  "desc_fr": "×1,5 Mult au prochain tour",
+  "desc_en": "×1.5 Mult next spin"
  }
 ]

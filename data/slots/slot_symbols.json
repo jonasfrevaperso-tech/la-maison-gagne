@@ -43,5 +43,14 @@
   "name_en": "Seven",
   "desc_fr": "Rare : un tour offert.",
   "desc_en": "Rare: a free spin."
+ },
+ {
+  "id": "diamond",
+  "weight": 6,
+  "icon": "slot_diamond",
+  "name_fr": "Diamant",
+  "name_en": "Diamond",
+  "desc_fr": "Très rare : ×Mult au prochain tour, ou un grigri rare offert.",
+  "desc_en": "Very rare: ×Mult next spin, or a free rare charm."
  }
 ]

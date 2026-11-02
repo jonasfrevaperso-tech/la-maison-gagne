@@ -72,7 +72,9 @@ func tick(dt: float) -> void:
 
 
 func bot_wants() -> Dictionary:
-	if _end_t >= 0.0 or _level >= _band_center() - p("pump") * 0.5:
+	# Anticipe la bande (elle se déplace) et la retombée de la mousse.
+	var ahead: float = 0.5 + 0.22 * sin((t + 0.1) * p("band_speed") / slow * TAU + _phase)
+	if _end_t >= 0.0 or _level + p("pump") > ahead + _band() * 0.5:
 		return {"do": ""}
 	var side: int = 1 - maxi(_last_side, 0) if _last_side >= 0 else 0
 	return {"do": "sym", "symbol": 0 if side == 0 else (1 if mouse else 2)}

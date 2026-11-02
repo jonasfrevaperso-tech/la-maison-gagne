@@ -61,8 +61,8 @@
   "trigger": "throwing",
   "anchor": "wheel",
   "order": 7,
-  "text_fr": "Le lancer se joue en trois temps : deux ÉPREUVES d'adresse tirées au hasard parmi neuf (un carton t'annonce la règle, {ui_spin} pour le passer), puis le LÂCHER : frappe {ui_spin} quand l'anneau touche la bille. Un beau lancer garde la bille dans ta zone (et offre plus de tirages au jackpot). Trop long ? Options → Jeu → Lancer : Rapide.",
-  "text_en": "A throw takes three beats: two random skill TRIALS out of nine (a title card explains the rule, {ui_spin} skips it), then the RELEASE: strike {ui_spin} when the ring touches the ball. A good throw keeps the ball in your zone (and earns more jackpot pulls). Too long? Options → Game → Throw: Quick.",
+  "text_fr": "Le lancer se joue en trois temps : deux ÉPREUVES d'adresse tirées au hasard parmi quatorze (un carton t'annonce la règle, {ui_spin} pour le passer), puis le LÂCHER : frappe {ui_spin} quand l'anneau touche la bille. Un beau lancer garde la bille dans ta zone (et offre plus de tirages au jackpot). Trop long ? Options → Jeu → Lancer : Rapide.",
+  "text_en": "A throw takes three beats: two random skill TRIALS out of fourteen (a title card explains the rule, {ui_spin} skips it), then the RELEASE: strike {ui_spin} when the ring touches the ball. A good throw keeps the ball in your zone (and earns more jackpot pulls). Too long? Options → Game → Throw: Quick.",
   "text_pad_fr": "Le lancer se joue en trois temps : deux ÉPREUVES d'adresse tirées au hasard (le carton annonce la règle, {ui_spin} pour le passer), puis le LÂCHER : {ui_spin} quand l'anneau touche la bille. Un beau lancer garde la bille dans ta zone.",
   "text_pad_en": "A throw takes three beats: two random skill TRIALS (the title card explains the rule, {ui_spin} skips it), then the RELEASE: {ui_spin} when the ring touches the ball. A good throw keeps the ball in your zone."
  },
@@ -151,8 +151,8 @@
   "trigger": "jackpot",
   "anchor": "center",
   "order": 16,
-  "text_fr": "JACKPOT ! Un plein gagnant réveille la vieille machine à sous. Tire le levier ({ui_spin}) : 1 tirage, 2 sur un « Très bien », 3 sur un lancer « Parfait ». Paires et brelans donnent de l'argent, du Mult pour le tour suivant, du contrôle… ou un tour offert.",
-  "text_en": "JACKPOT! A winning straight bet wakes the old slot machine. Pull the lever ({ui_spin}): 1 pull, 2 on a « Great » throw, 3 on a « Perfect » one. Pairs and triples give money, Mult for the next spin, control… or a free spin."
+  "text_fr": "JACKPOT ! Un plein gagnant — ou un coup assez énorme pour solder l'échéance — réveille la vieille machine à sous. Tire le levier ({ui_spin}) : 1 tirage, 2 sur un « Très bien », 3 sur un « Parfait ». Les cases à SCEAU CLOCHE et certains grigris offrent des tirages gratuits. Paires et brelans : argent, Mult ou ×Mult pour le tour suivant, grigris… ou un tour offert.",
+  "text_en": "JACKPOT! A winning straight bet — or a hit big enough to clear the deadline — wakes the old slot machine. Pull the lever ({ui_spin}): 1 pull, 2 on a « Great » throw, 3 on a « Perfect » one. BELL SEAL pockets and some grigris grant free pulls. Pairs and triples: money, Mult or ×Mult for the next spin, grigris… or a free spin."
  },
  {
   "id": "tip_decor",
