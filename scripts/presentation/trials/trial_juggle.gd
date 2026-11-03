@@ -145,44 +145,14 @@ func _build_juggler(st: Stage3D) -> void:
 		Stage3D.glow(Palette.GOLD, 0.8))
 
 
-## Jeton de casino 3D : tranche colorée à rayures ivoire, faces à couronne ivoire.
-func _build_chip(col: Color) -> Node3D:
-	var n: Node3D = Node3D.new()
-	stage.root.add_child(n)
-	n.scale = Vector3.ONE * 1.3
-	var body: MeshInstance3D = MeshInstance3D.new()
-	body.mesh = MeshPool.disc(CHIP_R * PX3, 0.04, 28)
-	body.material_override = Stage3D.mat(col, 0.1, 0.35)
-	body.rotation.x = PI * 0.5
-	n.add_child(body)
-	var ivory: StandardMaterial3D = Stage3D.mat(Palette.IVORY, 0.0, 0.4)
-	for f: float in [-1.0, 1.0]:
-		var ring: MeshInstance3D = MeshInstance3D.new()
-		ring.mesh = MeshPool.disc((CHIP_R - 7.0) * PX3, 0.004, 28)
-		ring.material_override = ivory
-		ring.rotation.x = PI * 0.5
-		ring.position.z = f * 0.021
-		n.add_child(ring)
-		var core: MeshInstance3D = MeshInstance3D.new()
-		core.mesh = MeshPool.disc((CHIP_R - 11.0) * PX3, 0.005, 28)
-		core.material_override = body.material_override
-		core.rotation.x = PI * 0.5
-		core.position.z = f * 0.022
-		n.add_child(core)
-	for k: int in 6:
-		var a: float = TAU * float(k) / 6.0
-		var edge: MeshInstance3D = Stage3D.box(n, Vector3(8.0 * PX3, 8.0 * PX3, 0.042), Vector3(cos(a), sin(a), 0) * CHIP_R * PX3 * 0.97,
-			ivory)
-		edge.rotation.z = a
-	return n
-
-
 func _sync_3d() -> void:
 	if stage == null:
 		return
 	var st: Stage3D = stage
 	while _chip3.size() < _chips.size():
-		_chip3.append(_build_chip(_chips[_chip3.size()]["col"] as Color))
+		var chip: Node3D = CasinoChip3D.build(stage.root, _chips[_chip3.size()]["col"] as Color, CHIP_R * PX3)
+		chip.scale = Vector3.ONE * 1.3
+		_chip3.append(chip)
 	for k: int in _chips.size():
 		var c: Dictionary = _chips[k]
 		var n: Node3D = _chip3[k]

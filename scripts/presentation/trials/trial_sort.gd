@@ -15,6 +15,10 @@ const PAD_LABEL: Array[String] = ["X", "Y", "B", "A"]
 const DIRS: Array[Vector2] = [Vector2.LEFT, Vector2.UP, Vector2.RIGHT, Vector2.DOWN]
 ## Distance entre la fenêtre de tri et chaque bac du losange.
 const BIN_GAP: Vector2 = Vector2(175.0, 122.0)
+## Décor 3D (caméra frontale du panneau) : mètres par pixel, pas des lattes du tapis.
+const PX3: float = 0.005
+const SLAT_PX: float = 36.0
+const BIN_R: float = 34.0
 
 var _chips: Array[Dictionary] = []
 var _spawned: int = 0
@@ -22,6 +26,122 @@ var _spawn_t: float = 0.3
 var _good: int = 0
 var _wrong: int = 0
 var _ended: bool = false
+var _slats: MeshPool = null
+var _rollers: Array[Node3D] = []
+var _bins3: Array[MeshInstance3D] = []
+var _bin_mats: Array[StandardMaterial3D] = []
+
+
+func begin() -> void:
+	_build_3d()
+
+
+# --------------------------------------------------------------------------- décor 3D
+
+
+func _belt() -> Rect2:
+	var r: Rect2 = play_rect()
+	return Rect2(r.position.x + 20.0, _window().get_center().y - 38.0, r.size.x - 40.0, 76.0)
+
+
+## Caisse des jetons : tôle rivetée, tapis roulant à lattes, rouleaux, bacs-gobelets de couleur.
+func _build_3d() -> void:
+	var r: Rect2 = play_rect()
+	var st: Stage3D = use_3d()
+	st.frontal(PX3, r.get_center(), r.size.y, 36.0)
+	st.env.background_color = Color(0.05, 0.05, 0.07)
+	st.env.ambient_light_energy = 0.4
+	var root: Node3D = st.root
+	var plate: StandardMaterial3D = Stage3D.mat(Color(0.14, 0.14, 0.17), 0.45, 0.45)
+	Stage3D.box(root, Vector3(r.size.x * 2.0 * PX3, r.size.y * 2.0 * PX3, 0.04), st.to3(r.get_center(), -0.3), plate)
+	var rivet: StandardMaterial3D = Stage3D.mat(Color(0.35, 0.35, 0.4), 0.45, 0.3)
+	for k: int in 14:
+		var x: float = r.position.x + 30.0 + float(k) * (r.size.x - 60.0) / 13.0
+		for y: float in [r.position.y + 16.0, r.end.y - 14.0]:
+			Stage3D.sphere(root, 4.0 * PX3, st.to3(Vector2(x, y), -0.28), rivet)
+	var belt: Rect2 = _belt()
+	Stage3D.box(root, Vector3(belt.size.x * PX3, belt.size.y * PX3, 0.04), st.to3(belt.get_center(), -0.04),
+		Stage3D.mat(Color(0.08, 0.08, 0.1), 0.0, 0.8))
+	var steel: StandardMaterial3D = Stage3D.mat(Color(0.5, 0.52, 0.58), 0.45, 0.3)
+	for y2: float in [belt.position.y - 4.0, belt.end.y + 4.0]:
+		Stage3D.box(root, Vector3((belt.size.x + 20.0) * PX3, 10.0 * PX3, 0.08), st.to3(Vector2(belt.get_center().x, y2), 0.0), steel)
+	var slat: BoxMesh = BoxMesh.new()
+	slat.size = Vector3(6.0 * PX3, (belt.size.y - 8.0) * PX3, 0.012)
+	_slats = MeshPool.new(root, slat, Stage3D.mat(Color(0.2, 0.2, 0.24), 0.2, 0.6))
+	for side: float in [belt.position.x, belt.end.x]:
+		var roll: Node3D = Node3D.new()
+		roll.position = st.to3(Vector2(side, belt.get_center().y), -0.02)
+		root.add_child(roll)
+		Stage3D.cylinder(roll, 36.0 * PX3, (belt.size.y + 24.0) * PX3, Vector3.ZERO, Stage3D.mat(Color(0.25, 0.25, 0.3), 0.45, 0.35))
+		Stage3D.box(roll, Vector3(10.0 * PX3, (belt.size.y + 26.0) * PX3, 74.0 * PX3), Vector3.ZERO,
+			Stage3D.mat(Color(0.45, 0.46, 0.5), 0.45, 0.3))
+		_rollers.append(roll)
+	# Bacs en losange (la couleur est la touche).
+	var c0: Vector2 = _window().get_center()
+	for d: int in 4:
+		var col: Color = COLORS[d]
+		var at: Vector3 = st.to3(c0 + DIRS[d] * BIN_GAP, 0.0)
+		var cup: MeshInstance3D = Stage3D.cylinder(root, BIN_R * PX3, 0.04, at + Vector3(0, 0, 0.0),
+			Stage3D.mat(col.darkened(0.35), 0.2, 0.35))
+		cup.rotation.x = PI * 0.5
+		var inner_m: StandardMaterial3D = Stage3D.mat(col.darkened(0.6), 0.0, 0.7)
+		inner_m.emission_enabled = true
+		inner_m.emission = col
+		inner_m.emission_energy_multiplier = 0.2
+		var inner: MeshInstance3D = Stage3D.cylinder(root, (BIN_R - 5.0) * PX3, 0.005, at + Vector3(0, 0, 0.021), inner_m)
+		inner.rotation.x = PI * 0.5
+		var ring: TorusMesh = TorusMesh.new()
+		ring.inner_radius = (BIN_R - 4.0) * PX3
+		ring.outer_radius = (BIN_R + 2.0) * PX3
+		var rim: MeshInstance3D = MeshInstance3D.new()
+		rim.mesh = ring
+		rim.material_override = Stage3D.mat(col, 0.3, 0.3)
+		rim.rotation.x = PI * 0.5
+		rim.position = at + Vector3(0, 0, 0.022)
+		root.add_child(rim)
+		_bins3.append(rim)
+		_bin_mats.append(inner_m)
+	Stage3D.omni(root, Color(1.0, 0.92, 0.8), 0.8, st.to3(c0, 2.0), 5.0)
+
+
+func _sync_3d() -> void:
+	if _slats == null:
+		return
+	var st: Stage3D = stage
+	var belt: Rect2 = _belt()
+	var off: float = fmod(t * _speed(), SLAT_PX)
+	var n: int = 0
+	var x: float = belt.position.x + off
+	while x < belt.end.x:
+		_slats.at(n).position = st.to3(Vector2(x, belt.get_center().y), -0.015)
+		n += 1
+		x += SLAT_PX
+	_slats.hide_from(n)
+	for roll: Node3D in _rollers:
+		roll.rotation.y = t * _speed() / 36.0
+	# Jetons : sur le tapis, puis envolés vers leur bac.
+	for c: Dictionary in _chips:
+		if not c.has("n"):
+			var chip: Node3D = CasinoChip3D.build(st.root, _color(int(c["kind"])), CHIP_R * PX3)
+			c["n"] = chip
+		var node: Node3D = c["n"]
+		var pos: Vector2 = c["p"]
+		var lift: float = 0.0
+		var sc: float = 1.0
+		if bool(c["done"]):
+			var u: float = clampf(float(c["t"]) / 0.45, 0.0, 1.0)
+			lift = sin(u * PI) * 0.25
+			sc = 1.0 - 0.5 * u
+		node.position = st.to3(pos, 0.07 + lift)
+		node.scale = Vector3.ONE * sc
+		node.rotation.z = -pos.x * 0.01
+	for k: int in 4:
+		var hot: float = 0.0
+		for ch: Dictionary in _chips:
+			if bool(ch["done"]) and _dir_of(int(ch["to"])) == k:
+				hot = maxf(hot, 1.0 - float(ch["t"]) / 0.45)
+		_bin_mats[k].emission_energy_multiplier = 0.2 + 2.5 * hot
+		_bins3[k].scale = Vector3.ONE * (1.0 + 0.15 * hot)
 
 
 func _kinds() -> int:
@@ -106,7 +226,11 @@ func tick(dt: float) -> void:
 			AudioBus.play("lose_soft", 1.2, -10.0)
 			continue
 		kept.append(c)
+	for c3: Dictionary in _chips:
+		if not kept.has(c3) and c3.has("n"):
+			(c3["n"] as Node3D).queue_free()
 	_chips = kept
+	_sync_3d()
 	if _spawned >= pi("chips") and _chips.is_empty():
 		_ended = true
 		var sc: float = float(_good) / float(pi("chips")) - p("wrong_penalty") * float(_wrong)
@@ -127,49 +251,20 @@ func bot_apply(want: Dictionary) -> void:
 
 
 func paint() -> void:
+	if stage == null:
+		return
 	var r: Rect2 = play_rect()
 	var c0: Vector2 = _window().get_center()
-	# Fond : tôle de la salle des coffres, rivets.
-	draw_rect(Rect2(r.position + Vector2(4, 4), r.size - Vector2(8, 8)), Color(0.07, 0.07, 0.09))
-	for k: int in 14:
-		var x: float = r.position.x + 30.0 + float(k) * (r.size.x - 60.0) / 13.0
-		draw_circle(Vector2(x, r.position.y + 16.0), 3.0, Color(0.25, 0.25, 0.3))
-		draw_circle(Vector2(x, r.end.y - 14.0), 3.0, Color(0.25, 0.25, 0.3))
-	# Tapis roulant : rebords d'acier, lattes qui défilent, rouleaux aux bouts.
-	var belt: Rect2 = Rect2(r.position.x + 20.0, c0.y - 38.0, r.size.x - 40.0, 76.0)
-	draw_rect(belt.grow(6.0), Color(0.3, 0.31, 0.36))
-	draw_rect(belt, Color(0.1, 0.1, 0.12))
-	var off: float = fmod(t * _speed(), 36.0)
-	var x2: float = belt.position.x - 36.0 + off
-	while x2 < belt.end.x:
-		if x2 > belt.position.x:
-			draw_line(Vector2(x2, belt.position.y + 3), Vector2(x2, belt.end.y - 3), Color(0.2, 0.2, 0.24), 4.0)
-		x2 += 36.0
-	draw_line(belt.position, Vector2(belt.end.x, belt.position.y), Color(0.55, 0.56, 0.62), 2.0)
-	for side: float in [belt.position.x, belt.end.x]:
-		draw_circle(Vector2(side, c0.y), 40.0, Color(0.22, 0.22, 0.26))
-		draw_circle(Vector2(side, c0.y), 12.0, Color(0.45, 0.46, 0.5))
-	# Bacs en losange, comme les boutons de la manette : la couleur EST la touche.
+	# Bacs en losange : étiquette de la touche sur chaque bac.
 	var n: int = _kinds()
 	for k: int in n:
 		var d: int = _dir_of(k)
 		var at: Vector2 = c0 + DIRS[d] * BIN_GAP
-		var col: Color = COLORS[d]
-		var hot: float = 0.0
-		for ch: Dictionary in _chips:
-			if bool(ch["done"]) and int(ch["to"]) == k:
-				hot = maxf(hot, 1.0 - float(ch["t"]) / 0.45)
-		draw_circle(at, 44.0 + 6.0 * hot, Color(col, 0.18 + 0.3 * hot))
-		draw_circle(at, 34.0, col.darkened(0.45))
-		draw_circle(at, 30.0, col.lerp(Color.WHITE, 0.25 * hot))
-		draw_circle(at + Vector2(-9, -10), 8.0, Color(1, 1, 1, 0.25))
-		var lbl: String
 		if mouse:
-			lbl = tr("TRIAL_SORT_LEFT_CLICK") if k == 0 else tr("TRIAL_SORT_RIGHT_CLICK")
+			var lbl: String = tr("TRIAL_SORT_LEFT_CLICK") if k == 0 else tr("TRIAL_SORT_RIGHT_CLICK")
 			text(at + Vector2(0, 52.0), lbl, UiKit.SIZE_SMALL, Palette.IVORY)
 		else:
-			lbl = PAD_LABEL[k] if InputGlyphs.using_pad else KEYS_LABEL[k]
-			text(at, lbl, UiKit.SIZE_H2, Palette.INK, "display", 0)
+			text(at, PAD_LABEL[k] if InputGlyphs.using_pad else KEYS_LABEL[k], UiKit.SIZE_H2, Palette.IVORY, "display", 0)
 	# Fenêtre de tri : équerres dorées.
 	var w: Rect2 = _window()
 	draw_rect(w, Color(Palette.GOLD_LIGHT, 0.08))
@@ -178,16 +273,4 @@ func paint() -> void:
 		var sy: float = 1.0 if corner.y < w.get_center().y else -1.0
 		draw_line(corner, corner + Vector2(22.0 * sx, 0), Palette.GOLD_LIGHT, 4.0)
 		draw_line(corner, corner + Vector2(0, 22.0 * sy), Palette.GOLD_LIGHT, 4.0)
-	for ch: Dictionary in _chips:
-		var pos: Vector2 = ch["p"]
-		var col2: Color = _color(int(ch["kind"]))
-		var a: float = 1.0 - clampf(float(ch["t"]) / 0.45, 0.0, 1.0) if bool(ch["done"]) else 1.0
-		var rad: float = CHIP_R * (1.0 - 0.4 * (1.0 - a))
-		draw_circle(pos + Vector2(3, 5), rad, Color(0, 0, 0, 0.4 * a))
-		draw_circle(pos, rad, Color(col2.darkened(0.3), a))
-		draw_circle(pos, rad - 5.0, Color(col2, a))
-		for e: int in 6:
-			var ang: float = float(e) * TAU / 6.0 + t * 0.5
-			draw_circle(pos + Vector2.from_angle(ang) * (rad - 2.5), 3.0, Color(Palette.IVORY, a))
-		draw_arc(pos, rad * 0.5, 0, TAU, 20, Color(Palette.IVORY, a * 0.8), 2.0)
 	text(Vector2(r.end.x - 110.0, r.position.y + 40.0), "%d / %d" % [_good, pi("chips")], UiKit.SIZE_BODY, Palette.IVORY, "mono")

@@ -19,6 +19,11 @@ const HIT_X: float = 96.0
 ## Les verdicts s'affichent à droite de la ligne de frappe (pas sur le bord du panneau).
 const POP_DX: float = 110.0
 const GROOVES: Array[String] = ["jazz", "funk", "mambo"]
+## Décor 3D du club : mètres par pixel, barres de l'égaliseur, projecteurs, vitesse du disque.
+const PX3: float = 0.005
+const EQ_BARS: int = 24
+const SPOTS: int = 3
+const RECORD_RPM: float = 33.0
 
 var _lanes: int = 4
 var _times: PackedFloat32Array = PackedFloat32Array()
@@ -37,12 +42,16 @@ var _best_combo: int = 0
 var _lane_flash: PackedFloat32Array = PackedFloat32Array([0, 0, 0, 0])
 var _groove: String = "jazz"
 var _last_beat: int = -1
+var _eq3: Array[MeshInstance3D] = []
+var _spots3: Array[SpotLight3D] = []
+var _record3: Node3D = null
 
 
 func begin() -> void:
 	_lanes = 2 if mouse else 4
 	_groove = GROOVES[rng.randi_range(0, GROOVES.size() - 1)]
 	_beat = 60.0 / Balance.f("throw_trials.rhythm.bpm_" + _groove)
+	_build_3d()
 	_lead = _beat * 4.0
 	var steps: int = pi("bars") * 8
 	var want: int = pi("notes") - (pi("assist_fewer") if assist else 0)
@@ -249,8 +258,11 @@ func paint() -> void:
 	for l: int in _lanes:
 		var y: float = _lane_y(l)
 		var lane_r: Rect2 = Rect2(r.position.x + 20.0, y - lane_h * 0.42, r.size.x - 40.0, lane_h * 0.84)
-		draw_rect(lane_r, Color(Palette.VELVET_DEEP, 0.9))
-		draw_rect(lane_r, Color(LANE_COLORS[l], 0.15 + 0.5 * _lane_flash[l]), false, 2.0)
+		# Piste lumineuse : verre fumé, liseré néon de sa couleur.
+		draw_rect(lane_r, Color(Palette.VELVET_DEEP, 0.62))
+		draw_rect(Rect2(lane_r.position, Vector2(lane_r.size.x, 3.0)), Color(LANE_COLORS[l], 0.35 + 0.5 * _lane_flash[l]))
+		draw_rect(Rect2(Vector2(lane_r.position.x, lane_r.end.y - 3.0), Vector2(lane_r.size.x, 3.0)),
+			Color(LANE_COLORS[l], 0.35 + 0.5 * _lane_flash[l]))
 		# Repères de mesure qui défilent avec les notes.
 		var first: int = int(ceil((t - 0.2) / _beat))
 		for bk: int in range(first, first + int(travel / _beat) + 2):
@@ -309,7 +321,82 @@ func _draw_hold(r: Rect2, i: int, travel: float) -> void:
 
 
 ## Scène de cabaret : rideau sombre, égaliseur qui bat la mesure, projecteurs colorés.
+## Club de jazz : rideau de fond, égaliseur lumineux, disque qui tourne, projecteurs colorés.
+func _build_3d() -> void:
+	var r: Rect2 = play_rect()
+	var st: Stage3D = use_3d()
+	st.frontal(PX3, r.get_center(), r.size.y, 36.0)
+	st.env.background_color = Color(0.03, 0.01, 0.03)
+	st.env.ambient_light_energy = 0.25
+	st.key.light_energy = 0.15
+	var root: Node3D = st.root
+	var velvet: StandardMaterial3D = Stage3D.mat(Color(0.25, 0.03, 0.08), 0.0, 0.8)
+	for k: int in 40:
+		var x: float = r.position.x - 400.0 + float(k) * 60.0
+		Stage3D.cylinder(root, 34.0 * PX3, r.size.y * 2.0 * PX3, st.to3(Vector2(x, r.get_center().y), -1.2 - 0.04 * float(k % 2)), velvet)
+	var w: float = (r.size.x - 40.0) / float(EQ_BARS)
+	for k2: int in EQ_BARS:
+		var col: Color = LANE_COLORS[k2 % LANE_COLORS.size()]
+		var bar: MeshInstance3D = Stage3D.box(root, Vector3((w - 6.0) * PX3, 1.0, 0.05),
+			st.to3(Vector2(r.position.x + 20.0 + (float(k2) + 0.5) * w, r.end.y - 20.0), -0.9), Stage3D.glow(col.darkened(0.55), 0.25))
+		_eq3.append(bar)
+	# Disque vinyle derrière la zone de frappe, avec étiquette dorée.
+	_record3 = Node3D.new()
+	_record3.position = st.to3(Vector2(r.position.x + HIT_X, r.get_center().y), -0.7)
+	root.add_child(_record3)
+	var vinyl: MeshInstance3D = Stage3D.cylinder(_record3, r.size.y * 0.42 * PX3, 0.02, Vector3.ZERO,
+		Stage3D.mat(Color("0a0a0c"), 0.2, 0.15))
+	vinyl.rotation.x = PI * 0.5
+	for g: int in 5:
+		var groove: TorusMesh = TorusMesh.new()
+		groove.inner_radius = r.size.y * (0.18 + 0.045 * float(g)) * PX3
+		groove.outer_radius = groove.inner_radius + 1.5 * PX3
+		var gm: MeshInstance3D = MeshInstance3D.new()
+		gm.mesh = groove
+		gm.material_override = Stage3D.mat(Color("2a2a30"), 0.3, 0.2)
+		gm.rotation.x = PI * 0.5
+		gm.position.z = 0.012
+		_record3.add_child(gm)
+	var label: MeshInstance3D = Stage3D.cylinder(_record3, r.size.y * 0.13 * PX3, 0.025, Vector3(0, 0, 0.002),
+		Stage3D.mat(Palette.ROULETTE_RED.darkened(0.5), 0.0, 0.5))
+	label.rotation.x = PI * 0.5
+	Stage3D.box(_record3, Vector3(r.size.y * 0.05 * PX3, r.size.y * 0.02 * PX3, 0.01), Vector3(r.size.y * 0.06 * PX3, 0, 0.016),
+		Stage3D.mat(Palette.GOLD, 0.45, 0.3))
+	for k3: int in SPOTS:
+		var sp: SpotLight3D = SpotLight3D.new()
+		sp.light_color = LANE_COLORS[k3]
+		sp.light_energy = 3.0
+		sp.spot_range = 8.0
+		sp.spot_angle = 26.0
+		sp.position = st.to3(Vector2(r.position.x + r.size.x * (0.25 + 0.25 * float(k3)), r.position.y - 200.0), 2.0)
+		root.add_child(sp)
+		_spots3.append(sp)
+
+
+func _sync_3d(pulse: float) -> void:
+	if _record3 == null:
+		return
+	var r: Rect2 = play_rect()
+	for k: int in _eq3.size():
+		var h: float = (0.25 + 0.75 * absf(sin(t * 2.3 + float(k) * 0.7) * cos(t * 1.1 + float(k) * 0.31))) * (0.55 + 0.45 * pulse)
+		var bh: float = maxf(h * (r.size.y - 60.0) * 0.45, 4.0) * PX3
+		var bar: MeshInstance3D = _eq3[k]
+		bar.scale.y = bh
+		bar.position.y = stage.to3(Vector2(0, r.end.y - 20.0)).y + bh * 0.5
+	_record3.rotation.z = -t * RECORD_RPM / 60.0 * TAU
+	for k2: int in _spots3.size():
+		var sp: SpotLight3D = _spots3[k2]
+		var target: Vector2 = Vector2(r.position.x + r.size.x * (0.3 + 0.2 * float(k2)) + sin(t * 0.8 + float(k2) * 2.0) * 120.0,
+			r.get_center().y)
+		sp.look_at(stage.to3(target, -1.0))
+		sp.light_color = LANE_COLORS[(k2 + int(t / _beat)) % 4]
+		sp.light_energy = 1.2 + 1.5 * pulse
+
+
 func _draw_stage(r: Rect2, pulse: float) -> void:
+	if stage != null:
+		_sync_3d(pulse)
+		return
 	draw_rect(Rect2(r.position + Vector2(3, 3), r.size - Vector2(6, 6)), Color(0.05, 0.02, 0.05))
 	var bars: int = 34
 	var w: float = (r.size.x - 40.0) / float(bars)

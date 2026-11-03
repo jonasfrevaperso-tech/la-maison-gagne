@@ -595,13 +595,13 @@
       "respawn_seconds": 1.0
     },
     "billiards": {
-      "shots": 3,
+      "shots": 4,
       "speed_min": 250,
       "speed_max": 2200,
       "friction": 520.0,
       "cushion": 0.75,
       "charge_seconds": 2.6,
-      "aim_speed": 0.9,
+      "aim_speed": 0.7,
       "aim_timeout": 7.0,
       "max_cut": 0.6,
       "miss_value": 0.6,
