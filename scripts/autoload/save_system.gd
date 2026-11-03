@@ -75,7 +75,7 @@ func default_profile() -> Dictionary:
 		"max_risk": {},
 		"achievements": [],
 		"challenges_done": [],
-		"seen": {"grigris": [], "pockets": [], "fortunes": [], "contracts": [], "creditors": []},
+		"seen": {"grigris": [], "pockets": [], "fortunes": [], "contracts": [], "creditors": [], "trials": []},
 		"stats": {"runs": 0, "wins": 0, "spins": 0, "best_spin": 0, "zeros": 0, "money_earned": 0},
 		"campaign": {"act_reached": 1, "endings": [], "dialogues_seen": []},
 		"tutorial": {"done": false, "tips_seen": []},

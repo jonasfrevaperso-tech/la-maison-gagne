@@ -335,6 +335,7 @@ CODEX_POCKETS,Cases,Pockets
 CODEX_FORTUNES,Cartes Fortune,Fortune cards
 CODEX_CONTRACTS,Contrats,Contracts
 CODEX_CREDITORS,Créanciers,Creditors
+CODEX_TRIALS,Épreuves du lancer,Throw trials
 CODEX_UNKNOWN,Pas encore rencontré.,Not met yet.
 HALL_CHARACTERS,Personnages,Characters
 HALL_MAX_RISK,Risque max débloqué : %d,Max Risk unlocked: %d
@@ -733,3 +734,34 @@ TRIAL_DERBY_PLACE_3,3e,3rd
 TRIAL_DERBY_PLACE_4,4e,4th
 TRIAL_DERBY_YOU,TOI,YOU
 TRIAL_DERBY_BREATH,Souffle,Breath
+TOUCH_FISH,PÊCHER,FISH
+TOUCH_MIDDLE,MILIEU,MIDDLE
+TOUCH_SHOOT,FRAPPER,SHOOT
+TRIAL_FISHING_HINT,"{confirm} lancer, ferrer · maintiens pour mouliner, relâche pour donner du fil","{confirm} cast, strike · hold to reel, release to give line"
+TRIAL_FISHING_HINT_MOUSE,"{@click} lancer, ferrer · maintiens pour mouliner, relâche pour donner du fil","{@click} cast, strike · hold to reel, release to give line"
+TRIAL_FISHING_HINT_TOUCH,"PÊCHER : lancer, ferrer, puis maintiens pour mouliner","FISH: cast, strike, then hold to reel"
+TRIAL_FISHING_CAST,Lance dans les remous,Cast into the ripples
+TRIAL_FISHING_WAIT,Patience…,Patience…
+TRIAL_FISHING_BITE,Ça mord !,A bite!
+TRIAL_FISHING_REEL,Remonte ! Garde la tension dans le vert,Reel in! Keep the tension in the green
+TRIAL_FISHING_HOOKED,Ferré !,Hooked!
+TRIAL_FISHING_MISSED,Trop tard…,Too late…
+TRIAL_FISHING_SNAP,Le fil casse !,The line snaps!
+TRIAL_FISHING_ESCAPED,Elle s'enfuit…,It got away…
+TRIAL_FISHING_LANDED,Belle carpe !,Fine carp!
+TRIAL_FISHING_TENSION,Tension,Tension
+TRIAL_LASERS_HINT,{move} se faufiler jusqu'à la porte du coffre,{move} sneak to the vault door
+TRIAL_LASERS_HINT_MOUSE,Guide le cambrioleur avec {@mouse} jusqu'à la porte,Guide the burglar with {@mouse} to the door
+TRIAL_LASERS_HINT_TOUCH,Joystick pour te faufiler jusqu'à la porte du coffre,Joystick to sneak to the vault door
+TRIAL_LASERS_ALARM,Alarme !,Alarm!
+TRIAL_LASERS_STATUS,Faisceaux touchés : %d,Beams touched: %d
+TRIAL_JUGGLE_HINT,"{qte_left} gauche · {qte_down} milieu · {qte_right} droite, quand le jeton touche la ligne","{qte_left} left · {qte_down} middle · {qte_right} right, as the chip reaches the line"
+TRIAL_JUGGLE_HINT_MOUSE,{@click} sous le jeton qui redescend sur la ligne,{@click} under the chip coming down to the line
+TRIAL_JUGGLE_HINT_TOUCH,"GAUCHE, MILIEU ou DROITE quand le jeton touche la ligne","LEFT, MIDDLE or RIGHT as the chip reaches the line"
+TRIAL_JUGGLE_DROP,Tombé !,Dropped!
+TRIAL_JUGGLE_STATUS,Rattrapés : %d · jetons en l'air : %d,Caught: %d · chips in the air: %d
+TRIAL_BILLIARDS_HINT,"{move} viser · maintiens {confirm} pour la force, lâche pour jouer","{move} aim · hold {confirm} for power, release to play"
+TRIAL_BILLIARDS_HINT_MOUSE,"Vise avec {@mouse} · maintiens {@click} pour la force, lâche pour jouer","Aim with {@mouse} · hold {@click} for power, release to play"
+TRIAL_BILLIARDS_HINT_TOUCH,"Joystick pour viser · maintiens FRAPPER, lâche pour jouer","Joystick to aim · hold SHOOT, release to play"
+TRIAL_BILLIARDS_POTTED,Dans la poche !,Potted!
+TRIAL_BILLIARDS_SCRATCH,La blanche !,Scratch!

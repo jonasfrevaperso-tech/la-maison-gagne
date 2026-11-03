@@ -8,6 +8,7 @@ const TICKS: int = 20
 const TICK_EVERY: float = 0.07
 const NEEDLE_W: float = 6.0
 const GAUGE_H: float = 44.0
+const BOT_FRAME: float = 1.0 / 60.0
 
 var _half: float = 0.1
 var _center: float = 0.7
@@ -95,7 +96,11 @@ func bot_wants() -> Dictionary:
 		return {"do": ""}
 	if not _charging:
 		return {"do": "hold"}
-	if absf(_level - _center) < _half * 0.25 and t < Balance.f("throw_game.charge_seconds") * slow:
+	if t >= Balance.f("throw_game.charge_seconds") * slow:
+		return {"do": ""}
+	# La jauge accélère : on lâche aussi quand elle va franchir le centre à l'image suivante.
+	var nxt: float = ThrowSkill.charge_level(t + BOT_FRAME, slow)
+	if absf(_level - _center) < _half * 0.25 or (_level - _center) * (nxt - _center) < 0.0:
 		return {"do": "release"}
 	return {"do": ""}
 

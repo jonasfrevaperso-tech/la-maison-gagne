@@ -71,12 +71,12 @@
   "trigger": "throwing",
   "anchor": "wheel",
   "order": 7,
-  "text_fr": "Le lancer se joue en trois temps : deux ÉPREUVES d'adresse tirées au hasard parmi quatorze (un carton t'annonce la règle, {ui_spin} pour le passer), puis le LÂCHER : frappe {ui_spin} quand l'anneau touche la bille. Un beau lancer garde la bille dans ta zone (et offre plus de tirages au jackpot). Trop long ? Options → Jeu → Lancer : Rapide.",
-  "text_en": "A throw takes three beats: two random skill TRIALS out of fourteen (a title card explains the rule, {ui_spin} skips it), then the RELEASE: strike {ui_spin} when the ring touches the ball. A good throw keeps the ball in your zone (and earns more jackpot pulls). Too long? Options → Game → Throw: Quick.",
+  "text_fr": "Le lancer se joue en trois temps : deux ÉPREUVES d'adresse tirées au hasard parmi vingt-cinq (un carton t'annonce la règle, {ui_spin} pour le passer), puis le LÂCHER : frappe {ui_spin} quand l'anneau touche la bille. Un beau lancer garde la bille dans ta zone (et offre plus de tirages au jackpot). Trop long ? Options → Jeu → Lancer : Rapide.",
+  "text_en": "A throw takes three beats: two random skill TRIALS out of twenty-five (a title card explains the rule, {ui_spin} skips it), then the RELEASE: strike {ui_spin} when the ring touches the ball. A good throw keeps the ball in your zone (and earns more jackpot pulls). Too long? Options → Game → Throw: Quick.",
   "text_pad_fr": "Le lancer se joue en trois temps : deux ÉPREUVES d'adresse tirées au hasard (le carton annonce la règle, {ui_spin} pour le passer), puis le LÂCHER : {ui_spin} quand l'anneau touche la bille. Un beau lancer garde la bille dans ta zone.",
   "text_pad_en": "A throw takes three beats: two random skill TRIALS (the title card explains the rule, {ui_spin} skips it), then the RELEASE: {ui_spin} when the ring touches the ball. A good throw keeps the ball in your zone.",
-  "text_touch_fr": "Le lancer se joue en trois temps : deux ÉPREUVES d'adresse tirées au hasard (le carton annonce la règle, touche pour le passer), puis le LÂCHER : touche l'écran quand l'anneau touche la bille. Certaines épreuves se jouent avec les boutons de couleur en bas à droite.",
-  "text_touch_en": "A throw takes three beats: two random skill TRIALS (a title card explains the rule, tap to skip it), then the RELEASE: tap when the ring touches the ball. Some trials are played with the coloured buttons at the bottom right."
+  "text_touch_fr": "Le lancer se joue en trois temps : deux ÉPREUVES d'adresse tirées au hasard (le carton annonce la règle, touche pour le passer), puis le LÂCHER : touche l'écran quand l'anneau touche la bille. Certaines épreuves se jouent avec les boutons de couleur ou le joystick en bas de l'écran.",
+  "text_touch_en": "A throw takes three beats: two random skill TRIALS (a title card explains the rule, tap to skip it), then the RELEASE: tap when the ring touches the ball. Some trials are played with the coloured buttons or the joystick at the bottom of the screen."
  },
  {
   "id": "tip_wild",

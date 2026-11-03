@@ -110,6 +110,7 @@ func _open_trial() -> void:
 	HitchMonitor.mark("épreuve " + id)
 	var scr: GDScript = load(TRIAL_SCRIPTS % id) as GDScript
 	var e: Dictionary = DataRegistry.db.get_entry("throw_trials", id)
+	SaveSystem.mark_seen("trials", id)  # le Codex montre les épreuves déjà jouées
 	# Au doigt, une épreuve à symboles se joue comme à la manette, avec le pavé de boutons.
 	var pad: Array[String] = []
 	var stick: bool = InputGlyphs.using_touch and bool(e.get("touch_stick", false))

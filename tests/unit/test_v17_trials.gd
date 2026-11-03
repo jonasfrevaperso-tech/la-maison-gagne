@@ -161,3 +161,63 @@ func test_scratch_targets_always_glint() -> void:
 	for i: int in sc._targets:
 		check(sc._seen[i] >= sc._passes, "trèfle %d vu à chaque passage" % i)
 	sc.free()
+
+
+## Pêche : un fil trop tendu casse, la carpe est perdue (remontée nulle).
+func test_fishing_line_snaps() -> void:
+	var f: TrialFishing = _trial("fishing") as TrialFishing
+	f.begin()
+	f._phase = "reel"
+	f._tension = 0.99
+	f._hold = true
+	f._pull_t = 10.0
+	f.tick(0.1)
+	eq(f._scores.size(), 1, "poisson terminé")
+	check(f._scores[0] <= f.p("w_cast") + f.p("w_bite"), "remontée perdue")
+	f.free()
+
+
+## Lasers : un faisceau actif touche le cambrioleur placé dessus.
+func test_lasers_beam_hits() -> void:
+	var l: TrialLasers = _trial("lasers") as TrialLasers
+	l.begin()
+	var seg: PackedVector2Array = PackedVector2Array()
+	for b: Dictionary in l._beams:
+		var segs: Array[PackedVector2Array] = l._segments(b, 0.0)
+		if not segs.is_empty():
+			seg = segs[0]
+			break
+	check(not seg.is_empty(), "un faisceau actif")
+	check(l._hit_at(seg[0].lerp(seg[1], 0.5), 0.0), "touché sur le faisceau")
+	l.free()
+
+
+## Jonglage : frapper au moment où le jeton touche la ligne vaut une réception pleine.
+func test_juggle_perfect_strike() -> void:
+	var j: TrialJuggle = _trial("juggle") as TrialJuggle
+	j.begin()
+	var c: Dictionary = j._chips[0]
+	c["age"] = j._flight()
+	j.strike(int(c["lane"]))
+	eq(j._marks.size(), 1, "une réception")
+	eq(j._marks[0], 1.0, "parfaite")
+	check(float(c["age"]) == 0.0, "relancé")
+	j.free()
+
+
+## Billard : visée « bille fantôme » et force du bot empochent une bille droite devant une poche.
+func test_billiards_ghost_ball_pots() -> void:
+	var b: TrialBilliards = _trial("billiards") as TrialBilliards
+	b.begin()
+	var pk: Vector2 = TrialBilliards.TABLE.end
+	b._obj = pk - Vector2(260, 140)
+	b._cue = b._obj - (pk - b._obj).normalized() * 300.0
+	b._aim = b._best_plan().x
+	b._charge = b.bot_charge()
+	b._strike()
+	var guard: int = 0
+	while b._rolling and guard < 4000:
+		guard += 1
+		b.tick(1.0 / 120.0)
+	check(b._obj_in, "bille empochée")
+	b.free()

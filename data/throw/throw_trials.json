@@ -272,5 +272,66 @@
    "qte_left": "TOUCH_LEFT",
    "qte_right": "TOUCH_RIGHT"
   }
+ },
+ {
+  "id": "fishing",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "La Pêche au Gros",
+  "name_en": "Big Game Fishing",
+  "desc_fr": "Les carpes dorées de la fontaine du hall. Lance dans les remous, ferre quand ça mord, puis remonte en gardant la tension du fil dans le vert.",
+  "desc_en": "The golden carp of the lobby fountain. Cast into the ripples, strike when it bites, then reel in keeping the line tension in the green.",
+  "touch_pad": [
+   "ui_spin"
+  ],
+  "touch_labels": {
+   "ui_spin": "TOUCH_FISH"
+  }
+ },
+ {
+  "id": "lasers",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Les Lasers du Coffre",
+  "name_en": "The Vault Lasers",
+  "desc_fr": "Traverse la salle des coffres jusqu'à la porte blindée sans toucher les faisceaux qui balaient, glissent et clignotent.",
+  "desc_en": "Cross the vault to the armoured door without touching the beams that sweep, slide and blink.",
+  "touch_stick": true
+ },
+ {
+  "id": "juggle",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Le Jonglage",
+  "name_en": "The Juggling Act",
+  "desc_fr": "Garde les jetons en l'air : frappe la bonne main quand un jeton redescend sur la ligne dorée. Ils sont de plus en plus nombreux.",
+  "desc_en": "Keep the chips in the air: strike the right hand as a chip comes down on the gold line. There are more and more of them.",
+  "touch_pad": [
+   "qte_left",
+   "qte_down",
+   "qte_right"
+  ],
+  "touch_layout": "row",
+  "touch_labels": {
+   "qte_left": "TOUCH_LEFT",
+   "qte_down": "TOUCH_MIDDLE",
+   "qte_right": "TOUCH_RIGHT"
+  }
+ },
+ {
+  "id": "billiards",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Le Billard",
+  "name_en": "The Billiards",
+  "desc_fr": "Trois coups, une bille de couleur à empocher à chaque fois. Vise avec la bille fantôme, dose la force, joue.",
+  "desc_en": "Three shots, one coloured ball to pot each time. Aim with the ghost ball, judge the power, play.",
+  "touch_stick": true,
+  "touch_pad": [
+   "ui_spin"
+  ],
+  "touch_labels": {
+   "ui_spin": "TOUCH_SHOOT"
+  }
  }
 ]

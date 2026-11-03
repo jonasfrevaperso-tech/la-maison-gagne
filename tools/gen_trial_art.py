@@ -567,11 +567,86 @@ def art_derby(rng) -> None:
     save(img, "derby")
 
 
+def art_fishing(rng) -> None:
+    """La Pêche au Gros : fontaine de marbre, statue dorée, carpes, canne et bouchon."""
+    img, d = canvas()
+    rect(d, 0, 0, W, H, (28, 24, 32))
+    rect(d, 14, 40, 146, 92, (207, 198, 184))
+    rect(d, 18, 44, 142, 88, (15, 59, 74))
+    rect(d, 74, 14, 86, 40, GOLD_D)
+    disc(d, 80, 10, 6, GOLD)
+    for (x, y, a) in ((40, 60, 1), (110, 74, -1), (64, 78, 1)):
+        d.polygon([(x + 8 * a, y), (x, y - 3), (x - 6 * a, y), (x, y + 3)], fill=GOLD)
+        d.polygon([(x - 6 * a, y), (x - 10 * a, y - 3), (x - 10 * a, y + 3)], fill=GOLD_D)
+    d.line((6, 98, 40, 20), fill=WOOD, width=2)
+    d.line((40, 20, 96, 62), fill=IVORY)
+    disc(d, 96, 62, 2, RED)
+    d.arc((88, 56, 104, 68), 0, 360, fill=IVORY)
+    save(img, "fishing")
+
+
+def art_lasers(rng) -> None:
+    """Les Lasers du Coffre : dalles d'acier, coffres, faisceaux rouges, porte blindée, voleur."""
+    img, d = canvas()
+    rect(d, 0, 0, W, H, (7, 9, 12))
+    rect(d, 8, 12, 152, 90, (21, 24, 30))
+    for x in range(8, 152, 12):
+        d.line((x, 12, x, 90), fill=(30, 34, 40))
+    for k in range(10):
+        rect(d, 10 + k * 14, 4, 20 + k * 14, 10, (74, 80, 92))
+    rect(d, 140, 38, 150, 64, GOLD_D)
+    disc(d, 145, 51, 4, GOLD)
+    for (a, b) in (((40, 12), (60, 80)), ((90, 90), (76, 30))):
+        d.line((*a, *b), fill=(120, 20, 30), width=3)
+        d.line((*a, *b), fill=(255, 60, 60), width=1)
+    rect(d, 110, 20, 111, 44, (255, 60, 60))
+    rect(d, 110, 60, 111, 90, (255, 60, 60))
+    disc(d, 22, 52, 5, INK)
+    disc(d, 22, 52, 4, IVORY)
+    save(img, "lasers")
+
+
+def art_juggle(rng) -> None:
+    """Le Jonglage : rideaux du cabaret, projecteur, croupier, jetons en arc."""
+    img, d = canvas()
+    rect(d, 0, 0, W, H, (18, 6, 12))
+    for x in range(0, 40, 8):
+        rect(d, x, 0, x + 6, H, (100, 10, 22))
+        rect(d, W - x - 6, 0, W - x, H, (100, 10, 22))
+    d.polygon([(70, 0), (90, 0), (120, 100), (40, 100)], fill=(40, 30, 24))
+    rect(d, 0, 86, W, H, WOOD_D)
+    rect(d, 74, 56, 86, 86, INK)
+    rect(d, 78, 56, 82, 72, IVORY)
+    disc(d, 80, 50, 6, (232, 200, 168))
+    for k, (x, y) in enumerate(((56, 40), (70, 22), (90, 22), (104, 40))):
+        chip(d, x, y, 5, [RED, YELLOW, CYAN, EMERALD][k])
+    d.line((52, 70, 108, 70), fill=GOLD)
+    save(img, "juggle")
+
+
+def art_billiards(rng) -> None:
+    """Le Billard : table vue de dessus, poches, bille blanche, bille fantôme, queue."""
+    img, d = canvas()
+    rect(d, 0, 0, W, H, (14, 10, 8))
+    rect(d, 10, 12, 150, 90, (90, 48, 24))
+    rect(d, 16, 18, 144, 84, (11, 90, 58))
+    rect(d, 20, 22, 140, 80, (14, 107, 69))
+    for (x, y) in ((20, 22), (80, 22), (140, 22), (20, 80), (80, 80), (140, 80)):
+        disc(d, x, y, 4, INK)
+    disc(d, 124, 32, 4, YELLOW)
+    d.ellipse((114, 37, 122, 45), outline=IVORY)
+    disc(d, 60, 64, 4, IVORY)
+    d.line((64, 61, 114, 43), fill=SMOKE)
+    d.line((14, 82, 54, 67), fill=(200, 154, 90), width=2)
+    save(img, "billiards")
+
+
 def main() -> None:
     rng = random.Random(1520)
     for fn in [art_charge, art_rhythm, art_bottles, art_memory, art_shells, art_darts, art_safe,
                art_tower, art_shaker, art_pour, art_simon, art_catch, art_highlow, art_sort,
-               art_invaders, art_cave, art_pachinko, art_blackjack, art_scratch, art_dice, art_derby]:
+               art_invaders, art_cave, art_pachinko, art_blackjack, art_scratch, art_dice, art_derby,
+               art_fishing, art_lasers, art_juggle, art_billiards]:
         fn(rng)
     print(f"{len(list(OUT.glob('trial_*.png')))} illustrations d'épreuves écrites dans {OUT.relative_to(ROOT)}")
 

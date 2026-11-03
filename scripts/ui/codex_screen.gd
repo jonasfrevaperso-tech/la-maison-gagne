@@ -3,6 +3,11 @@ extends MetaScreen
 ## Codex : collection de tout le contenu. Ce qui n'a pas encore été vu reste masqué.
 
 const CARD_COLS: int = 12
+const TRIAL_COLS: int = 5
+## Carton d'épreuve du Codex : illustration pixel art ×2 (160 × 100) et règle dessous.
+const TRIAL_ART_SCALE: float = 2.0
+const TRIAL_TILE_W: float = 320.0
+const UNSEEN_TINT: Color = Color(0.09, 0.07, 0.12)
 const SECTIONS: Array[Array] = [
 	["grigris", "grigri", "CODEX_GRIGRIS"],
 	["pocket_types", "pocket_card", "CODEX_POCKETS"],
@@ -37,6 +42,7 @@ func build() -> void:
 				_fill_grid(grid(CARD_COLS), members, seen_list, String(sec[1]), cat)
 		else:
 			_fill_grid(grid(CARD_COLS), ids, seen_list, String(sec[1]), cat)
+	_trials(seen)
 	section(tr("CODEX_CREDITORS"))
 	for c: Dictionary in DataRegistry.db.list("creditors"):
 		if bool(c.get("secret", false)) and not seen.get("creditors", []).has(c["id"]):
@@ -50,6 +56,35 @@ func build() -> void:
 		)
 		r.custom_minimum_size = Vector2(1600, 0)
 		content.add_child(r)
+
+
+## Épreuves du lancer : carton illustré, nom et règle ; masquées tant qu'on ne les a pas jouées.
+func _trials(seen: Dictionary) -> void:
+	var all: Array[Dictionary] = DataRegistry.db.list("throw_trials")
+	var seen_list: Array = seen.get("trials", [])
+	var known: int = all.filter(func(e: Dictionary) -> bool: return seen_list.has(e["id"])).size()
+	section("%s — %d / %d" % [tr("CODEX_TRIALS"), known, all.size()])
+	var g: GridContainer = grid(TRIAL_COLS)
+	for e: Dictionary in all:
+		var box: VBoxContainer = VBoxContainer.new()
+		box.custom_minimum_size = Vector2(TRIAL_TILE_W, 0)
+		var met: bool = seen_list.has(e["id"])
+		var art: TextureRect = TextureRect.new()
+		var path: String = "res://assets/trials/trial_%s.png" % String(e["id"])
+		if ResourceLoader.exists(path):
+			art.texture = load(path) as Texture2D  # silhouette sombre tant qu'elle n'est pas jouée
+		art.custom_minimum_size = Vector2(160.0, 100.0) * TRIAL_ART_SCALE
+		art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		art.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		art.modulate = Color.WHITE if met else UNSEEN_TINT
+		box.add_child(art)
+		box.add_child(UiKit.label(Localization.t(e, "name") if met else "???", UiKit.SIZE_BODY, Palette.GOLD_LIGHT, "display"))
+		var desc: Label = UiKit.label(Localization.t(e, "desc") if met else tr("CODEX_UNKNOWN"), UiKit.SIZE_SMALL, Palette.IVORY)
+		desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		desc.custom_minimum_size = Vector2(TRIAL_TILE_W, 0)
+		box.add_child(desc)
+		g.add_child(box)
 
 
 func _fill_grid(g: GridContainer, ids: Array[String], seen_list: Array, kind: String, cat: String) -> void:
