@@ -28,6 +28,7 @@ var _intensity: float = 0.0
 var _ambience: AudioStreamPlayer = null
 ## En headless (tests, simulation, CI), le pilote audio factice ne libère jamais les lectures.
 var _silent: bool = false
+var _hushed: bool = false
 var _music_tweens: Array[Tween] = []
 var _mix: Dictionary = {}
 var _duck: float = 0.0
@@ -56,6 +57,11 @@ func _ready() -> void:
 	add_child(_ambience)
 	apply_volumes()
 	EventBus.settings_changed.connect(apply_volumes)
+
+
+## Coupe les nouveaux sons (chauffe du rendu derrière le carton de chargement) ; jamais en headless.
+func hush(on: bool) -> void:
+	_hushed = on
 
 
 ## Arrête et détache tous les flux (évite des lectures orphelines à la fermeture).
@@ -136,7 +142,7 @@ func _variants(sfx_id: String) -> Array:
 
 ## Joue un SFX (variante et pitch aléatoires). `pitch` multiplie le pitch de base.
 func play(sfx_id: String, pitch: float = 1.0, volume_db: float = 0.0, bus: String = "SFX") -> void:
-	if _silent:
+	if _silent or _hushed:
 		return
 	var v: Array = _variants(sfx_id)
 	if v.is_empty():

@@ -5,6 +5,7 @@ extends Node
 ## partir sur Oui, aller sur Non avec « droite » et revenir avec « gauche ».
 
 const SETTLE: int = 30
+const WAIT_FRAMES: int = 3000
 
 var problems: Array[String] = []
 var checked: int = 0
@@ -23,8 +24,7 @@ func _run() -> void:
 	GameState.controller.run.flags["act_intro_seen_1"] = true
 	GameState.controller.run.flags["tutorial_off"] = true
 	GameState.goto(&"run")
-	await _settle(150)
-	var rs: RunScreen = _find(get_tree().root, "RunScreen") as RunScreen
+	var rs: RunScreen = await _wait_for("RunScreen") as RunScreen
 	if rs == null:
 		problems.append("écran de partie introuvable")
 	else:
@@ -43,8 +43,7 @@ func _run() -> void:
 	GameState.autosave()
 	GameState.controller = null
 	GameState.goto(&"title")
-	await _settle(150)
-	var ts: Node = _find(get_tree().root, "TitleScreen")
+	var ts: Node = await _wait_for("TitleScreen")
 	if ts != null:
 		ts.call("_on_new")
 		await _check("titre → nouvelle partie")
@@ -83,6 +82,17 @@ func _check(label: String) -> void:
 		problems.append("%s : « gauche » mène à %s au lieu de Oui" % [label, _name(vp.gui_get_focus_owner())])
 	box.call("go_back")
 	await _settle()
+
+
+## Attend l'écran (chargement, chauffe du rendu) puis l'ouverture des rideaux.
+func _wait_for(cls: String) -> Node:
+	for _i: int in WAIT_FRAMES:
+		await get_tree().process_frame
+		var n: Node = _find(get_tree().root, cls)
+		if n != null:
+			await _settle(90)
+			return n
+	return null
 
 
 func _press(action: StringName) -> void:

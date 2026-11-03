@@ -656,3 +656,5 @@ OPT_ON,Activée,On
 OPT_DENSITY_LOW,Faible,Low
 OPT_DENSITY_MEDIUM,Moyenne,Medium
 OPT_DENSITY_HIGH,Élevée,High
+LOADING_TITLE,La Maison prépare la table…,The House is setting the table…
+LOADING_TIP,Astuce :,Tip:

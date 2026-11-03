@@ -20,6 +20,7 @@ var _acc: float = 0.0
 var _frames: int = 0
 var _worst: float = 0.0
 var _log: bool = false
+var _pipelines: int = 0
 
 
 ## Étape notable (ouverture d'une épreuve, d'une surcouche…) : citée par le prochain à-coup.
@@ -46,6 +47,18 @@ func _apply() -> void:
 	_label.position = safe.position + MARGIN
 
 
+## Pipelines graphiques compilés depuis le lancement (une compilation = un à-coup possible).
+static func _pipeline_count() -> int:
+	var n: int = 0
+	for k: RenderingServer.RenderingInfo in [
+		RenderingServer.RENDERING_INFO_PIPELINE_COMPILATIONS_CANVAS, RenderingServer.RENDERING_INFO_PIPELINE_COMPILATIONS_MESH,
+		RenderingServer.RENDERING_INFO_PIPELINE_COMPILATIONS_SURFACE, RenderingServer.RENDERING_INFO_PIPELINE_COMPILATIONS_DRAW,
+		RenderingServer.RENDERING_INFO_PIPELINE_COMPILATIONS_SPECIALIZATION,
+	]:
+		n += RenderingServer.get_rendering_info(k)
+	return n
+
+
 func _on_screen(screen_id: StringName, _params: Dictionary) -> void:
 	_screen = String(screen_id)
 	_screen_ms = Time.get_ticks_msec()
@@ -53,10 +66,14 @@ func _on_screen(screen_id: StringName, _params: Dictionary) -> void:
 
 func _process(delta: float) -> void:
 	var ms: float = delta * 1000.0
+	var pipes: int = _pipeline_count()
+	var new_pipes: int = pipes - _pipelines
+	_pipelines = pipes
 	if _log and ms > HITCH_MS:
 		var now: int = Time.get_ticks_msec()
-		print("HITCH %.0f ms · écran %s (+%.1f s) · dernière étape « %s » (+%.1f s)" % [
-			ms, _screen, float(now - _screen_ms) / 1000.0, _last_mark, float(now - _mark_ms) / 1000.0,
+		print("HITCH %.0f ms · script %.0f ms · %d pipeline(s) · écran %s (+%.1f s) · étape « %s » (+%.1f s)" % [
+			ms, Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0, new_pipes, _screen,
+			float(now - _screen_ms) / 1000.0, _last_mark, float(now - _mark_ms) / 1000.0,
 		])
 	if not _label.visible:
 		return

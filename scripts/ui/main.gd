@@ -18,6 +18,15 @@ const SCREENS: Dictionary[StringName, String] = {
 	&"intro": "res://scenes/ui/intro_cutscene.tscn",
 }
 
+## Écrans lourds : carton de chargement (chargement en tâche de fond, chauffe du rendu).
+const HEAVY_SCREENS: Array[StringName] = [&"run", &"summary"]
+## Images rendues derrière les rideaux fermés avant de les ouvrir (premières compilations) ;
+## écran lourd : jusqu'à ce qu'aucun pipeline graphique ne se compile plus (borné).
+const SETTLE_FRAMES: int = 3
+const SETTLE_QUIET_FRAMES: int = 6
+const SETTLE_MAX_MS: int = 2500
+const SETTLE_LIGHT_MS: int = 700
+
 ## Surcouches modales qui reçoivent la navigation manette à la place de l'écran.
 const MODAL_CLASSES: Array[String] = ["Overlay", "DialogueOverlay", "ActTitle"]
 
@@ -27,6 +36,7 @@ var _frame: Control = null
 var _overlay_layer: CanvasLayer = null
 var _current: Node = null
 var _transition: ScreenTransition = null
+var _loading: LoadingScreen = null
 
 
 func _ready() -> void:
@@ -43,6 +53,8 @@ func _ready() -> void:
 	add_child(_overlay_layer)
 	_transition = ScreenTransition.new()
 	_overlay_layer.add_child(_transition)
+	_loading = LoadingScreen.new()
+	_overlay_layer.add_child(_loading)
 	var toasts: ToastLayer = ToastLayer.new()
 	_overlay_layer.add_child(toasts)
 	var post: PostFx = PostFx.new()
@@ -146,12 +158,50 @@ func _on_screen_requested(screen_id: StringName, params: Dictionary) -> void:
 		return
 	_transition.style = "crt" if screen_id in [&"title", &"summary"] else "curtains"
 	await _transition.close()
+	HitchMonitor.mark("écran " + String(screen_id))
 	if _current != null:
 		_current.queue_free()
 		_current = null
-	var packed: PackedScene = load(SCREENS[screen_id]) as PackedScene
+	var heavy: bool = screen_id in HEAVY_SCREENS
+	if heavy:
+		await _loading.show_card()
+	var packed: PackedScene = await _load_scene(SCREENS[screen_id], heavy)
+	if heavy and screen_id == &"run":
+		await Warmup.run(_frame, func(p: float) -> void: _loading.set_progress(0.3 + 0.6 * p))
 	_current = packed.instantiate()
 	if _current.has_method("setup"):
 		_current.call("setup", params)
 	_frame.add_child(_current)
+	for _i: int in SETTLE_FRAMES:
+		await get_tree().process_frame
+	await _settle_pipelines(SETTLE_MAX_MS if heavy else SETTLE_LIGHT_MS)
+	if heavy:
+		await _loading.hide_card()
+	HitchMonitor.mark("ouverture " + String(screen_id))
 	await _transition.open()
+
+
+func _settle_pipelines(max_ms: int) -> void:
+	var t0: int = Time.get_ticks_msec()
+	var quiet: int = 0
+	var last: int = HitchMonitor._pipeline_count()
+	while quiet < SETTLE_QUIET_FRAMES and Time.get_ticks_msec() - t0 < max_ms:
+		await get_tree().process_frame
+		var now: int = HitchMonitor._pipeline_count()
+		quiet = quiet + 1 if now == last else 0
+		last = now
+	_loading.set_progress(1.0)
+
+
+## Chargement en tâche de fond (la barre du carton avance), sinon chargement direct.
+func _load_scene(path: String, show_progress: bool) -> PackedScene:
+	if not show_progress or ResourceLoader.has_cached(path):
+		return load(path) as PackedScene
+	ResourceLoader.load_threaded_request(path, "PackedScene", true)
+	var prog: Array = []
+	while ResourceLoader.load_threaded_get_status(path, prog) == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+		if not prog.is_empty():
+			_loading.set_progress(0.3 * float(prog[0]))
+		await get_tree().process_frame
+	var res: PackedScene = ResourceLoader.load_threaded_get(path) as PackedScene
+	return res if res != null else load(path) as PackedScene
