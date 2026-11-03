@@ -43,6 +43,8 @@ func start() -> bool:
 	if args.has("dev-trial-bench"):
 		var tb: DevTrialBench = DevTrialBench.new()
 		tb.runs = maxi(int(String(args["dev-trial-bench"])), 1) if String(args["dev-trial-bench"]) != "true" else 3
+		if args.has("dev-trials-only"):
+			tb.only = String(args["dev-trials-only"]).split(",")
 		add_child(tb)
 		return true
 	if args.has("dev-confirm-check"):

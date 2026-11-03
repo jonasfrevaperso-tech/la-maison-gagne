@@ -671,3 +671,65 @@ TRIAL_CATCH_BONUS_MAGNET,Aimant,Magnet
 TRIAL_CATCH_BONUS_WIDE,Grand plateau,Wide tray
 TRIAL_CATCH_BONUS_SLOW,Ralenti,Slow-mo
 TRIAL_CATCH_BONUS_DOUBLE,Valeur ×2,Value ×2
+TOUCH_FIRE,FEU,FIRE
+TOUCH_JUMP,SAUT,JUMP
+TOUCH_LEFT,GAUCHE,LEFT
+TOUCH_RIGHT,DROITE,RIGHT
+TRIAL_INVADERS_HINT,{move} déplacer le râteau · {confirm} tirer,{move} move the rake · {confirm} fire
+TRIAL_INVADERS_HINT_MOUSE,Bouge {@mouse} pour déplacer le râteau · {@click} tirer,Move {@mouse} to move the rake · {@click} fire
+TRIAL_INVADERS_HINT_TOUCH,Joystick pour déplacer le râteau · FEU pour tirer,Joystick to move the rake · FIRE to shoot
+TRIAL_INVADERS_MARQUEE,LES ENVAHISSEURS DU ZÉRO,ZERO INVADERS
+TRIAL_INVADERS_STATUS,DÉTRUITS %d %%,DESTROYED %d %%
+TRIAL_INVADERS_SAUCER,Plaque volante !,Flying plaque!
+TRIAL_INVADERS_HIT,Touché !,Hit!
+TRIAL_CAVE_HINT,{move} courir · {confirm} sauter (et se lâcher du câble),{move} run · {confirm} jump (and let go of the cable)
+TRIAL_CAVE_HINT_MOUSE,Bouge {@mouse} devant le groom pour courir · {@click} sauter,Move {@mouse} ahead of the bellhop to run · {@click} jump
+TRIAL_CAVE_HINT_TOUCH,Joystick pour courir · SAUT pour sauter et se lâcher du câble,Joystick to run · JUMP to jump and let go of the cable
+TRIAL_CAVE_STATUS,Trésors : %d / %d,Treasures: %d / %d
+TRIAL_CAVE_FALL,Dans la fosse !,Into the pit!
+TRIAL_CAVE_HIT,Aïe !,Ouch!
+TRIAL_CAVE_TREASURE,Trésor !,Treasure!
+TRIAL_PACHINKO_HINT,"{qte_left} taquet gauche · {qte_right} taquet droit, quand la bille passe","{qte_left} left kicker · {qte_right} right kicker, as the ball passes"
+TRIAL_PACHINKO_HINT_MOUSE,"{@click} taquet gauche · {@right_click} taquet droit, quand la bille passe","{@click} left kicker · {@right_click} right kicker, as the ball passes"
+TRIAL_PACHINKO_HINT_TOUCH,GAUCHE ou DROITE quand la bille passe sur le taquet,LEFT or RIGHT as the ball crosses the kicker
+TRIAL_PACHINKO_GOLD,Godet d'or !,Gold cup!
+TRIAL_PACHINKO_SILVER,Argent,Silver
+TRIAL_PACHINKO_GUTTER,Gouttière,Gutter
+TOUCH_HIT,TIRER,HIT
+TOUCH_DOUBLE,DOUBLER,DOUBLE
+TOUCH_STAND,RESTER,STAND
+TRIAL_BLACKJACK_HINT,{qte_left} tirer · {qte_up} doubler · {qte_right} rester,{qte_left} hit · {qte_up} double · {qte_right} stand
+TRIAL_BLACKJACK_HINT_MOUSE,"{@click} sur TIRER, DOUBLER ou RESTER avant la fin du chrono","{@click} HIT, DOUBLE or STAND before time runs out"
+TRIAL_BLACKJACK_HINT_TOUCH,"TIRER, DOUBLER ou RESTER avant la fin du chrono","HIT, DOUBLE or STAND before time runs out"
+TRIAL_BLACKJACK_HIT,Tirer,Hit
+TRIAL_BLACKJACK_DOUBLE,Doubler,Double
+TRIAL_BLACKJACK_STAND,Rester,Stand
+TRIAL_BLACKJACK_BOOK,Dans le livre !,By the book!
+TRIAL_BLACKJACK_OFFBOOK,Hors stratégie,Off the book
+TRIAL_BLACKJACK_SLOW,Trop lent !,Too slow!
+TRIAL_BLACKJACK_WIN,Main gagnée,Hand won
+TRIAL_BLACKJACK_LOSE,Main perdue,Hand lost
+TRIAL_BLACKJACK_PUSH,Égalité,Push
+TRIAL_BLACKJACK_RULE,"La donneuse reste sur 17 · on note la décision, pas les cartes","Dealer stands on 17 · the call is graded, not the cards"
+TRIAL_SCRATCH_HINT,{move} choisir une case · maintiens {confirm} pour gratter,{move} pick a cell · hold {confirm} to scratch
+TRIAL_SCRATCH_HINT_MOUSE,Maintiens {@click} sur une case pour la gratter,Hold {@click} on a cell to scratch it
+TRIAL_SCRATCH_HINT_TOUCH,Frotte une case du doigt pour la gratter,Rub a cell with your finger to scratch it
+TRIAL_SCRATCH_TICKET,FORTUNE DU ZÉRO,ZERO FORTUNE
+TRIAL_SCRATCH_STATUS,Grattages restants : %d · trèfles : %d / 3,Scratches left: %d · clovers: %d / 3
+TRIAL_SCRATCH_CLOVER,Trèfle d'or !,Gold clover!
+TRIAL_SCRATCH_BLANK,Perdu,Blank
+TRIAL_DICE_HINT,"{move} viser · maintiens {confirm} pour la force, lâche pour lancer","{move} aim · hold {confirm} for power, release to throw"
+TRIAL_DICE_HINT_MOUSE,"Vise avec {@mouse} · maintiens {@click} pour la force, lâche pour lancer","Aim with {@mouse} · hold {@click} for power, release to throw"
+TRIAL_DICE_HINT_TOUCH,"Joystick pour viser · maintiens LANCER pour la force, lâche pour lancer","Joystick to aim · hold THROW for power, release to throw"
+TRIAL_DICE_NO_WALL,Sans la bande !,Missed the wall!
+TRIAL_DERBY_HINT,Alterne {qte_left} et {qte_right} au rythme du sabot doré,Alternate {qte_left} and {qte_right} in time with the golden hoof
+TRIAL_DERBY_HINT_MOUSE,Alterne {@click} et {@right_click} au rythme du sabot doré,Alternate {@click} and {@right_click} in time with the golden hoof
+TRIAL_DERBY_HINT_TOUCH,Alterne GAUCHE et DROITE au rythme du sabot doré,Alternate LEFT and RIGHT in time with the golden hoof
+TRIAL_DERBY_MARQUEE,LE TIERCÉ DU GRAND ZÉRO,THE GRAND ZERO DERBY
+TRIAL_DERBY_WINDED,Essoufflé !,Winded!
+TRIAL_DERBY_PLACE_1,1er !,1st!
+TRIAL_DERBY_PLACE_2,2e,2nd
+TRIAL_DERBY_PLACE_3,3e,3rd
+TRIAL_DERBY_PLACE_4,4e,4th
+TRIAL_DERBY_YOU,TOI,YOU
+TRIAL_DERBY_BREATH,Souffle,Breath

@@ -162,5 +162,115 @@
   "name_en": "Chip Sorting",
   "desc_fr": "Envoie chaque jeton qui passe dans la fenêtre vers le bac de sa couleur. Le tapis accélère.",
   "desc_en": "Send every chip crossing the window to the bin of its colour. The belt speeds up."
+ },
+ {
+  "id": "invaders",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Les Envahisseurs du Zéro",
+  "name_en": "Zero Invaders",
+  "desc_fr": "Des rangées de jetons-envahisseurs descendent vers le tapis. Déplace le râteau-canon du croupier et tire, abrité derrière les piles de jetons. Gare à la riposte.",
+  "desc_en": "Rows of chip invaders march down on the felt. Slide the croupier's rake-cannon and fire from behind the chip stacks. Mind the return fire.",
+  "touch_stick": true,
+  "touch_pad": [
+   "ui_spin"
+  ],
+  "touch_labels": {
+   "ui_spin": "TOUCH_FIRE"
+  }
+ },
+ {
+  "id": "cave",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "La Cave du Grand Zéro",
+  "name_en": "The Grand Zero Cellar",
+  "desc_fr": "Le patron veut sa bouteille. Traverse les caves en courant : saute fosses, tonneaux et rats, accroche-toi aux câbles des lustres et cueille les trésors.",
+  "desc_en": "The boss wants his bottle. Run through the cellars: jump pits, barrels and rats, swing on the chandelier cables and grab the treasures.",
+  "touch_stick": true,
+  "touch_pad": [
+   "ui_spin"
+  ],
+  "touch_labels": {
+   "ui_spin": "TOUCH_JUMP"
+  }
+ },
+ {
+  "id": "pachinko",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Pachinko",
+  "name_en": "Pachinko",
+  "desc_fr": "Les billes dévalent le plateau de clous. Frappe le taquet gauche ou droit quand elles passent dessus pour les renvoyer dans le godet d'or.",
+  "desc_en": "Balls tumble through the pins. Flip the left or right kicker as they pass over it to send them into the gold cup.",
+  "touch_pad": [
+   "qte_left",
+   "qte_right"
+  ],
+  "touch_layout": "split",
+  "touch_labels": {
+   "qte_left": "TOUCH_LEFT",
+   "qte_right": "TOUCH_RIGHT"
+  }
+ },
+ {
+  "id": "blackjack",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Blackjack express",
+  "name_en": "Express Blackjack",
+  "desc_fr": "Trois mains, quelques secondes par décision : tirer, doubler ou rester. On ne note pas les cartes, seulement la justesse et la vitesse de ta décision.",
+  "desc_en": "Three hands, a few seconds per decision: hit, double or stand. The cards aren't graded, only how sound and quick your call is.",
+  "touch_pad": [
+   "qte_left",
+   "qte_up",
+   "qte_right"
+  ],
+  "touch_layout": "row",
+  "touch_labels": {
+   "qte_left": "TOUCH_HIT",
+   "qte_up": "TOUCH_DOUBLE",
+   "qte_right": "TOUCH_STAND"
+  }
+ },
+ {
+  "id": "scratch",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Le Grattage",
+  "name_en": "The Scratchcard",
+  "desc_fr": "Trois trèfles d'or se cachent sous neuf cases, et tu n'en grattes que quatre. Le reflet qui balaie le ticket les trahit à chaque passage : observe, puis gratte.",
+  "desc_en": "Three gold clovers hide under nine cells, and you may scratch only four. The glint sweeping the ticket gives them away on every pass: watch, then scratch."
+ },
+ {
+  "id": "dice",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Les Dés",
+  "name_en": "The Dice",
+  "desc_fr": "Vise, dose la force et fais rebondir les dés sur la bande du fond pour qu'ils s'arrêtent dans la zone dorée. La face ne compte pas, seulement où ils s'arrêtent.",
+  "desc_en": "Aim, judge the force and bounce the dice off the back wall so they stop in the gold zone. The face doesn't matter, only where they land.",
+  "touch_stick": true,
+  "touch_pad": [
+   "ui_spin"
+  ]
+ },
+ {
+  "id": "derby",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Le Tiercé",
+  "name_en": "The Derby",
+  "desc_fr": "Ton cheval de bois galope quand tu alternes gauche et droite au rythme du sabot doré. Trop vite, il s'essouffle. Trois adversaires t'attendent.",
+  "desc_en": "Your wooden horse gallops as you alternate left and right in time with the golden hoof. Too fast and it runs out of breath. Three rivals await.",
+  "touch_pad": [
+   "qte_left",
+   "qte_right"
+  ],
+  "touch_layout": "split",
+  "touch_labels": {
+   "qte_left": "TOUCH_LEFT",
+   "qte_right": "TOUCH_RIGHT"
+  }
  }
 ]

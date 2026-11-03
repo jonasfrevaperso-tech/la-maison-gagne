@@ -562,7 +562,9 @@ func bot_wants() -> Dictionary:
 	# Commande PD : freine à l'approche (le plateau a de l'inertie).
 	var axis: float = clampf(((goal - _x) * 6.0 - _v * 0.9) / p("tray_speed"), -1.0, 1.0)
 	var bank: bool = _stack_n >= int(p("stack_max") * 0.4) or _wobble > 0.4 or _stun > 0.0
-	return {"do": "axis", "v": Vector2(axis, 0.0), "bank": bank}
+	if bank and _stack_n > 0:
+		return {"do": "confirm"}
+	return {"do": "axis", "v": Vector2(axis, 0.0)}
 
 
 func _landing(it: Dictionary) -> float:
@@ -570,12 +572,10 @@ func _landing(it: Dictionary) -> float:
 
 
 func bot_apply(want: Dictionary) -> void:
-	if String(want.get("do", "")) == "axis":
-		_bot_axis = (want["v"] as Vector2).x
-		_bot_bank = bool(want.get("bank", false))
-	else:
-		_bot_axis = 0.0
-		_bot_bank = false
+	# Un geste par image, comme à la vraie manette (stick, ou valider pour vider).
+	var act: String = String(want.get("do", ""))
+	_bot_axis = (want["v"] as Vector2).x if act == "axis" else 0.0
+	_bot_bank = act == "confirm"
 
 
 # --------------------------------------------------------------------------- dessin

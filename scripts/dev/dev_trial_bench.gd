@@ -11,6 +11,8 @@ const IDLE_MAX: float = 0.4
 
 var runs: int = 3
 var problems: Array[String] = []
+## --dev-trials-only=a,b : ne joue que ces épreuves (mise au point).
+var only: PackedStringArray = PackedStringArray()
 
 
 func _ready() -> void:
@@ -23,6 +25,8 @@ func _run() -> void:
 	add_child(host)
 	for e: Dictionary in DataRegistry.db.list("throw_trials"):
 		var id: String = String(e["id"])
+		if not only.is_empty() and not only.has(id):
+			continue
 		var bot: Array[float] = []
 		var idle: Array[float] = []
 		var secs: Array[float] = []

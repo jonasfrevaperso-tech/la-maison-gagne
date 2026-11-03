@@ -407,12 +407,173 @@ def art_sort(rng) -> None:
     save(img, "sort")
 
 
+def art_invaders(rng) -> None:
+    """Les Envahisseurs du Zéro : borne d'arcade, rangées de jetons-envahisseurs, râteau-canon."""
+    img, d = canvas()
+    rect(d, 0, 0, W, H, (18, 10, 28))
+    rect(d, 20, 4, 140, 14, (40, 8, 40))
+    rect(d, 20, 4, 140, 5, MAGENTA)
+    rect(d, 24, 16, 136, 96, INK)
+    inv = ["  #   #  ", "  #####  ", " ## # ## ", "#########", "# ##### #", "  #   #  "]
+    cols = [MAGENTA, YELLOW, CYAN, EMERALD]
+    for r in range(4):
+        for c in range(6):
+            x0, y0 = 32 + c * 17, 20 + r * 11
+            for yy, row in enumerate(inv):
+                for xx, ch in enumerate(row):
+                    if ch == "#" and yy < 6:
+                        d.point((x0 + xx, y0 + yy), fill=cols[r])
+    for k in range(3):
+        x = 40 + k * 36
+        rect(d, x, 72, x + 12, 77, GOLD)
+        rect(d, x + 2, 70, x + 10, 72, GOLD_D)
+    rect(d, 76, 84, 84, 88, IVORY)
+    rect(d, 79, 80, 81, 84, IVORY)
+    rect(d, 79, 50, 80, 58, GOLD_L)
+    rect(d, 101, 60, 102, 66, MAGENTA)
+    for y in range(16, 96, 2):
+        d.line((24, y, 136, y), fill=(0, 0, 0))
+    save(img, "invaders")
+
+
+def art_cave(rng) -> None:
+    """La Cave du Grand Zéro : voûte de briques, fosse, câble de lustre, tonneau, trésor."""
+    img, d = canvas()
+    gradient(img, (0, 0, W, 78), (26, 15, 12), (44, 24, 18))
+    for y in range(6, 76, 8):
+        off = 6 if (y // 8) % 2 else 0
+        for x in range(-off, W, 14):
+            rect(d, x + 1, y + 1, x + 12, y + 6, (52, 28, 22))
+    rect(d, 0, 78, W, H, (58, 36, 24))
+    rect(d, 0, 78, W, 79, (107, 74, 42))
+    rect(d, 70, 78, 110, H, INK)
+    d.line((90, 10, 100, 50), fill=GOLD, width=1)
+    disc(d, 90, 10, 3, GOLD_D)
+    rect(d, 98, 50, 104, 56, RED)
+    rect(d, 99, 46, 103, 50, IVORY)
+    disc(d, 40, 72, 6, (122, 74, 36))
+    d.line((34, 72, 46, 72), fill=(58, 34, 16))
+    disc(d, 130, 50, 5, GOLD)
+    disc(d, 130, 50, 3, IVORY)
+    glow(img, 20, 30, 16, AMBER, 0.5)
+    rect(d, 19, 30, 21, 38, (140, 90, 40))
+    disc(d, 20, 28, 3, AMBER)
+    save(img, "cave")
+
+
+def art_pachinko(rng) -> None:
+    """Pachinko : caisson rouge, ampoules, plateau de clous, billes, taquets, godet d'or."""
+    img, d = canvas()
+    rect(d, 0, 0, W, H, (20, 8, 18))
+    rect(d, 34, 2, 126, 98, (90, 12, 24))
+    for k in range(12):
+        disc(d, 38 + k * 8, 5, 1, GOLD_L if k % 2 else GOLD_D)
+    rect(d, 40, 10, 120, 92, (42, 32, 24))
+    for r in range(7):
+        for c in range(9):
+            x = 46 + c * 9 + (4 if r % 2 else 0)
+            if x < 116:
+                d.point((x, 18 + r * 8), fill=IVORY)
+    for (x, y) in ((60, 30), (88, 52), (70, 74)):
+        disc(d, x, y, 2, STEEL)
+    d.line((44, 80, 66, 84), fill=CYAN, width=2)
+    d.line((116, 80, 94, 84), fill=CYAN, width=2)
+    rect(d, 72, 86, 88, 92, GOLD)
+    rect(d, 66, 86, 72, 92, SMOKE)
+    rect(d, 88, 86, 94, 92, SMOKE)
+    save(img, "pachinko")
+
+
+def art_blackjack(rng) -> None:
+    """Blackjack express : feutre en demi-lune, sabot, deux cartes, jetons, chrono."""
+    img, d = canvas()
+    rect(d, 0, 0, W, H, INK)
+    d.ellipse((-30, -70, 190, 96), fill=GOLD_D)
+    d.ellipse((-28, -68, 188, 94), fill=FELT)
+    card(d, 56, 50, 20, 28, label="A", red=False)
+    card(d, 80, 50, 20, 28, label="K", red=True)
+    card(d, 70, 14, 16, 22, label="6", red=True)
+    rect(d, 88, 14, 104, 36, VELVET)
+    rect(d, 120, 10, 146, 30, WOOD_D)
+    rect(d, 122, 12, 144, 26, VELVET)
+    for k, col in enumerate((CYAN, YELLOW, RED)):
+        rect(d, 30 + k * 36, 86, 58 + k * 36, 94, col)
+    chip(d, 24, 64, 5, RED)
+    chip(d, 24, 60, 5, GOLD)
+    save(img, "blackjack")
+
+
+def art_scratch(rng) -> None:
+    """Le Grattage : ticket crème, 9 cases argentées, deux grattées (trèfles), reflet doré."""
+    img, d = canvas()
+    rect(d, 0, 0, W, H, (26, 15, 20))
+    rect(d, 0, 78, W, H, WOOD_D)
+    rect(d, 38, 6, 122, 94, (244, 231, 200))
+    rect(d, 40, 8, 120, 92, GOLD)
+    rect(d, 42, 10, 118, 90, (244, 231, 200))
+    rect(d, 50, 13, 110, 19, VELVET)
+    for i in range(9):
+        x, y = 48 + (i % 3) * 22, 24 + (i // 3) * 22
+        rect(d, x, y, x + 18, y + 18, (184, 184, 196))
+        if i in (1, 5):
+            rect(d, x + 2, y + 2, x + 16, y + 16, IVORY)
+            disc(d, x + 7, y + 7, 3, EMERALD)
+            disc(d, x + 11, y + 7, 3, EMERALD)
+            disc(d, x + 9, y + 11, 3, EMERALD)
+    glow(img, 101, 40, 10, GOLD_L, 0.7)
+    disc(d, 101, 40, 2, IVORY)
+    disc(d, 128, 70, 6, GOLD)
+    save(img, "scratch")
+
+
+def art_dice(rng) -> None:
+    """Les Dés : table de craps vue de dessus, bande à pyramides, zone dorée, deux dés."""
+    img, d = canvas()
+    rect(d, 0, 0, W, H, (74, 42, 20))
+    rect(d, 10, 8, 150, 92, GOLD_D)
+    rect(d, 12, 10, 148, 90, FELT)
+    for x in range(12, 148, 6):
+        d.polygon([(x, 10), (x + 3, 14), (x + 6, 10)], fill=GOLD)
+    disc(d, 100, 44, 12, (90, 110, 50))
+    d.ellipse((88, 32, 112, 56), outline=GOLD_L)
+    for (x, y) in ((92, 40), (102, 46)):
+        rect(d, x, y, x + 8, y + 8, RED)
+        d.point((x + 2, y + 2), fill=IVORY)
+        d.point((x + 5, y + 5), fill=IVORY)
+    for k in range(6):
+        d.point((80 - k * 4, 80 - k * 8), fill=CYAN)
+    rect(d, 20, 70, 140, 71, (200, 200, 190))
+    save(img, "dice")
+
+
+def art_derby(rng) -> None:
+    """Le Tiercé : stand forain à ampoules, quatre chevaux de bois sur leurs rails, damier."""
+    img, d = canvas()
+    rect(d, 0, 0, W, H, (26, 12, 24))
+    rect(d, 0, 4, W, 16, VELVET)
+    for k in range(20):
+        disc(d, 4 + k * 8, 6, 1, GOLD_L if k % 2 else GOLD_D)
+    cols = [YELLOW, CYAN, RED, EMERALD]
+    for k in range(4):
+        y = 30 + k * 17
+        rect(d, 8, y + 6, 140, y + 7, (180, 120, 60))
+        x = 40 + (3 - k) * 14 + (20 if k == 0 else 0)
+        rect(d, x, y - 2, x + 16, y + 3, cols[k])
+        rect(d, x + 14, y - 6, x + 18, y, cols[k])
+        for l in (1, 6, 10, 14):
+            rect(d, x + l, y + 3, x + l + 1, y + 6, cols[k])
+    for y in range(24, 96, 4):
+        rect(d, 146, y, 150, y + 2, IVORY if (y // 4) % 2 else INK)
+    save(img, "derby")
+
+
 def main() -> None:
     rng = random.Random(1520)
     for fn in [art_charge, art_rhythm, art_bottles, art_memory, art_shells, art_darts, art_safe,
-               art_tower, art_shaker, art_pour, art_simon, art_catch, art_highlow, art_sort]:
+               art_tower, art_shaker, art_pour, art_simon, art_catch, art_highlow, art_sort,
+               art_invaders, art_cave, art_pachinko, art_blackjack, art_scratch, art_dice, art_derby]:
         fn(rng)
-    print(f"14 illustrations d'épreuves écrites dans {OUT.relative_to(ROOT)}")
+    print(f"{len(list(OUT.glob('trial_*.png')))} illustrations d'épreuves écrites dans {OUT.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":

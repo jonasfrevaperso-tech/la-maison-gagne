@@ -43,3 +43,121 @@ func test_catch_combo_multiplier() -> void:
 	c._combo = 1000
 	eq(c._mult(), c.p("combo_max"), "plafond")
 	c.free()
+
+
+## Envahisseurs : tout détruire vaut la note pleine ; une touche coûte et sonne le canon.
+func test_invaders_score_and_hits() -> void:
+	var v: TrialInvaders = _trial("invaders") as TrialInvaders
+	v.begin()
+	for i: Dictionary in v._inv:
+		i["alive"] = false
+	v._killed = v._total
+	v.tick(0.01)
+	check(v.finished and is_equal_approx(v.score, 1.0), "tous détruits : 1")
+	var w: TrialInvaders = _trial("invaders") as TrialInvaders
+	w.begin()
+	w._bombs.append(Vector2(w._x, TrialInvaders.CANNON_Y))
+	w.tick(0.001)
+	eq(w._hits, 1, "bombe sur le canon : touché")
+	check(w._stun > 0.0, "canon sonné")
+	v.free()
+	w.free()
+
+
+## Cave : tomber dans une fosse ramène au bord et compte une chute.
+func test_cave_fall_returns_to_edge() -> void:
+	var c: TrialCave = _trial("cave") as TrialCave
+	c.begin()
+	var k: int = -1
+	for i: int in c._segs.size():
+		if String(c._segs[i]["kind"]) == "pit":
+			k = i
+			break
+	check(k >= 0, "une fosse au parcours")
+	var s: Dictionary = c._segs[k]
+	c._x = float(s["x"])
+	c._y = TrialCave.FLOOR_Y + c.p("fall_depth") + 10.0
+	c._vy = 10.0
+	c._ground = false
+	c._land()
+	eq(c._falls, 1, "chute comptée")
+	check(c._x < float(s["x"]) - float(s["w"]) * 0.5, "retour avant la fosse")
+	c.free()
+
+
+## Pachinko : un taquet frappé au point idéal envoie la bille dans le godet d'or ;
+## une bille non frappée finit hors du godet.
+func test_pachinko_kick_reaches_gold() -> void:
+	var pa: TrialPachinko = _trial("pachinko") as TrialPachinko
+	pa.begin()
+	var x: float = pa._center() - TrialPachinko.KICK_GAP * 0.5 - TrialPachinko.KICK_HALF_W
+	pa._balls.append({"p": Vector2(x, TrialPachinko.KICK_Y), "v": Vector2(0, 300), "kicked": false})
+	pa._launched = pa.pi("balls")
+	pa.kick(0)
+	for _k: int in 240:
+		pa.tick(1.0 / 60.0)
+	check(pa.finished, "bille arrivée")
+	eq(pa._scores[0], 1.0, "godet d'or")
+	pa.free()
+
+
+## Blackjack : valeur des mains (as souple) et stratégie de base sur des cas d'école.
+func test_blackjack_rules() -> void:
+	eq(BlackjackRules.total([1, 13]), 21, "as + roi")
+	eq(BlackjackRules.total([1, 1, 9]), 21, "deux as + 9")
+	check(BlackjackRules.is_soft([1, 6]), "17 souple")
+	eq(BlackjackRules.best([10, 6], 10, true), "hit", "16 contre 10 : tirer")
+	eq(BlackjackRules.best([10, 6], 6, true), "stand", "16 contre 6 : rester")
+	eq(BlackjackRules.best([6, 5], 6, true), "double", "11 contre 6 : doubler")
+	eq(BlackjackRules.best([6, 5], 6, false), "hit", "11 sans doubler : tirer")
+	eq(BlackjackRules.best([1, 7], 9, true), "hit", "18 souple contre 9 : tirer")
+	eq(BlackjackRules.best([1, 7], 4, false), "stand", "18 souple sans doubler : rester")
+	eq(BlackjackRules.outcome([10, 9], [10, 7]), "win", "19 contre 17")
+
+
+## Équité : jouer selon la stratégie de base vaut la note pleine, quelles que soient les cartes.
+func test_blackjack_grades_decision_not_luck() -> void:
+	for seed_v: int in [3, 77, 1234]:
+		var b: TrialBlackjack = _trial("blackjack") as TrialBlackjack
+		b.rng = RandomNumberGenerator.new()
+		b.rng.seed = seed_v
+		b.begin()
+		var guard: int = 0
+		while not b.finished and guard < 3000:
+			guard += 1
+			if b._phase == "decide":
+				b.choose(BlackjackRules.best(b._player, b._dealer[0], b._first))
+			b.tick(1.0 / 60.0)
+		check(b.finished, "partie terminée (graine %d)" % seed_v)
+		check(b.score > 0.95, "décisions justes et immédiates : ≈ 1 (graine %d, %.2f)" % [seed_v, b.score])
+		b.free()
+
+
+## Dés : le plan du bot (reflet sur la bande, force calculée) arrête les dés dans la zone ;
+## la face tirée n'entre pas dans la note.
+func test_dice_plan_lands_in_zone() -> void:
+	var dc: TrialDice = _trial("dice") as TrialDice
+	dc.begin()
+	var plan: Vector2 = dc.bot_plan()
+	dc._aim = plan.x
+	dc._charge = plan.y
+	dc._release()
+	var guard: int = 0
+	while dc._flying and guard < 2000:
+		guard += 1
+		dc.tick(1.0 / 120.0)
+	check(dc._wall, "les dés touchent la bande")
+	check(dc._pos.distance_to(dc._zone) < dc._zone_r(), "arrêt dans la zone (%.0f px)" % dc._pos.distance_to(dc._zone))
+	dc.free()
+
+
+## Grattage : les trèfles scintillent à chaque passage du reflet.
+func test_scratch_targets_always_glint() -> void:
+	var sc: TrialScratch = _trial("scratch") as TrialScratch
+	sc.begin()
+	for _k: int in 60 * 5:
+		sc.t += 1.0 / 60.0
+		sc._reflect(1.0 / 60.0)
+	for i: int in sc._targets:
+		check(sc._seen[i] >= sc._passes, "trèfle %d vu à chaque passage" % i)
+	sc.free()

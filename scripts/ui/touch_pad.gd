@@ -25,6 +25,8 @@ const STYLE: Dictionary[String, Array] = {
 }
 ## Libellé des boutons sans glyphe.
 const LABELS: Dictionary[String, String] = {"ui_spin": "TOUCH_THROW"}
+## Largeur maximale d'un libellé, en rayons du bouton.
+const LABEL_FIT: float = 1.6
 const LAYOUTS: Array[String] = ["diamond", "row", "split"]
 ## Position (en diamètres) de chaque bouton dans le losange.
 const DIAMOND: Dictionary[String, Vector2] = {
@@ -204,4 +206,8 @@ func _draw_pad(area: Control) -> void:
 			var fs: int = UiKit.fs(UiKit.SIZE_BODY)
 			var txt: String = tr(label_key)
 			var w: float = f.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+			if w > r * LABEL_FIT:
+				# Libellé long (DOUBLER…) : réduit pour tenir dans le bouton.
+				fs = maxi(floori(float(fs) * r * LABEL_FIT / w), 1)
+				w = f.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
 			area.draw_string(f, c + Vector2(-w * 0.5, fs * 0.35), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Palette.INK)
