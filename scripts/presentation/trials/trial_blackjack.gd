@@ -15,13 +15,16 @@ const ACTION_COLORS: Dictionary[String, Color] = {
 }
 ## Bouton de manette de chaque décision (X tirer, Y doubler, B rester).
 const SYMBOL_OF: Dictionary[String, int] = {"hit": 0, "double": 1, "stand": 2}
-const CARD_SIZE: Vector2 = Vector2(120.0, 168.0)
 const PLAYER_Y: float = 640.0
-const DEALER_Y: float = 250.0
 const BUTTON_Y: float = 900.0
 const BUTTON_SIZE: Vector2 = Vector2(260.0, 90.0)
-const SUITS: Array[String] = ["♠", "♥", "♦", "♣"]
-const RANKS: Array[String] = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
+## Décor 3D : rangées de cartes sur le tapis (m), écart entre cartes, sabot, vitesse de glisse.
+const PLAYER_Z: float = 0.85
+const DEALER_Z: float = -0.95
+const CARD_STEP: float = 0.62
+const SHOE_AT: Vector3 = Vector3(2.5, 0.2, -1.5)
+const SLIDE: float = 9.0
+const CHIP_COLORS: Array[Color] = [Color("d11a3c"), Color("1f6fd1"), Color("1e9e5a"), Color("ece4d0"), Color("1a1a1a")]
 
 var _hand: int = 0
 var _player: Array[int] = []
@@ -37,10 +40,115 @@ var _last_ok: int = -1
 var _bot_choice: String = ""
 var _results: Array[String] = []
 var _mouse_pos: Vector2 = Vector2(-1, -1)
+var _pc3: Array[PlayingCard3D] = []
+var _dc3: Array[PlayingCard3D] = []
 
 
 func begin() -> void:
+	_build_3d()
 	_deal()
+
+
+# --------------------------------------------------------------------------- décor 3D
+
+
+func _build_3d() -> void:
+	var st: Stage3D = use_3d()
+	st.env.background_color = Color(0.03, 0.02, 0.03)
+	st.env.ambient_light_energy = 0.4
+	st.key.light_energy = 0.3
+	st.look(Vector3(0, 4.4, 3.3), Vector3(0, 0, 0.15), 42.0)
+	var r: Node3D = st.root
+	# Feutre en demi-lune, liseré doré, rail matelassé de cuir.
+	var felt: MeshInstance3D = Stage3D.cylinder(r, 4.2, 0.06, Vector3(0, -0.03, -2.2), Stage3D.mat(Color(0.04, 0.24, 0.14), 0.0, 0.95))
+	felt.name = "felt"
+	Stage3D.box(r, Vector3(14, 0.04, 9), Vector3(0, -0.08, 0), Stage3D.mat(Color(0.12, 0.05, 0.04), 0.0, 0.7))
+	var gilt: StandardMaterial3D = Stage3D.mat(Palette.GOLD_DARK, 0.45, 0.35)
+	var leather: StandardMaterial3D = Stage3D.mat(Color(0.2, 0.07, 0.05), 0.0, 0.45)
+	for k: int in 48:
+		var a: float = lerpf(-1.15, 1.15, float(k) / 47.0)
+		var arc: MeshInstance3D = Stage3D.box(r, Vector3(0.12, 0.006, 0.025), Vector3(sin(a) * 2.6, 0.002, -2.2 + cos(a) * 2.6), gilt)
+		arc.rotation.y = a
+		var pad: MeshInstance3D = Stage3D.box(r, Vector3(0.6, 0.18, 0.35), Vector3(sin(a) * 4.25, 0.06, -2.2 + cos(a) * 4.25), leather)
+		pad.rotation.y = a
+	var rule: Label3D = Stage3D.text3d(r, tr("TRIAL_BLACKJACK_RULE"), Vector3(0, 0.005, 0.0), 64, Color(Palette.GOLD_LIGHT, 0.55),
+		Color(0, 0, 0, 0))
+	rule.rotation.x = -PI * 0.5
+	rule.pixel_size = 0.0019
+	# Cases de mise devant le joueur.
+	for k2: int in 3:
+		var ring: MeshInstance3D = Stage3D.cylinder(r, 0.26, 0.004, Vector3(-1.6 + float(k2) * 1.6, 0.001, 1.9), gilt)
+		ring.name = "ring%d" % k2
+		Stage3D.cylinder(r, 0.23, 0.006, Vector3(-1.6 + float(k2) * 1.6, 0.002, 1.9), Stage3D.mat(Color(0.04, 0.24, 0.14), 0.0, 0.95))
+	# Sabot : boîte de bois laqué, cartes rouges dedans, ouverture vers la donneuse.
+	var shoe: Node3D = Node3D.new()
+	shoe.position = SHOE_AT
+	shoe.rotation.y = -0.5
+	r.add_child(shoe)
+	Stage3D.box(shoe, Vector3(0.75, 0.32, 1.0), Vector3.ZERO, Stage3D.mat(Color(0.16, 0.08, 0.04), 0.1, 0.35))
+	Stage3D.box(shoe, Vector3(0.6, 0.26, 0.9), Vector3(0, 0.06, -0.02), Stage3D.mat(Palette.ROULETTE_RED.darkened(0.4), 0.1, 0.5))
+	Stage3D.box(shoe, Vector3(0.77, 0.04, 0.2), Vector3(0, 0.17, 0.45), gilt)
+	# Plateau de jetons de la donneuse et piles de jetons du joueur.
+	var rack: Node3D = Node3D.new()
+	rack.position = Vector3(0, 0.05, -2.05)
+	r.add_child(rack)
+	Stage3D.box(rack, Vector3(2.4, 0.1, 0.5), Vector3.ZERO, Stage3D.mat(Color(0.12, 0.06, 0.03), 0.1, 0.4))
+	for c: int in CHIP_COLORS.size():
+		var col_m: StandardMaterial3D = Stage3D.mat(CHIP_COLORS[c], 0.1, 0.4)
+		var stack: MeshInstance3D = Stage3D.cylinder(rack, 0.13, 0.4, Vector3(-0.9 + float(c) * 0.45, 0.08, 0), col_m)
+		stack.rotation.x = PI * 0.5
+		Stage3D.cylinder(r, 0.14, 0.06 + 0.04 * float(c % 3), Vector3(-2.6 + float(c) * 0.32, 0.03, 1.35 + 0.05 * float(c % 2)), col_m)
+	var lamp: OmniLight3D = Stage3D.omni(r, Color(1.0, 0.86, 0.6), 2.6, Vector3(0, 2.8, -0.1), 7.5)
+	lamp.shadow_enabled = RenderQuality.shadows()
+
+
+func _spawn_card(rank: int, suit: int) -> PlayingCard3D:
+	var c: PlayingCard3D = PlayingCard3D.new()
+	stage.root.add_child(c)
+	c.set_card(rank, suit)
+	c.position = SHOE_AT + Vector3(-0.2, 0.15, 0.3)
+	c.rotation.y = -0.5
+	c.face_up = false
+	c.flip = 0.0
+	return c
+
+
+func _row_at(k: int, n: int, z: float) -> Vector3:
+	return Vector3((float(k) - float(n - 1) * 0.5) * CARD_STEP, 0.008 + float(k) * 0.003, z)
+
+
+func _clear_cards() -> void:
+	for c: PlayingCard3D in _pc3 + _dc3:
+		c.queue_free()
+	_pc3.clear()
+	_dc3.clear()
+
+
+func _sync_3d(dt: float) -> void:
+	if stage == null:
+		return
+	while _pc3.size() < _player.size():
+		_pc3.append(_spawn_card(_player[_pc3.size()], _suits[_pc3.size()]))
+	# La donneuse a toujours deux cartes : la seconde reste face cachée jusqu'à son tour.
+	var dn: int = maxi(_dealer.size(), 2)
+	while _dc3.size() < dn:
+		var i: int = _dc3.size()
+		_dc3.append(_spawn_card(_dealer[i] if i < _dealer.size() else 1, _dealer_suits[i] if i < _dealer_suits.size() else 0))
+	var w: float = 1.0 - exp(-SLIDE * dt)
+	for k: int in _pc3.size():
+		_move(_pc3[k], _row_at(k, _pc3.size(), PLAYER_Z), w, true)
+	for k2: int in _dc3.size():
+		var shown: bool = k2 < _dealer.size()
+		if shown:
+			_dc3[k2].set_card(_dealer[k2], _dealer_suits[k2])
+		_move(_dc3[k2], _row_at(k2, _dc3.size(), DEALER_Z), w, shown)
+
+
+func _move(c: PlayingCard3D, target: Vector3, w: float, face: bool) -> void:
+	c.position = c.position.lerp(target, w)
+	c.rotation.y = lerp_angle(c.rotation.y, 0.0, w)
+	# Retournée une fois posée.
+	c.face_up = face and c.position.distance_to(target) < 0.12
 
 
 func _draw_card() -> int:
@@ -48,6 +156,7 @@ func _draw_card() -> int:
 
 
 func _deal() -> void:
+	_clear_cards()
 	_player = [_draw_card(), _draw_card()]
 	_suits = [rng.randi_range(0, 3), rng.randi_range(0, 3)]
 	_dealer = [_draw_card()]
@@ -140,6 +249,7 @@ func _apply(action: String) -> void:
 
 func tick(dt: float) -> void:
 	_phase_t -= dt
+	_sync_3d(dt)
 	match _phase:
 		"deal":
 			if _phase_t <= 0.0:
@@ -200,48 +310,20 @@ func bot_apply(w: Dictionary) -> void:
 # --------------------------------------------------------------------------- dessin
 
 
-func _card(at: Vector2, rank: int, suit: int, hidden: bool = false) -> void:
-	var r: Rect2 = Rect2(at, CARD_SIZE)
-	draw_rect(Rect2(at + Vector2(6, 8), CARD_SIZE), Color(0, 0, 0, 0.35))
-	if hidden:
-		draw_rect(r, Palette.VELVET)
-		draw_rect(r.grow(-8), Palette.GOLD_DARK, false, 3.0)
-		return
-	draw_rect(r, Palette.IVORY)
-	draw_rect(r, Palette.GOLD_DARK, false, 2.0)
-	var red: bool = suit == 1 or suit == 2
-	var col: Color = Palette.ROULETTE_RED if red else Palette.INK
-	var lbl: String = RANKS[rank - 1]
-	text(at + Vector2(26, 26), lbl, UiKit.SIZE_BODY, col, "display", 0)
-	text(at + CARD_SIZE * 0.5 + Vector2(0, 8), SUITS[suit], UiKit.SIZE_H1, col, "ui", 0)
-
-
 func paint() -> void:
-	# Table de blackjack : feutre vert en demi-lune, liseré doré, sabot.
-	draw_rect(Rect2(-size.x, 0, size.x * 3.0, size.y), Color("0b0710"))
-	var c: Vector2 = Vector2(size.x * 0.5, -260.0)
-	draw_circle(c, 1180.0, Palette.GOLD_DARK)
-	draw_circle(c, 1166.0, Palette.FELT)
-	draw_arc(c, 900.0, 0.35, PI - 0.35, 64, Color(Palette.GOLD, 0.35), 3.0)
-	text(Vector2(size.x * 0.5, 470.0), tr("TRIAL_BLACKJACK_RULE"), UiKit.SIZE_SMALL, Color(Palette.GOLD_LIGHT, 0.6))
-	draw_rect(Rect2(size.x - 380, 120, 150, 110), Color("2a1a10"))
-	draw_rect(Rect2(size.x - 370, 130, 130, 90), Palette.VELVET)
-	# Donneuse.
-	for k: int in _dealer.size():
-		_card(Vector2(size.x * 0.5 - 70.0 + float(k) * 80.0, DEALER_Y), _dealer[k], _dealer_suits[k])
-	if _dealer.size() == 1:
-		_card(Vector2(size.x * 0.5 + 10.0, DEALER_Y), 1, 0, true)
+	if stage == null:
+		return
+	# Totaux à côté des rangées 3D, issue de la main.
 	if _dealer.size() > 1:
-		text(Vector2(size.x * 0.5 - 180.0, DEALER_Y + 80.0), str(BlackjackRules.total(_dealer)), UiKit.SIZE_H2, Palette.IVORY)
-	# Joueur.
-	var n: int = _player.size()
-	for k2: int in n:
-		_card(Vector2(size.x * 0.5 - float(n) * 40.0 + float(k2) * 80.0, PLAYER_Y), _player[k2], _suits[k2])
+		var dl: Vector2 = stage.project(_row_at(0, _dc3.size(), DEALER_Z) - Vector3(0.55, 0, 0))
+		_badge(dl, str(BlackjackRules.total(_dealer)), Palette.IVORY)
 	var tot: int = BlackjackRules.total(_player)
 	var soft: String = "*" if BlackjackRules.is_soft(_player) and tot < 21 else ""
-	text(Vector2(size.x * 0.5 - float(n) * 40.0 - 80.0, PLAYER_Y + 80.0), str(tot) + soft, UiKit.SIZE_H2, Palette.GOLD_LIGHT)
+	var pl: Vector2 = stage.project(_row_at(0, maxi(_pc3.size(), 1), PLAYER_Z) - Vector3(0.6, 0, 0))
+	_badge(pl, str(tot) + soft, Palette.GOLD_LIGHT if tot <= 21 else Palette.MULT_RED)
 	if _phase == "result" and not _results.is_empty():
-		text(Vector2(size.x * 0.5, PLAYER_Y - 120.0), tr("TRIAL_BLACKJACK_" + _results[-1].to_upper()), UiKit.SIZE_H2, Palette.IVORY)
+		var mid: Vector2 = stage.project(Vector3(0, 0, (PLAYER_Z + DEALER_Z) * 0.5))
+		text(mid, tr("TRIAL_BLACKJACK_" + _results[-1].to_upper()), UiKit.SIZE_H1, Palette.IVORY)
 	# Boutons et chrono de décision.
 	for k3: int in ACTIONS.size():
 		var a: String = ACTIONS[k3]
@@ -249,10 +331,19 @@ func paint() -> void:
 		var usable: bool = _phase == "decide" and (a != "double" or _first)
 		var col: Color = ACTION_COLORS[a] if usable else Palette.SMOKE_DARK
 		var hover: bool = mouse and br.has_point(_mouse_pos)
+		draw_rect(br, Color(Palette.INK, 0.75))
 		draw_rect(br, Color(col, 0.35 if hover else 0.2))
 		draw_rect(br, col, false, 3.0)
 		text(br.get_center(), tr(ACTION_KEYS[a]), UiKit.SIZE_BODY, col)
 	if _phase == "decide":
 		var left: float = clampf(1.0 - _decide_t / _limit(), 0.0, 1.0)
+		draw_rect(Rect2(size.x * 0.5 - 300, BUTTON_Y - 30, 600, 10), Color(Palette.INK, 0.7))
 		draw_rect(Rect2(size.x * 0.5 - 300, BUTTON_Y - 30, 600 * left, 10), Palette.GOLD if left > 0.3 else Palette.MULT_RED)
 	pips(Vector2(size.x * 0.5, 80.0), _marks, maxi(_marks.size(), pi("hands")))
+
+
+## Pastille ronde avec un total de main.
+func _badge(at: Vector2, label: String, col: Color) -> void:
+	draw_circle(at, 46.0, Color(Palette.INK, 0.85))
+	draw_arc(at, 46.0, 0, TAU, 32, col, 3.0)
+	text(at, label, UiKit.SIZE_H2, col)

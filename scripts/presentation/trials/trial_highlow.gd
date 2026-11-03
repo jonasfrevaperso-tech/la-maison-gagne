@@ -5,9 +5,11 @@ extends ThrowTrial
 ## le pari le plus probable compte comme réussi, même si la carte suivante déjoue les calculs.
 ## Le temps de réflexion se resserre à chaque carte. Note = part des bons choix.
 
-const RANKS: Array[String] = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "V", "D", "R"]
-const RANKS_EN: Array[String] = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
-const CARD: Vector2 = Vector2(130.0, 180.0)
+## Décor 3D : place de la carte en cours, de la suivante et du talon sur le tapis (m).
+const CUR_AT: Vector3 = Vector3(-0.42, 0.01, 0.0)
+const NEXT_AT: Vector3 = Vector3(0.42, 0.01, 0.0)
+const DECK_AT: Vector3 = Vector3(1.25, 0.0, -0.3)
+const SLIDE: float = 8.0
 
 var _cards: Array[int] = []
 var _i: int = 0
@@ -15,12 +17,81 @@ var _decide_t: float = 0.0
 var _scores: Array[float] = []
 var _reveal: float = -1.0
 var _last_guess: int = 0
+var _cur3: PlayingCard3D = null
+var _next3: PlayingCard3D = null
 
 
 func begin() -> void:
 	for k: int in pi("cards") + 1:
 		_cards.append(rng.randi_range(1, 13))
+	_build_3d()
 	AudioBus.play("card_flip", 1.0, -4.0)
+
+
+# --------------------------------------------------------------------------- décor 3D
+
+
+## Le guéridon d'Odile : tapis vert, talon, cendrier et verre, sous une lampe basse.
+func _build_3d() -> void:
+	var st: Stage3D = use_3d()
+	st.env.background_color = Color(0.03, 0.02, 0.03)
+	st.env.ambient_light_energy = 0.4
+	st.key.light_energy = 0.25
+	st.look(Vector3(0, 1.55, 1.05), Vector3(0, 0, 0.08), 40.0)
+	var r: Node3D = st.root
+	Stage3D.cylinder(r, 2.4, 0.08, Vector3(0, -0.05, 0), Stage3D.mat(Color(0.2, 0.08, 0.04), 0.1, 0.4))
+	Stage3D.cylinder(r, 2.2, 0.08, Vector3(0, -0.04, 0), Stage3D.mat(Color(0.04, 0.24, 0.14), 0.0, 0.95))
+	Stage3D.box(r, Vector3(12, 0.02, 8), Vector3(0, -0.12, 0), Stage3D.mat(Color(0.08, 0.04, 0.05), 0.0, 0.8))
+	# Talon de cartes (dos bordeaux).
+	for k: int in 8:
+		var c: MeshInstance3D = Stage3D.box(r, Vector3(PlayingCard3D.SIZE.x, 0.012, PlayingCard3D.SIZE.y),
+			DECK_AT + Vector3(0, 0.006 + 0.012 * float(k), 0),
+			Stage3D.mat(Palette.ROULETTE_RED.darkened(0.4 + 0.02 * float(k % 2)), 0.1, 0.5))
+		c.rotation.y = 0.15 + 0.03 * float(k % 3)
+	# Cendrier et verre.
+	Stage3D.cylinder(r, 0.2, 0.06, Vector3(-1.3, 0.03, -0.35), Stage3D.mat(Color(0.5, 0.52, 0.58), 0.45, 0.25))
+	Stage3D.cylinder(r, 0.11, 0.22, Vector3(1.3, 0.11, 0.35), Stage3D.mat(Color(0.62, 0.34, 0.08), 0.0, 0.15))
+	Stage3D.cylinder(r, 0.115, 0.03, Vector3(1.3, 0.235, 0.35), Stage3D.mat(Color(0.85, 0.88, 0.92), 0.1, 0.1))
+	var lamp: OmniLight3D = Stage3D.omni(r, Color(1.0, 0.85, 0.6), 2.2, Vector3(0, 1.3, -0.1), 4.0)
+	lamp.shadow_enabled = RenderQuality.shadows()
+	_cur3 = _spawn(_cards[0])
+	_cur3.position = CUR_AT
+	_cur3.rotation.y = 0.0
+	_cur3.face_up = true
+	_next3 = _spawn(_cards[1])
+
+
+func _spawn(rank: int) -> PlayingCard3D:
+	var c: PlayingCard3D = PlayingCard3D.new()
+	stage.root.add_child(c)
+	# Couleurs de la règle : rang pair en cœur (rouge), impair en pique (noir).
+	c.set_card(rank, 1 if rank % 2 == 0 else 0)
+	c.position = DECK_AT + Vector3(0, 0.12, 0)
+	c.rotation.y = 0.15
+	c.face_up = false
+	c.flip = 0.0
+	return c
+
+
+## Carte suivante : la carte retournée devient la carte en cours, une nouvelle sort du talon.
+func _advance_3d() -> void:
+	if stage == null or _i + 1 >= _cards.size():
+		return
+	_cur3.queue_free()
+	_cur3 = _next3
+	_next3 = _spawn(_cards[_i + 1])
+
+
+func _sync_3d(dt: float) -> void:
+	if stage == null:
+		return
+	var w: float = 1.0 - exp(-SLIDE * dt)
+	_cur3.position = _cur3.position.lerp(CUR_AT, w)
+	_cur3.rotation.y = lerp_angle(_cur3.rotation.y, 0.0, w)
+	_cur3.face_up = true
+	_next3.position = _next3.position.lerp(NEXT_AT, w)
+	_next3.rotation.y = lerp_angle(_next3.rotation.y, 0.0, w)
+	_next3.face_up = _reveal >= 0.0
 
 
 func _limit() -> float:
@@ -65,11 +136,13 @@ func _finish_card(sc: float) -> void:
 
 
 func tick(dt: float) -> void:
+	_sync_3d(dt)
 	if _reveal >= 0.0:
 		_reveal += dt
 		if _reveal > p("reveal_seconds") * slow:
 			_reveal = -1.0
 			_i += 1
+			_advance_3d()
 			_decide_t = 0.0
 			if _i >= pi("cards"):
 				finish(mean(_scores))
@@ -92,95 +165,29 @@ func bot_apply(want: Dictionary) -> void:
 		guess(-(want["dir"] as Vector2i).y)
 
 
-func _draw_card(at: Vector2, rank: int, face: bool) -> void:
-	var r: Rect2 = Rect2(at - CARD * 0.5, CARD)
-	draw_rect(r.grow(3), Color(0, 0, 0, 0.4))
-	if not face:
-		draw_rect(r, Palette.ROULETTE_RED.darkened(0.3))
-		draw_rect(r.grow(-8), Palette.GOLD_DARK, false, 2.0)
-		for k: int in 5:
-			var y: float = r.position.y + 24.0 + float(k) * 33.0
-			draw_line(Vector2(r.position.x + 14, y), Vector2(r.end.x - 14, y + 16.0), Color(Palette.GOLD_DARK, 0.5), 2.0)
-		return
-	draw_rect(r, Palette.IVORY)
-	draw_rect(r.grow(-5), Color(Palette.GOLD_DARK, 0.5), false, 1.0)
-	var red: bool = rank % 2 == 0
-	var ink: Color = Palette.ROULETTE_RED if red else Palette.INK
-	var label: String = (RANKS_EN if Localization.locale().begins_with("en") else RANKS)[rank - 1]
-	# Index dans les coins (lettre + couleur), comme une vraie carte.
-	text(r.position + Vector2(20, 22), label, UiKit.SIZE_SMALL, ink, "display", 0)
-	_suit(r.position + Vector2(20, 46), 7.0, red)
-	text(r.end - Vector2(20, 46), label, UiKit.SIZE_SMALL, ink, "display", 0)
-	_suit(r.end - Vector2(20, 22), 7.0, red)
-	var c: Vector2 = r.get_center()
-	if rank >= 11:
-		# Figure : son emblème au centre (bonnet à plume, diadème, couronne), lettre dessous.
-		_figure(c + Vector2(0, -16), rank, ink)
-		text(c + Vector2(0, 46), label, UiKit.SIZE_H2, ink, "display", 0)
-	else:
-		text(c + Vector2(0, -8), label, UiKit.SIZE_H1, ink, "display", 0)
-		_suit(c + Vector2(0, 46), 13.0, red)
-
-
-## Symbole de couleur : cœur (rouge) ou pique (noir).
-func _suit(at: Vector2, s: float, red: bool) -> void:
-	if red:
-		draw_circle(at + Vector2(-s * 0.5, -s * 0.3), s * 0.55, Palette.ROULETTE_RED)
-		draw_circle(at + Vector2(s * 0.5, -s * 0.3), s * 0.55, Palette.ROULETTE_RED)
-		var tri: PackedVector2Array = PackedVector2Array([
-			at + Vector2(-s * 1.02, -s * 0.15), at + Vector2(s * 1.02, -s * 0.15), at + Vector2(0, s)])
-		draw_colored_polygon(tri, Palette.ROULETTE_RED)
-	else:
-		draw_circle(at + Vector2(-s * 0.5, s * 0.2), s * 0.55, Palette.INK)
-		draw_circle(at + Vector2(s * 0.5, s * 0.2), s * 0.55, Palette.INK)
-		var tip: PackedVector2Array = PackedVector2Array([
-			at + Vector2(-s * 1.02, s * 0.05), at + Vector2(s * 1.02, s * 0.05), at + Vector2(0, -s)])
-		draw_colored_polygon(tip, Palette.INK)
-		draw_colored_polygon(PackedVector2Array([at + Vector2(0, s * 0.3), at + Vector2(-s * 0.4, s), at + Vector2(s * 0.4, s)]), Palette.INK)
-
-
-## Emblème des figures : Valet = bonnet à plume, Dame = diadème et rose, Roi = couronne fermée.
-func _figure(c: Vector2, rank: int, ink: Color) -> void:
-	var gold: Color = Palette.GOLD
-	var dark: Color = Palette.GOLD_DARK
-	match rank:
-		11:
-			draw_colored_polygon(PackedVector2Array([c + Vector2(-30, 14), c + Vector2(30, 14), c + Vector2(22, -8), c + Vector2(-18, -14)]), ink)
-			draw_rect(Rect2(c + Vector2(-32, 12), Vector2(64, 8)), dark)
-			draw_colored_polygon(PackedVector2Array([c + Vector2(14, -8), c + Vector2(40, -40), c + Vector2(46, -34), c + Vector2(20, -4)]), gold)
-			for k: int in 4:
-				draw_line(c + Vector2(22 + k * 6, -14 - k * 7), c + Vector2(30 + k * 6, -12 - k * 7), dark, 2.0)
-		12:
-			draw_colored_polygon(PackedVector2Array([c + Vector2(-30, 16), c + Vector2(30, 16), c + Vector2(30, 0), c + Vector2(15, -18),
-				c + Vector2(0, -4), c + Vector2(-15, -18), c + Vector2(-30, 0)]), gold)
-			draw_rect(Rect2(c + Vector2(-30, 10), Vector2(60, 6)), dark)
-			for x: float in [-15.0, 15.0]:
-				draw_circle(c + Vector2(x, -20), 4.0, ink)
-			draw_circle(c + Vector2(0, -12), 6.0, Palette.ROULETTE_RED)
-			draw_circle(c + Vector2(0, -12), 3.0, Palette.ROULETTE_RED.lightened(0.3))
-		_:
-			draw_colored_polygon(PackedVector2Array([c + Vector2(-32, 18), c + Vector2(32, 18), c + Vector2(34, -14), c + Vector2(17, 0),
-				c + Vector2(0, -24), c + Vector2(-17, 0), c + Vector2(-34, -14)]), gold)
-			draw_rect(Rect2(c + Vector2(-32, 10), Vector2(64, 8)), dark)
-			for x: float in [-34.0, 0.0, 34.0]:
-				draw_circle(c + Vector2(x, -14 if x != 0.0 else -26), 5.0, gold)
-			draw_line(c + Vector2(0, -32), c + Vector2(0, -44), gold, 3.0)
-			draw_line(c + Vector2(-5, -38), c + Vector2(5, -38), gold, 3.0)
-			for x: float in [-16.0, 0.0, 16.0]:
-				draw_circle(c + Vector2(x, 14), 3.0, ink if x != 0.0 else Palette.CYAN)
-
-
 func paint() -> void:
 	var r: Rect2 = play_rect()
 	var cx: float = r.get_center().x
-	var cy: float = r.get_center().y + 10.0
-	var idx: int = mini(_i, pi("cards") - 1)
-	_draw_card(Vector2(cx - 110.0, cy), _cards[idx], true)
-	_draw_card(Vector2(cx + 110.0, cy), _cards[idx + 1], _reveal >= 0.0)
+	if stage == null:
+		return
+	var nxt: Vector2 = stage.project(NEXT_AT)
+	var cur: Vector2 = stage.project(CUR_AT)
 	# Flèches de choix et compte à rebours.
 	if _reveal < 0.0 and _i < pi("cards"):
 		var left: float = clampf(1.0 - _decide_t / _limit(), 0.0, 1.0)
+		draw_rect(Rect2(cx - 150, r.position.y + 30, 300, 8), Color(Palette.INK, 0.7))
 		draw_rect(Rect2(cx - 150, r.position.y + 30, 300 * left, 8), Palette.GOLD if left > 0.3 else Palette.DANGER)
-		text(Vector2(cx + 330.0, cy - 50.0), tr("TRIAL_HIGHLOW_UP"), UiKit.SIZE_BODY, Palette.EMERALD)
-		text(Vector2(cx + 330.0, cy + 50.0), tr("TRIAL_HIGHLOW_DOWN"), UiKit.SIZE_BODY, Palette.CYAN)
-	pips(Vector2(cx - 330.0, cy), _scores, pi("cards"))
+		var ax: float = nxt.x + (nxt.x - cur.x) * 0.75
+		_arrow(Vector2(ax, nxt.y - 70.0), -1.0, Palette.EMERALD)
+		_arrow(Vector2(ax, nxt.y + 70.0), 1.0, Palette.CYAN)
+		text(Vector2(ax + 110.0, nxt.y - 70.0), tr("TRIAL_HIGHLOW_UP"), UiKit.SIZE_BODY, Palette.EMERALD)
+		text(Vector2(ax + 110.0, nxt.y + 70.0), tr("TRIAL_HIGHLOW_DOWN"), UiKit.SIZE_BODY, Palette.CYAN)
+	pips(Vector2(cur.x - (nxt.x - cur.x) * 1.1, cur.y), _scores, pi("cards"))
+
+
+## Flèche pleine (dir -1 vers le haut, +1 vers le bas) sur pastille sombre.
+func _arrow(at: Vector2, dir: float, col: Color) -> void:
+	draw_circle(at, 30.0, Color(Palette.INK, 0.8))
+	draw_arc(at, 30.0, 0, TAU, 28, col, 2.0)
+	draw_colored_polygon(PackedVector2Array([at + Vector2(0, dir * 16.0), at + Vector2(-14, -dir * 10.0), at + Vector2(14, -dir * 10.0)]),
+		col)
