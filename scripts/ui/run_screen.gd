@@ -285,7 +285,7 @@ func _refresh_table() -> void:
 	var hl: Dictionary = {}
 	for spot_id: String in r.slip.order:
 		for n: int in BetCatalog.get_spot(spot_id).numbers:
-			hl[n] = true
+			hl[n] = int(hl.get(n, 0)) + int(r.slip.chips.get(spot_id, 0))
 	wheel_view.highlight_numbers = hl
 	table_view.queue_redraw()
 	_refresh_budget()
@@ -464,15 +464,19 @@ func _queue_intros() -> void:
 		r.flags[act_key] = true
 		_queue(ActTitle.new().configure(r.act()))
 		var dlg_id: String = "act%d_intro" % r.act()
-		if ctl.db.has_entry("dialogues", dlg_id):
+		if _story_new(dlg_id):
 			_queue(DialogueOverlay.new().configure(dlg_id, r, ctl.db))
+		elif ctl.db.has_entry("dialogues", dlg_id) and DialogueOverlay.has_choices(ctl.db.get_entry("dialogues", dlg_id)):
+			var quick: DialogueOverlay = DialogueOverlay.new().configure(dlg_id, r, ctl.db)
+			quick.choices_only = true  # déjà vu : seulement le choix (bonus de début d'acte)
+			_queue(quick)
 	# Interlude au deuxième palier de chaque acte (scénario entre deux créanciers).
 	var mid_key: String = "act_mid_seen_%d" % r.act()
 	var tiers: Array = Balance.arr("run.acts")[r.act() - 1] as Array
 	if r.deadline_idx == 0 and tiers.size() > 1 and int(tiers[1]) == r.tier and not r.flags.has(mid_key):
 		r.flags[mid_key] = true
 		var mid_id: String = "act%d_mid" % r.act()
-		if ctl.db.has_entry("dialogues", mid_id):
+		if _story_new(mid_id):
 			_queue(DialogueOverlay.new().configure(mid_id, r, ctl.db))
 	if r.is_creditor() and r.creditor_id != "":
 		_queue(CreditorIntro.new().configure(ctl.db.get_entry("creditors", r.creditor_id)))
@@ -856,6 +860,13 @@ func _open_shop() -> void:
 
 ## Scène racontée une seule fois par profil avant une nouveauté (boutique, machine à sous,
 ## pacte). Renvoie vrai si la scène est jouée : `then` reprend ensuite le déroulé normal.
+## Dialogue d'histoire à montrer : jamais vu sur ce profil (ou option « Revoir les dialogues »).
+func _story_new(dlg_id: String) -> bool:
+	if not ctl.db.has_entry("dialogues", dlg_id):
+		return false
+	return Settings.b("game", "replay_story") or not DialogueOverlay.seen(dlg_id)
+
+
 func _story_once(dlg_id: String, then: Callable) -> bool:
 	if DialogueOverlay.seen(dlg_id) or not ctl.db.has_entry("dialogues", dlg_id):
 		return false

@@ -3,7 +3,7 @@ extends Node
 ## Accès de développement (sources uniquement, exclu des exports) : captures d'écran,
 ## pilote automatique, accès direct à un écran ou une phase de run.
 ## Sauvegardes isolées dans `user://dev/` (cf. DevMode).
-## -- --dev-run=lea [--dev-phase=shop|pact|summary|creditor|grigris] [--dev-debt-mult=0.5]
+## -- --dev-run=lea [--dev-phase=shop|pact|summary|creditor|grigris|aimbets] [--dev-debt-mult=0.5]
 ##    [--shot=user://shot.png] [--frames=120] [--dev-screen=options] [--dev-autoplay=N
 ##    --shot-dir=... --perf] [--quit-frames=N]
 
@@ -17,7 +17,7 @@ func start() -> bool:
 		for pair: String in String(args["dev-set"]).split(";"):
 			var kv: PackedStringArray = pair.split("=")
 			var path: PackedStringArray = kv[0].split("/")
-			Settings.override(path[0], path[1], str_to_var(kv[1]) if kv[1].is_valid_float() else kv[1])
+			Settings.override(path[0], path[1], str_to_var(kv[1]) if kv[1].is_valid_float() or kv[1] in ["true", "false"] else kv[1])
 	if args.has("dev-autoplay"):
 		var ap: DevAutoplay = DevAutoplay.new()
 		ap.spins_wanted = int(args["dev-autoplay"])
@@ -83,6 +83,14 @@ func start() -> bool:
 			ShopModel.enter(r, DataRegistry.db)
 		"pact":
 			r.phase = RunState.Phase.PACT_OFFER
+		"aimbets":
+			r.flags["act_intro_seen_1"] = true
+			r.flags["tutorial_off"] = true
+			r.slip.place("red", 2)
+			r.slip.place("straight:19", 3)
+			r.slip.place("split:17-20", 1)
+			r.slip.place("dozen:3", 1)
+			_aim_later.call_deferred()
 		"creditor":
 			r.deadline_idx = 2
 			GameState.controller.start_deadline()
@@ -123,6 +131,17 @@ func start() -> bool:
 		r.flags["act_intro_seen_1"] = true
 		_bigscore_later.call_deferred()
 	return true
+
+
+## Visée avec des mises posées (contrôle du marquage des cases misées sur la roue).
+func _aim_later() -> void:
+	var found: Array[Node] = []
+	while found.is_empty():
+		await get_tree().process_frame
+		found = get_tree().root.find_children("*", "RunScreen", true, false)
+	for _i: int in 120:
+		await get_tree().process_frame
+	found[0].call("_on_spin_pressed")
 
 
 ## Super build simulé : Jetons et Mult gigantesques, pour vérifier formats compacts et flammes.

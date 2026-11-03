@@ -26,6 +26,11 @@ const BALL_R: float = 0.04
 const LABEL_R: float = 0.74
 const ICON_R: float = 0.64
 const SEAL_R: float = 0.605
+## Mise sur la case : liseré doré en relief au bord extérieur, pastille-jeton avec le nombre.
+const BET_BAND_W: float = 0.045
+const BET_BAND_Y: float = 0.03
+const BET_CHIP_R: float = 0.03
+const BET_CHIP_AT: float = 0.665
 const DIAMONDS: int = 8
 const TRAIL: int = 10
 const SECTOR_STEPS: int = 4
@@ -63,6 +68,10 @@ var _prob_nodes: Array[MeshInstance3D] = []
 var _labels: Array[Label3D] = []
 var _icons: Array[Sprite3D] = []
 var _base_colors: Array[Color] = []
+var _bet_bands: Array[MeshInstance3D] = []
+var _bet_chips: Array[MeshInstance3D] = []
+var _bet_counts: Array[Label3D] = []
+var _has_icon: Array[bool] = []
 var _cam_fov: float = CAM_FOV
 var _cam_target: Vector3 = Vector3.ZERO
 var _cam_dist: float = 4.0
@@ -405,6 +414,10 @@ func _rebuild_pockets() -> void:
 	_labels.clear()
 	_icons.clear()
 	_base_colors.clear()
+	_bet_bands.clear()
+	_bet_chips.clear()
+	_bet_counts.clear()
+	_has_icon.clear()
 	var n: int = wheel.size()
 	var span: float = TAU / float(maxi(n, 1))
 	var fret_mat: StandardMaterial3D = _mat(Palette.GOLD, 1.0, 0.25)
@@ -425,6 +438,7 @@ func _rebuild_pockets() -> void:
 		_pocket_mats.append(m)
 		_base_colors.append(col)
 		_pockets_root.add_child(_sector(R_POCKET_IN, R_POCKET_OUT, Y_POCKET, Y_POCKET + 0.012, a0, a1, m))
+		var icons_before: int = _icons.size()
 		if p.type_id != Pocket.TYPE_STANDARD:
 			var tdef: Dictionary = db.get_entry("pocket_types", String(p.type_id)) if db != null else {}
 			var tcol: Color = Color(String(tdef.get("color", ""))) if tdef.has("color") else PocketInfo.type_color(p.type_id)
@@ -480,6 +494,8 @@ func _rebuild_pockets() -> void:
 			seal.material_override = sm
 			seal.position = Vector3(cos(a0 + span * 0.5) * SEAL_R, Y_POCKET + 0.02, sin(a0 + span * 0.5) * SEAL_R)
 			_pockets_root.add_child(seal)
+		_has_icon.append(icons_before < _icons.size())
+		_build_bet_marker(a0, a1, span, font)
 		# Bande de visée (sur l'anneau doré) et barre de probabilité (bord intérieur).
 		var zm: StandardMaterial3D = _unshaded(Color(Palette.CYAN, 0.0))
 		zm.emission_enabled = true
@@ -493,6 +509,46 @@ func _rebuild_pockets() -> void:
 		pr.visible = false
 		_pockets_root.add_child(pr)
 		_prob_nodes.append(pr)
+
+
+## Repère de mise d'une case (caché tant qu'aucun jeton n'y est posé) : liseré et pastille.
+func _build_bet_marker(a0: float, a1: float, span: float, font: Font) -> void:
+	var bm: StandardMaterial3D = _mat(Palette.GOLD_LIGHT, 0.9, 0.2)
+	bm.emission_enabled = true
+	bm.emission = Palette.GOLD
+	bm.emission_energy_multiplier = JuiceProfile.BET_GLOW
+	var band: MeshInstance3D = _sector(R_POCKET_OUT - BET_BAND_W, R_POCKET_OUT, Y_POCKET + BET_BAND_Y, Y_POCKET + BET_BAND_Y, a0, a1, bm)
+	band.visible = false
+	_pockets_root.add_child(band)
+	_bet_bands.append(band)
+	var chip: MeshInstance3D = MeshInstance3D.new()
+	var cm: CylinderMesh = CylinderMesh.new()
+	cm.top_radius = BET_CHIP_R
+	cm.bottom_radius = BET_CHIP_R
+	cm.height = 0.012
+	chip.mesh = cm
+	var chm: StandardMaterial3D = _mat(Palette.GOLD, 0.7, 0.3)
+	chm.emission_enabled = true
+	chm.emission = Palette.GOLD_DARK
+	chm.emission_energy_multiplier = 0.4
+	chip.material_override = chm
+	var mid: float = a0 + span * 0.5
+	chip.position = Vector3(cos(mid) * BET_CHIP_AT, Y_POCKET + 0.035, sin(mid) * BET_CHIP_AT)
+	chip.visible = false
+	_pockets_root.add_child(chip)
+	_bet_chips.append(chip)
+	var l: Label3D = Label3D.new()
+	l.font = font
+	l.font_size = 40
+	l.outline_size = 0
+	l.modulate = Palette.INK
+	l.pixel_size = 0.0011
+	l.shaded = false
+	l.double_sided = true
+	l.position = chip.position + Vector3(0, 0.008, 0)
+	l.visible = false
+	_pockets_root.add_child(l)
+	_bet_counts.append(l)
 
 
 ## Secteur d'anneau (dessus plat incliné de y0 à y1 vers l'extérieur, plus la face avant).
@@ -552,6 +608,8 @@ func sync(v: WheelView, delta: float) -> void:
 		l.global_basis = flat
 	for sp: Sprite3D in _icons:
 		sp.global_basis = flat
+	for bl: Label3D in _bet_counts:
+		bl.global_basis = flat
 	var zone: Dictionary[int, float] = {}
 	var center_idx: int = v.aim_index if v.aiming else v.locked_index
 	if center_idx >= 0:
@@ -564,8 +622,16 @@ func sync(v: WheelView, delta: float) -> void:
 	for i: int in mini(n, _pocket_mats.size()):
 		var p: Pocket = wheel.at(i)
 		var col: Color = _base_colors[i]
-		if v.highlight_numbers.has(p.number):
-			col = col.lightened(0.22)
+		var bet: int = int(v.highlight_numbers.get(p.number, 0))
+		if bet > 0:
+			col = col.lightened(JuiceProfile.BET_LIFT)
+		elif v.aiming and not v.highlight_numbers.is_empty():
+			col = col.darkened(JuiceProfile.BET_DIM_CONTRAST if Settings.b("access", "high_contrast") else JuiceProfile.BET_DIM_AIMING)
+		if i < _bet_bands.size():
+			_bet_bands[i].visible = bet > 0
+			_bet_chips[i].visible = bet > 0 and not _has_icon[i]
+			_bet_counts[i].visible = bet > 0 and not _has_icon[i]
+			_bet_counts[i].text = str(bet)
 		if i == v.hover_index:
 			col = col.lightened(0.3)
 		if i == v.flash_index and v.flash_amount() > 0.0:

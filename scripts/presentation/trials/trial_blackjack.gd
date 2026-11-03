@@ -107,7 +107,9 @@ func choose(action: String) -> void:
 		return
 	var best: String = BlackjackRules.best(_player, _dealer[0], _first)
 	var ok: bool = action == best
-	var speed: float = clampf(1.0 - _decide_t / _limit(), 0.0, 1.0)
+	# Le temps de lire ses cartes ne coûte rien : la vitesse ne compte qu'après le délai de grâce.
+	var grace: float = p("speed_grace") * slow
+	var speed: float = clampf(1.0 - maxf(0.0, _decide_t - grace) / maxf(_limit() - grace, 0.01), 0.0, 1.0)
 	_marks.append((1.0 - p("speed_weight") + p("speed_weight") * speed) if ok else 0.0)
 	_last_ok = 1 if ok else 0
 	pop(Vector2(size.x * 0.5, PLAYER_Y - 60.0), 1.0 if ok else 0.0, "TRIAL_BLACKJACK_BOOK" if ok else "TRIAL_BLACKJACK_OFFBOOK")
@@ -127,6 +129,10 @@ func _apply(action: String) -> void:
 			if action == "double" or tot >= 21:
 				_phase = "dealer"
 				_phase_t = p("reveal_seconds")
+			else:
+				# Le temps de voir la nouvelle carte avant la décision suivante.
+				_phase = "deal"
+				_phase_t = p("hit_seconds")
 		_:
 			_phase = "dealer"
 			_phase_t = p("reveal_seconds")

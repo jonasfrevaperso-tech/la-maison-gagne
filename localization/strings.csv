@@ -596,6 +596,8 @@ OPT_FPS_MOBILE_DESC,"60 images/s conseillées. 90 ou 120 : plus fluide sur les �
 OPT_HAPTICS,Vibrations,Vibration
 OPT_TAP_CONFIRM,Confirmer les mises d'un second toucher,Confirm bets with a second tap
 OPT_TAP_CONFIRM_DESC,"Désactivé : lever le doigt pose le jeton. Activé : le premier toucher vise (la loupe reste affichée), un second toucher sur la même case pose le jeton.","Off: lifting your finger places the chip. On: the first tap aims (the magnifier stays visible), a second tap on the same spot places the chip."
+OPT_REPLAY_STORY,Revoir les dialogues de l'histoire,Replay story dialogues
+OPT_REPLAY_STORY_DESC,"Rejoue les dialogues d'ouverture des actes à chaque partie (sinon, une seule fois par profil).","Plays the act opening dialogues in every run (otherwise only once per profile)."
 OPT_LEFT_HANDED,Disposition gaucher,Left-handed layout
 OPT_LEFT_HANDED_DESC,"Inverse la table : le tapis et le bouton Lancer passent à gauche, la roue à droite.","Mirrors the table: the betting layout and the Spin button move to the left, the wheel to the right."
 CARD_BUY,Acheter · %d $,Buy · $%d

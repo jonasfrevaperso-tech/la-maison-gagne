@@ -208,12 +208,12 @@ func _grab_rope() -> void:
 	for k: int in _segs.size():
 		if String(_segs[k]["kind"]) != "rope":
 			continue
-		# Les mains attrapent le câble sur son tiers inférieur (plus tolérant que le seul bout).
+		# Les mains attrapent le câble sur sa moitié inférieure (plus tolérant que le seul bout).
 		var e: Vector2 = _rope_end(k)
 		var pivot: Vector2 = Vector2(float(_segs[k]["x"]), FLOOR_Y - ROPE_PIVOT_H)
 		var hands: Vector2 = Vector2(_x, _y - BODY.y)
-		var near: Vector2 = Geometry2D.get_closest_point_to_segment(hands, pivot.lerp(e, 0.6), e)
-		if near.distance_to(hands) < GRAB_R and _x < float(_segs[k]["x"]) + 40.0:
+		var near: Vector2 = Geometry2D.get_closest_point_to_segment(hands, pivot.lerp(e, p("rope_grab_from")), e)
+		if near.distance_to(hands) < GRAB_R * p("grab_scale") and _x < float(_segs[k]["x"]) + 60.0:
 			_rope = k
 			_vx = 0.0
 			_vy = 0.0

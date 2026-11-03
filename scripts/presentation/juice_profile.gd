@@ -26,6 +26,11 @@ const CELEBRATION_TIERS: Array[float] = [0.25, 0.5, 1.0, 3.0]  # fraction de la 
 ## Jetons 3D par palier de célébration, pièces 3D quand une échéance est remboursée.
 const CHIPS_3D_PER_TIER: int = 28
 const COINS_3D_DEADLINE: int = 70
+## Roue : cases misées (liseré doré, pastille-jeton) et cases non misées assombries en visée.
+const BET_DIM_AIMING: float = 0.38
+const BET_DIM_CONTRAST: float = 0.55
+const BET_LIFT: float = 0.12
+const BET_GLOW: float = 0.9
 const CELEBRATION_KEYS: Array[String] = ["CELEB_GOOD", "CELEB_HUGE", "CELEB_JACKPOT", "CELEB_BANK"]
 
 

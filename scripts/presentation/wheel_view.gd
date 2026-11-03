@@ -17,6 +17,10 @@ const BALL_START_SPEED_FACTOR: float = 1.0
 const RIM_RATIO: float = 0.96
 const POCKET_OUTER: float = 0.82
 const POCKET_INNER: float = 0.58
+## Repère de mise : épaisseur du liseré doré, rayon et position de la pastille (fractions du rayon).
+const BET_BAND: float = 0.045
+const BET_CHIP_R: float = 0.03
+const BET_CHIP_AT: float = 0.645
 const HUB_RATIO: float = 0.36
 const BALL_ORBIT: float = 0.9
 const BALL_RADIUS_RATIO: float = 0.028
@@ -41,7 +45,7 @@ var aim_index: int = 0
 ## Case figée par la visée pendant l'élan et le lâcher (−1 : aucune).
 var locked_index: int = -1
 var zone_width: int = 7
-var highlight_numbers: Dictionary = {}  # numéro -> true (paris posés)
+var highlight_numbers: Dictionary = {}  # numéro -> jetons posés qui le couvrent
 var flash_index: int = -1
 var hover_index: int = -1
 var probabilities: Array[float] = []
@@ -367,8 +371,11 @@ func _draw() -> void:
 		var a1: float = a0 + span
 		var col: Color = Palette.pocket_color(p.color())
 		var tdef: Dictionary = db.get_entry("pocket_types", String(p.type_id)) if db != null else {}
-		if highlight_numbers.has(p.number):
-			col = col.lightened(0.25)
+		var bet: int = int(highlight_numbers.get(p.number, 0))
+		if bet > 0:
+			col = col.lightened(JuiceProfile.BET_LIFT)
+		elif aiming and not highlight_numbers.is_empty():
+			col = col.darkened(JuiceProfile.BET_DIM_CONTRAST if Settings.b("access", "high_contrast") else JuiceProfile.BET_DIM_AIMING)
 		if i == flash_index and _flash_t > 0.0:
 			col = col.lerp(Palette.GOLD_LIGHT, _flash_t * 0.8)
 		if i == hover_index:
@@ -388,6 +395,8 @@ func _draw() -> void:
 			_draw_type_icon(i, p, r)
 		if p.seal != &"":
 			draw_circle(to_screen(a0 + span * 0.5, r * (POCKET_INNER + 0.04)), r * 0.016, PocketInfo.seal_color(p.seal))
+		if bet > 0:
+			_draw_bet_marker(a0, span, r, bet, c)
 	# Zone de visée (qui suit la case figée pendant l'élan et le lâcher)
 	if aiming or locked_index >= 0:
 		var center_idx: int = aim_index if aiming else locked_index
@@ -446,6 +455,19 @@ func _draw() -> void:
 		else:
 			draw_circle(bp, r * BALL_RADIUS_RATIO, Palette.IVORY)
 
+
+## Case misée : liseré doré au bord extérieur et pastille-jeton avec le nombre de jetons.
+func _draw_bet_marker(a0: float, span: float, r: float, bet: int, c: Vector2) -> void:
+	_draw_ring_sector(c, r * (POCKET_OUTER - BET_BAND), r * POCKET_OUTER, a0, a0 + span, Palette.GOLD_LIGHT)
+	var at: Vector2 = to_screen(a0 + span * 0.5, r * BET_CHIP_AT)
+	var cr: float = r * BET_CHIP_R
+	draw_circle(at, cr, Palette.GOLD)
+	draw_arc(at, cr, 0.0, TAU, 20, Palette.GOLD_DARK, 2.0, true)
+	var f: Font = UiKit.font("mono")
+	var fs: int = maxi(10, int(cr * 1.3))
+	var txt: String = str(bet)
+	var w: float = f.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+	draw_string(f, at + Vector2(-w * 0.5, fs * 0.35), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Palette.INK)
 
 func _draw_number(i: int, p: Pocket, r: float) -> void:
 	var f: Font = UiKit.font("mono")

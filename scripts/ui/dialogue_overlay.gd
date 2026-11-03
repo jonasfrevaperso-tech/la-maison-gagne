@@ -20,6 +20,8 @@ const TEXT_MIN_H: float = 120.0
 var dialogue: Dictionary = {}
 var run: RunState = null
 var db: ContentDB = null
+## Dialogue déjà vu : on ne rejoue que ses répliques à choix (leurs effets comptent en partie).
+var choices_only: bool = false
 var _lines: Array = []
 var _index: int = -1
 var _typed: float = 0.0
@@ -40,6 +42,22 @@ func configure(dialogue_id: String, p_run: RunState, p_db: ContentDB) -> Dialogu
 	dialogue = db.get_entry("dialogues", dialogue_id)
 	_lines = personalize(dialogue.get("lines", []) as Array, run.character_id if run != null else "")
 	return self
+
+
+## Première réplique à choix à partir de `from` (taille du tableau s'il n'y en a plus).
+static func next_choice(lines: Array, from: int) -> int:
+	var i: int = from
+	while i < lines.size() and not (lines[i] as Dictionary).has("choices"):
+		i += 1
+	return i
+
+
+## Le dialogue a-t-il une réplique à choix (seule partie rejouée quand il est déjà vu) ?
+static func has_choices(entry: Dictionary) -> bool:
+	for l: Variant in entry.get("lines", []):
+		if (l as Dictionary).has("choices"):
+			return true
+	return false
 
 
 ## Dialogue déjà vu sur ce profil (scènes « une seule fois » : boutique, machine à sous, pacte).
@@ -135,7 +153,7 @@ func _speaker(who: String) -> Dictionary:
 
 
 func _next() -> void:
-	_index += 1
+	_index = next_choice(_lines, _index + 1) if choices_only else _index + 1
 	for c: Node in _choices.get_children():
 		c.queue_free()
 	if _index >= _lines.size():
