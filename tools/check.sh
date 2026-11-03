@@ -67,6 +67,11 @@ step "Interface (focus manette, chevauchements, débordements, 6 résolutions)"
 grep -E "^UI :|Interface :" "$LOG_DIR/ui.log"
 scan "$LOG_DIR/ui.log" || status=1
 
+step "Interface mobile (6 formats de téléphone, texte ×1,35 et ×1,6, cibles tactiles)"
+"$GODOT" --headless --path . -- --dev-ui-check --dev-mobile >"$LOG_DIR/ui_mobile.log" 2>&1 || status=1
+grep -E "^UI :|Interface :" "$LOG_DIR/ui_mobile.log"
+scan "$LOG_DIR/ui_mobile.log" || status=1
+
 step "Campagne complète à la manette seule (dettes réduites)"
 if [ "${SKIP_PAD_RUN:-0}" = "1" ]; then echo "(ignorée : SKIP_PAD_RUN=1)"; else
 rm -f "$HOME/.local/share/godot/app_userdata/La Maison Gagne/dev/run.json" "$HOME/.local/share/godot/app_userdata/La Maison Gagne/dev/run.json.bak"

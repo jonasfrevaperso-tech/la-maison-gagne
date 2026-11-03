@@ -84,12 +84,22 @@ func _ready() -> void:
 	build_card.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	var bar: GrigriBar = GrigriBar.new()
 	(build_card.get_meta("body") as VBoxContainer).add_child(bar)
-	v.add_child(build_card)
 	bar.bind(r)
 	var actions: HBoxContainer = HBoxContainer.new()
 	actions.alignment = BoxContainer.ALIGNMENT_CENTER
 	actions.add_theme_constant_override("separation", 20)
-	v.add_child(actions)
+	# Téléphone : le build et les boutons sur une même ligne (le bilan tient en hauteur).
+	if Platform.is_mobile():
+		var bottom: HBoxContainer = HBoxContainer.new()
+		bottom.alignment = BoxContainer.ALIGNMENT_CENTER
+		bottom.add_theme_constant_override("separation", 40)
+		v.add_child(bottom)
+		bottom.add_child(build_card)
+		actions.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		bottom.add_child(actions)
+	else:
+		v.add_child(build_card)
+		v.add_child(actions)
 	var again: Button = UiKit.button(tr("SUMMARY_AGAIN"), _again.bind(r.character_id, r.risk_level))
 	actions.add_child(again)
 	if victory and not r.endless:

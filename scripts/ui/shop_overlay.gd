@@ -10,6 +10,7 @@ const OWNED_PROMPTS_W: float = 1100.0
 const PACK_BTN: Vector2 = Vector2(210, 150)
 const PACK_DESC_W: float = 210.0
 const OWNED_KEYS: Array[Array] = [["@double_click", "HINT_K_SELL"], ["@drag", "HINT_K_MOVE"], ["@right_click", "HINT_K_LOCK"]]
+const OWNED_TOUCH: Array[Array] = [["@tap", "HINT_K_CARD_SHEET"], ["@drag", "HINT_K_MOVE"]]
 const OWNED_PAD: Array[Array] = [
 	["@dpad", "HINT_K_SELECT"], ["ui_accept", "HINT_K_BUY_SELL"], ["bet_repeat", "HINT_K_LOCK"], ["bet_cycle_prev", "HINT_K_MOVE"]
 ]
@@ -104,7 +105,7 @@ func build() -> void:
 	_owned_prompts.custom_minimum_size = Vector2(OWNED_PROMPTS_W, InputGlyphs.PROMPT_H + 4)
 	_owned_prompts.alignment = BoxContainer.ALIGNMENT_CENTER
 	obody.add_child(_owned_prompts)
-	_owned_prompts.set_device_items.call_deferred(OWNED_KEYS, OWNED_PAD)
+	_owned_prompts.set_device_items.call_deferred(OWNED_KEYS, OWNED_PAD, OWNED_TOUCH)
 	body.add_child(ocard)
 	# Actions.
 	var actions: HBoxContainer = row()
@@ -166,6 +167,7 @@ func _refresh(animate: bool = false) -> void:
 		card.price = int(o["price"])
 		card.draggable = false
 		card.disabled_look = bool(o["sold"])
+		card.action_text = tr("CARD_BUY") % card.price
 		card.activated.connect(_on_buy_grigri)
 		_offers_row.add_child(card)
 		SaveSystem.mark_seen("grigris", String(o["id"]))
@@ -197,6 +199,7 @@ func _refresh(animate: bool = false) -> void:
 		cc.price = int(co["price"])
 		cc.disabled_look = bool(co["sold"])
 		cc.draggable = false
+		cc.action_text = tr("CARD_BUY") % cc.price
 		cc.activated.connect(_on_buy_contract)
 		_contract_row.add_child(cc)
 	_reroll_btn.text = tr("SHOP_REROLL") % int(r.shop_state.get("reroll_cost", 0))
@@ -377,6 +380,7 @@ func _refresh_pack() -> void:
 				var card: GrigriCard = GrigriCard.new().configure("pocket_card", String(c2["type"]), i)
 				card.edition = StringName(String(c2.get("edition", "")))
 				card.draggable = false
+				card.action_text = tr("PACK_ADD")
 				card.activated.connect(func(_c: GrigriCard) -> void: _choose(i, "add"))
 				col.add_child(card)
 				var extra: String = "n° %d" % int(c2["number"])
@@ -388,12 +392,14 @@ func _refresh_pack() -> void:
 			"fortune":
 				var fc: GrigriCard = GrigriCard.new().configure("fortune", String(c2["fortune"]), i)
 				fc.draggable = false
+				fc.action_text = tr("PACK_TAKE")
 				fc.activated.connect(func(_c: GrigriCard) -> void: _choose(i, "add"))
 				col.add_child(fc)
 				col.add_child(UiKit.button(tr("PACK_TAKE"), _choose.bind(i, "add"), Vector2(150, 44)))
 			"occult":
 				var oc: GrigriCard = GrigriCard.new().configure("grigri", String(c2["grigri"]), i)
 				oc.draggable = false
+				oc.action_text = tr("PACK_TAKE")
 				oc.activated.connect(func(_c: GrigriCard) -> void: _choose(i, "add"))
 				col.add_child(oc)
 				col.add_child(UiKit.button(tr("PACK_TAKE"), _choose.bind(i, "add"), Vector2(150, 44)))

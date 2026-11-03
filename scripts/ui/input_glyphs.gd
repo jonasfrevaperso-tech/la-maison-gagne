@@ -11,7 +11,7 @@ const SEP: String = "  ·  "
 const PAIR_FALLBACK: String = "%s: %s"
 const STICK_DEADZONE: float = 0.5
 const MOUSE_MOVE_THRESHOLD: float = 2.0
-const MODES: Array[String] = ["auto", "keyboard", "gamepad"]
+const MODES: Array[String] = ["auto", "keyboard", "gamepad", "touch"]
 ## Hauteur par défaut d'une invite (pixels logiques).
 const PROMPT_H: int = 30
 const KEYCAP_PAD: int = 6
@@ -68,7 +68,26 @@ const MARKERS_PAD: Dictionary[String, Array] = {
 	"@qte": ["pad_x", "pad_y", "pad_b", "pad_a"],
 }
 
+## Repères en mode tactile : gestes au doigt. Les actions clavier n'ont pas d'invite (les
+## boutons à l'écran suffisent) ; les épreuves affichent leurs propres boutons.
+const MARKERS_TOUCH: Dictionary[String, Array] = {
+	"@click": ["touch_tap"],
+	"@shift_click": ["touch_tap"],
+	"@right_click": ["touch_hold"],
+	"@double_click": ["touch_double"],
+	"@drag": ["touch_drag"],
+	"@wheel": ["touch_swipe"],
+	"@mouse": ["touch_drag"],
+	"@qte": ["pad_x", "pad_y", "pad_b", "pad_a"],
+	"@qte_mouse": ["touch_tap"],
+	"@tap": ["touch_tap"],
+	"@hold": ["touch_hold"],
+	"@swipe": ["touch_swipe"],
+}
+
 static var using_pad: bool = false
+## Mode tactile (téléphone) : actif quand le dernier geste vient de l'écran tactile.
+static var using_touch: bool = false
 static var _auto_checked: bool = false
 static var _tex_cache: Dictionary[String, Texture2D] = {}
 static var _keycap_style: StyleBoxFlat = null
@@ -82,17 +101,31 @@ static func mode() -> String:
 	return m if m in MODES else "auto"
 
 
+## Choix proposés dans les réglages (valeurs, clés de texte) : clavier sur PC, doigt sur mobile.
+static func mode_choices() -> Array[Array]:
+	if Platform.is_mobile():
+		return [["auto", "touch", "gamepad"], ["OPT_IM_AUTO", "OPT_IM_TOUCH", "OPT_IM_GAMEPAD"]]
+	return [["auto", "keyboard", "gamepad"], ["OPT_IM_AUTO", "OPT_IM_KEYBOARD", "OPT_IM_GAMEPAD"]]
+
+
 ## Applique le mode réglé (au démarrage et quand les options changent) ; vrai si l'affichage change.
 static func apply_mode() -> bool:
 	var m: String = mode()
 	var want: bool = using_pad
+	var touch: bool = using_touch
 	if m == "keyboard":
 		want = false
+		touch = false
 	elif m == "gamepad":
 		want = true
+		touch = false
+	elif m == "touch":
+		want = false
+		touch = true
 	elif _first_auto():
-		want = _pad_connected() and _handheld()
-	return _set_pad(want)
+		want = _pad_connected() and (_handheld() or Platform.is_mobile())
+		touch = Platform.is_mobile() and not want
+	return _set_touch(touch) or _set_pad(want)
 
 
 ## Note le périphérique d'un événement (mode automatique seulement) ; vrai si l'affichage change.
@@ -100,16 +133,37 @@ static func note_event(event: InputEvent) -> bool:
 	if mode() != "auto":
 		return false
 	var pad: bool = using_pad
-	if event is InputEventJoypadButton:
+	var touch: bool = using_touch
+	if event is InputEventScreenTouch or event is InputEventScreenDrag:
+		pad = false
+		touch = true
+	elif event is InputEventJoypadButton:
 		pad = true
+		touch = false
 	elif event is InputEventJoypadMotion:
 		if absf((event as InputEventJoypadMotion).axis_value) > STICK_DEADZONE:
 			pad = true
+			touch = false
+	elif event.device == InputEvent.DEVICE_ID_EMULATION:
+		pass  # souris émulée depuis le toucher : on reste en tactile
+	elif Platform.is_mobile() and (event is InputEventMouseButton or event is InputEventMouseMotion):
+		pass  # sur téléphone (et en émulation), la souris vaut le doigt
 	elif event is InputEventKey or event is InputEventMouseButton:
 		pad = false
+		touch = false
 	elif event is InputEventMouseMotion and (event as InputEventMouseMotion).relative.length() > MOUSE_MOVE_THRESHOLD:
 		pad = false
-	return _set_pad(pad)
+		touch = false
+	var a: bool = _set_touch(touch)
+	var b: bool = _set_pad(pad)
+	return a or b
+
+
+static func _set_touch(touch: bool) -> bool:
+	if touch == using_touch:
+		return false
+	using_touch = touch
+	return true
 
 
 static func _set_pad(pad: bool) -> bool:
@@ -148,11 +202,11 @@ static func parts_for(action: String) -> Array[String]:
 			out.append_array(parts_for(part))
 		return out
 	if action.begins_with("@"):
-		var table: Dictionary[String, Array] = MARKERS_PAD if using_pad else MARKERS_KEYS
+		var table: Dictionary[String, Array] = MARKERS_PAD if using_pad else (MARKERS_TOUCH if using_touch else MARKERS_KEYS)
 		for p: Variant in table.get(action, []):
 			out.append(String(p))
 		return out
-	if not InputMap.has_action(action):
+	if not InputMap.has_action(action) or using_touch:
 		return out
 	for e: InputEvent in InputMap.action_get_events(action):
 		if using_pad and e is InputEventJoypadButton:

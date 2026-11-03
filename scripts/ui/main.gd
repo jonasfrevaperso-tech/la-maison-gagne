@@ -49,6 +49,7 @@ func _ready() -> void:
 	add_child(post)
 	if Platform.is_mobile():
 		add_child(FrameGovernor.new())
+		add_child(TouchHelper.new())
 	EventBus.screen_requested.connect(_on_screen_requested)
 	EventBus.note_requested.connect(_open_note)
 	var nav: PadNavigator = PadNavigator.new()
@@ -110,6 +111,12 @@ func _input(event: InputEvent) -> void:
 
 
 func _fit_frame() -> void:
+	if Platform.is_mobile():
+		# Téléphone : les écrans restent dans la zone sûre (poinçon de la caméra, barre de gestes).
+		var safe: Rect2 = Platform.safe_rect(get_viewport())
+		UiLayout.fit_frame(_frame, safe.size)
+		_frame.position = safe.position
+		return
 	UiLayout.fit_frame(_frame, get_viewport().get_visible_rect().size)
 
 

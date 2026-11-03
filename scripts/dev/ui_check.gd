@@ -16,6 +16,20 @@ const CONFIGS: Array[Array] = [
 	[Vector2i(2560, 1080), 1.0],
 	[Vector2i(1920, 1200), 1.3],
 ]
+## Téléphone (`--dev-mobile`) : zone sûre logique (hauteur 1080 sur les écrans allongés), texte
+## agrandi : Pixel 7 (20:9 moins le poinçon), 19,5:9, pliable ouvert (≈ 6:5), tablette 16:10.
+const CONFIGS_MOBILE: Array[Array] = [
+	[Vector2i(2290, 1080), 1.35],
+	[Vector2i(2240, 1080), 1.6],
+	[Vector2i(2290, 1080), 1.6],
+	[Vector2i(1920, 1600), 1.35],
+	[Vector2i(1920, 1200), 1.35],
+	[Vector2i(1920, 1080), 1.6],
+]
+## Téléphone : plus petite cible tactile (px logiques ≈ px physiques à 1080 de haut ; 88 ≈ 5,3 mm).
+const TOUCH_MIN_PX: float = 88.0
+## Téléphone : plus petit texte (px logiques ramenés à un écran de 1080 px de haut).
+const PHONE_MIN_PX: float = 20.0
 ## Chevauchement toléré entre deux éléments (px) : bords qui se touchent, ombres.
 const OVERLAP_TOLERANCE: float = 3.0
 ## Lisibilité Steam Deck : taille minimale d'un texte rendu en 1280×800 (critère Valve : 9 px).
@@ -47,7 +61,7 @@ func _run() -> void:
 	var db: ContentDB = ContentDB.shared()
 	Settings.set_value("game", "input_mode", "gamepad")
 	InputGlyphs.apply_mode()
-	for cfg: Array in CONFIGS:
+	for cfg: Array in (CONFIGS_MOBILE if Platform.is_mobile() else CONFIGS):
 		var sz: Vector2i = cfg[0]
 		Settings.set_value("access", "text_scale", float(cfg[1]))
 		UiKit.clear_cache()
@@ -171,6 +185,8 @@ func _check(node: Control, label: String, need_focus: bool = true, prep: Callabl
 			problems.append("%s : bouton « %s » hors de l'écran %s" % [label, _name(btn), r])
 	_check_fonts(node, label)
 	_check_overlaps(node, label)
+	if Platform.is_mobile():
+		_check_touch_targets(node, label)
 	if need_focus:
 		await _check_reach(node, label)
 	frame.remove_child(node)
@@ -202,7 +218,7 @@ func _cleanup() -> void:
 ## Plus petit texte visible, ramené à l'écran du Steam Deck (la fenêtre logique la plus haute
 ## correspond à 800 px physiques).
 func _check_fonts(node: Control, label: String) -> void:
-	var to_deck: float = DECK_HEIGHT / maxf(float(root.size.y), 1.0)
+	var to_deck: float = 1.0 if Platform.is_mobile() else DECK_HEIGHT / maxf(float(root.size.y), 1.0)
 	var worst: float = 1e9
 	var worst_name: String = ""
 	for c: Node in node.find_children("*", "Control", true, false):
@@ -226,8 +242,30 @@ func _check_fonts(node: Control, label: String) -> void:
 		if px < worst:
 			worst = px
 			worst_name = txt.substr(0, 24)
-	if worst < DECK_MIN_PX:
-		problems.append("%s : texte de %.1f px sur Steam Deck (« %s »), minimum %.0f px" % [label, worst, worst_name, DECK_MIN_PX])
+	var min_px: float = PHONE_MIN_PX if Platform.is_mobile() else DECK_MIN_PX
+	if worst < min_px:
+		var where: String = "sur téléphone" if Platform.is_mobile() else "sur Steam Deck"
+		problems.append("%s : texte de %.1f px %s (« %s »), minimum %.0f px" % [label, worst, where, worst_name, min_px])
+
+
+## Téléphone : chaque bouton actif doit offrir une cible assez grande pour le doigt.
+## Sur téléphone, 1 px logique ≈ 1 px physique (≈ 0,06 mm) ; les pliables et tablettes, plus hauts
+## en pixels logiques, sont aussi physiquement plus grands : pas de mise à l'échelle.
+func _check_touch_targets(node: Control, label: String) -> void:
+	var to_phone: float = 1.0
+	var reported: int = 0
+	for b: Node in node.find_children("*", "BaseButton", true, false):
+		var btn: BaseButton = b as BaseButton
+		if not btn.is_visible_in_tree() or btn.disabled or btn.modulate.a < 0.05:
+			continue
+		var sc: Vector2 = btn.get_global_transform_with_canvas().get_scale()
+		var h: float = btn.size.y * sc.y * to_phone
+		var w: float = btn.size.x * sc.x * to_phone
+		if minf(w, h) < TOUCH_MIN_PX:
+			problems.append("%s : cible tactile « %s » de %.0f×%.0f px (minimum %.0f)" % [label, _name(btn), w, h, TOUCH_MIN_PX])
+			reported += 1
+			if reported >= 4:
+				return
 
 
 ## Éléments lisibles ou cliquables (boutons, textes, cartes) qui se recouvrent : le texte d'un

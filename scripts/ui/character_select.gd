@@ -3,6 +3,10 @@ extends Control
 ## Choix du personnage, du niveau de Risque et (optionnel) de la graine.
 
 const CARD_W: float = 280.0
+## Téléphone : cartes moins hautes, détail et réglages côte à côte, flèches au format doigt.
+const CARD_MOBILE: Vector2 = Vector2(270, 340)
+const PORTRAIT_SCALE_MOBILE: float = 0.72
+const ARROW_MOBILE: Vector2 = Vector2(104, 100)
 
 var daily: bool = false
 var _selected: String = "lea"
@@ -39,31 +43,48 @@ func _ready() -> void:
 	_cards.alignment = BoxContainer.ALIGNMENT_CENTER
 	_cards.add_theme_constant_override("separation", 18)
 	v.add_child(_cards)
+	var mobile: bool = Platform.is_mobile()
+	# Téléphone : le détail à gauche, risque / graine / boutons à droite (le tout tient en hauteur).
+	var left: VBoxContainer = v
+	var right: VBoxContainer = v
+	if mobile:
+		var bottom: HBoxContainer = HBoxContainer.new()
+		bottom.alignment = BoxContainer.ALIGNMENT_CENTER
+		bottom.add_theme_constant_override("separation", 40)
+		v.add_child(bottom)
+		left = VBoxContainer.new()
+		right = VBoxContainer.new()
+		right.add_theme_constant_override("separation", 12)
+		bottom.add_child(left)
+		bottom.add_child(right)
 	_detail = UiKit.rich("", UiKit.SIZE_BODY)
-	_detail.custom_minimum_size = Vector2(1200, 120)
+	_detail.custom_minimum_size = Vector2(900 if mobile else 1200, 120)
 	_detail.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	v.add_child(_detail)
+	left.add_child(_detail)
 	var risk_row: HBoxContainer = HBoxContainer.new()
 	risk_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	risk_row.add_theme_constant_override("separation", 16)
-	v.add_child(risk_row)
-	risk_row.add_child(UiKit.button("◀", _change_risk.bind(-1), Vector2(64, 54)))
+	right.add_child(risk_row)
+	var arrow: Vector2 = ARROW_MOBILE if mobile else Vector2(64, 54)
+	risk_row.add_child(UiKit.button("◀", _change_risk.bind(-1), arrow))
 	_risk_label = UiKit.label("", UiKit.SIZE_H2, Palette.GOLD_LIGHT, "display")
 	_risk_label.custom_minimum_size = Vector2(320, 0)
 	_risk_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	risk_row.add_child(_risk_label)
-	risk_row.add_child(UiKit.button("▶", _change_risk.bind(1), Vector2(64, 54)))
+	risk_row.add_child(UiKit.button("▶", _change_risk.bind(1), arrow))
 	_risk_desc = UiKit.label("", UiKit.SIZE_BODY, Palette.SMOKE)
 	_risk_desc.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_risk_desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	v.add_child(_risk_desc)
+	if mobile:
+		_risk_desc.custom_minimum_size = Vector2(900, 0)
+	left.add_child(_risk_desc)
 	var seed_row: HBoxContainer = HBoxContainer.new()
 	seed_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	v.add_child(seed_row)
+	right.add_child(seed_row)
 	seed_row.add_child(UiKit.label(tr("CHAR_SEED"), UiKit.SIZE_BODY))
 	_seed_edit = LineEdit.new()
 	_seed_edit.placeholder_text = tr("CHAR_SEED_PLACEHOLDER")
-	_seed_edit.custom_minimum_size = Vector2(300, 48)
+	_seed_edit.custom_minimum_size = Vector2(300, UiKit.BUTTON_MIN_H_MOBILE if mobile else 48)
 	_seed_edit.editable = not daily
 	_seed_edit.set_meta("osk_upper", true)
 	if daily:
@@ -74,7 +95,7 @@ func _ready() -> void:
 	var actions: HBoxContainer = HBoxContainer.new()
 	actions.alignment = BoxContainer.ALIGNMENT_CENTER
 	actions.add_theme_constant_override("separation", 20)
-	v.add_child(actions)
+	right.add_child(actions)
 	actions.add_child(UiKit.button(tr("MENU_BACK"), GameState.goto.bind(GameState.SCREEN_TITLE)))
 	_start_btn = UiKit.button(tr("CHAR_START"), _start)
 	actions.add_child(_start_btn)
@@ -107,7 +128,7 @@ func _build_cards() -> void:
 		var e: Dictionary = DataRegistry.db.get_entry("characters", cid)
 		var unlocked: bool = _unlocked(cid)
 		var b: Button = Button.new()
-		b.custom_minimum_size = Vector2(CARD_W, 360)
+		b.custom_minimum_size = CARD_MOBILE if Platform.is_mobile() else Vector2(CARD_W, 360)
 		b.toggle_mode = true
 		b.disabled = not unlocked or daily
 		b.pressed.connect(_select.bind(cid))
@@ -120,8 +141,18 @@ func _build_cards() -> void:
 		var pv: PortraitView = PortraitView.new().configure(String(e.get("portrait", cid)), Color(String(e.get("color", "d4af37"))))
 		pv.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		pv.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		pv.scale = Vector2(0.9, 0.9)
-		col.add_child(pv)
+		if Platform.is_mobile():
+			# Le portrait réduit occupe sa taille réduite (le nom reste dans la carte).
+			var holder: Control = Control.new()
+			holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			holder.custom_minimum_size = Vector2.ONE * PortraitView.SIZE_PX * PORTRAIT_SCALE_MOBILE
+			holder.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+			pv.scale = Vector2.ONE * PORTRAIT_SCALE_MOBILE
+			holder.add_child(pv)
+			col.add_child(holder)
+		else:
+			pv.scale = Vector2(0.9, 0.9)
+			col.add_child(pv)
 		var n: Label = UiKit.label(Localization.t(e, "name") if unlocked else "???", UiKit.SIZE_BODY, Palette.GOLD_LIGHT, "display")
 		n.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		n.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

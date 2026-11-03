@@ -7,7 +7,16 @@ const MENU_BUTTON: Vector2 = Vector2(720, 52)
 const GRID_COLS: int = 3
 const MENU_GAP: int = 8
 const PANEL_POS: Vector2 = Vector2(110, 90)
+## Téléphone : colonne plus large, reprise et nouvelle partie côte à côte, pas de « Quitter ».
+const MENU_WIDTH_MOBILE: float = 1000.0
+const GRID_COLS_MOBILE: int = 3
+const PANEL_POS_MOBILE: Vector2 = Vector2(90, 40)
 const TIP_SECONDS: float = 9.0
+const TIP_W: float = 620.0
+const TIP_W_MOBILE: float = 480.0
+## Téléphone : en dessous de cette largeur logique (écrans 16:9 ou pliables), l'astuce
+## rejoindrait le menu ; on la masque.
+const TIP_MIN_W_MOBILE: float = 2100.0
 const TIPS: Array[String] = [
 	"TIP_COLOR", "TIP_COPY", "TIP_ECONOMY", "TIP_NEED_XMULT", "TIP_OUTSIDE", "TIP_PRECISION",
 	"TIP_RETRIGGER", "TIP_STRAIGHT", "TIP_STREAK", "TIP_ZERO",
@@ -32,9 +41,12 @@ func _ready() -> void:
 	else:
 		add_child(DecoBackground.new())
 	add_child(_veil())
+	var mobile: bool = Platform.is_mobile()
+	var menu_w: float = MENU_WIDTH_MOBILE if mobile else MENU_WIDTH
+	var panel_pos: Vector2 = PANEL_POS_MOBILE if mobile else PANEL_POS
 	var col: VBoxContainer = VBoxContainer.new()
-	col.position = PANEL_POS
-	col.custom_minimum_size = Vector2(MENU_WIDTH, 0)
+	col.position = panel_pos
+	col.custom_minimum_size = Vector2(menu_w, 0)
 	col.add_theme_constant_override("separation", MENU_GAP)
 	add_child(col)
 	var t: Label = UiKit.title(tr("GAME_TITLE"), UiKit.SIZE_TITLE)
@@ -42,32 +54,45 @@ func _ready() -> void:
 	col.add_child(t)
 	var sub: Label = UiKit.label(tr("GAME_TAGLINE"), UiKit.SIZE_H2, Palette.MAGENTA, "display")
 	col.add_child(sub)
-	var div: DecoDivider = UiKit.divider(MENU_WIDTH, Palette.GOLD_DARK)
+	var div: DecoDivider = UiKit.divider(menu_w, Palette.GOLD_DARK)
 	col.add_child(div)
 	col.add_child(UiKit.spacer(6))
 	var first: Button = null
+	# Téléphone : reprise et nouvelle partie sur une même ligne (le menu tient en hauteur).
+	var main_row: BoxContainer = HBoxContainer.new() if mobile else VBoxContainer.new()
+	main_row.add_theme_constant_override("separation", MENU_GAP)
+	col.add_child(main_row)
+	var main_w: float = (menu_w - float(MENU_GAP)) * 0.5 if mobile and SaveSystem.has_run() else menu_w
 	if SaveSystem.has_run():
-		first = UiKit.button(tr("MENU_CONTINUE"), _on_continue, Vector2(MENU_WIDTH, 62))
-		col.add_child(first)
+		var cont: VBoxContainer = VBoxContainer.new()
+		cont.add_theme_constant_override("separation", 2 if mobile else MENU_GAP)
+		main_row.add_child(cont)
+		first = UiKit.button(tr("MENU_CONTINUE"), _on_continue, Vector2(main_w, 62))
+		cont.add_child(first)
 		var info: String = _run_summary()
 		if info != "":
 			var lbl: Label = UiKit.label(info, UiKit.SIZE_SMALL, Palette.GOLD_LIGHT)
 			lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			col.add_child(lbl)
-	var new_btn: Button = UiKit.button(tr("MENU_NEW_RUN"), _on_new, MENU_BUTTON)
-	col.add_child(new_btn)
+			lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			lbl.custom_minimum_size = Vector2(main_w, 0)
+			cont.add_child(lbl)
+	var new_btn: Button = UiKit.button(tr("MENU_NEW_RUN"), _on_new, Vector2(main_w, MENU_BUTTON.y))
+	new_btn.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	main_row.add_child(new_btn)
 	if first == null:
 		first = new_btn
 	# Entrées secondaires (et Quitter) sur trois colonnes : le menu tient en 16:9 et en 16:10
 	# même avec le texte agrandi.
 	var extras: Array[Array] = _extra_entries()
-	extras.append(["MENU_QUIT", _on_quit])
+	if not mobile:
+		extras.append(["MENU_QUIT", _on_quit])  # Android : on quitte par le geste Retour
+	var cols: int = GRID_COLS_MOBILE if mobile else GRID_COLS
 	var grid: GridContainer = GridContainer.new()
-	grid.columns = GRID_COLS
+	grid.columns = cols
 	grid.add_theme_constant_override("h_separation", MENU_GAP)
 	grid.add_theme_constant_override("v_separation", MENU_GAP)
 	col.add_child(grid)
-	var cell: Vector2 = Vector2((MENU_WIDTH - float(MENU_GAP) * float(GRID_COLS - 1)) / float(GRID_COLS), 48)
+	var cell: Vector2 = Vector2((menu_w - float(MENU_GAP) * float(cols - 1)) / float(cols), 48)
 	for i: int in range(0, extras.size()):
 		var b: Button = UiKit.button(tr(String(extras[i][0])), extras[i][1] as Callable, cell)
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -78,7 +103,7 @@ func _ready() -> void:
 	col.modulate.a = 0.0
 	var tw: Tween = col.create_tween().set_parallel()
 	tw.tween_property(col, "modulate:a", 1.0, 0.6)
-	tw.tween_property(col, "position:x", PANEL_POS.x, 0.6).from(PANEL_POS.x - 60.0).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tw.tween_property(col, "position:x", panel_pos.x, 0.6).from(panel_pos.x - 60.0).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	_add_footer()
 	AudioBus.play_music("menu")
 	if not Settings.b("game", "telemetry_asked") and not DevMode.active():
@@ -124,15 +149,22 @@ func _add_footer() -> void:
 	_tip = UiKit.label("", UiKit.SIZE_SMALL, Palette.IVORY)
 	_tip.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_tip.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	_tip.custom_minimum_size = Vector2(620, 0)
+	_tip.custom_minimum_size = Vector2(TIP_W_MOBILE if Platform.is_mobile() else TIP_W, 0)
 	_tip.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
 	_tip.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	_tip.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	_tip.offset_right = -110.0
 	_tip.offset_bottom = -96.0
 	add_child(_tip)
+	if Platform.is_mobile():
+		resized.connect(_fit_tip)
+		_fit_tip.call_deferred()
 	_tip_i = RngService.cosmetic().randi_range(0, TIPS.size() - 1)
 	_next_tip()
+
+
+func _fit_tip() -> void:
+	_tip.visible = size.x >= TIP_MIN_W_MOBILE
 
 
 func _next_tip() -> void:

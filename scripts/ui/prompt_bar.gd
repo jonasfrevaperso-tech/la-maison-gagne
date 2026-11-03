@@ -17,6 +17,7 @@ var _items: Array[Array] = []
 var _sentence: String = ""
 var _keys_items: Array[Array] = []
 var _pad_items: Array[Array] = []
+var _touch_items: Array[Array] = []
 
 
 func _ready() -> void:
@@ -29,10 +30,20 @@ func _ready() -> void:
 
 
 ## Jeux d'invites distincts pour clavier/souris et manette (seul celui du périphérique actif s'affiche).
-func set_device_items(keys_items: Array[Array], pad_items: Array[Array]) -> void:
+## `touch_items` : variante au doigt (sinon les repères souris sont traduits en gestes).
+func set_device_items(keys_items: Array[Array], pad_items: Array[Array], touch_items: Array[Array] = []) -> void:
 	_keys_items = keys_items
 	_pad_items = pad_items
-	set_items(pad_items if InputGlyphs.using_pad else keys_items)
+	_touch_items = touch_items
+	set_items(_items_for(InputGlyphs.using_pad))
+
+
+func _items_for(pad: bool) -> Array[Array]:
+	if pad:
+		return _pad_items
+	if InputGlyphs.using_touch and not _touch_items.is_empty():
+		return _touch_items
+	return _keys_items
 
 
 func set_items(items: Array[Array], sentence: String = "") -> void:
@@ -46,7 +57,7 @@ func set_items(items: Array[Array], sentence: String = "") -> void:
 
 func _on_device_changed(pad: bool) -> void:
 	if not _keys_items.is_empty() or not _pad_items.is_empty():
-		_items = _pad_items if pad else _keys_items
+		_items = _items_for(pad)
 	_rebuild()
 
 

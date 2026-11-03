@@ -30,7 +30,7 @@ func show_pocket(index: int) -> void:
 	var out: Vector2 = (at - (s.wheel_view.position + s.wheel_view.size * 0.5)).normalized()
 	var sz: Vector2 = _pocket_card.get_combined_minimum_size()
 	var pos: Vector2 = at + out * POCKET_CARD_GAP - sz * 0.5 + Vector2(sz.x * 0.5 * signf(out.x), 0.0)
-	_pocket_card.position = pos.clamp(Vector2(8, 8), UiLayout.DESIGN_SIZE - sz - Vector2(8, 8))
+	_pocket_card.position = pos.clamp(Vector2(8, 8), s.stage_size - sz - Vector2(8, 8))
 
 
 ## Fiche du pari sous le curseur manette : au-dessus du curseur, sinon en dessous ; jamais sur

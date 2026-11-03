@@ -30,6 +30,8 @@ const HINT_SENTENCES: Array[String] = ["AIMING", "RETHROW", "TARGETING", "THROWI
 
 var ctl: RunController = null
 var state: UiState = UiState.BETTING
+## Taille de la scène de référence : 1920×1080 sur PC, plus large sur téléphone (20:9).
+var stage_size: Vector2 = UiLayout.DESIGN_SIZE
 
 var wheel_view: WheelView = null
 ## Mini-jeu du lancer (élan, lâcher), par-dessus la roue.
@@ -83,6 +85,10 @@ var _throw: RunScreenThrow = null
 var _cards: RunScreenCards
 var _curse: CurseFx = null
 var _bg: Control = null
+var _actions: HBoxContainer = null
+var _menu_btn: Button = null
+var _header_strip: Panel = null
+var _trial_host: Control = null
 
 
 func setup(_params: Dictionary) -> void:
@@ -93,6 +99,8 @@ func _ready() -> void:
 	theme = UiKit.theme()
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	ctl = GameState.controller
+	if Platform.is_mobile():
+		stage_size = RunScreenLayoutMobile.STAGE
 	_input_ctl = RunScreenInput.new(self)
 	_cards = RunScreenCards.new(self)
 	_throw = RunScreenThrow.new(self)
@@ -187,7 +195,9 @@ func _build() -> void:
 	var trial_host: Control = Control.new()
 	trial_host.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	trial_host.size = UiLayout.DESIGN_SIZE
+	trial_host.position.x = (stage_size.x - UiLayout.DESIGN_SIZE.x) * 0.5
 	_stage.add_child(trial_host)
+	_trial_host = trial_host
 	throw_game.full_host = trial_host
 	# Couches d'effets (malus visuels des grigris sous les textes flottants)
 	_curse = CurseFx.new()
@@ -215,6 +225,8 @@ func _build() -> void:
 	tutorial = TutorialDirector.new()
 	tutorial.anchor_rect = _anchor_rect
 	add_child(tutorial)
+	if Platform.is_mobile():
+		RunScreenLayoutMobile.apply(self)
 
 
 # --------------------------------------------------------------------------- rafraîchissements
@@ -395,6 +407,7 @@ func _refresh_fortunes() -> void:
 	for i: int in r.fortunes.size():
 		var card: GrigriCard = GrigriCard.new().configure("fortune", r.fortunes[i], i)
 		card.draggable = false
+		card.action_text = tr("CARD_USE")
 		card.activated.connect(_on_fortune_activated)
 		fortune_bar.add_child(card)
 	for _j: int in maxi(r.fortune_slots - r.fortunes.size(), 0):
@@ -487,7 +500,7 @@ func _anchor_rect(anchor: String) -> Rect2:
 
 
 func _fit_stage() -> void:
-	UiLayout.fit_stage(_stage, size)
+	UiLayout.fit_stage(_stage, size, stage_size)
 
 
 ## Moments de jeu signalés au tutoriel une fois les surcouches fermées.
@@ -608,7 +621,7 @@ func _bet_rejected(res: BetSlip.PlaceResult) -> void:
 
 
 func _on_spot_hovered(spot_id: String) -> void:
-	if not table_view.cursor_active or spot_id == "":
+	if not (table_view.cursor_active or table_view.touch_aiming) or spot_id == "":
 		return
 	_cards.show_bet(spot_id)
 
@@ -734,7 +747,7 @@ func _on_score_finished(total: int) -> void:
 		return
 	if out.deadline_won:
 		AudioBus.play("deadline_won")
-		float_layer.burst_3d(UiLayout.canvas_point(_stage, Vector2(UiLayout.DESIGN_SIZE.x * 0.5, 120)), JuiceProfile.COINS_3D_DEADLINE, true)
+		float_layer.burst_3d(UiLayout.canvas_point(_stage, Vector2(stage_size.x * 0.5, 120)), JuiceProfile.COINS_3D_DEADLINE, true)
 		EventBus.subtitle.emit(tr("SUB_DEADLINE_WON"))
 		if bool(ctl.run.flags.get("act_changed", false)):
 			var outro: String = "act%d_creditor_won" % (ctl.run.act() - 1)

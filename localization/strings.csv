@@ -589,3 +589,17 @@ OPT_QUALITY_DESC,"Économie : autonomie maximale. Équilibré : 3D allégée, 60
 OPT_QUALITY_ECO,Économie,Eco
 OPT_QUALITY_BALANCED,Équilibré,Balanced
 OPT_QUALITY_HIGH,Beau,High
+OPT_IM_TOUCH,Désactivé (écran tactile),Off (touchscreen)
+OPT_INPUT_MODE_DESC_MOBILE,"Automatique : le jeu passe à la manette dès qu'une manette Bluetooth est utilisée, et revient au doigt dès qu'on touche l'écran. Activé : tout se joue à la manette. Désactivé : uniquement au doigt.","Automatic: the game switches to the controller as soon as a Bluetooth controller is used, and back to touch as soon as you touch the screen. On: everything is played with a controller. Off: touch only."
+OPT_FPS_MOBILE_DESC,"60 images/s conseillées. 90 ou 120 : plus fluide sur les écrans rapides (Pixel 7 : 90 Hz), mais le téléphone chauffe et la batterie se vide plus vite.","60 FPS recommended. 90 or 120: smoother on fast screens (Pixel 7: 90 Hz), but the phone runs warmer and the battery drains faster."
+OPT_HAPTICS,Vibrations,Vibration
+OPT_TAP_CONFIRM,Confirmer les mises d'un second toucher,Confirm bets with a second tap
+OPT_TAP_CONFIRM_DESC,"Désactivé : lever le doigt pose le jeton. Activé : le premier toucher vise (la loupe reste affichée), un second toucher sur la même case pose le jeton.","Off: lifting your finger places the chip. On: the first tap aims (the magnifier stays visible), a second tap on the same spot places the chip."
+OPT_LEFT_HANDED,Disposition gaucher,Left-handed layout
+OPT_LEFT_HANDED_DESC,"Inverse la table : le tapis et le bouton Lancer passent à gauche, la roue à droite.","Mirrors the table: the betting layout and the Spin button move to the left, the wheel to the right."
+CARD_BUY,Acheter · %d $,Buy · $%d
+CARD_SELL,Vendre · %d $,Sell · $%d
+CARD_USE,Utiliser,Use
+CARD_LOCK,Verrouiller,Lock
+CARD_UNLOCK,Déverrouiller,Unlock
+HINT_K_CARD_SHEET,détails · vendre · verrouiller,details · sell · lock

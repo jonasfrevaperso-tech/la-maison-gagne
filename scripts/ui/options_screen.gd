@@ -171,6 +171,9 @@ func _audio_tab() -> void:
 
 func _video_tab() -> void:
 	var b: VBoxContainer = _tab("OPT_TAB_VIDEO")
+	if Platform.is_mobile():
+		_video_mobile(b)
+		return
 	_choice(b, "OPT_WINDOW_MODE", "video", "window_mode", Settings.WINDOW_MODES, ["OPT_WM_WINDOWED", "OPT_WM_FULLSCREEN", "OPT_WM_EXCLUSIVE"])
 	var screen: Vector2i = DisplayServer.screen_get_size(DisplayServer.window_get_current_screen())
 	var sizes: Array = []
@@ -200,6 +203,22 @@ func _video_tab() -> void:
 	_desc(b, "OPT_HANDHELD_DESC")
 
 
+## Téléphone : pas de fenêtre ni de définition ; qualité 3D et cadence (écran 90 Hz du Pixel).
+func _video_mobile(b: VBoxContainer) -> void:
+	_choice(
+		b, "OPT_QUALITY", "video", "quality", Settings.QUALITY_LEVELS, ["OPT_QUALITY_ECO", "OPT_QUALITY_BALANCED", "OPT_QUALITY_HIGH"]
+	)
+	_desc(b, "OPT_QUALITY_DESC")
+	_choice(b, "OPT_FPS_CAP", "video", "fps_cap", [30, 60, 90, 120], ["30", "60", "90", "120"])
+	_desc(b, "OPT_FPS_MOBILE_DESC")
+	_slider(b, "OPT_CRT", "video", "crt", 0.0, 1.0, 0.05)
+	_slider(b, "OPT_BLOOM", "video", "bloom", 0.0, 1.0, 0.05)
+	_check(b, "OPT_SHOW_FPS", "video", "show_fps")
+	_check(b, "OPT_WHEEL_3D", "video", "wheel_3d")
+	_check(b, "OPT_DECOR_3D", "video", "decor_3d")
+	b.add_child(UiKit.label(tr("OPT_WHEEL_3D_DESC"), UiKit.SIZE_SMALL, Palette.SMOKE))
+
+
 func _juice_tab() -> void:
 	var b: VBoxContainer = _tab("OPT_TAB_JUICE")
 	_slider(b, "OPT_JUICE", "juice", "intensity", 0.0, 1.0, 0.05)
@@ -219,10 +238,17 @@ func _game_tab() -> void:
 	_desc(b, "OPT_THROW_MODE_DESC")
 	_check(b, "OPT_ASSIST", "game", "assist")
 	_check(b, "OPT_TUTORIAL_TIPS", "game", "tutorial_tips")
+	if Platform.is_mobile():
+		_check(b, "OPT_HAPTICS", "game", "haptics")
+		_check(b, "OPT_TAP_CONFIRM", "game", "tap_confirm")
+		_desc(b, "OPT_TAP_CONFIRM_DESC")
+		_check(b, "OPT_LEFT_HANDED", "game", "left_handed")
+		_desc(b, "OPT_LEFT_HANDED_DESC")
 	_check(b, "OPT_TELEMETRY", "game", "telemetry")
 	_desc(b, "OPT_TELEMETRY_DESC")
 	b.add_child(UiKit.button(tr("OPT_RESET_TUTORIAL"), _reset_tutorial))
-	b.add_child(UiKit.button(tr("OPT_OPEN_DATA"), _open_data_dir))
+	if not Platform.is_mobile():
+		b.add_child(UiKit.button(tr("OPT_OPEN_DATA"), _open_data_dir))
 
 
 func _access_tab() -> void:
@@ -235,7 +261,7 @@ func _access_tab() -> void:
 		["off", "protan", "deutan", "tritan"],
 		["CB_OFF", "CB_PROTAN", "CB_DEUTAN", "CB_TRITAN"]
 	)
-	_slider(b, "OPT_TEXT_SCALE", "access", "text_scale", UiKit.TEXT_SCALE_MIN, UiKit.TEXT_SCALE_MAX, 0.05)
+	_slider(b, "OPT_TEXT_SCALE", "access", "text_scale", UiKit.TEXT_SCALE_MIN, UiKit.text_scale_max(), 0.05)
 	_desc(b, "OPT_TEXT_SCALE_DESC")
 	_check(b, "OPT_HIGH_CONTRAST", "access", "high_contrast")
 	_check(b, "OPT_SUBTITLES", "access", "subtitles")
@@ -243,8 +269,9 @@ func _access_tab() -> void:
 
 func _input_tab() -> void:
 	var b: VBoxContainer = _tab("OPT_TAB_INPUT")
-	_choice(b, "OPT_INPUT_MODE", "game", "input_mode", InputGlyphs.MODES, ["OPT_IM_AUTO", "OPT_IM_KEYBOARD", "OPT_IM_GAMEPAD"])
-	_desc(b, "OPT_INPUT_MODE_DESC")
+	var im: Array[Array] = InputGlyphs.mode_choices()
+	_choice(b, "OPT_INPUT_MODE", "game", "input_mode", im[0], im[1])
+	_desc(b, "OPT_INPUT_MODE_DESC_MOBILE" if Platform.is_mobile() else "OPT_INPUT_MODE_DESC")
 	_slider(b, "OPT_STICK_SENS", "input", "stick_sensitivity", 0.0, 1.0, 0.05)
 	_desc(b, "OPT_STICK_SENS_DESC")
 	_remap_box = VBoxContainer.new()
@@ -263,6 +290,8 @@ func _build_remap_rows() -> void:
 		_remap_box.remove_child(c)
 		c.queue_free()
 	_remap_buttons.clear()
+	if Platform.is_mobile() and not InputGlyphs.using_pad:
+		return  # au doigt : rien à remapper (une manette Bluetooth affiche ses boutons)
 	var device: String = "OPT_REMAP_PAD" if InputGlyphs.using_pad else "OPT_REMAP_KEYS"
 	_remap_box.add_child(UiKit.label(tr(device), UiKit.SIZE_BODY, Palette.GOLD))
 	for action: String in REMAPPABLE:

@@ -47,6 +47,8 @@ func build() -> void:
 	body.add_child(_text)
 	_attach = CheckBox.new()
 	_attach.text = tr("NOTE_ATTACH_SHOT")
+	if Platform.is_mobile():
+		_attach.custom_minimum_size.y = UiKit.BUTTON_MIN_H_MOBILE
 	_attach.button_pressed = _shot != null
 	_attach.disabled = _shot == null
 	body.add_child(_attach)

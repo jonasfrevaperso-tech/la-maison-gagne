@@ -32,16 +32,16 @@ const DEFAULT_WINDOW: Vector2i = Vector2i(1600, 900)
 
 ## Échelle qui fait tenir la scène de référence dans `viewport` (jamais d'agrandissement :
 ## l'étirement du projet s'en charge déjà).
-static func stage_scale(viewport: Vector2) -> float:
-	return minf(1.0, minf(viewport.x / DESIGN_SIZE.x, viewport.y / DESIGN_SIZE.y))
+static func stage_scale(viewport: Vector2, design: Vector2 = DESIGN_SIZE) -> float:
+	return minf(1.0, minf(viewport.x / design.x, viewport.y / design.y))
 
 
-## Place `stage` (taille DESIGN_SIZE) au centre de `viewport`, mise à l'échelle.
-static func fit_stage(stage: Control, viewport: Vector2) -> void:
-	var s: float = stage_scale(viewport)
-	stage.size = DESIGN_SIZE
+## Place `stage` (taille `design`, DESIGN_SIZE par défaut) au centre de `viewport`, mise à l'échelle.
+static func fit_stage(stage: Control, viewport: Vector2, design: Vector2 = DESIGN_SIZE) -> void:
+	var s: float = stage_scale(viewport, design)
+	stage.size = design
 	stage.scale = Vector2(s, s)
-	stage.position = ((viewport - DESIGN_SIZE * s) * 0.5).floor()
+	stage.position = ((viewport - design * s) * 0.5).floor()
 
 
 ## Cadre plein écran des écrans : au moins DESIGN_SIZE dans chaque dimension (les écrans

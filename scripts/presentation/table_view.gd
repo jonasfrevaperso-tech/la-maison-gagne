@@ -3,6 +3,8 @@ extends Control
 ## Tapis de roulette européen. Détecte l'emplacement visé selon la position fine :
 ## centre = plein, bord = cheval, coin = carré, bas de colonne = transversale/sixain.
 ## Clic gauche + la mise choisie (Maj : +5), clic droit −1, molette ±1.
+## Au doigt : poser le doigt ouvre une loupe, glisser vise, relâcher pose la mise (option :
+## second toucher pour confirmer) ; appui long immobile sur une pile : −1 jeton.
 
 signal spot_changed(spot_id: String, delta: int)
 signal spot_hovered(spot_id: String)
@@ -23,6 +25,13 @@ const FINE_ROW_BOTTOM: int = 5
 const BOTTOM_EDGE_INSET: float = 0.06
 const CHIP_POP_HEIGHT: float = 14.0
 const EVEN_ORDER: Array[String] = ["low", "even", "red", "black", "odd", "high"]
+## Tactile : au-delà de ce déplacement (px), le doigt vise au lieu d'appuyer longuement.
+const TOUCH_SLOP: float = 18.0
+## Tactile : durée de l'appui long immobile qui retire un jeton.
+const TOUCH_HOLD_REMOVE: float = 0.55
+const HAPTIC_AIM_MS: int = 6
+const HAPTIC_PLACE_MS: int = 14
+const HAPTIC_REMOVE_MS: int = 30
 
 var slip: BetSlip = null
 var hover_spot: String = ""
@@ -39,6 +48,10 @@ var bet_amount: int = 1
 ## Tapis en 3D (réglage vidéo « 3D ») : le plateau est rendu derrière, le 2D ne dessine plus
 ## que les surbrillances, le curseur et les aides.
 var table3d: Table3D = null
+## Tactile : un doigt est posé sur le tapis (visée en cours).
+var touch_aiming: bool = false
+## Tactile (option « toucher pour confirmer ») : mise visée en attente du second toucher.
+var pending_spot: String = ""
 var _pops: Dictionary = {}  # spot_id -> temps restant de l'animation de pose
 var _cx: int = 0
 var _cy: int = 2
@@ -48,6 +61,10 @@ var _ch: float = 0.0
 var _origin: Vector2 = Vector2.ZERO
 var _zero_w: float = 0.0
 var _out_h: float = 0.0
+var _loupe: BetLoupe = null
+var _aim_start: Vector2 = Vector2.ZERO
+var _aim_moved: bool = false
+var _aim_hold: float = 0.0
 
 
 func _ready() -> void:
@@ -200,6 +217,10 @@ func spot_at(p: Vector2) -> String:
 
 
 func _gui_input(event: InputEvent) -> void:
+	if InputGlyphs.using_touch and (event is InputEventMouseButton or event is InputEventMouseMotion):
+		_touch_input(event)
+		accept_event()
+		return
 	if event is InputEventMouseMotion:
 		var s: String = spot_at((event as InputEventMouseMotion).position)
 		if s != hover_spot:
@@ -225,7 +246,82 @@ func _gui_input(event: InputEvent) -> void:
 		accept_event()
 
 
+# --------------------------------------------------------------------------- doigt
+
+
+func _touch_input(event: InputEvent) -> void:
+	var mb: InputEventMouseButton = event as InputEventMouseButton
+	if mb != null:
+		if mb.button_index != MOUSE_BUTTON_LEFT:
+			return
+		if mb.pressed:
+			touch_aiming = true
+			_aim_start = mb.position
+			_aim_moved = false
+			_aim_hold = 0.0
+			_aim(mb.position)
+		elif touch_aiming:
+			_release_aim()
+		return
+	var mm: InputEventMouseMotion = event as InputEventMouseMotion
+	if mm != null and touch_aiming:
+		if mm.position.distance_to(_aim_start) > TOUCH_SLOP:
+			_aim_moved = true
+		_aim(mm.position)
+
+
+func _aim(p: Vector2) -> void:
+	var s: String = spot_at(p)
+	if s != hover_spot:
+		hover_spot = s
+		spot_hovered.emit(s)
+		if s != "":
+			Platform.haptic(HAPTIC_AIM_MS)
+		queue_redraw()
+	if _loupe == null:
+		_loupe = BetLoupe.new()
+		add_child(_loupe)
+	_loupe.show_at(get_global_transform_with_canvas() * p, s)
+
+
+func _release_aim() -> void:
+	touch_aiming = false
+	if _loupe != null:
+		_loupe.hide_loupe()
+	var spot: String = hover_spot
+	var removed: bool = _aim_hold < 0.0
+	if removed or spot == "":
+		hover_spot = pending_spot
+		spot_hovered.emit("")
+		queue_redraw()
+		return
+	if Settings.b("game", "tap_confirm") and spot != pending_spot:
+		pending_spot = spot  # premier toucher : la mise reste en surbrillance
+		return
+	pending_spot = ""
+	hover_spot = ""
+	spot_hovered.emit("")
+	spot_changed.emit(spot, bet_amount)
+	Platform.haptic(HAPTIC_PLACE_MS)
+	queue_redraw()
+
+
+## Appui long immobile sur une pile : retire un jeton (une fois par appui).
+func _touch_hold(delta: float) -> void:
+	if not touch_aiming or _aim_moved or _aim_hold < 0.0:
+		return
+	_aim_hold += delta
+	if _aim_hold < TOUCH_HOLD_REMOVE:
+		return
+	_aim_hold = -1.0
+	if slip != null and slip.chips.has(hover_spot):
+		spot_changed.emit(hover_spot, -1)
+		Platform.haptic(HAPTIC_REMOVE_MS)
+
+
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_MOUSE_EXIT and touch_aiming:
+		return  # le doigt glisse hors du tapis : la visée continue jusqu'au relâcher
 	if what == NOTIFICATION_MOUSE_EXIT:
 		hover_spot = ""
 		spot_hovered.emit("")
@@ -233,6 +329,7 @@ func _notification(what: int) -> void:
 
 
 func _process(delta: float) -> void:
+	_touch_hold(delta)
 	if flash_t > 0.0:
 		flash_t = maxf(flash_t - delta, 0.0)
 		queue_redraw()

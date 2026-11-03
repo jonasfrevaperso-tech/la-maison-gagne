@@ -3,8 +3,10 @@ extends Control
 ## Crédits défilants (contenu tiré de docs/CREDITS.md résumé) + mention jeu de hasard simulé.
 
 const SCROLL_SPEED: float = 40.0
+const BACK_MARGIN: Vector2 = Vector2(60, 40)
 
 var _box: VBoxContainer = null
+var _back: Button = null
 
 
 func setup(_params: Dictionary) -> void:
@@ -16,7 +18,7 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(DecoBackground.new())
 	_box = VBoxContainer.new()
-	_box.position = Vector2(460, 1080)
+	_box.position = Vector2(460, UiLayout.DESIGN_SIZE.y)
 	_box.custom_minimum_size = Vector2(1000, 0)
 	_box.add_theme_constant_override("separation", 18)
 	add_child(_box)
@@ -28,17 +30,24 @@ func _ready() -> void:
 		l.custom_minimum_size = Vector2(1000, 0)
 		_box.add_child(l)
 	var back: Button = UiKit.button(tr("MENU_BACK"), GameState.goto.bind(GameState.SCREEN_TITLE))
-	back.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
-	back.position = Vector2(-320, -100)
+	_back = back
 	add_child(back)
+	back.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	back.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	back.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	back.offset_right = -BACK_MARGIN.x
+	back.offset_bottom = -BACK_MARGIN.y
 	back.call_deferred("grab_focus")
 	AudioBus.play_music("menu")
 
 
 func _process(delta: float) -> void:
+	# Texte centré entre le bord gauche et le bouton Retour (écrans larges, texte agrandi).
+	var room: float = size.x - _back.size.x - BACK_MARGIN.x * 2.0
+	_box.position.x = maxf(BACK_MARGIN.x * 0.5, (room - _box.size.x) * 0.5)
 	_box.position.y -= SCROLL_SPEED * delta
 	if _box.position.y < -_box.size.y:
-		_box.position.y = 1080.0
+		_box.position.y = size.y
 
 
 func go_back() -> void:

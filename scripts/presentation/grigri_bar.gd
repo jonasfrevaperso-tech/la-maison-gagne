@@ -38,6 +38,7 @@ func refresh() -> void:
 		card.disabled_look = g.disabled
 		if shop_mode:
 			card.price = ShopModel.sell_value(run, DataRegistry.db, g)
+			card.action_text = tr("CARD_SELL") % card.price
 		card.lock_toggled.connect(_on_lock)
 		card.reorder_requested.connect(_on_reorder)
 		card.activated.connect(_on_activated)

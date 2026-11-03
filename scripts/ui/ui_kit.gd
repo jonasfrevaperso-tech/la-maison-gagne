@@ -12,8 +12,13 @@ const SIZE_BODY: int = 24
 const SIZE_SMALL: int = 18
 ## Plancher de lisibilité : 14 px logiques = 9,3 px à 1280×800 (minimum Steam Deck : 9 px).
 const MIN_FONT: int = 14
+## Téléphone : 22 px logiques ≈ 8,4 sp sur un écran de 1080 px de haut à 420 dpi.
+const MIN_FONT_MOBILE: int = 22
+## Téléphone : hauteur minimale d'un bouton (≈ 6 mm sur un Pixel 7).
+const BUTTON_MIN_H_MOBILE: float = 100.0
 const TEXT_SCALE_MIN: float = 1.0
 const TEXT_SCALE_MAX: float = 1.3
+const TEXT_SCALE_MAX_MOBILE: float = 1.7
 const RADIUS: int = 6
 const BORDER: int = 2
 const PAD: int = 14
@@ -124,11 +129,16 @@ static func label(text: String, size: int = SIZE_BODY, color: Color = Palette.IV
 
 ## Taille de police à l'écran : option « Taille du texte » appliquée, plancher de lisibilité.
 static func fs(size: int) -> int:
-	return maxi(roundi(float(size) * text_scale()), MIN_FONT)
+	return maxi(roundi(float(size) * text_scale()), MIN_FONT_MOBILE if Platform.is_mobile() else MIN_FONT)
 
 
 static func text_scale() -> float:
-	return clampf(Settings.f("access", "text_scale"), TEXT_SCALE_MIN, TEXT_SCALE_MAX)
+	return clampf(Settings.f("access", "text_scale"), TEXT_SCALE_MIN, text_scale_max())
+
+
+## Taille de texte maximale : plus grande sur téléphone (écran de 6 pouces).
+static func text_scale_max() -> float:
+	return TEXT_SCALE_MAX_MOBILE if Platform.is_mobile() else TEXT_SCALE_MAX
 
 
 static func title(text: String, size: int = SIZE_H1) -> Label:
@@ -143,6 +153,8 @@ static func button(text: String, callback: Callable, min_size: Vector2 = BUTTON_
 	var b: Button = Button.new()
 	b.text = text
 	b.custom_minimum_size = min_size
+	if Platform.is_mobile():
+		b.custom_minimum_size.y = maxf(min_size.y, BUTTON_MIN_H_MOBILE)
 	b.add_theme_font_override("font", font("display"))
 	b.pressed.connect(callback)
 	b.pressed.connect(AudioBus.ui.bind("click"))
@@ -160,6 +172,8 @@ static func button(text: String, callback: Callable, min_size: Vector2 = BUTTON_
 static func _hover_scale(b: Button, on: bool) -> void:
 	if not is_instance_valid(b) or b.disabled:
 		return
+	if on and InputGlyphs.using_touch:
+		return  # au doigt, pas de survol (sinon le bouton resterait grossi après le toucher)
 	var k: float = 1.0 + HOVER_GROW * JuiceProfile.intensity() if on else 1.0
 	b.create_tween().tween_property(b, "scale", Vector2(k, k), HOVER_TIME).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 

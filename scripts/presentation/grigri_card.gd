@@ -3,6 +3,7 @@ extends Control
 ## Carte de grigri / Fortune / contrat : cadre de rareté, icône (ou glyphe de repli),
 ## inclinaison 3D légère sous la souris, rebond au déclenchement, brillance d'édition.
 ## Glisser-déposer pour réordonner ; clic droit = verrouiller ; double-clic = action.
+## Au doigt : un toucher ouvre la fiche (CardSheet), un glisser réordonne.
 
 signal activated(card: GrigriCard)
 signal lock_toggled(card: GrigriCard)
@@ -30,6 +31,8 @@ var disabled_look: bool = false
 var price: int = -1
 var show_counter: bool = false
 var draggable: bool = true
+## Tactile : texte de l'action principale proposée par la fiche (acheter, vendre, utiliser…).
+var action_text: String = ""
 
 var _hover: bool = false
 var _mouse_in: bool = false
@@ -156,6 +159,14 @@ func _process(delta: float) -> void:
 
 
 func _gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and InputGlyphs.using_touch:
+		# Au doigt : un toucher ouvre la fiche de la carte (description et actions).
+		var tb: InputEventMouseButton = event as InputEventMouseButton
+		if tb.button_index == MOUSE_BUTTON_LEFT:
+			if not tb.pressed and Rect2(Vector2.ZERO, size).has_point(tb.position):
+				CardSheet.open(self)
+			accept_event()
+		return
 	if event is InputEventMouseButton:
 		var mb: InputEventMouseButton = event as InputEventMouseButton
 		if mb.pressed and mb.button_index == MOUSE_BUTTON_RIGHT and kind == "grigri":

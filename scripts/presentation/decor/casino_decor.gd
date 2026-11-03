@@ -36,6 +36,14 @@ const MARGIN_LAYOUT: Array = [
 	["cards", Vector2(2030, 520), -0.3],
 	["ashtray", Vector2(2040, 780), 0.0],
 ]
+## Téléphone (scène 2200×1080, cf. RunScreenLayoutMobile) : zones libres en haut, autour du score.
+const LAYOUT_MOBILE: Array = [
+	["neon", Vector2(1860, 215), -0.08],
+	["lamp", Vector2(2110, 250), 2.6],
+	["chips", Vector2(860, 235), 0.0],
+	["glass", Vector2(1680, 250), 0.0],
+]
+const CRITTERS_MOBILE: Array = [["spider", Vector2(2300, 160), Vector2(1990, 300)]]
 ## Bestioles : [type, entrée (bord), arrêt].
 const CRITTERS: Array = [
 	["spider", Vector2(2000, 180), Vector2(1560, 200)],
@@ -185,14 +193,15 @@ func _make_dust() -> CPUParticles3D:
 
 
 func _build_props() -> void:
-	for row: Array in LAYOUT + MARGIN_LAYOUT:
+	var rows: Array = LAYOUT_MOBILE if Platform.is_mobile() else LAYOUT + MARGIN_LAYOUT
+	for row: Array in rows:
 		var pr: DecorProp = DecorProp.new(String(row[0]))
 		pr.call("build_" + String(row[0]))
 		pr.rotation.y = float(row[2])
 		pr.set_meta("design", row[1])
 		_root3d.add_child(pr)
 		props.append(pr)
-	for row: Array in CRITTERS:
+	for row: Array in CRITTERS_MOBILE if Platform.is_mobile() else CRITTERS:
 		var c: DecorCritter = DecorCritter.new(String(row[0]))
 		c.call("build_" + String(row[0]))
 		c.set_meta("design", row[2])

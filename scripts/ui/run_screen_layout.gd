@@ -12,6 +12,7 @@ static func build_header(s: RunScreen) -> void:
 	strip.add_theme_stylebox_override("panel", UiKit.flat(Color(Palette.INK, 0.72), Palette.GOLD_DARK, 2, 10, 0))
 	strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	s._stage.add_child(strip)
+	s._header_strip = strip
 	var top: HBoxContainer = HBoxContainer.new()
 	top.position = Vector2(RunScreen.MARGIN, RunScreen.MARGIN * 0.6)
 	top.add_theme_constant_override("separation", 26)
@@ -45,6 +46,7 @@ static func build_actions(s: RunScreen) -> void:
 	actions.position = Vector2(840, 360 + RunScreen.TABLE_SIZE.y + 22)
 	actions.add_theme_constant_override("separation", 10)
 	s._stage.add_child(actions)
+	s._actions = actions
 	var small: Vector2 = Vector2(150, 54)
 	s._undo_btn = UiKit.button(s.tr("BTN_UNDO"), s._on_undo, small)
 	s._repeat_btn = UiKit.button(s.tr("BTN_REPEAT"), s._on_repeat, small)
@@ -77,6 +79,7 @@ static func build_actions(s: RunScreen) -> void:
 	PromptBadge.attach(menu_btn, "pause_menu")
 	menu_btn.position = Vector2(UiLayout.DESIGN_SIZE.x - RunScreen.MARGIN - 64, RunScreen.MARGIN * 0.5)
 	s._stage.add_child(menu_btn)
+	s._menu_btn = menu_btn
 	# Aide aux commandes : invites du périphérique actif (glyphes manette ou touches), sans débordement.
 	s._prompt_bar = PromptBar.new()
 	s._prompt_bar.position = Vector2(840, 360 + RunScreen.TABLE_SIZE.y + RunScreen.HINT_OFFSET_Y)
@@ -98,6 +101,8 @@ static func build_actions(s: RunScreen) -> void:
 
 ## L'aide aux commandes suit la hauteur réelle de la rangée d'actions (grande police comprise).
 static func place_hints(s: RunScreen, actions: Control) -> void:
+	if Platform.is_mobile():
+		return  # RunScreenLayoutMobile place l'aide lui-même
 	var y: float = maxf(actions.position.y + actions.size.y + RunScreen.HINT_GAP * 0.5, 360 + RunScreen.TABLE_SIZE.y + RunScreen.HINT_OFFSET_Y)
 	s._prompt_bar.position.y = y
 	s._hint_label.position.y = y + InputGlyphs.PROMPT_H + 10

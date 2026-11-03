@@ -170,6 +170,47 @@ def mouse(button: str) -> Image.Image:
     return im
 
 
+def touch(kind: str) -> Image.Image:
+    """Doigt (index tendu) : 'tap', 'hold', 'double', 'drag', 'swipe'."""
+    w, h = 16, 16
+    im, d = canvas(w, h)
+    skin = (240, 205, 170, 255)
+    shade = (196, 150, 116, 255)
+    accent = (255, 46, 136, 255)
+    fx = 7  # colonne gauche de l'index
+    # Onde de contact autour du bout du doigt.
+    if kind in ("tap", "double", "hold"):
+        d.ellipse((fx - 4, 0, fx + 6, 6), outline=accent)
+        if kind == "double":
+            d.ellipse((fx - 6, -2, fx + 8, 8), outline=(255, 140, 190, 255))
+        if kind == "hold":
+            d.ellipse((fx - 3, 1, fx + 5, 5), fill=(255, 46, 136, 120))
+    if kind == "drag":
+        d.line((1, 3, 4, 3), fill=accent)
+        d.line((11, 3, 14, 3), fill=accent)
+        d.point((2, 2), fill=accent)
+        d.point((2, 4), fill=accent)
+        d.point((13, 2), fill=accent)
+        d.point((13, 4), fill=accent)
+    if kind == "swipe":
+        for x in range(1, 15):
+            d.point((x, 1), fill=accent)
+        d.point((13, 0), fill=accent)
+        d.point((13, 2), fill=accent)
+        d.point((12, 0), fill=accent)
+        d.point((12, 2), fill=accent)
+    # Index (3 px de large) et main.
+    d.rectangle((fx - 1, 2, fx + 3, 10), fill=INK)
+    d.rectangle((fx, 3, fx + 2, 10), fill=skin)
+    d.rectangle((fx - 4, 8, fx + 7, 15), fill=INK)
+    d.rectangle((fx - 3, 9, fx + 6, 14), fill=skin)
+    d.line((fx + 3, 9, fx + 3, 12), fill=shade)
+    d.line((fx + 5, 9, fx + 5, 12), fill=shade)
+    d.line((fx - 3, 14, fx + 6, 14), fill=shade)
+    d.point((fx + 1, 3), fill=(255, 235, 215, 255))
+    return im
+
+
 def save(name: str, im: Image.Image) -> None:
     im.resize((im.width * SCALE, im.height * SCALE), Image.NEAREST).save(OUT / f"{name}.png")
 
@@ -194,6 +235,8 @@ def main() -> None:
     glyphs["pad_r3"] = stick("R", True)
     for b in ["", "left", "right", "wheel"]:
         glyphs["mouse" + (f"_{b}" if b else "")] = mouse(b)
+    for k in ["tap", "hold", "double", "drag", "swipe"]:
+        glyphs[f"touch_{k}"] = touch(k)
     for name, im in glyphs.items():
         save(name, im)
     # Planche de contrôle (non importée : hors de assets/).

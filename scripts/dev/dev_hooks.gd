@@ -152,6 +152,10 @@ func _hover_later(points: String) -> void:
 		await get_tree().process_frame
 	for p: String in points.split(";"):
 		var xy: PackedStringArray = p.split(",")
+		# p = appuyer, r = relâcher, m = glisser bouton enfoncé (gestes au doigt émulés).
+		if xy.size() == 3 and xy[2] in ["p", "r", "m"]:
+			await _pointer_step(Vector2(float(xy[0]), float(xy[1])), xy[2])
+			continue
 		if xy.size() == 3:
 			for down: bool in [true, false]:
 				var b: InputEventMouseButton = InputEventMouseButton.new()
@@ -167,6 +171,25 @@ func _hover_later(points: String) -> void:
 		ev.relative = Vector2(3, 3)
 		Input.parse_input_event(ev)
 		await get_tree().create_timer(1.5).timeout
+
+
+func _pointer_step(at: Vector2, step: String) -> void:
+	if step == "m":
+		var mm: InputEventMouseMotion = InputEventMouseMotion.new()
+		mm.position = at
+		mm.global_position = at
+		mm.button_mask = MOUSE_BUTTON_MASK_LEFT
+		mm.relative = Vector2(4, 4)
+		Input.parse_input_event(mm)
+	else:
+		var b: InputEventMouseButton = InputEventMouseButton.new()
+		b.button_index = MOUSE_BUTTON_LEFT
+		b.pressed = step == "p"
+		b.position = at
+		b.global_position = at
+		Input.parse_input_event(b)
+	for _i: int in 20:
+		await get_tree().process_frame
 
 
 ## Démonstration du décor : chaque objet est secoué tour à tour (bouteille et jetons : jusqu'à la chute).
