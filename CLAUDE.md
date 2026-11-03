@@ -41,3 +41,17 @@ Roguelite de roulette européenne (Godot 4.7, GDScript typé). Jeu de hasard **s
 - `snake_case` fichiers/fonctions/variables, `PascalCase` classes, `UPPER_SNAKE` constantes.
 - Toujours typer : `var x: int = 0`, `func f(a: int) -> void:`, `Array[Pocket]`, `Dictionary[String, int]` quand utile.
 - Signaux typés dans `EventBus`, nommés au passé (`bet_placed`, `spin_resolved`).
+
+┌────────────────────────────────────────────────────────────────────────────┬──────────────────────────────────────────────────────────────────────────────┐
+│                                  Élément                                   │                                 Emplacement                                  │
+├────────────────────────────────────────────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────┤
+│ JDK 17 (Temurin)                                                           │ ~/.local/jdk/jdk17                                                           │
+├────────────────────────────────────────────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────┤
+│ Android SDK : platform-tools, build-tools 36.1.0, Android 36, NDK 29       │ ~/Android/Sdk                                                                │
+├────────────────────────────────────────────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────┤
+│ Templates d'export Android de Godot 4.7.2                                  │ ~/.local/share/godot/export_templates/4.7.2.stable                           │
+├────────────────────────────────────────────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────┤
+│ Clé de signature debug                                                     │ ~/.android/debug.keystore                                                    │
+├────────────────────────────────────────────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────┤
+│ Chemins du JDK, du SDK et de la clé dans les paramètres de l'éditeur Godot │ ~/.config/godot/editor_settings-4.7.tres (copie de l'ancien fichier en .bak) │
+└────────────────────────────────────────────────────────────────────────────┴──────────────────────────────────────────────────────────────────────────────┘

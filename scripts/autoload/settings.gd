@@ -16,7 +16,8 @@ const DEFAULTS: Dictionary = {
 		"show_fps": false,
 		"wheel_3d": true,
 		"decor_3d": true,
-		"handheld": false
+		"handheld": false,
+		"quality": "balanced"
 	},
 	"juice": {"intensity": 1.0, "shake": 1.0, "flashes": true, "reduced_motion": false, "curse_fx": 1.0},
 	"game":
@@ -31,7 +32,11 @@ const DEFAULTS: Dictionary = {
 		"tutorial_tips": true,
 		"input_mode": "auto",
 		"telemetry": false,
-		"telemetry_asked": false
+		"telemetry_asked": false,
+		"haptics": true,
+		"left_handed": false,
+		"tap_confirm": false,
+		"audio_offset_ms": -1
 	},
 	"access": {"colorblind": "off", "text_scale": 1.0, "high_contrast": false, "subtitles": true},
 	"input": {"bindings": {}, "pad_bindings": {}, "stick_sensitivity": 0.35},
@@ -44,6 +49,13 @@ const ECO_PRESET: Dictionary = {"bloom": 0.0, "fps_cap": 60}
 ## sont gardées (video/handheld_saved) et restaurées quand on désactive le mode.
 const HANDHELD_KEYS: Array[String] = ["video/bloom", "video/fps_cap", "access/text_scale"]
 const WINDOW_MODES: Array[String] = ["windowed", "fullscreen", "exclusive"]
+## Mobile (Android) : niveaux de qualité du rendu (cf. RenderQuality).
+const QUALITY_LEVELS: Array[String] = ["eco", "balanced", "high"]
+const MOBILE_FILE: String = "settings_mobile.cfg"
+## Premier lancement sur téléphone : texte agrandi, effets d'écran allégés, 60 images/s.
+const MOBILE_DEFAULTS: Dictionary = {
+	"access/text_scale": 1.35, "video/crt": 0.25, "video/bloom": 0.4, "video/fps_cap": 60, "video/quality": "balanced"
+}
 
 ## Surcharge de vitesse non persistée (QA automatisée) ; 0 = utiliser l'option du joueur.
 var speed_override: float = 0.0
@@ -55,7 +67,9 @@ var _applied_render: String = ""
 
 
 func _ready() -> void:
-	_path = DevMode.save_dir() + FILE
+	# L'émulation mobile de développement a son propre fichier : elle ne touche pas aux
+	# réglages des sessions PC.
+	_path = DevMode.save_dir() + (MOBILE_FILE if Platform.is_emulated() else FILE)
 	load_settings()
 	apply_bindings()
 	apply()
@@ -127,6 +141,8 @@ func load_settings() -> void:
 	_migrate()
 	if first_launch:
 		_detect_handheld()
+		if Platform.is_mobile():
+			_mobile_first_launch()
 	for section: String in DEFAULTS.keys():
 		var sec: Dictionary = DEFAULTS[section]
 		for key: String in sec.keys():
@@ -152,6 +168,14 @@ func _migrate() -> void:
 func _detect_handheld() -> void:
 	if is_steam_deck():
 		_set_handheld(true)
+
+
+## Téléphone : réglages par défaut adaptés et langue du système (FR, sinon EN).
+func _mobile_first_launch() -> void:
+	for path: String in MOBILE_DEFAULTS.keys():
+		var parts: PackedStringArray = path.split("/")
+		_cfg.set_value(parts[0], parts[1], MOBILE_DEFAULTS[path])
+	_cfg.set_value("game", "locale", "fr" if OS.get_locale_language() == "fr" else "en")
 
 
 static func is_steam_deck() -> bool:
@@ -226,7 +250,7 @@ func juice() -> float:
 func apply() -> void:
 	if DisplayServer.get_name() == "headless":
 		return
-	if not DevMode.active():
+	if not DevMode.active() and not Platform.is_mobile():
 		_apply_window()
 		_apply_render_resolution()
 	Engine.max_fps = int(get_value("video", "fps_cap"))

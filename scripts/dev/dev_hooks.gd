@@ -10,6 +10,8 @@ extends Node
 
 func start() -> bool:
 	var args: Dictionary = DevMode.args()
+	if Platform.is_emulated():
+		_emulate_mobile()
 	if args.has("dev-autoplay"):
 		var ap: DevAutoplay = DevAutoplay.new()
 		ap.spins_wanted = int(args["dev-autoplay"])
@@ -183,3 +185,20 @@ func _decor_demo() -> void:
 			pr2.poke()
 			await get_tree().create_timer(0.25).timeout
 		await get_tree().create_timer(0.6).timeout
+
+
+## Émulation mobile : fenêtre au format du téléphone (réduite pour tenir à l'écran), toucher
+## émulé par la souris. Le profil tactile et la zone sûre simulée viennent de `Platform`.
+func _emulate_mobile() -> void:
+	Input.emulate_touch_from_mouse = true
+	if DisplayServer.get_name() == "headless":
+		return
+	var phone: Vector2 = Vector2(Platform.emulated_size())
+	var usable: Rect2i = DisplayServer.screen_get_usable_rect(DisplayServer.window_get_current_screen())
+	var k: float = minf(1.0, minf(float(usable.size.x) * 0.95 / phone.x, float(usable.size.y) * 0.9 / phone.y))
+	if DevMode.args().has("shot"):
+		k = 1.0  # captures à la définition réelle du téléphone
+	var win: Vector2i = Vector2i((phone * k).round())
+	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+	DisplayServer.window_set_size(win)
+	DisplayServer.window_set_position(usable.position + (usable.size - win) / 2)
