@@ -15,6 +15,8 @@ const ACT_TITLE_SECONDS: float = 1.0
 ## n'apparaissent qu'en jouant (mousse, filet de liquide, éclats) compilent aussi leurs pipelines.
 const TRIAL_FRAMES: int = 8
 const TRIAL_STEP: float = 0.15
+## Scènes chauffées ensemble.
+const BATCH: int = 6
 
 static var done: bool = false
 static var _tick: Callable = Callable()
@@ -38,24 +40,36 @@ static func run(host: Control, progress: Callable) -> void:
 	items.append(_chips)
 	items.append(_cards)
 	var tree: SceneTree = host.get_tree()
-	for i: int in items.size():
-		var holder: Control = Control.new()
-		holder.size = UiLayout.DESIGN_SIZE
-		holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		host.add_child(holder)
-		var secs: float = float((items[i] as Callable).call(holder))
+	# Par lots : les scènes d'un lot compilent ensemble (sur téléphone, une image coûte cher).
+	var i: int = 0
+	while i < items.size():
+		var holders: Array[Control] = []
+		var ticks: Array[Callable] = []
+		var secs: float = 0.0
+		for k: int in mini(BATCH, items.size() - i):
+			var holder: Control = Control.new()
+			holder.size = UiLayout.DESIGN_SIZE
+			holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			host.add_child(holder)
+			holders.append(holder)
+			secs = maxf(secs, float((items[i + k] as Callable).call(holder)))
+			if _tick.is_valid():
+				ticks.append(_tick)
+				_tick = Callable()
+		i += holders.size()
 		var t: int = Time.get_ticks_msec()
 		for _f: int in FRAMES_PER_ITEM:
 			await tree.process_frame
-		if _tick.is_valid():
+		if not ticks.is_empty():
 			for _k: int in TRIAL_FRAMES:
-				_tick.call()
+				for tk: Callable in ticks:
+					tk.call()
 				await tree.process_frame
-			_tick = Callable()
 		while float(Time.get_ticks_msec() - t) < secs * 1000.0:
 			await tree.process_frame
-		holder.queue_free()
-		progress.call(float(i + 1) / float(items.size()))
+		for h: Control in holders:
+			h.queue_free()
+		progress.call(float(i) / float(items.size()))
 	await tree.process_frame
 	AudioBus.hush(false)
 	print("Chauffe : %d scènes, %d pipelines, %d ms" % [

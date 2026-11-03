@@ -27,7 +27,11 @@ une main sur un vrai téléphone peut juger. Cocher, noter le modèle et la vers
 - [ ] Carte Fortune : Utiliser, puis toucher la case de la roue.
 
 ## Épreuves du lancer
-- [ ] Les 14 épreuves se jouent au doigt (toucher, maintenir, glisser, boutons de couleur).
+- [ ] Les 25 épreuves se jouent au doigt, en plein écran (toucher, maintenir, glisser, boutons de couleur, joystick virtuel).
+- [ ] Joystick virtuel : fixe en bas à gauche (à droite en gaucher), intensité progressive, retour au centre au lâcher.
+- [ ] Shaker, Pachinko, Tiercé : un bouton dans chaque coin bas, alternance des deux pouces.
+- [ ] Fiche de case visible sous le doigt pendant la visée.
+- [ ] Carton de chargement à l'entrée en partie, aucun gel une fois ouvert.
 - [ ] Effet (rythme) : les notes tombent juste au son (régler le décalage audio si besoin).
 - [ ] Coffre-fort : la molette tourne au doigt.
 - [ ] Cartons d'annonce : commandes tactiles affichées ; toucher passe le carton.

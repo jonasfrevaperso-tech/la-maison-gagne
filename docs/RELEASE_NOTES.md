@@ -1,3 +1,53 @@
+# Notes de version — 1.7.0 « Salle de jeux »
+
+Une mise à jour pour les deux versions du jeu. Chaque point précise la version concernée : **[PC]**, **[Android]** ou **[PC + Android]**.
+
+## Onze nouvelles épreuves — 25 en tout [PC + Android]
+Chaque lancer tire toujours deux épreuves, désormais parmi **vingt-cinq**. Toutes notent l'adresse ou la décision, jamais la chance.
+- **Les Envahisseurs du Zéro** : une borne d'arcade du sous-sol. Des rangées de jetons-envahisseurs descendent vers le tapis : on déplace le râteau-canon du croupier et on tire, abrité derrière des piles de jetons qui s'effritent. Une plaque volante passe en bonus, et les envahisseurs ripostent.
+- **La Cave du Grand Zéro** : course de plateformes dans les caves. On saute fosses, tonneaux et rats, on se balance aux câbles des lustres au-dessus des grandes fosses et on cueille les trésors.
+- **Pachinko** : les billes dévalent un plateau de clous ; on frappe le taquet gauche ou droit au moment où elles passent pour les renvoyer dans le godet d'or.
+- **Blackjack express** : trois mains, quelques secondes par décision (tirer, doubler, rester). Seules la justesse de la décision (stratégie de base) et sa vitesse sont notées, jamais les cartes.
+- **Le Grattage** : neuf cases, quatre grattages. Le reflet qui balaie le ticket fait scintiller les trois trèfles d'or à chaque passage ; il faut observer avant de gratter.
+- **Les Dés** : on vise, on dose la force, et les dés doivent rebondir sur la bande du fond de la table de craps avant de s'arrêter dans la zone dorée. La face ne compte pas.
+- **Le Tiercé** : course de chevaux de bois de fête foraine. On alterne deux touches au rythme du sabot doré ; marteler trop vite essouffle le cheval.
+- **La Pêche au Gros** : les carpes dorées de la fontaine du hall. Lancer dans les remous, ferrer au bon moment, puis remonter en gardant la tension du fil dans le vert.
+- **Les Lasers du Coffre** : traverser la salle des coffres jusqu'à la porte blindée entre des faisceaux qui balaient, glissent et clignotent.
+- **Le Jonglage** : sur la scène du cabaret, garder en l'air des jetons de plus en plus nombreux en frappant la bonne main au bon moment.
+- **Le Billard** : trois coups, une bille à empocher à chaque fois, avec la bille fantôme pour viser et une jauge de force.
+- **Codex** : nouvelle section « Épreuves du lancer », qui affiche l'illustration, le nom et la règle de chaque épreuve déjà jouée.
+
+## La Pluie du Grand Lustre [PC + Android]
+La Pluie de jetons est entièrement refaite.
+- **Décor** : la salle de bal du Grand Zéro en 3D. Le lustre de cristal se balance puis se décroche, le plafond à caissons fuit, un croupier fantôme regarde depuis le balcon et les appliques vacillent.
+- **Le plateau** a de l'inertie et s'incline. On y attrape des jetons (1) et des plaques (3) en évitant les fausses pièces, les bouteilles et les cigares, qui étourdissent.
+- **Bonus** : aimant, grand plateau, ralenti et valeur ×2.
+- **La pile** vacille et se renverse si elle monte trop haut ou si on la secoue. Il faut la **mettre à l'abri** au bon moment.
+- **Enchaînements** : un multiplicateur récompense les prises consécutives.
+- **Quatre vagues** : bruine, rafale du ventilateur, tourbillons, puis le lustre qui se décroche.
+
+## Corrections [PC + Android]
+- **Confirmations à la manette** (quitter une partie, nouvelle partie, quitter le jeu) : on peut de nouveau aller sur « Non ». Le focus restait piégé sur « Oui » quand la boîte s'ouvrait depuis le menu de pause.
+- **Verrou des objets** : un cadenas en pixel art dans le coin haut gauche de la carte, à côté du compteur. Il ne recouvre plus la pastille de famille.
+- **Écrans de chargement** : un carton art déco (roulette qui tourne, astuce, barre de progression) couvre l'entrée en partie et le bilan. Au premier lancement, la Maison « prépare la table » : les épreuves, la machine à sous et les décors sont rendus une fois derrière le carton. Les petits gels du début de partie disparaissent.
+
+## PC
+- **Réglages graphiques complets** (Options → Vidéo → Graphismes) :
+  - **préréglage** : Bas, Moyen, Élevé, Ultra, Steam Deck ou Personnalisé ;
+  - **mise à l'échelle 3D** : bilinéaire, **AMD FSR 1.0** ou **AMD FSR 2.2**, avec raccourcis Qualité, Équilibré, Performance et Ultra-performance, et **netteté FSR** réglable ;
+  - **échelle de rendu**, **anticrénelage** (MSAA, FXAA, TAA ; FSR 2 fait le sien), **ombres** (sans à hautes), **filtrage anisotrope**, **occlusion ambiante** et **densité des particules** ;
+  - **synchronisation verticale** : sans, activée, adaptative ou mailbox.
+- La roue et le tapis, rendus sur fond transparent, restent en mise à l'échelle bilinéaire (FSR y perdrait la transparence).
+- Compteur d'images : il affiche aussi la pire image récente.
+
+## Android
+- **Fiche de case au doigt** : pendant la visée, la fiche de la case sous le doigt (cote, gain, chances, limite) s'affiche du côté opposé à la main.
+- **Toutes les épreuves en plein écran**, jusqu'aux bords des écrans 20:9 ; les petites épreuves sont agrandies.
+- **Joystick virtuel** fixe en bas à gauche (en bas à droite en mode gaucher) : Fléchettes (joystick et bouton LANCER), Pluie du Grand Lustre, Envahisseurs, Cave, Dés, Lasers et Billard.
+- **Shaker** : A dans le coin bas gauche, B dans le coin bas droit, pour alterner les deux pouces. Pachinko et Tiercé utilisent la même disposition.
+- **Chargement plus court** : la préparation de la table, faite une fois par session, est passée de ≈ 12 s à ≈ 5 s sur Pixel 7 (scènes chauffées par lots).
+- Les boutons tactiles portent le nom de leur action (FEU, SAUT, VIDER, TIRER / DOUBLER / RESTER, PÊCHER, FRAPPER…). Les libellés longs sont réduits pour tenir dans le bouton.
+
 # Notes de version — 1.6.0 « Les Familles »
 
 ## Des builds lisibles
