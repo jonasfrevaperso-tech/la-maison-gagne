@@ -113,7 +113,11 @@
   },
   "economy": {
     "start_money": 8,
-    "deadline_rewards": [4, 5, 6],
+    "deadline_rewards": [
+      4,
+      5,
+      6
+    ],
     "money_per_unused_spin": 1,
     "interest_step": 5,
     "interest_per_step": 1,
@@ -243,7 +247,10 @@
       "bars": 4,
       "notes": 11,
       "holds": 3,
-      "hold_steps": [3, 4],
+      "hold_steps": [
+        3,
+        4
+      ],
       "assist_fewer": 3,
       "travel_seconds": 2.4,
       "stray_penalty": 0.03,
@@ -256,7 +263,11 @@
     },
     "bottles": {
       "throws": 3,
-      "sweep_seconds": [2.6, 2.2, 1.9],
+      "sweep_seconds": [
+        2.6,
+        2.2,
+        1.9
+      ],
       "power_seconds": 1.5,
       "power_zone": 0.18,
       "neck_tolerance": 1.0,
@@ -354,14 +365,49 @@
       "input_seconds": 2.5
     },
     "catch": {
-      "duration": 12.0,
-      "tray_speed": 1100.0,
-      "fall_speed_start": 330.0,
-      "fall_speed_end": 560.0,
-      "spawn_start": 0.75,
-      "spawn_end": 0.4,
-      "bad_ratio": 0.25,
-      "bad_penalty": 0.06
+      "duration": 16.0,
+      "tray_speed": 1250.0,
+      "tray_accel": 9.0,
+      "mouse_gain": 8.0,
+      "fall_speed_start": 300.0,
+      "fall_speed_end": 500.0,
+      "spawn_start": 0.62,
+      "spawn_end": 0.34,
+      "finale_gap": 0.75,
+      "bad_ratio": 0.16,
+      "hazard_ratio": 0.1,
+      "plaque_ratio": 0.14,
+      "plaque_value": 3.0,
+      "plaque_speed": 1.2,
+      "bad_penalty": 0.05,
+      "topple_penalty": 0.08,
+      "stun_seconds": 0.7,
+      "stun_wobble": 0.35,
+      "stack_max": 14,
+      "wobble_gain": 1.4,
+      "wobble_decay": 1.6,
+      "combo_step": 5.0,
+      "combo_bonus": 0.25,
+      "combo_max": 2.0,
+      "bonus_seconds": 4.0,
+      "magnet_radius": 420.0,
+      "magnet_pull": 700.0,
+      "wide_factor": 1.6,
+      "slow_factor": 0.55,
+      "wind_speed": 140.0,
+      "zig_amp": 110.0,
+      "zig_freq": 3.0,
+      "waves": [
+        0.0,
+        0.22,
+        0.45,
+        0.74
+      ],
+      "bonus_at": [
+        0.18,
+        0.42,
+        0.66
+      ]
     },
     "highlow": {
       "cards": 6,

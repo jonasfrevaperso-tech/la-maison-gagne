@@ -172,6 +172,9 @@ func _validate_entry(db: ContentDB, cat: String, e: Dictionary) -> void:
 			errors.append("%s : touch_layout doit valoir %s" % [eid, ", ".join(TOUCH_LAYOUTS)])
 		if String(e.get("touch_layout", "")) == "split" and (e.get("touch_pad", []) as Array).size() != 2:
 			errors.append("%s : la disposition split demande exactement deux boutons" % eid)
+		for la: Variant in (e.get("touch_labels", {}) as Dictionary).keys():
+			if not (e.get("touch_pad", []) as Array).has(la):
+				errors.append("%s : touch_labels « %s » hors du pavé" % [eid, la])
 		if e.has("touch_stick") and typeof(e["touch_stick"]) != TYPE_BOOL:
 			errors.append("%s : touch_stick doit être un booléen" % eid)
 		if float(e.get("weight", 0)) <= 0.0:

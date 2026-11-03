@@ -339,21 +339,36 @@ def art_simon(rng) -> None:
 
 
 def art_catch(rng) -> None:
+    """La Pluie du Grand Lustre : salle de bal, lustre de cristal, pluie de jetons et plaques."""
     img, d = canvas()
-    room(img, d, 86)
-    rect(d, 0, 0, W, 6, WOOD_D)
-    for k in range(6):
-        rect(d, 10 + k * 28, 6, 18 + k * 28, 9, INK)
-    for _ in range(11):
-        x, y = rng.randint(10, 150), rng.randint(14, 70)
-        fake = rng.random() < 0.25
-        chip(d, x, y, 4, (176, 58, 255) if fake else GOLD, INK if fake else IVORY)
-    rect(d, 62, 80, 98, 83, GOLD_D)
-    rect(d, 62, 78, 98, 79, GOLD_L)
-    rect(d, 60, 72, 62, 83, GOLD_D)
-    rect(d, 98, 72, 100, 83, GOLD_D)
-    chip(d, 76, 76, 4, GOLD)
-    chip(d, 84, 75, 4, GOLD)
+    room(img, d, 84, floor=WOOD, wall_top=NIGHT, wall_bottom=WINE)
+    rect(d, 30, 84, 130, 88, RED_D)
+    rect(d, 0, 0, W, 7, WOOD_D)
+    for k in range(5):
+        rect(d, 8 + k * 32, 7, 26 + k * 32, 10, INK)
+    for x in (12, 148):
+        rect(d, x, 18, x + 3, 78, GOLD_D)
+    glow(img, 80, 22, 26, GOLD_L, 0.5)
+    rect(d, 79, 7, 81, 14, GOLD)
+    rect(d, 62, 14, 98, 16, GOLD)
+    rect(d, 68, 20, 92, 21, GOLD_D)
+    for k in range(9):
+        x = 63 + k * 4
+        rect(d, x, 16, x + 1, 19 + (k % 3), CYAN)
+    for _ in range(10):
+        x, y = rng.randint(14, 146), rng.randint(26, 70)
+        roll = rng.random()
+        if roll < 0.2:
+            chip(d, x, y, 4, (176, 58, 255), INK)
+        elif roll < 0.4:
+            rect(d, x - 5, y - 3, x + 5, y + 3, IVORY)
+            rect(d, x - 3, y - 1, x + 3, y + 1, GOLD)
+        else:
+            chip(d, x, y, 4, GOLD)
+    rect(d, 60, 78, 100, 81, GOLD_D)
+    rect(d, 60, 76, 100, 77, GOLD_L)
+    for k in range(4):
+        chip(d, 80, 73 - k * 3, 4, GOLD)
     save(img, "catch")
 
 

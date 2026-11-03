@@ -562,10 +562,10 @@ TRIAL_SIMON_HINT,Rejoue la mélodie avec {@qte},Play the melody back with {@qte}
 TRIAL_SIMON_HINT_MOUSE,Rejoue la mélodie en cliquant sur les touches,Play the melody back by clicking the keys
 TRIAL_SIMON_LISTEN,Écoute…,Listen…
 TRIAL_SIMON_PLAY,À toi : %d / %d,Your turn: %d / %d
-TRIAL_CATCH_HINT,{move} déplacer le plateau,{move} move the tray
-TRIAL_CATCH_HINT_MOUSE,Bouge {@mouse} pour déplacer le plateau,Move {@mouse} to move the tray
+TRIAL_CATCH_HINT,{move} déplacer le plateau · {confirm} mettre la pile à l'abri,{move} move the tray · {confirm} bank your stack
+TRIAL_CATCH_HINT_MOUSE,Bouge {@mouse} pour déplacer le plateau · {@click} mettre la pile à l'abri,Move {@mouse} to move the tray · {@click} bank your stack
 TRIAL_CATCH_FAKE,Fausse pièce !,Fake coin!
-TRIAL_CATCH_STATUS,Jetons %d / %d · fausses pièces %d,Chips %d / %d · fakes %d
+TRIAL_CATCH_STATUS,À l'abri : %d,Banked: %d
 TRIAL_HIGHLOW_HINT,{ui_up} plus haut · {ui_down} plus bas,{ui_up} higher · {ui_down} lower
 TRIAL_HIGHLOW_HINT_MOUSE,{@click} plus haut · {@right_click} plus bas,{@click} higher · {@right_click} lower
 TRIAL_HIGHLOW_UP,▲ Plus haut,▲ Higher
@@ -607,7 +607,7 @@ HUD_STAKE_BTN,Mise ×%d,Stake ×%d
 HUD_STAKE_TIP,"Jetons posés à chaque toucher du tapis (1, 2, 5 ou 10).","Chips placed with each tap on the felt (1, 2, 5 or 10)."
 TRIAL_DARTS_HINT_TOUCH,Joystick à gauche pour corriger la visée · LANCER à droite,Joystick on the left to steady the aim · THROW on the right
 TRIAL_SAFE_HINT_TOUCH,Tourne la molette du doigt {@drag} · touche {@tap} pour valider,Turn the dial with your finger {@drag} · tap {@tap} to lock
-TRIAL_CATCH_HINT_TOUCH,Joystick pour déplacer le plateau,Use the joystick to move the tray
+TRIAL_CATCH_HINT_TOUCH,Joystick pour déplacer le plateau · VIDER pour mettre la pile à l'abri,Joystick to move the tray · BANK to save your stack
 TRIAL_MEMORY_HINT_TOUCH,Touche {@tap} une carte pour la retourner,Tap {@tap} a card to flip it
 TRIAL_SHELLS_HINT_TOUCH,Touche {@tap} un gobelet pour le soulever,Tap {@tap} a cup to lift it
 OPT_AUDIO_OFFSET,Décalage audio (ms),Audio offset (ms)
@@ -659,3 +659,15 @@ OPT_DENSITY_HIGH,Élevée,High
 LOADING_TITLE,La Maison prépare la table…,The House is setting the table…
 LOADING_TIP,Astuce :,Tip:
 TOUCH_THROW,LANCER,THROW
+TOUCH_EMPTY,VIDER,BANK
+TRIAL_CATCH_WAVE_1,La bruine,The drizzle
+TRIAL_CATCH_WAVE_2,Rafale du ventilateur !,Fan gust!
+TRIAL_CATCH_WAVE_3,Ça tourbillonne…,It swirls…
+TRIAL_CATCH_WAVE_4,Le lustre se décroche !,The chandelier gives way!
+TRIAL_CATCH_BANKED,À l'abri !,Banked!
+TRIAL_CATCH_TOPPLE,La pile tombe !,Stack toppled!
+TRIAL_CATCH_STUN,Sonné !,Stunned!
+TRIAL_CATCH_BONUS_MAGNET,Aimant,Magnet
+TRIAL_CATCH_BONUS_WIDE,Grand plateau,Wide tray
+TRIAL_CATCH_BONUS_SLOW,Ralenti,Slow-mo
+TRIAL_CATCH_BONUS_DOUBLE,Valeur ×2,Value ×2

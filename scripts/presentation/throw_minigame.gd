@@ -120,7 +120,7 @@ func _open_trial() -> void:
 	trial = (scr.new() as ThrowTrial).setup(e, _precision, _assist, _mouse and pad.is_empty() and not stick)
 	trial.touch_controls = not pad.is_empty() or stick
 	if not pad.is_empty():
-		trial.add_child(TouchPad.new().configure(pad, pad_layout))
+		trial.add_child(TouchPad.new().configure(pad, pad_layout, e.get("touch_labels", {}) as Dictionary))
 	if stick:
 		trial.add_child(TouchStick.new())
 	trial.hold = hold

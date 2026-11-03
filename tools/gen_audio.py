@@ -518,6 +518,9 @@ def sfx_defs():
     d["steps"] = (lambda k: np.concatenate([np.pad(addpad(inst_kick(0.12) * 0.5, inst_clack(300 * v(k), 0.06) * 0.5), (0, int(0.32 * SR))) for _ in range(4)]) * 0.7, 3)
     d["door_boom"] = (lambda k: reverb(addpad(inst_gong(48, 3.0) * 0.6, inst_kick(0.8), fft_filter(saw(55, t_axis(2.0)), 0, 400) * env_adsr(int(2.0 * SR), 0.3, 0.4, 0.5, 0.8) * 0.4), 2.5, 0.45), 1)
     d["heartbeat"] = (lambda k: np.concatenate([inst_kick(0.18) * 0.8, np.zeros(int(0.12 * SR)), inst_kick(0.2) * 0.6, np.zeros(int(0.5 * SR))]), 2)
+    # 1.7 — la Pluie du Grand Lustre.
+    d["chandelier"] = (lambda k: reverb(cluster(lambda f, dur=0.5: inst_bell(f, dur, 1.2, 3.1), 7, 0.045, 3400 * v(k)) * 0.45, 1.2, 0.35), 3)
+    d["gust"] = (lambda k: fft_filter(noise(int(1.0 * SR)), 150, 1800) * env_adsr(int(1.0 * SR), 0.25, 0.2, 0.6, 0.45) * 0.55, 2)
     for style in ("jazz", "funk", "mambo"):
         d["groove_" + style] = ((lambda st: (lambda k: groove(st)))(style), 1)
     return d

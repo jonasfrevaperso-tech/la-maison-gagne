@@ -33,6 +33,7 @@ Mesures objectives en l'absence d'écoute humaine. Seuils : saturation > −0,1 
 | card_place | 4 | -3.6 | -17.6 | 0.08 |
 | card_use | 3 | -3.6 | -15.0 | 1.09 |
 | celebrate | 3 | -3.6 | -16.1 | 1.00 |
+| chandelier | 3 | -3.6 | -18.9 | 1.91 |
 | chime | 4 | -3.6 | -12.8 | 0.80 |
 | chip_lose | 3 | -3.6 | -8.3 | 0.15 |
 | chip_place | 5 | -3.6 | -20.4 | 0.16 |
@@ -79,6 +80,7 @@ Mesures objectives en l'absence d'écoute humaine. Seuils : saturation > −0,1 
 | groove_jazz | 1 | -3.6 | -16.4 | 12.86 |
 | groove_mambo | 1 | -3.6 | -19.0 | 12.00 |
 | grow | 3 | -3.6 | -14.8 | 1.04 |
+| gust | 2 | -3.6 | -16.1 | 1.00 |
 | heartbeat | 2 | -3.6 | -13.9 | 1.00 |
 | hover | 3 | -3.6 | -12.6 | 0.02 |
 | jackpot | 3 | -3.6 | -18.3 | 2.60 |

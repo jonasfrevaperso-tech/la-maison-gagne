@@ -123,11 +123,17 @@
   "id": "catch",
   "stage": "full",
   "weight": 1.0,
-  "name_fr": "Pluie de jetons",
-  "name_en": "Chip Rain",
-  "desc_fr": "Le plafond fuit des jetons : attrape les dorés avec le plateau, évite les fausses pièces violettes.",
-  "desc_en": "The ceiling is leaking chips: catch the gold ones on your tray, dodge the purple fakes.",
-  "touch_stick": true
+  "name_fr": "La Pluie du Grand Lustre",
+  "name_en": "The Grand Chandelier Rain",
+  "desc_fr": "La salle de bal prend l'eau… en jetons. Attrape jetons et plaques sous le lustre qui se balance, évite fausses pièces, bouteilles et cigares, et mets ta pile à l'abri avant qu'elle ne se renverse.",
+  "desc_en": "The ballroom is leaking… chips. Catch chips and plaques under the swaying chandelier, dodge fakes, bottles and cigars, and bank your stack before it topples.",
+  "touch_stick": true,
+  "touch_pad": [
+   "ui_spin"
+  ],
+  "touch_labels": {
+   "ui_spin": "TOUCH_EMPTY"
+  }
  },
  {
   "id": "highlow",

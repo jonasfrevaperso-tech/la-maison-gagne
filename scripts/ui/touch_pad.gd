@@ -33,6 +33,8 @@ const DIAMOND: Dictionary[String, Vector2] = {
 
 var actions: Array[String] = []
 var layout: String = ""
+## Libellés propres à l'épreuve (`touch_labels` des données), à la place du glyphe.
+var labels: Dictionary = {}
 var _area: Control = null
 var _areas: Array[Control] = []
 var _centers: Dictionary[String, Vector2] = {}
@@ -40,8 +42,9 @@ var _held: Dictionary[int, String] = {}  # doigt -> action
 var _icons: Dictionary[String, Texture2D] = {}
 
 
-func configure(p_actions: Array[String], p_layout: String = "") -> TouchPad:
+func configure(p_actions: Array[String], p_layout: String = "", p_labels: Dictionary = {}) -> TouchPad:
 	actions = p_actions
+	labels = p_labels
 	layout = p_layout if p_layout != "" else default_layout(p_actions)
 	return self
 
@@ -191,13 +194,14 @@ func _draw_pad(area: Control) -> void:
 		var c: Vector2 = _centers[a] - origin
 		area.draw_circle(c, r, Color(col, 0.85 if pressed else 0.55))
 		area.draw_arc(c, r - 2.0, 0.0, TAU, 48, col.lightened(0.4), 4.0, true)
-		if _icons.has(a):
+		var label_key: String = String(labels.get(a, LABELS.get(a, "")))
+		if _icons.has(a) and not labels.has(a):
 			var tex: Texture2D = _icons[a]
 			var s: float = r * 0.9
 			area.draw_texture_rect(tex, Rect2(c - Vector2.ONE * s * 0.5, Vector2.ONE * s), false)
-		elif LABELS.has(a):
+		elif label_key != "":
 			var f: Font = UiKit.font("display")
 			var fs: int = UiKit.fs(UiKit.SIZE_BODY)
-			var txt: String = tr(LABELS[a])
+			var txt: String = tr(label_key)
 			var w: float = f.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
 			area.draw_string(f, c + Vector2(-w * 0.5, fs * 0.35), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Palette.INK)
