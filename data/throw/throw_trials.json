@@ -57,7 +57,11 @@
   "name_fr": "Fléchettes",
   "name_en": "Darts",
   "desc_fr": "Ta main tangue. Ramène le viseur au centre de la cible et lance au bon moment. Trois fléchettes.",
-  "desc_en": "Your hand sways. Bring the sight back to the bullseye and throw at the right moment. Three darts."
+  "desc_en": "Your hand sways. Bring the sight back to the bullseye and throw at the right moment. Three darts.",
+  "touch_stick": true,
+  "touch_pad": [
+   "ui_spin"
+  ]
  },
  {
   "id": "safe",
@@ -82,13 +86,14 @@
   "stage": "panel",
   "weight": 1.0,
   "touch_pad": [
-   "qte_right",
-   "qte_down"
+   "qte_down",
+   "qte_right"
   ],
   "name_fr": "Shaker",
   "name_en": "Shaker",
   "desc_fr": "Alterne gauche et droite pour faire mousser, et garde la mousse dans la bande dorée qui se promène.",
-  "desc_en": "Alternate left and right to whip up foam, and keep it inside the wandering gold band."
+  "desc_en": "Alternate left and right to whip up foam, and keep it inside the wandering gold band.",
+  "touch_layout": "split"
  },
  {
   "id": "pour",
@@ -121,7 +126,8 @@
   "name_fr": "Pluie de jetons",
   "name_en": "Chip Rain",
   "desc_fr": "Le plafond fuit des jetons : attrape les dorés avec le plateau, évite les fausses pièces violettes.",
-  "desc_en": "The ceiling is leaking chips: catch the gold ones on your tray, dodge the purple fakes."
+  "desc_en": "The ceiling is leaking chips: catch the gold ones on your tray, dodge the purple fakes.",
+  "touch_stick": true
  },
  {
   "id": "highlow",

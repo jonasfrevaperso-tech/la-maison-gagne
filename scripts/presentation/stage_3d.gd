@@ -94,12 +94,13 @@ func to3(p2: Vector2, z: float = 0.0) -> Vector3:
 	return Vector3(d.x, -d.y, z)
 
 
-## Point 3D → position dans le repère de ce contrôle (pour accrocher textes et effets 2D).
+## Point 3D → position dans le repère du parent (pour accrocher textes et effets 2D ; égal au
+## repère de ce contrôle quand il est à l'origine, débord du décor sur téléphone compris).
 func project(p: Vector3) -> Vector2:
 	var vp_size: Vector2 = Vector2(_vp.size)
 	if vp_size.x <= 0.0 or size.x <= 0.0:
 		return Vector2.ZERO
-	return cam.unproject_position(p) * (size / vp_size)
+	return cam.unproject_position(p) * (size / vp_size) + position
 
 
 # --------------------------------------------------------------------------- fabrique

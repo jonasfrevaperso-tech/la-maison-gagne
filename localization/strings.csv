@@ -605,9 +605,9 @@ CARD_UNLOCK,Déverrouiller,Unlock
 HINT_K_CARD_SHEET,détails · vendre · verrouiller,details · sell · lock
 HUD_STAKE_BTN,Mise ×%d,Stake ×%d
 HUD_STAKE_TIP,"Jetons posés à chaque toucher du tapis (1, 2, 5 ou 10).","Chips placed with each tap on the felt (1, 2, 5 or 10)."
-TRIAL_DARTS_HINT_TOUCH,Glisse le doigt {@drag} pour corriger · relâche pour lancer,Slide your finger {@drag} to steady · lift to throw
+TRIAL_DARTS_HINT_TOUCH,Joystick à gauche pour corriger la visée · LANCER à droite,Joystick on the left to steady the aim · THROW on the right
 TRIAL_SAFE_HINT_TOUCH,Tourne la molette du doigt {@drag} · touche {@tap} pour valider,Turn the dial with your finger {@drag} · tap {@tap} to lock
-TRIAL_CATCH_HINT_TOUCH,Glisse le doigt {@drag} pour déplacer le plateau,Slide your finger {@drag} to move the tray
+TRIAL_CATCH_HINT_TOUCH,Joystick pour déplacer le plateau,Use the joystick to move the tray
 TRIAL_MEMORY_HINT_TOUCH,Touche {@tap} une carte pour la retourner,Tap {@tap} a card to flip it
 TRIAL_SHELLS_HINT_TOUCH,Touche {@tap} un gobelet pour le soulever,Tap {@tap} a cup to lift it
 OPT_AUDIO_OFFSET,Décalage audio (ms),Audio offset (ms)
@@ -658,3 +658,4 @@ OPT_DENSITY_MEDIUM,Moyenne,Medium
 OPT_DENSITY_HIGH,Élevée,High
 LOADING_TITLE,La Maison prépare la table…,The House is setting the table…
 LOADING_TIP,Astuce :,Tip:
+TOUCH_THROW,LANCER,THROW

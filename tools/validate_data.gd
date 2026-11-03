@@ -19,7 +19,9 @@ const REQUIRED_BY_CAT: Dictionary = {
 }
 const RARITIES: Array[String] = ["common", "rare", "legendary", "cursed"]
 ## Boutons possibles du pavé tactile des épreuves (cf. TouchPad.STYLE, qui dépend des autoloads).
-const TOUCH_PAD_ACTIONS: Array[String] = ["qte_left", "qte_up", "qte_right", "qte_down", "ui_up", "ui_down"]
+const TOUCH_PAD_ACTIONS: Array[String] = ["qte_left", "qte_up", "qte_right", "qte_down", "ui_up", "ui_down", "ui_spin"]
+## Dispositions du pavé tactile (cf. TouchPad.LAYOUTS ; recopiées : outil lancé sans autoloads).
+const TOUCH_LAYOUTS: Array[String] = ["diamond", "row", "split"]
 ## Mots et repères qui supposent une souris (conseils du tutoriel).
 const MOUSE_WORDS: Array[String] = [
 	"{@click", "{@right_click", "{@double_click", "{@mouse", "{@wheel", "Clique", "clique", "Click", "click",
@@ -166,6 +168,12 @@ func _validate_entry(db: ContentDB, cat: String, e: Dictionary) -> void:
 				errors.append("%s : touch_pad « %s » inconnu" % [eid, a])
 		if not Balance.data().get("throw_trials", {}).has(String(e.get("id", ""))):
 			errors.append("%s : réglages absents de balance.json (throw_trials)" % eid)
+		if e.has("touch_layout") and not TOUCH_LAYOUTS.has(String(e["touch_layout"])):
+			errors.append("%s : touch_layout doit valoir %s" % [eid, ", ".join(TOUCH_LAYOUTS)])
+		if String(e.get("touch_layout", "")) == "split" and (e.get("touch_pad", []) as Array).size() != 2:
+			errors.append("%s : la disposition split demande exactement deux boutons" % eid)
+		if e.has("touch_stick") and typeof(e["touch_stick"]) != TYPE_BOOL:
+			errors.append("%s : touch_stick doit être un booléen" % eid)
 		if float(e.get("weight", 0)) <= 0.0:
 			errors.append("%s : poids nul" % eid)
 	if cat == "contracts" and String(e.get("requires", "")) != "" and not db.has_entry("contracts", String(e["requires"])):

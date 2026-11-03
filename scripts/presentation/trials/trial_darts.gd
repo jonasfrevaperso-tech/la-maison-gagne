@@ -182,7 +182,7 @@ func handle(event: InputEvent) -> bool:
 	if mm != null:
 		_mouse_pt = mm.position
 		return true
-	if InputGlyphs.using_touch and event is InputEventMouseButton:
+	if InputGlyphs.using_touch and mouse and event is InputEventMouseButton:
 		# Doigt : on vise en glissant, la fléchette part au relâcher.
 		var mb: InputEventMouseButton = event as InputEventMouseButton
 		_mouse_pt = mb.position

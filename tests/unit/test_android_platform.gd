@@ -193,3 +193,44 @@ func test_background_saves_and_mutes() -> void:
 	SaveSystem.run_path = saved_path
 	SaveSystem.profile_path = saved_profile
 	GameState.controller = saved_ctl
+
+
+## Joystick virtuel : le pouce à droite et un peu vers le haut → ui_right fort, ui_up faible,
+## rien à gauche ; relâcher remet tout à zéro (held_vector des épreuves).
+func test_touch_stick_strengths() -> void:
+	var st: TouchStick = TouchStick.new()
+	st._set_vector(Vector2(0.8, -0.3))
+	check(is_equal_approx(Input.get_action_strength(&"ui_right"), 0.8), "droite à 0,8")
+	check(is_equal_approx(Input.get_action_strength(&"ui_up"), 0.3), "haut à 0,3")
+	check(not Input.is_action_pressed(&"ui_left"), "gauche relâchée")
+	check(ThrowTrial.held_vector().x > 0.5, "les épreuves lisent le joystick")
+	st._set_vector(Vector2.ZERO)
+	check(not Input.is_action_pressed(&"ui_right") and not Input.is_action_pressed(&"ui_up"), "tout relâché")
+	st.free()
+
+
+## Pavé « split » (Shaker) : premier bouton dans le coin bas gauche, second dans le coin bas
+## droit ; inversés en disposition gaucher.
+func test_touch_pad_split_corners() -> void:
+	var saved: bool = Settings.b("game", "left_handed")
+	for lefty: bool in [false, true]:
+		Settings.set_value("game", "left_handed", lefty)
+		var pad: TouchPad = TouchPad.new().configure(["qte_down", "qte_right"] as Array[String], "split")
+		pad._area = pad._new_area()
+		pad._areas.append(pad._new_area())
+		var w: float = 2200.0
+		pad._layout_split(Rect2(0, 0, w, 1080))
+		var a_left: bool = pad._centers["qte_down"].x < w * 0.25
+		var b_right: bool = pad._centers["qte_right"].x > w * 0.75
+		if lefty:
+			check(not a_left and not b_right, "gaucher : coins inversés")
+		else:
+			check(a_left and b_right, "A en bas à gauche, B en bas à droite")
+		eq(pad._hit(pad._centers["qte_right"]), "qte_right", "toucher le coin droit = B")
+		pad.free()
+	Settings.set_value("game", "left_handed", saved)
+	eq(TouchPad.default_layout(["qte_left", "qte_up", "qte_right", "qte_down"] as Array[String]), "diamond", "quatre boutons : losange")
+
+
+func test_touch_layouts_match_validator() -> void:
+	eq(TouchPad.LAYOUTS, (load("res://tools/validate_data.gd") as GDScript).get_script_constant_map()["TOUCH_LAYOUTS"], "mêmes dispositions")

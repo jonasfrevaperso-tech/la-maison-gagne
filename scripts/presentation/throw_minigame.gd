@@ -19,6 +19,14 @@ const GRADE_TIME: float = 1.8
 const PANEL_RECT: Rect2 = Rect2(830.0, 330.0, 1060.0, 400.0)
 ## Téléphone, épreuve aux boutons : le cadre glisse à gauche pour laisser le pavé sous le pouce.
 const PANEL_SHIFT_TOUCH_PAD: float = 560.0
+## Téléphone : marge autour d'une épreuve agrandie, et agrandissement maximal.
+const MOBILE_MARGIN: float = 30.0
+const MOBILE_MAX_SCALE: float = 2.2
+## Bandeau des étapes dessiné au-dessus d'une épreuve « panel » (px de maquette, avant agrandissement).
+const PANEL_STEPS_H: float = 36.0
+## Le fond et le décor 3D débordent largement de la scène : les bords de l'écran 20:9 hors
+## scène (poinçon, coins) restent couverts.
+const MOBILE_EDGE_BLEED: float = 320.0
 ## Repli sans calque (tests) : sous la roue, coordonnées locales.
 const PANEL_H: float = 300.0
 const PANEL_BELOW: float = 40.0
@@ -43,6 +51,8 @@ var _assist: bool = false
 var _mouse: bool = false
 var _t: float = 0.0
 var _release_time: float = 1.0
+## Téléphone : fond plein écran posé sous l'épreuve (toutes les épreuves y sont plein écran).
+var _backdrop: Control = null
 var _grade: ThrowSkill.Grade = ThrowSkill.Grade.MISS
 var _grade_t: float = 0.0
 var _control_delta: float = 0.0
@@ -102,17 +112,24 @@ func _open_trial() -> void:
 	var e: Dictionary = DataRegistry.db.get_entry("throw_trials", id)
 	# Au doigt, une épreuve à symboles se joue comme à la manette, avec le pavé de boutons.
 	var pad: Array[String] = []
+	var stick: bool = InputGlyphs.using_touch and bool(e.get("touch_stick", false))
+	var pad_layout: String = String(e.get("touch_layout", ""))
 	if InputGlyphs.using_touch:
 		for a: Variant in e.get("touch_pad", []):
 			pad.append(String(a))
-	trial = (scr.new() as ThrowTrial).setup(e, _precision, _assist, _mouse and pad.is_empty())
+	trial = (scr.new() as ThrowTrial).setup(e, _precision, _assist, _mouse and pad.is_empty() and not stick)
+	trial.touch_controls = not pad.is_empty() or stick
 	if not pad.is_empty():
-		trial.add_child(TouchPad.new().configure(pad))
+		trial.add_child(TouchPad.new().configure(pad, pad_layout))
+	if stick:
+		trial.add_child(TouchStick.new())
 	trial.hold = hold
 	trial.steps = steps()
 	trial.step = _index
 	trial.done.connect(_on_trial_done)
-	if full_host != null:
+	if full_host != null and Platform.is_mobile():
+		_place_mobile(pad, pad_layout, stick)
+	elif full_host != null:
 		var r: Rect2 = Rect2(Vector2.ZERO, UiLayout.DESIGN_SIZE) if trial.full() else PANEL_RECT
 		# (gaucher : le pavé est à gauche, le cadre peut rester sur le tapis)
 		if not pad.is_empty() and not trial.full() and not Settings.b("game", "left_handed"):
@@ -133,6 +150,67 @@ func _close_trial() -> void:
 	if trial != null:
 		trial.queue_free()
 		trial = null
+	if _backdrop != null:
+		_backdrop.queue_free()
+		_backdrop = null
+
+
+## Téléphone : l'épreuve occupe tout l'écran. Fond plein écran (le plateau dort dessous) ;
+## épreuve « full » à sa taille de maquette, son décor 3D élargi aux bords ; épreuve « panel »
+## agrandie au maximum à côté des commandes tactiles (joystick, pavé) ou au-dessus d'elles.
+func _place_mobile(pad: Array[String], pad_layout: String, stick: bool) -> void:
+	var host_parent: Control = full_host.get_parent() as Control
+	var area: Rect2 = Rect2(Vector2(-full_host.position.x, 0.0), host_parent.size if host_parent != null else UiLayout.DESIGN_SIZE)
+	_backdrop = Control.new()
+	_backdrop.mouse_filter = Control.MOUSE_FILTER_STOP  # le doigt hors de l'épreuve n'atteint pas le tapis
+	_backdrop.position = area.position - Vector2(MOBILE_EDGE_BLEED, MOBILE_EDGE_BLEED)
+	_backdrop.size = area.size + Vector2.ONE * MOBILE_EDGE_BLEED * 2.0
+	var deco: DecoBackground = DecoBackground.new()
+	deco.origin_ratio = Vector2(0.5, 0.5)
+	_backdrop.add_child(deco)
+	RenderQuality.cover(true)
+	_backdrop.tree_exiting.connect(RenderQuality.cover.bind(false))
+	full_host.add_child(_backdrop)
+	if trial.full():
+		trial.position = Vector2.ZERO
+		trial.size = UiLayout.DESIGN_SIZE
+		trial.bleed_x = full_host.position.x + MOBILE_EDGE_BLEED
+		full_host.add_child(trial)
+		return
+	trial.size = PANEL_RECT.size
+	trial.scale = Vector2.ONE * _mobile_fit(area, pad, pad_layout, stick)
+	full_host.add_child(trial)
+
+
+## Échelle et position d'une épreuve « panel » : meilleure de deux dispositions (commandes à
+## côté, ou bande de commandes en bas).
+func _mobile_fit(area: Rect2, pad: Array[String], pad_layout: String, stick: bool) -> float:
+	var m: float = MOBILE_MARGIN
+	var pad_box: Vector2 = TouchPad.box_size(pad, pad_layout) if not pad.is_empty() else Vector2.ZERO
+	var stick_box: Vector2 = TouchStick.box_size() if stick else Vector2.ZERO
+	var split: bool = pad_layout == "split"
+	var left_hand: bool = Settings.b("game", "left_handed")
+	# Côté : le pavé d'un côté (pouce droit), le joystick de l'autre.
+	var side_l: float = stick_box.x if not left_hand else (pad_box.x if not split else 0.0)
+	var side_r: float = (pad_box.x if not split else 0.0) if not left_hand else stick_box.x
+	var side: Rect2 = Rect2(area.position + Vector2(side_l + m, m), area.size - Vector2(side_l + side_r + m * 2.0, m * 2.0))
+	if split:
+		side.size.x = 0.0
+	var band_h: float = maxf(pad_box.y, stick_box.y)
+	var band: Rect2 = Rect2(area.position + Vector2(m, m), area.size - Vector2(m * 2.0, band_h + m * 2.0))
+	var best: Rect2 = side if _fit(side) >= _fit(band) else band
+	# Le bandeau des étapes dépasse au-dessus du cadre : place réservée en haut.
+	best.position.y += PANEL_STEPS_H * _fit(best)
+	best.size.y -= PANEL_STEPS_H * _fit(best)
+	var k: float = _fit(best)
+	trial.position = best.position + (best.size - PANEL_RECT.size * k) * 0.5
+	return k
+
+
+func _fit(r: Rect2) -> float:
+	if r.size.x <= 0.0 or r.size.y <= 0.0:
+		return 0.0
+	return minf(minf(r.size.x / PANEL_RECT.size.x, r.size.y / PANEL_RECT.size.y), MOBILE_MAX_SCALE)
 
 
 func _on_trial_done(sc: float) -> void:

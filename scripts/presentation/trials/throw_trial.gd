@@ -38,6 +38,10 @@ var steps: Array[String] = []
 var step: int = 0
 ## Scène 3D facultative (objets de l'épreuve), dessinée DERRIÈRE les textes et repères 2D.
 var stage: Stage3D = null
+## Téléphone : débord horizontal du décor 3D de chaque côté (épreuve plein écran sur 20:9).
+var bleed_x: float = 0.0
+## Commandes tactiles à l'écran (pavé, joystick) : un toucher ailleurs ne vaut pas « valider ».
+var touch_controls: bool = false
 ## Carton d'annonce (nom, règle, commandes) avant que l'épreuve ne commence.
 var intro_left: float = 0.0
 var _intro_total: float = 1.0
@@ -97,7 +101,7 @@ func _place_hint() -> void:
 func _refresh_hint() -> void:
 	var key: String = "TRIAL_%s_HINT" % String(entry.get("id", "")).to_upper()
 	var raw: String = tr(key + "_MOUSE") if mouse and tr(key + "_MOUSE") != key + "_MOUSE" else tr(key)
-	if mouse and InputGlyphs.using_touch and tr(key + "_TOUCH") != key + "_TOUCH":
+	if (mouse or touch_controls) and InputGlyphs.using_touch and tr(key + "_TOUCH") != key + "_TOUCH":
 		raw = tr(key + "_TOUCH")
 	raw = raw.replace("{confirm}", "{@click}" if mouse else "{ui_spin}")
 	raw = raw.replace("{move}", "{@mouse}" if mouse else ("{@lstick}" if InputGlyphs.using_pad else "{@arrows}"))
@@ -202,6 +206,9 @@ func use_3d() -> Stage3D:
 	stage.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	if not full():
 		stage.offset_bottom = -HINT_H
+	elif bleed_x > 0.0:
+		stage.offset_left = -bleed_x
+		stage.offset_right = bleed_x
 	return stage
 
 
@@ -369,7 +376,7 @@ func _draw_intro() -> void:
 func confirm_pressed(event: InputEvent) -> bool:
 	var mb: InputEventMouseButton = event as InputEventMouseButton
 	if mb != null:
-		return mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT
+		return mb.pressed and not touch_controls and mb.button_index == MOUSE_BUTTON_LEFT
 	for a: StringName in CONFIRM_ACTIONS:
 		if GameInput.pressed(event, a):
 			return true
@@ -379,7 +386,7 @@ func confirm_pressed(event: InputEvent) -> bool:
 func confirm_released(event: InputEvent) -> bool:
 	var mb: InputEventMouseButton = event as InputEventMouseButton
 	if mb != null:
-		return not mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT
+		return not mb.pressed and not touch_controls and mb.button_index == MOUSE_BUTTON_LEFT
 	for a: StringName in CONFIRM_ACTIONS:
 		if GameInput.released(event, a):
 			return true
