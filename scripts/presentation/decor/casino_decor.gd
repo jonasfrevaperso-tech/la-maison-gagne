@@ -37,13 +37,13 @@ const MARGIN_LAYOUT: Array = [
 	["ashtray", Vector2(2040, 780), 0.0],
 ]
 ## Téléphone (scène 2200×1080, cf. RunScreenLayoutMobile) : zones libres en haut, autour du score.
+## Téléphone : les cartes Fortune occupent le coin haut droit ; le décor se range à leur gauche.
 const LAYOUT_MOBILE: Array = [
-	["neon", Vector2(1860, 215), -0.08],
-	["lamp", Vector2(2110, 250), 2.6],
+	["neon", Vector2(1780, 215), -0.08],
 	["chips", Vector2(860, 235), 0.0],
-	["glass", Vector2(1680, 250), 0.0],
+	["glass", Vector2(1010, 250), 0.0],
 ]
-const CRITTERS_MOBILE: Array = [["spider", Vector2(2300, 160), Vector2(1990, 300)]]
+const CRITTERS_MOBILE: Array = [["spider", Vector2(1900, -60), Vector2(1880, 300)]]
 ## Bestioles : [type, entrée (bord), arrêt].
 const CRITTERS: Array = [
 	["spider", Vector2(2000, 180), Vector2(1560, 200)],

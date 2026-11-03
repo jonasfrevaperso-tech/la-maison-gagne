@@ -29,13 +29,15 @@ func _rebuild_current() -> void:
 		_build_bubble()
 
 
-## Texte de l'astuce pour le périphérique actif (variante manette si elle existe), avec les
+## Texte de l'astuce pour le périphérique actif (variante manette ou tactile si elle existe), avec les
 ## jetons {action} remplacés par les invites (glyphes ou touches).
 static func tip_text(entry: Dictionary) -> String:
 	var lang: String = TranslationServer.get_locale().substr(0, 2)
 	var raw: String = ""
 	if InputGlyphs.using_pad:
 		raw = String(entry.get("text_pad_" + lang, entry.get("text_pad_fr", "")))
+	elif InputGlyphs.using_touch:
+		raw = String(entry.get("text_touch_" + lang, entry.get("text_touch_fr", "")))
 	if raw == "":
 		raw = Localization.t(entry, "text")
 	return InputGlyphs.expand(raw, TEXT_GLYPH_H)

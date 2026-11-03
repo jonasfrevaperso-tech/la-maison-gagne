@@ -103,7 +103,8 @@ func _build_ui() -> void:
 	_letter.add_theme_font_override("font", UiKit.font("body"))
 	_letter.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_letter)
-	_skip_label = UiKit.label(tr("CUTSCENE_HOLD_SKIP"), UiKit.SIZE_SMALL, Palette.SMOKE)
+	var skip_key: String = "CUTSCENE_HOLD_SKIP_TOUCH" if InputGlyphs.using_touch else "CUTSCENE_HOLD_SKIP"
+	_skip_label = UiKit.label(tr(skip_key), UiKit.SIZE_SMALL, Palette.SMOKE)
 	_skip_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_skip_label)
 	resized.connect(_layout)
@@ -301,7 +302,7 @@ func _type(delta: float) -> void:
 
 
 func _update_skip(delta: float) -> void:
-	var held: bool = Input.is_anything_pressed() or _axis_held()
+	var held: bool = Input.is_anything_pressed() or _axis_held() or Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)
 	if held:
 		_skip_t += delta
 		if _skip_t >= SKIP_HOLD:

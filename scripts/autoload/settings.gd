@@ -176,6 +176,9 @@ func _mobile_first_launch() -> void:
 		var parts: PackedStringArray = path.split("/")
 		_cfg.set_value(parts[0], parts[1], MOBILE_DEFAULTS[path])
 	_cfg.set_value("game", "locale", "fr" if OS.get_locale_language() == "fr" else "en")
+	# Décalage audio du rythme : latence de sortie mesurée par le système (réglable ensuite).
+	var lat_ms: float = AudioServer.get_output_latency() * 1000.0
+	_cfg.set_value("game", "audio_offset_ms", int(clampf(roundf(lat_ms / 10.0) * 10.0, 0.0, Platform.AUDIO_OFFSET_MAX_MS)))
 
 
 static func is_steam_deck() -> bool:

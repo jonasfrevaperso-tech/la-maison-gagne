@@ -19,6 +19,7 @@ const POP_TIME: float = 0.8
 ## Hauteur réservée en bas du cadre à l'aide aux commandes.
 const HINT_H: float = 40.0
 const STICK_DEAD: float = 0.25
+const HAPTIC_PERFECT_MS: int = 40
 
 var entry: Dictionary = {}
 var assist: bool = false
@@ -96,6 +97,8 @@ func _place_hint() -> void:
 func _refresh_hint() -> void:
 	var key: String = "TRIAL_%s_HINT" % String(entry.get("id", "")).to_upper()
 	var raw: String = tr(key + "_MOUSE") if mouse and tr(key + "_MOUSE") != key + "_MOUSE" else tr(key)
+	if mouse and InputGlyphs.using_touch and tr(key + "_TOUCH") != key + "_TOUCH":
+		raw = tr(key + "_TOUCH")
 	raw = raw.replace("{confirm}", "{@click}" if mouse else "{ui_spin}")
 	raw = raw.replace("{move}", "{@mouse}" if mouse else ("{@lstick}" if InputGlyphs.using_pad else "{@arrows}"))
 	_hint.text = "[center]%s[/center]" % InputGlyphs.expand(raw, 24)
@@ -228,6 +231,8 @@ func finish(p_score: float) -> void:
 ## Verdict affiché par-dessus l'épreuve terminée (pendant la pause de l'orchestrateur).
 func show_verdict(g: ThrowSkill.Grade) -> void:
 	_verdict = int(g)
+	if g == ThrowSkill.Grade.PERFECT:
+		Platform.haptic(HAPTIC_PERFECT_MS)
 	queue_redraw()
 
 

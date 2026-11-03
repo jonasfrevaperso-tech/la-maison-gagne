@@ -70,6 +70,12 @@ const MARKERS_PAD: Dictionary[String, Array] = {
 
 ## Repères en mode tactile : gestes au doigt. Les actions clavier n'ont pas d'invite (les
 ## boutons à l'écran suffisent) ; les épreuves affichent leurs propres boutons.
+## Au doigt : glyphe des actions qui ont un équivalent tactile (pavé des épreuves, toucher).
+const TOUCH_ACTIONS: Dictionary[String, String] = {
+	"qte_left": "pad_x", "qte_up": "pad_y", "qte_right": "pad_b", "qte_down": "pad_a",
+	"ui_up": "pad_dpad_up", "ui_down": "pad_dpad_down",
+	"ui_spin": "touch_tap", "ui_accept": "touch_tap", "bet_place": "touch_tap",
+}
 const MARKERS_TOUCH: Dictionary[String, Array] = {
 	"@click": ["touch_tap"],
 	"@shift_click": ["touch_tap"],
@@ -206,7 +212,12 @@ static func parts_for(action: String) -> Array[String]:
 		for p: Variant in table.get(action, []):
 			out.append(String(p))
 		return out
-	if not InputMap.has_action(action) or using_touch:
+	if using_touch:
+		# Au doigt : boutons du pavé tactile (épreuves) et toucher pour valider.
+		if TOUCH_ACTIONS.has(action):
+			out.append(TOUCH_ACTIONS[action])
+		return out
+	if not InputMap.has_action(action):
 		return out
 	for e: InputEvent in InputMap.action_get_events(action):
 		if using_pad and e is InputEventJoypadButton:

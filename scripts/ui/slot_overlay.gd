@@ -11,6 +11,9 @@ signal closed
 
 enum Step { INTRO, WAIT_PULL, SPINNING, RESULT, SUMMARY }
 
+## Téléphone : vibrations (ms) à l'arrêt d'un rouleau et au gros lot.
+const HAPTIC_REEL_MS: int = 12
+const HAPTIC_JACKPOT_MS: int = 60
 const REELS: int = SlotCabinet3D.REELS
 const INTRO_TIME: float = 1.6
 const AUTO_PULL: float = 4.0
@@ -90,6 +93,7 @@ func _ready() -> void:
 	modulate.a = 0.0
 	create_tween().tween_property(self, "modulate:a", 1.0, 0.35)
 	AudioBus.play("jackpot", 1.0, 0.0)
+	Platform.haptic(HAPTIC_JACKPOT_MS)
 	AudioBus.play("slot_ring", 1.0, -3.0)
 	EventBus.juice_flash.emit(Palette.GOLD_LIGHT, 0.4)
 	EventBus.juice_shake.emit(0.5)
@@ -328,6 +332,7 @@ func _hurry() -> void:
 
 func _on_reel_stopped(k: int) -> void:
 	AudioBus.play("slot_stop", 0.85 + 0.1 * float(k))
+	Platform.haptic(HAPTIC_REEL_MS)
 	EventBus.juice_shake.emit(0.18 if k != _tease else 0.4)
 	_speed[k] = 0.0
 
@@ -353,6 +358,7 @@ func _resolve() -> void:
 	_win = 1.0 if big else 0.6
 	_cab.drop_coins(int(TRAY_COINS.get(match_kind, 5)), _rng)
 	AudioBus.play("slot_big" if big else "slot_win")
+	Platform.haptic(HAPTIC_JACKPOT_MS if big else HAPTIC_REEL_MS * 2)
 	AudioBus.play("coins", 1.0, -4.0)
 	if match_kind == "quad":
 		AudioBus.play("choir", 1.0, -2.0)

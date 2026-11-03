@@ -59,6 +59,8 @@ func _ready() -> void:
 
 func _run() -> void:
 	var db: ContentDB = ContentDB.shared()
+	var saved_scale: float = Settings.f("access", "text_scale")
+	var saved_mode: String = Settings.s("game", "input_mode")
 	Settings.set_value("game", "input_mode", "gamepad")
 	InputGlyphs.apply_mode()
 	for cfg: Array in (CONFIGS_MOBILE if Platform.is_mobile() else CONFIGS):
@@ -84,8 +86,8 @@ func _run() -> void:
 			var ov: Control = o[1] as Control
 			var prep_o: Callable = (o[2] as Callable).bind(ov) if o.size() > 2 else Callable()
 			await _check(ov, "%s @%dx%d×%.1f" % [o[0], sz.x, sz.y, float(cfg[1])], true, prep_o)
-	Settings.set_value("access", "text_scale", 1.0)
-	Settings.set_value("game", "input_mode", "auto")
+	Settings.set_value("access", "text_scale", saved_scale)
+	Settings.set_value("game", "input_mode", saved_mode)
 	for p: String in problems:
 		printerr("UI : " + p)
 	print("Interface : %d vues contrôlées, %d problème(s)" % [checked, problems.size()])

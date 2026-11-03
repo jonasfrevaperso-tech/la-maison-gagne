@@ -16,7 +16,9 @@
   "text_fr": "Clique sur le tapis ({@click}) pour poser un jeton. Commence simple : le losange rouge (Rouge, paie ×2).",
   "text_en": "Click the felt ({@click}) to place a chip. Start simple: the red diamond (Red, pays ×2).",
   "text_pad_fr": "Déplace le curseur sur le tapis ({@dpad}) et pose un jeton avec {bet_place}. Commence simple : le losange rouge (Rouge, paie ×2).",
-  "text_pad_en": "Move the cursor over the felt ({@dpad}) and place a chip with {bet_place}. Start simple: the red diamond (Red, pays ×2)."
+  "text_pad_en": "Move the cursor over the felt ({@dpad}) and place a chip with {bet_place}. Start simple: the red diamond (Red, pays ×2).",
+  "text_touch_fr": "Pose le doigt sur le tapis ({@tap}) : une loupe montre la mise visée, relâche pour poser un jeton. Commence simple : le losange rouge (Rouge, paie ×2).",
+  "text_touch_en": "Put your finger on the felt ({@tap}): a magnifier shows the targeted bet, lift to place a chip. Start simple: the red diamond (Red, pays ×2)."
  },
  {
   "id": "tip_inside",
@@ -26,7 +28,9 @@
   "text_fr": "Un numéro seul (plein) paie ×36. Vise les bords et les coins entre deux numéros pour les chevaux (×18) et carrés (×9). {@right_click} retire un jeton.",
   "text_en": "A single number (straight) pays ×36. Aim at edges and corners between numbers for splits (×18) and corners (×9). {@right_click} removes a chip.",
   "text_pad_fr": "Un numéro seul (plein) paie ×36. La croix avance d'une demi-case : un pas vers le bord donne un cheval (×18), un pas de plus en diagonale un carré (×9), le bas du tapis les transversales. {bet_cycle_prev} {bet_cycle_next} règlent la mise, {bet_remove} retire un jeton.",
-  "text_pad_en": "A single number (straight) pays ×36. The d-pad moves half a cell: one step onto an edge gives a split (×18), one more step diagonally a corner (×9), the bottom edge streets. {bet_cycle_prev} {bet_cycle_next} set the stake, {bet_remove} removes a chip."
+  "text_pad_en": "A single number (straight) pays ×36. The d-pad moves half a cell: one step onto an edge gives a split (×18), one more step diagonally a corner (×9), the bottom edge streets. {bet_cycle_prev} {bet_cycle_next} set the stake, {bet_remove} removes a chip.",
+  "text_touch_fr": "Un numéro seul (plein) paie ×36. Glisse le doigt vers les bords et les coins entre deux numéros pour les chevaux (×18) et carrés (×9). Appui long immobile sur une pile ({@hold}) : retire un jeton.",
+  "text_touch_en": "A single number (straight) pays ×36. Slide your finger to edges and corners between numbers for splits (×18) and corners (×9). Press and hold still on a stack ({@hold}): removes a chip."
  },
  {
   "id": "tip_budget",
@@ -34,7 +38,9 @@
   "anchor": "budget",
   "order": 4,
   "text_fr": "Tu as 10 jetons par tour. {bet_cycle_prev} {bet_cycle_next} changent la mise posée à chaque clic. Les paris sur un seul numéro sont limités : répartis-les.",
-  "text_en": "You have 10 chips per spin. {bet_cycle_prev} {bet_cycle_next} change how many chips each click places. Single-number bets are capped: spread them out."
+  "text_en": "You have 10 chips per spin. {bet_cycle_prev} {bet_cycle_next} change how many chips each click places. Single-number bets are capped: spread them out.",
+  "text_touch_fr": "Tu as 10 jetons par tour. Le bouton ×1 change la mise posée à chaque toucher. Les paris sur un seul numéro sont limités : répartis-les.",
+  "text_touch_en": "You have 10 chips per spin. The ×1 button changes how many chips each tap places. Single-number bets are capped: spread them out."
  },
  {
   "id": "tip_spin",
@@ -45,7 +51,9 @@
   "text_fr": "Quand tu es prêt, appuie sur LANCER ({ui_spin}).",
   "text_en": "When you're ready, press SPIN ({ui_spin}).",
   "text_pad_fr": "Quand tu es prêt, lance avec {ui_spin}.",
-  "text_pad_en": "When you're ready, spin with {ui_spin}."
+  "text_pad_en": "When you're ready, spin with {ui_spin}.",
+  "text_touch_fr": "Quand tu es prêt, touche LANCER.",
+  "text_touch_en": "When you're ready, tap SPIN."
  },
  {
   "id": "tip_aim",
@@ -54,7 +62,9 @@
   "order": 6,
   "until": "throwing",
   "text_fr": "La roue tourne sous l'aiguille. L'arc cyan montre la zone où la bille tombera le plus souvent. Vise ({ui_spin}) quand tes numéros y sont !",
-  "text_en": "The wheel turns under the needle. The cyan arc shows where the ball will most often land. Aim ({ui_spin}) when your numbers are in it!"
+  "text_en": "The wheel turns under the needle. The cyan arc shows where the ball will most often land. Aim ({ui_spin}) when your numbers are in it!",
+  "text_touch_fr": "La roue tourne sous l'aiguille. L'arc cyan montre la zone où la bille tombera le plus souvent. Touche l'écran ({@tap}) quand tes numéros y sont !",
+  "text_touch_en": "The wheel turns under the needle. The cyan arc shows where the ball will most often land. Tap the screen ({@tap}) when your numbers are in it!"
  },
  {
   "id": "tip_throw",
@@ -64,7 +74,9 @@
   "text_fr": "Le lancer se joue en trois temps : deux ÉPREUVES d'adresse tirées au hasard parmi quatorze (un carton t'annonce la règle, {ui_spin} pour le passer), puis le LÂCHER : frappe {ui_spin} quand l'anneau touche la bille. Un beau lancer garde la bille dans ta zone (et offre plus de tirages au jackpot). Trop long ? Options → Jeu → Lancer : Rapide.",
   "text_en": "A throw takes three beats: two random skill TRIALS out of fourteen (a title card explains the rule, {ui_spin} skips it), then the RELEASE: strike {ui_spin} when the ring touches the ball. A good throw keeps the ball in your zone (and earns more jackpot pulls). Too long? Options → Game → Throw: Quick.",
   "text_pad_fr": "Le lancer se joue en trois temps : deux ÉPREUVES d'adresse tirées au hasard (le carton annonce la règle, {ui_spin} pour le passer), puis le LÂCHER : {ui_spin} quand l'anneau touche la bille. Un beau lancer garde la bille dans ta zone.",
-  "text_pad_en": "A throw takes three beats: two random skill TRIALS (the title card explains the rule, {ui_spin} skips it), then the RELEASE: {ui_spin} when the ring touches the ball. A good throw keeps the ball in your zone."
+  "text_pad_en": "A throw takes three beats: two random skill TRIALS (the title card explains the rule, {ui_spin} skips it), then the RELEASE: {ui_spin} when the ring touches the ball. A good throw keeps the ball in your zone.",
+  "text_touch_fr": "Le lancer se joue en trois temps : deux ÉPREUVES d'adresse tirées au hasard (le carton annonce la règle, touche pour le passer), puis le LÂCHER : touche l'écran quand l'anneau touche la bille. Certaines épreuves se jouent avec les boutons de couleur en bas à droite.",
+  "text_touch_en": "A throw takes three beats: two random skill TRIALS (a title card explains the rule, tap to skip it), then the RELEASE: tap when the ring touches the ball. Some trials are played with the coloured buttons at the bottom right."
  },
  {
   "id": "tip_wild",
@@ -90,7 +102,9 @@
   "text_fr": "Ici, l'historique des derniers numéros. Survole une case de la roue pour lire ses effets.",
   "text_en": "Here's the history of recent numbers. Hover a wheel pocket to read its effects.",
   "text_pad_fr": "Ici, l'historique des derniers numéros. Les effets des cases s'affichent quand tu cibles la roue avec une carte Fortune.",
-  "text_pad_en": "Here's the history of recent numbers. Pocket effects show up when you target the wheel with a Fortune card."
+  "text_pad_en": "Here's the history of recent numbers. Pocket effects show up when you target the wheel with a Fortune card.",
+  "text_touch_fr": "Ici, l'historique des derniers numéros. Appui long ({@hold}) sur une case de la roue pour lire ses effets.",
+  "text_touch_en": "Here's the history of recent numbers. Press and hold ({@hold}) a wheel pocket to read its effects."
  },
  {
   "id": "tip_shop",
@@ -108,7 +122,9 @@
   "text_fr": "Tes grigris se déclenchent de gauche à droite. Glisse-les pour changer l'ordre, {@right_click} pour les verrouiller.",
   "text_en": "Your charms trigger left to right. Drag them to reorder, {@right_click} to lock them.",
   "text_pad_fr": "Tes grigris se déclenchent de gauche à droite. {item_panel} pour les sélectionner, {bet_cycle_prev} {bet_cycle_next} pour les déplacer, {bet_repeat} pour les verrouiller.",
-  "text_pad_en": "Your charms trigger left to right. {item_panel} to select them, {bet_cycle_prev} {bet_cycle_next} to move them, {bet_repeat} to lock them."
+  "text_pad_en": "Your charms trigger left to right. {item_panel} to select them, {bet_cycle_prev} {bet_cycle_next} to move them, {bet_repeat} to lock them.",
+  "text_touch_fr": "Tes grigris se déclenchent de gauche à droite. Touche-en un ({@tap}) : sa fiche permet de le déplacer (◀ ▶) ou de le verrouiller. Tu peux aussi le glisser ({@drag}).",
+  "text_touch_en": "Your charms trigger left to right. Tap one ({@tap}): its card lets you move it (◀ ▶) or lock it. You can also drag it ({@drag})."
  },
  {
   "id": "tip_family",
@@ -118,7 +134,9 @@
   "text_fr": "Chaque grigri appartient à une famille (pastille en coin). Deux, trois puis cinq grigris d'une même famille activent un BUILD : un bonus de plus, de plus en plus fort. Les pastilles à côté de « Tes grigris » montrent ta progression ; survole-les pour le détail.",
   "text_en": "Every charm belongs to a family (corner badge). Two, three then five charms of the same family activate a BUILD: an extra bonus that keeps growing. The badges next to \"Your charms\" show your progress; hover them for details.",
   "text_pad_fr": "Chaque grigri appartient à une famille (pastille en coin). Deux, trois puis cinq grigris d'une même famille activent un BUILD : un bonus de plus, de plus en plus fort. Les pastilles à côté de « Tes grigris » montrent ta progression ; {item_panel} puis sélectionne un grigri pour le détail.",
-  "text_pad_en": "Every charm belongs to a family (corner badge). Two, three then five charms of the same family activate a BUILD: an extra bonus that keeps growing. The badges next to \"Your charms\" show your progress; {item_panel} then select a charm for details."
+  "text_pad_en": "Every charm belongs to a family (corner badge). Two, three then five charms of the same family activate a BUILD: an extra bonus that keeps growing. The badges next to \"Your charms\" show your progress; {item_panel} then select a charm for details.",
+  "text_touch_fr": "Chaque grigri appartient à une famille (pastille en coin). Deux, trois puis cinq grigris d'une même famille activent un BUILD : un bonus de plus, de plus en plus fort. Les pastilles à côté de « Tes grigris » montrent ta progression ; appui long ({@hold}) pour le détail.",
+  "text_touch_en": "Every charm belongs to a family (corner badge). Two, three then five charms of the same family activate a BUILD: an extra bonus that keeps growing. The badges next to \"Your charms\" show your progress; press and hold ({@hold}) for details."
  },
  {
   "id": "tip_fortune",
@@ -128,7 +146,9 @@
   "text_fr": "Une carte Fortune ! Clique-la ({@click}), puis clique la case de la roue à transformer.",
   "text_en": "A Fortune card! Click it ({@click}), then click the wheel pocket to transform.",
   "text_pad_fr": "Une carte Fortune ! {item_panel} pour la sélectionner, {ui_accept} pour l'utiliser, puis choisis la case sur la roue ({@dpad_lr}) et valide ({ui_accept}).",
-  "text_pad_en": "A Fortune card! {item_panel} to select it, {ui_accept} to use it, then pick the wheel pocket ({@dpad_lr}) and confirm ({ui_accept})."
+  "text_pad_en": "A Fortune card! {item_panel} to select it, {ui_accept} to use it, then pick the wheel pocket ({@dpad_lr}) and confirm ({ui_accept}).",
+  "text_touch_fr": "Une carte Fortune ! Touche-la ({@tap}) puis « Utiliser », et touche la case de la roue à transformer.",
+  "text_touch_en": "A Fortune card! Tap it ({@tap}) then \"Use\", and tap the wheel pocket to transform."
  },
  {
   "id": "tip_creditor",
@@ -154,7 +174,9 @@
   "text_fr": "Survole un emplacement du tapis : sa fiche montre la cote, le gain par jeton, tes chances et la limite de table, en couleurs.",
   "text_en": "Hover a spot on the felt: its card shows the odds, payout per chip, your chances and the table limit, colour-coded.",
   "text_pad_fr": "La fiche de l'emplacement sous ton curseur montre la cote, le gain par jeton, tes chances et la limite de table, en couleurs.",
-  "text_pad_en": "The card of the spot under your cursor shows the odds, payout per chip, your chances and the table limit, colour-coded."
+  "text_pad_en": "The card of the spot under your cursor shows the odds, payout per chip, your chances and the table limit, colour-coded.",
+  "text_touch_fr": "Pendant que tu vises, la fiche de l'emplacement montre la cote, le gain par jeton, tes chances et la limite de table, en couleurs.",
+  "text_touch_en": "While you aim, the spot's card shows the odds, payout per chip, your chances and the table limit, colour-coded."
  },
  {
   "id": "tip_jackpot",
@@ -162,7 +184,9 @@
   "anchor": "center",
   "order": 16,
   "text_fr": "JACKPOT ! Un plein gagnant — ou un coup assez énorme pour solder l'échéance — réveille la vieille machine à sous. Tire le levier ({ui_spin}) : 1 tirage, 2 sur un « Très bien », 3 sur un « Parfait ». Les cases à SCEAU CLOCHE et certains grigris offrent des tirages gratuits. Quatre rouleaux : paires, brelans et carrés (très rares, énormes) donnent argent, Mult ou ×Mult pour le tour suivant, grigris… ou un tour offert.",
-  "text_en": "JACKPOT! A winning straight bet — or a hit big enough to clear the deadline — wakes the old slot machine. Pull the lever ({ui_spin}): 1 pull, 2 on a « Great » throw, 3 on a « Perfect » one. BELL SEAL pockets and some grigris grant free pulls. Four reels: pairs, triples and quads (very rare, huge) give money, Mult or ×Mult for the next spin, grigris… or a free spin."
+  "text_en": "JACKPOT! A winning straight bet — or a hit big enough to clear the deadline — wakes the old slot machine. Pull the lever ({ui_spin}): 1 pull, 2 on a « Great » throw, 3 on a « Perfect » one. BELL SEAL pockets and some grigris grant free pulls. Four reels: pairs, triples and quads (very rare, huge) give money, Mult or ×Mult for the next spin, grigris… or a free spin.",
+  "text_touch_fr": "JACKPOT ! Un plein gagnant — ou un coup assez énorme pour solder l'échéance — réveille la vieille machine à sous. Touche le levier : 1 tirage, 2 sur un « Très bien », 3 sur un « Parfait ». Les cases à SCEAU CLOCHE et certains grigris offrent des tirages gratuits. Quatre rouleaux : paires, brelans et carrés (très rares, énormes) donnent argent, Mult ou ×Mult pour le tour suivant, grigris… ou un tour offert.",
+  "text_touch_en": "JACKPOT! A winning straight bet — or a hit big enough to clear the deadline — wakes the old slot machine. Tap the lever: 1 pull, 2 on a « Great » throw, 3 on a « Perfect » one. BELL SEAL pockets and some grigris grant free pulls. Four reels: pairs, triples and quads (very rare, huge) give money, Mult or ×Mult for the next spin, grigris… or a free spin."
  },
  {
   "id": "tip_decor",
@@ -172,7 +196,9 @@
   "text_fr": "Ce vieux casino a encore de la vie : clique sur les objets du décor (lampe, verre, dés, jetons, néon…), et guette les visiteurs.",
   "text_en": "This old casino still has some life in it: click the props on the table (lamp, glass, dice, chips, neon…), and watch for visitors.",
   "text_pad_fr": "Ce vieux casino a encore de la vie : une pichenette du joystick droit ({@rstick}) taquine un objet du décor.",
-  "text_pad_en": "This old casino still has some life in it: flick the right stick ({@rstick}) to poke a prop on the table."
+  "text_pad_en": "This old casino still has some life in it: flick the right stick ({@rstick}) to poke a prop on the table.",
+  "text_touch_fr": "Ce vieux casino a encore de la vie : touche les objets du décor (lampe, verre, jetons, néon…), et guette les visiteurs.",
+  "text_touch_en": "This old casino still has some life in it: tap the props on the table (lamp, glass, chips, neon…), and watch for visitors."
  },
  {
   "id": "tip_pause",
@@ -180,7 +206,9 @@
   "anchor": "center",
   "order": 17,
   "text_fr": "{pause_menu} ouvre le menu : volumes et réglages rapides sans quitter la partie. {speed_toggle} accélère les animations.",
-  "text_en": "{pause_menu} opens the menu: volumes and quick settings without leaving the run. {speed_toggle} speeds up animations."
+  "text_en": "{pause_menu} opens the menu: volumes and quick settings without leaving the run. {speed_toggle} speeds up animations.",
+  "text_touch_fr": "Le bouton ☰ (ou le geste Retour) ouvre le menu : volumes et réglages rapides sans quitter la partie. Le bouton ×1 accélère les animations.",
+  "text_touch_en": "The ☰ button (or the Back gesture) opens the menu: volumes and quick settings without leaving the run. The ×1 button speeds up animations."
  },
  {
   "id": "tip_curse",

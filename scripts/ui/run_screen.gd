@@ -65,6 +65,8 @@ var _undo_btn: Button = null
 var _repeat_btn: Button = null
 var _clear_btn: Button = null
 var _speed_btn: Button = null
+## Téléphone : bouton de mise (×1, ×2, ×5, ×10 en boucle) à la place de LB/RB ou Q/W.
+var _amount_btn: Button = null
 var _flash_rect: ColorRect = null
 var _shake: float = 0.0
 var _flash: float = 0.0
@@ -190,7 +192,8 @@ func _build() -> void:
 	_fortune_caption = UiKit.label("", UiKit.SIZE_SMALL, Palette.CYAN, "display")
 	_fortune_caption.position = fortune_bar.position - Vector2(0, BAR_CAPTION_Y)
 	_stage.add_child(_fortune_caption)
-	_fortune_caption.resized.connect(RunScreenLayout.seat_caption.bind(_fortune_caption, fortune_bar))
+	if not Platform.is_mobile():  # téléphone : légende à côté des cartes (RunScreenLayoutMobile)
+		_fortune_caption.resized.connect(RunScreenLayout.seat_caption.bind(_fortune_caption, fortune_bar))
 	# Écrans dédiés des épreuves du lancer : au-dessus de tout le plateau.
 	var trial_host: Control = Control.new()
 	trial_host.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -269,6 +272,8 @@ func _refresh_budget() -> void:
 
 func _refresh_amount() -> void:
 	_refresh_budget()
+	if _amount_btn != null:
+		_amount_btn.text = tr("HUD_STAKE_BTN") % table_view.bet_amount
 
 
 func _refresh_table() -> void:
@@ -306,6 +311,9 @@ func _refresh_buttons() -> void:
 	# La rangée d'actions tient dans le tapis : pendant une relance, les boutons de mise s'effacent.
 	for b: Button in [_undo_btn, _repeat_btn, _clear_btn]:
 		b.visible = not rethrow
+	if _amount_btn != null:
+		_amount_btn.disabled = not betting
+		_amount_btn.visible = not rethrow
 	_refresh_hint()
 
 

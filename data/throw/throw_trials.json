@@ -12,6 +12,12 @@
   "id": "rhythm",
   "stage": "panel",
   "weight": 1.0,
+  "touch_pad": [
+   "qte_left",
+   "qte_up",
+   "qte_right",
+   "qte_down"
+  ],
   "name_fr": "Effet",
   "name_en": "Spin",
   "desc_fr": "Un morceau démarre : frappe les notes quand elles passent la ligne, accords compris. Ne tape pas dans le vide.",
@@ -75,6 +81,10 @@
   "id": "shaker",
   "stage": "panel",
   "weight": 1.0,
+  "touch_pad": [
+   "qte_right",
+   "qte_down"
+  ],
   "name_fr": "Shaker",
   "name_en": "Shaker",
   "desc_fr": "Alterne gauche et droite pour faire mousser, et garde la mousse dans la bande dorée qui se promène.",
@@ -93,6 +103,12 @@
   "id": "simon",
   "stage": "full",
   "weight": 1.0,
+  "touch_pad": [
+   "qte_left",
+   "qte_up",
+   "qte_right",
+   "qte_down"
+  ],
   "name_fr": "Le Juke-box",
   "name_en": "The Jukebox",
   "desc_fr": "Regarde la mélodie de lumières, puis rejoue-la note par note. Trois mélodies, de plus en plus longues.",
@@ -111,6 +127,10 @@
   "id": "highlow",
   "stage": "panel",
   "weight": 1.0,
+  "touch_pad": [
+   "ui_up",
+   "ui_down"
+  ],
   "name_fr": "Plus haut, plus bas",
   "name_en": "Higher or Lower",
   "desc_fr": "La carte suivante sera-t-elle plus haute ou plus basse ? Seul le choix le plus probable compte, et vite.",
@@ -120,6 +140,12 @@
   "id": "sort",
   "stage": "panel",
   "weight": 1.0,
+  "touch_pad": [
+   "qte_left",
+   "qte_up",
+   "qte_right",
+   "qte_down"
+  ],
   "name_fr": "Tri des jetons",
   "name_en": "Chip Sorting",
   "desc_fr": "Envoie chaque jeton qui passe dans la fenêtre vers le bac de sa couleur. Le tapis accélère.",

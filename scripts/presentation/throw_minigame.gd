@@ -17,6 +17,8 @@ const GRADE_TIME: float = 1.8
 ## Cadre des épreuves « panel » : par-dessus le tapis (inutile pendant le lancer), la roue reste
 ## entièrement visible. Coordonnées de maquette (calque `full_host`).
 const PANEL_RECT: Rect2 = Rect2(830.0, 330.0, 1060.0, 400.0)
+## Téléphone, épreuve aux boutons : le cadre glisse à gauche pour laisser le pavé sous le pouce.
+const PANEL_SHIFT_TOUCH_PAD: float = 560.0
 ## Repli sans calque (tests) : sous la roue, coordonnées locales.
 const PANEL_H: float = 300.0
 const PANEL_BELOW: float = 40.0
@@ -56,7 +58,7 @@ func _ready() -> void:
 func start(precision: int, assist: bool, count: int = -1) -> void:
 	_precision = precision
 	_assist = assist
-	_mouse = GameInput.last_was_mouse and not InputGlyphs.using_pad
+	_mouse = (GameInput.last_was_mouse or InputGlyphs.using_touch) and not InputGlyphs.using_pad
 	_release_time = Balance.f("throw_game.release_seconds") * (Balance.f("throw_game.assist_slowdown") if assist else 1.0)
 	var n: int = count if count > 0 else ThrowTrials.count_for(Settings.s("game", "throw_mode"))
 	# Évite les épreuves des deux derniers lancers : plus de variété d'un lancer à l'autre.
@@ -96,13 +98,24 @@ func steps() -> Array[String]:
 func _open_trial() -> void:
 	var id: String = trial_ids[_index]
 	var scr: GDScript = load(TRIAL_SCRIPTS % id) as GDScript
-	trial = (scr.new() as ThrowTrial).setup(DataRegistry.db.get_entry("throw_trials", id), _precision, _assist, _mouse)
+	var e: Dictionary = DataRegistry.db.get_entry("throw_trials", id)
+	# Au doigt, une épreuve à symboles se joue comme à la manette, avec le pavé de boutons.
+	var pad: Array[String] = []
+	if InputGlyphs.using_touch:
+		for a: Variant in e.get("touch_pad", []):
+			pad.append(String(a))
+	trial = (scr.new() as ThrowTrial).setup(e, _precision, _assist, _mouse and pad.is_empty())
+	if not pad.is_empty():
+		trial.add_child(TouchPad.new().configure(pad))
 	trial.hold = hold
 	trial.steps = steps()
 	trial.step = _index
 	trial.done.connect(_on_trial_done)
 	if full_host != null:
 		var r: Rect2 = Rect2(Vector2.ZERO, UiLayout.DESIGN_SIZE) if trial.full() else PANEL_RECT
+		# (gaucher : le pavé est à gauche, le cadre peut rester sur le tapis)
+		if not pad.is_empty() and not trial.full() and not Settings.b("game", "left_handed"):
+			r.position.x -= PANEL_SHIFT_TOUCH_PAD
 		trial.position = r.position
 		trial.size = r.size
 		full_host.add_child(trial)

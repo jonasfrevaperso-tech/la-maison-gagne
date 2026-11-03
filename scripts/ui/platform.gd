@@ -12,6 +12,8 @@ const DEV_DEFAULT_SIZE: Vector2i = Vector2i(2400, 1080)
 const DP_BASE_DPI: float = 160.0
 ## Densité supposée en émulation (Pixel 7 : 420 dpi).
 const DEV_DPI: int = 420
+## Décalage audio maximal (ms) : au-delà, la mesure du système est jugée aberrante.
+const AUDIO_OFFSET_MAX_MS: float = 250.0
 
 ## -1 : détection normale ; 0 / 1 : profil PC / mobile imposé (tests).
 static var force: int = -1
@@ -94,3 +96,15 @@ static func haptic(ms: int) -> void:
 	if not is_android() or not Settings.b("game", "haptics"):
 		return
 	Input.vibrate_handheld(ms)
+
+
+## Décalage audio (s) appliqué au jugement du rythme : le son sort du haut-parleur en retard.
+## PC : 0 (inchangé). Téléphone : réglage `game/audio_offset_ms`, ou latence mesurée par le
+## système (`AudioServer.get_output_latency`) tant qu'il vaut -1.
+static func audio_offset() -> float:
+	if not is_mobile():
+		return 0.0
+	var ms: float = float(Settings.get_value("game", "audio_offset_ms"))
+	if ms < 0.0:
+		return clampf(AudioServer.get_output_latency(), 0.0, AUDIO_OFFSET_MAX_MS / 1000.0)
+	return ms / 1000.0

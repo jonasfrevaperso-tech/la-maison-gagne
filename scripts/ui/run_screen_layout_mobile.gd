@@ -13,10 +13,12 @@ const WHEEL_RECT: Rect2 = Rect2(6, 150, 690, 590)
 const SCORE_POS: Vector2 = Vector2(1120, 128)
 const TABLE_RECT: Rect2 = Rect2(736, 330, 1448, 516)
 const ACTIONS_Y: float = 894.0
-const BTN: Vector2 = Vector2(176, 104)
+const BTN: Vector2 = Vector2(160, 104)
 const SPIN_BTN: Vector2 = Vector2(300, 118)
 const SPEED_BTN: Vector2 = Vector2(110, 104)
-const FORTUNE_X: float = 906.0
+## Cartes Fortune : coin haut droit, au-dessus du tapis (le bas reste aux grigris et aux boutons).
+const FORTUNE_TOP: float = 136.0
+const CAPTION_GAP: float = 14.0
 const HINT_W: float = 1000.0
 
 
@@ -34,10 +36,10 @@ static func apply(s: RunScreen) -> void:
 	var bar_y: float = STAGE.y - GrigriCard.CARD_SIZE.y - M
 	s.grigri_bar.position = Vector2(M + 8.0, bar_y)
 	s._grigri_caption.position = s.grigri_bar.position - Vector2(0, RunScreen.BAR_CAPTION_Y)
-	s.fortune_bar.position = Vector2(FORTUNE_X, bar_y)
-	s._fortune_caption.position = s.fortune_bar.position - Vector2(0, RunScreen.BAR_CAPTION_Y)
+	_seat_fortunes(s)
+	s.fortune_bar.resized.connect(func() -> void: _seat_fortunes(s))
+	s._fortune_caption.resized.connect(func() -> void: _seat_fortunes(s))
 	RunScreenLayout.seat_caption(s._grigri_caption, s.grigri_bar)
-	RunScreenLayout.seat_caption(s._fortune_caption, s.fortune_bar)
 	if Settings.b("game", "left_handed"):
 		_mirror(s)
 
@@ -54,6 +56,11 @@ static func _header(s: RunScreen) -> void:
 static func _actions(s: RunScreen) -> void:
 	var row: HBoxContainer = s._actions
 	row.add_theme_constant_override("separation", 14)
+	if s._amount_btn == null:
+		s._amount_btn = UiKit.button(s.tr("HUD_STAKE_BTN") % s.table_view.bet_amount, s._input_ctl.cycle_amount, BTN)
+		s._amount_btn.tooltip_text = s.tr("HUD_STAKE_TIP")
+		row.add_child(s._amount_btn)
+		row.move_child(s._amount_btn, 0)
 	for b: Button in [s._undo_btn, s._repeat_btn, s._clear_btn]:
 		b.custom_minimum_size = BTN
 	s._speed_btn.custom_minimum_size = SPEED_BTN
@@ -68,6 +75,16 @@ static func _actions(s: RunScreen) -> void:
 	s._hint_label.size = Vector2(HINT_W, 0)
 	s._hint_label.max_lines_visible = 1
 	_seat_actions(s)
+
+
+static func _seat_fortunes(s: RunScreen) -> void:
+	var w: float = s.fortune_bar.get_combined_minimum_size().x
+	var x: float = STAGE.x - TABLE_RECT.end.x if Settings.b("game", "left_handed") else TABLE_RECT.end.x - w
+	s.fortune_bar.position = Vector2(x, FORTUNE_TOP)
+	# Légende sous les cartes (au-dessus : le bandeau du haut ; à gauche : le score).
+	var cap: Vector2 = s._fortune_caption.get_combined_minimum_size()
+	var cx: float = x if Settings.b("game", "left_handed") else x + w - cap.x
+	s._fortune_caption.position = Vector2(cx, FORTUNE_TOP + GrigriCard.CARD_SIZE.y + CAPTION_GAP * 0.25)
 
 
 ## La rangée reste calée sur le bord du tapis (côté pouce) quand des boutons apparaissent.

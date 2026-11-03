@@ -48,6 +48,8 @@ func _ready() -> void:
 
 ## Affiche la loupe pour un doigt en `finger` (coordonnées de fenêtre) et la mise `spot_id`.
 func show_at(finger: Vector2, spot_id: String) -> void:
+	if not is_inside_tree() or _mat == null:
+		return
 	var vp: Vector2 = get_viewport_rect().size
 	var safe: Rect2 = Platform.safe_rect(get_viewport())
 	var pos: Vector2 = Vector2(finger.x - SIZE_PX * 0.5, finger.y - FINGER_GAP - SIZE_PX)

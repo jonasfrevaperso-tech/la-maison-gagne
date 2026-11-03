@@ -18,6 +18,13 @@ const REQUIRED_BY_CAT: Dictionary = {
 	"slot_prizes": ["match", "symbol", "do"],
 }
 const RARITIES: Array[String] = ["common", "rare", "legendary", "cursed"]
+## Boutons possibles du pavé tactile des épreuves (cf. TouchPad.STYLE, qui dépend des autoloads).
+const TOUCH_PAD_ACTIONS: Array[String] = ["qte_left", "qte_up", "qte_right", "qte_down", "ui_up", "ui_down"]
+## Mots et repères qui supposent une souris (conseils du tutoriel).
+const MOUSE_WORDS: Array[String] = [
+	"{@click", "{@right_click", "{@double_click", "{@mouse", "{@wheel", "Clique", "clique", "Click", "click",
+	"Survole", "survole", "Hover", "hover",
+]
 const SKIP_DESC: Array[String] = ["dialogues", "achievements", "challenges", "events", "speakers", "tutorial", "cutscenes"]
 
 var errors: Array[String] = []
@@ -139,11 +146,24 @@ func _validate_entry(db: ContentDB, cat: String, e: Dictionary) -> void:
 			var who: String = String(c.get("who", ""))
 			if who != "hero" and not db.has_entry("speakers", who):
 				errors.append("%s : locuteur inconnu '%s'" % [eid, who])
+	if cat == "tutorial":
+		# Téléphone : un conseil qui parle de souris (clic, survol, molette) a sa variante tactile.
+		for lang: String in ["fr", "en"]:
+			var txt: String = String(e.get("text_" + lang, ""))
+			var mouse_talk: bool = false
+			for w: String in MOUSE_WORDS:
+				mouse_talk = mouse_talk or txt.contains(w)
+			if mouse_talk and String(e.get("text_touch_" + lang, "")) == "":
+				errors.append("%s : texte souris sans variante tactile (text_touch_%s)" % [eid, lang])
 	if cat == "throw_trials":
 		if not String(e.get("stage", "")) in ["panel", "full"]:
 			errors.append("%s : stage doit valoir panel ou full" % eid)
 		if not ResourceLoader.exists("res://scripts/presentation/trials/trial_%s.gd" % String(e.get("id", ""))):
 			errors.append("%s : script d'épreuve absent" % eid)
+		# Tactile : boutons du pavé (TouchPad), sinon l'épreuve se joue au pointeur.
+		for a: Variant in e.get("touch_pad", []):
+			if not TOUCH_PAD_ACTIONS.has(String(a)) or not InputMap.has_action(StringName(String(a))):
+				errors.append("%s : touch_pad « %s » inconnu" % [eid, a])
 		if not Balance.data().get("throw_trials", {}).has(String(e.get("id", ""))):
 			errors.append("%s : réglages absents de balance.json (throw_trials)" % eid)
 		if float(e.get("weight", 0)) <= 0.0:

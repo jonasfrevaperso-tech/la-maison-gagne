@@ -6,6 +6,8 @@ extends ThrowTrial
 
 const DIAL_N: int = 40
 const DIAL_R: float = 92.0
+## Doigt : en dessous de ce nombre de crans tournés, le geste est un toucher (valider).
+const TOUCH_TAP_NOTCHES: float = 0.6
 
 var _codes: Array[int] = []
 var _locked: Array[float] = []
@@ -13,6 +15,9 @@ var _dial: float = 0.0
 var _last_notch: int = 0
 var _bot_axis: float = 0.0
 var _drag: bool = false
+## Doigt : la molette suit l'angle du doigt autour d'elle ; un toucher sans tourner valide.
+var _touch_angle: float = 0.0
+var _touch_turned: float = 0.0
 var _open_t: float = -1.0
 var _scores: Array[float] = []
 ## Scène 3D : porte de coffre en acier, molette graduée qui tourne vraiment, voyant du cran.
@@ -118,6 +123,8 @@ func _closeness() -> float:
 
 
 func handle(event: InputEvent) -> bool:
+	if InputGlyphs.using_touch and (event is InputEventMouseButton or event is InputEventMouseMotion):
+		return _touch(event)
 	var mb: InputEventMouseButton = event as InputEventMouseButton
 	if mb != null:
 		if mb.button_index == MOUSE_BUTTON_WHEEL_UP and mb.pressed:
@@ -138,6 +145,29 @@ func handle(event: InputEvent) -> bool:
 		lock()
 		return true
 	return false
+
+
+## Geste circulaire autour de la molette (un tour de doigt = un tour de molette).
+func _touch(event: InputEvent) -> bool:
+	var mb: InputEventMouseButton = event as InputEventMouseButton
+	if mb != null and mb.button_index == MOUSE_BUTTON_LEFT:
+		if mb.pressed:
+			_drag = true
+			_touch_turned = 0.0
+			_touch_angle = (mb.position - _dial_center()).angle()
+		elif _drag:
+			_drag = false
+			if absf(_touch_turned) < TOUCH_TAP_NOTCHES:
+				lock()
+		return true
+	var mm: InputEventMouseMotion = event as InputEventMouseMotion
+	if mm != null and _drag:
+		var a: float = (mm.position - _dial_center()).angle()
+		var notches: float = angle_difference(_touch_angle, a) / TAU * float(DIAL_N)
+		_touch_angle = a
+		_touch_turned += notches
+		turn(notches)
+	return true
 
 
 func turn(d: float) -> void:

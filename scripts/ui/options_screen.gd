@@ -240,6 +240,8 @@ func _game_tab() -> void:
 	_check(b, "OPT_TUTORIAL_TIPS", "game", "tutorial_tips")
 	if Platform.is_mobile():
 		_check(b, "OPT_HAPTICS", "game", "haptics")
+		_slider(b, "OPT_AUDIO_OFFSET", "game", "audio_offset_ms", 0.0, Platform.AUDIO_OFFSET_MAX_MS, 10.0)
+		_desc(b, "OPT_AUDIO_OFFSET_DESC")
 		_check(b, "OPT_TAP_CONFIRM", "game", "tap_confirm")
 		_desc(b, "OPT_TAP_CONFIRM_DESC")
 		_check(b, "OPT_LEFT_HANDED", "game", "left_handed")

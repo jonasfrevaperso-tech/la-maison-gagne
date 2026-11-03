@@ -186,6 +186,16 @@ func change_amount(d: int) -> void:
 	s._refresh_amount()
 
 
+## Téléphone : le bouton de mise passe à la taille suivante (retour à 1 après 10).
+func cycle_amount() -> void:
+	var i: int = AMOUNTS.find(s.table_view.bet_amount)
+	s.table_view.bet_amount = AMOUNTS[(i + 1) % AMOUNTS.size()]
+	s.table_view.queue_redraw()
+	AudioBus.ui("click")
+	Platform.haptic(8)
+	s._refresh_amount()
+
+
 ## Jeu au tapis sans souris (manette, Steam Deck, clavier) : renvoie true si l'événement est consommé.
 func gamepad_table(event: InputEvent) -> bool:
 	var dirs: Dictionary = {"ui_left": Vector2i(-1, 0), "ui_right": Vector2i(1, 0), "ui_up": Vector2i(0, -1), "ui_down": Vector2i(0, 1)}

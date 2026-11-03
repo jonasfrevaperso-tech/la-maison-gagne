@@ -21,11 +21,14 @@ var _shown_for: Control = null
 var _bubble: PanelContainer = null
 var _text: RichTextLabel = null
 var _park_next: bool = false
+var _custom: Control = null
 
 
 func _ready() -> void:
 	layer = 90
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	# Infobulles natives : coupées sur téléphone par `gui/timers/tooltip_delay_sec.mobile` (lu au
+	# démarrage ; l'émulation sur PC les garde en plus de la bulle tactile).
 	get_tree().node_added.connect(_on_node_added)
 	_bubble = PanelContainer.new()
 	_bubble.add_theme_stylebox_override("panel", UiKit.flat(Color(Palette.INK, 0.94), Palette.GOLD, 2, 6, 18))
@@ -52,6 +55,8 @@ func _input(event: InputEvent) -> void:
 			_down = true
 			_down_at = t.position
 			_held = 0.0
+			_park_next = false
+			_move_pointer(t.position)  # le survol suit le doigt (infobulles, surbrillances)
 			if _bubble.visible:
 				_hide()
 		else:
@@ -77,26 +82,36 @@ func _process(delta: float) -> void:
 
 ## Pointeur émulé hors de l'écran : les survols se terminent quand le doigt se lève.
 func _park_pointer() -> void:
+	_move_pointer(OFFSCREEN)
+
+
+func _move_pointer(at: Vector2) -> void:
 	var mm: InputEventMouseMotion = InputEventMouseMotion.new()
 	mm.device = InputEvent.DEVICE_ID_EMULATION
-	mm.position = OFFSCREEN
-	mm.global_position = OFFSCREEN
+	mm.position = at
+	mm.global_position = at
 	Input.parse_input_event(mm)
 
 
 func _try_tooltip() -> void:
+	# Premier contrôle sous le doigt qui a une infobulle (fixe ou calculée : roue, tapis…).
 	var c: Control = get_viewport().gui_get_hovered_control()
-	while c != null and c.tooltip_text == "":
+	var tip: String = ""
+	while c != null:
+		tip = c.get_tooltip(c.get_global_transform_with_canvas().affine_inverse() * _down_at)
+		if tip == "":
+			tip = c.tooltip_text
+		if tip != "":
+			break
 		c = c.get_parent() as Control
-	if c == null:
+	if c == null or c is GrigriCard or c is TableView:
+		return  # cartes : fiche au toucher (CardSheet) ; tapis : loupe
+	# Infobulle illustrée (roue, pastilles de famille…) quand le contrôle en fournit une.
+	var custom: Control = c.call("_make_custom_tooltip", tip) as Control if c.has_method("_make_custom_tooltip") else null
+	if custom == null and tip.strip_edges() == "":
 		return
-	var local: Vector2 = c.get_global_transform_with_canvas().affine_inverse() * _down_at
-	var tip: String = c.get_tooltip(local)
-	if tip == "":
-		tip = c.tooltip_text
-	if tip.strip_edges() == "":
-		return  # infobulle sur mesure (cartes : fiche au toucher)
-	show_at(tip, _down_at)
+	_set_custom(custom)
+	show_at(tip if custom == null else "", _down_at)
 	_shown_for = c
 	Platform.haptic(15)
 
@@ -104,7 +119,10 @@ func _try_tooltip() -> void:
 ## Bulle d'aide à l'opposé du doigt (au-dessus s'il touche le bas de l'écran, sinon dessous),
 ## toujours dans la zone sûre.
 func show_at(text: String, finger: Vector2) -> void:
-	_text.text = text
+	if text != "":
+		if _custom != null:
+			_set_custom(null)
+		_text.text = text
 	_bubble.visible = true
 	_bubble.reset_size()
 	await get_tree().process_frame
@@ -118,6 +136,17 @@ func show_at(text: String, finger: Vector2) -> void:
 	_bubble.position = pos
 
 
+func _set_custom(custom: Control) -> void:
+	if _custom != null:
+		_custom.queue_free()
+	_custom = custom
+	_text.visible = custom == null
+	if custom != null:
+		custom.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_bubble.add_child(custom)
+
+
 func _hide() -> void:
 	_bubble.visible = false
 	_shown_for = null
+	_set_custom(null)

@@ -72,6 +72,9 @@ func begin() -> void:
 		_end = maxf(_end, _times[_times.size() - 1] + _dur[_dur.size() - 1] + _window() + 0.4)
 	AudioBus.duck_music(true)
 	AudioBus.play("groove_" + _groove, 1.0, -2.0)
+	# Téléphone : le son sort en retard ; l'horloge de l'épreuve part d'autant en arrière pour que
+	# notes, image et jugement tombent sur ce qu'on entend (PC : décalage nul).
+	t = -Platform.audio_offset()
 
 
 func _add(step: int, lane: int, len_steps: int) -> void:
