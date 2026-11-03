@@ -126,3 +126,30 @@ func _mb(at: Vector2, pressed: bool) -> InputEventMouseButton:
 	mb.pressed = pressed
 	mb.position = at
 	return mb
+
+
+## Mise en arrière-plan (appel, accueil) : la partie est sauvegardée, le son coupé puis rendu ;
+## l'application tuée ensuite se reprend depuis cette sauvegarde.
+func test_background_saves_and_mutes() -> void:
+	var saved_path: String = SaveSystem.run_path
+	var saved_profile: String = SaveSystem.profile_path
+	SaveSystem.run_path = "user://test_android_run.json"
+	SaveSystem.profile_path = "user://test_android_profile.json"
+	var saved_ctl: RunController = GameState.controller
+	var ctl: RunController = RunController.new(DataRegistry.db)
+	ctl.new_run("lea", 0, 4321)
+	GameState.controller = ctl
+	var life: AppLifecycle = AppLifecycle.new()
+	life._to_background()
+	check(SaveSystem.has_run(), "partie sauvegardée en arrière-plan")
+	var back: RunState = SaveSystem.load_run()
+	check(back != null and back.rng.seed_value == ctl.run.rng.seed_value, "même partie au redémarrage")
+	check(AudioServer.is_bus_mute(AppLifecycle.MASTER_BUS), "son coupé")
+	life._to_foreground()
+	check(not AudioServer.is_bus_mute(AppLifecycle.MASTER_BUS), "son rendu au retour")
+	life.free()
+	SaveSystem.clear_run()
+	DirAccess.remove_absolute(SaveSystem.profile_path)
+	SaveSystem.run_path = saved_path
+	SaveSystem.profile_path = saved_profile
+	GameState.controller = saved_ctl

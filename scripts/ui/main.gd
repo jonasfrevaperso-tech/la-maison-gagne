@@ -50,6 +50,9 @@ func _ready() -> void:
 	if Platform.is_mobile():
 		add_child(FrameGovernor.new())
 		add_child(TouchHelper.new())
+		var life: AppLifecycle = AppLifecycle.new()
+		life.active_root = _active_root
+		add_child(life)
 	EventBus.screen_requested.connect(_on_screen_requested)
 	EventBus.note_requested.connect(_open_note)
 	var nav: PadNavigator = PadNavigator.new()

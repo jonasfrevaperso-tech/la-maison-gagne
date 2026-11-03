@@ -246,5 +246,14 @@ func _on_daily() -> void:
 	GameState.goto(GameState.SCREEN_CHARACTER, {"daily": true})
 
 
+## Android (geste Retour) : quitter après confirmation.
+func ask_quit() -> void:
+	if find_children("*", "ConfirmBox", true, false).size() > 0:
+		return
+	var dlg: ConfirmBox = ConfirmBox.new().configure(tr("CONFIRM_QUIT"))
+	dlg.confirmed.connect(_on_quit)
+	add_child(dlg)
+
+
 func _on_quit() -> void:
 	GameState.quit_game()

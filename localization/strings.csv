@@ -613,3 +613,4 @@ TRIAL_SHELLS_HINT_TOUCH,Touche {@tap} un gobelet pour le soulever,Tap {@tap} a c
 OPT_AUDIO_OFFSET,Décalage audio (ms),Audio offset (ms)
 OPT_AUDIO_OFFSET_DESC,"Épreuve Effet : si tes notes sont jugées trop tard alors que tu tapes en rythme, augmente cette valeur (Bluetooth : 150 à 250).","Spin trial: if your notes are judged late while you tap in time, raise this value (Bluetooth: 150 to 250)."
 CUTSCENE_HOLD_SKIP_TOUCH,Maintiens le doigt sur l'écran pour passer,Hold your finger on the screen to skip
+CONFIRM_QUIT,Quitter La Maison Gagne ?,Quit La Maison Gagne?
