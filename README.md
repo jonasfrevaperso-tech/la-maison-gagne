@@ -7,6 +7,7 @@ Roguelite de roulette européenne art déco, Godot 4.7. Tu hérites de la dette 
 ## Jouer
 - **Depuis les sources** : installer Godot 4.7.x, puis `godot --path .` à la racine (ou ouvrir `project.godot` dans l'éditeur et appuyer sur F5).
 - **Exports** : Windows (`.exe`), Linux (binaire `x86_64`) et **Flatpak** (`.flatpak`), tous autonomes — `tools/build_release.sh` (voir « Exporter »).
+- **Android** : APK signé (`LaMaisonGagne-<version>-android-arm64.apk`, release GitHub `v*-android`) : l'ouvrir sur le téléphone et autoriser « Installer des applis inconnues ». Entièrement jouable au doigt (loupe de mise, fiches de cartes, boutons de couleur des épreuves). Construction : `tools/build_android.sh` — voir `docs/ANDROID.md`.
 
 ### Commandes
 Le **mode manette** se règle dans Options → Commandes : *Automatique* (les indications suivent le dernier appareil utilisé), *Activé* (tout à la manette, curseur masqué) ou *Désactivé* (clavier et souris). Seules les indications de l'appareil actif sont affichées, avec des glyphes Xbox 360 en pixel art pour la manette.

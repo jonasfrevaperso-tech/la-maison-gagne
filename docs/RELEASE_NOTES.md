@@ -253,3 +253,28 @@ Godot 4.7.2 · GDScript typé · contenu 100 % en JSON validé · RNG détermini
 - Équilibrage validé par bots uniquement (bot compétent ≈ 40 % de victoires au Risque 0) ; à réajuster avec des retours de joueurs.
 - Audio contrôlé par mesures objectives, pas encore par une écoute humaine.
 - Les options de développement (`-- --dev-run`, `--dev-autoplay`…) restent accessibles dans le binaire (sans effet en usage normal).
+
+---
+
+# 1.6.0-android — La Maison dans la poche
+
+La version 1.6.0 complète, jouable entièrement au doigt sur les téléphones Android récents (Android 7 et plus, 64 bits). Testée sur Google Pixel 7. Même contenu que la version PC, mêmes sauvegardes de partie d'un lancement à l'autre ; la version PC ne change pas.
+
+## Au doigt
+- **Miser** : pose le doigt sur le tapis, une loupe montre la case visée ; glisse vers un bord ou un coin pour un cheval ou un carré, relâche pour poser. Appui long immobile sur une pile : retire un jeton. Bouton de taille de mise (×1, ×2, ×5, ×10). Option « toucher pour confirmer ».
+- **Cartes** (grigris, Fortune, Bazar) : touche une carte pour ouvrir sa fiche (description, Acheter / Vendre / Utiliser, Verrouiller, déplacer ◀ ▶).
+- **Épreuves** : toutes jouables au doigt ; celles à symboles affichent des boutons de couleur X / Y / B / A sous le pouce. Fléchettes : vise en glissant, lance en relâchant. Coffre-fort : tourne la molette d'un geste circulaire.
+- **Infobulles** : appui long. **Cinématique** : maintiens le doigt pour la passer.
+- **Rythme** : la latence audio du téléphone est compensée (Options › Jeu › Décalage audio).
+- **Vibrations** : pose de jeton, verdict Parfait, rouleaux et jackpot de la machine à sous (désactivables).
+
+## Téléphone
+- Écran de jeu repensé pour le 20:9 : tapis agrandi sous le pouce, gros boutons, disposition gaucher. Texte agrandi par défaut (×1,35, jusqu'à ×1,7). Rien sous la caméra ni sous la barre de gestes.
+- Qualité Économie / Équilibré / Beau, baisse automatique si le téléphone peine. Toute la 3D est conservée.
+- Geste Retour : ferme la fenêtre ouverte, sinon met en pause ; sur l'écran titre, demande avant de quitter.
+- Appel, notification, bouton d'accueil : la partie est sauvegardée et le son coupé ; au retour, pause (ou « touche pour reprendre » en pleine épreuve). Même après un arrêt forcé, « Reprendre la partie » au lancement.
+- L'écran ne se met pas en veille pendant une partie.
+- Seule permission : vibreur. Aucune connexion Internet, aucun achat, aucune publicité.
+
+## Installer
+Télécharger `LaMaisonGagne-1.6.0-android-arm64.apk` sur le téléphone, l'ouvrir et autoriser « Installer des applis inconnues » pour le navigateur ou le gestionnaire de fichiers. Les mises à jour suivantes s'installent par-dessus sans perdre la progression.

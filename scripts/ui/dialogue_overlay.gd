@@ -76,6 +76,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	theme = UiKit.theme()
 	var dim: ColorRect = UiKit.background(Color(0, 0, 0, 0.45))
+	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(dim)
 	var panel: PanelContainer = UiKit.panel(Palette.INK, Palette.GOLD)
 	panel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
@@ -85,6 +86,8 @@ func _ready() -> void:
 	panel.offset_right = -MARGIN
 	# Les choix agrandissent le panneau vers le haut (jamais hors de l'écran ni sur le texte).
 	panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	# Un clic / toucher sur la boîte de texte fait avancer (seuls les boutons de choix l'arrêtent).
+	panel.mouse_filter = Control.MOUSE_FILTER_PASS
 	add_child(panel)
 	var h: HBoxContainer = HBoxContainer.new()
 	h.add_theme_constant_override("separation", 30)
@@ -101,6 +104,7 @@ func _ready() -> void:
 	_text.fit_content = true
 	_text.custom_minimum_size = Vector2(0, TEXT_MIN_H)
 	_text.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_text.mouse_filter = Control.MOUSE_FILTER_PASS
 	v.add_child(_text)
 	_choices = VBoxContainer.new()
 	_choices.add_theme_constant_override("separation", 8)

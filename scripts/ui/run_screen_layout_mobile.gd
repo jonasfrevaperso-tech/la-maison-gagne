@@ -26,6 +26,7 @@ static func apply(s: RunScreen) -> void:
 	_header(s)
 	s.wheel_view.position = WHEEL_RECT.position
 	s.wheel_view.size = WHEEL_RECT.size
+	s.throw_game.set_anchors_preset(Control.PRESET_TOP_LEFT)  # placé, pas étiré (cf. ThrowMinigame._ready)
 	s.throw_game.position = WHEEL_RECT.position
 	s.throw_game.size = WHEEL_RECT.size
 	s._history_box.position = Vector2(WHEEL_RECT.position.x + 14.0, WHEEL_RECT.end.y + 6.0)

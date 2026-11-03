@@ -15,6 +15,8 @@ Roguelite de roulette européenne (Godot 4.7, GDScript typé). Jeu de hasard **s
 - Simulation : `godot --headless --path . -s res://scripts/sim/sim_main.gd -- --runs=500 --bot=greedy`
 - Validation des données : `godot --headless --path . -s res://tools/validate_data.gd`
 - Lancer le jeu : `godot --path .`
+- Android : `tools/build_android.sh [--debug] [--install]` (APK dans `build/`, cf. `docs/ANDROID.md`) ; émulation sur PC : `godot --path . -- --dev-mobile` ; interface mobile : `godot --headless --path . -- --dev-ui-check --dev-mobile` ; mémoire vidéo : `--dev-mem=200`.
+- Pixel 7 : `~/Android/Sdk/platform-tools/adb install -r build/LaMaisonGagne-<ver>-android-arm64.apk`, journal `adb logcat -s godot:V`.
 
 ## Arborescence
 - `scripts/core/` : logique **pure** (RefCounted, aucun accès aux autoloads, aucun Node). Testable headless.

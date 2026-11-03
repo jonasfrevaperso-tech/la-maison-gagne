@@ -14,6 +14,7 @@ const HOLD_BASE: float = 1.7
 const HOLD_PER_CHAR: float = 0.028
 const FADE: float = 0.7
 const SKIP_HOLD: float = 3.0
+const SKIP_MARGIN: float = 70.0
 const TAP_MAX: float = 0.35
 const RAIN_DROPS: int = 240
 const DUST_MOTES: int = 70
@@ -116,8 +117,11 @@ func _layout() -> void:
 	# Le texte de la lettre s'écrit sur la feuille (zone utile du dessin de la lettre).
 	_letter.position = art.position + Vector2(0.21, 0.17) * art.size
 	_letter.size = Vector2(0.6, 0.7) * art.size
-	_skip_label.position = Vector2(size.x - 410.0, 26.0)
-	_skip_label.size = Vector2(340.0, 30.0)
+	# Largeur du texte (la consigne tactile est plus longue), calée à droite, dans la zone sûre.
+	var w: float = _skip_label.get_combined_minimum_size().x
+	var right: float = Platform.safe_rect(get_viewport()).end.x - global_position.x if Platform.is_mobile() else size.x
+	_skip_label.size = Vector2(w, 30.0)
+	_skip_label.position = Vector2(minf(size.x, right) - w - SKIP_MARGIN, 26.0)
 	_skip_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 
 
@@ -459,6 +463,6 @@ func _draw_title() -> void:
 func _draw_skip_ring() -> void:
 	if _skip_t <= 0.0:
 		return
-	var c: Vector2 = Vector2(size.x - 40.0, 40.0)
+	var c: Vector2 = Vector2(_skip_label.position.x + _skip_label.size.x + SKIP_MARGIN - 30.0, 40.0)
 	draw_arc(c, 16.0, 0, TAU, 32, Color(Palette.SMOKE, 0.5), 3.0, true)
 	draw_arc(c, 16.0, -PI * 0.5, -PI * 0.5 + TAU * clampf(_skip_t / SKIP_HOLD, 0.0, 1.0), 32, Palette.GOLD_LIGHT, 4.0, true)

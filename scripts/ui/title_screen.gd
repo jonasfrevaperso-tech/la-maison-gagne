@@ -190,7 +190,7 @@ func _run_summary() -> String:
 
 ## Consentement à la télémétrie locale (demandé une seule fois, modifiable dans les options).
 func _ask_telemetry() -> void:
-	var dlg: ConfirmBox = ConfirmBox.new().configure(tr("CONFIRM_TELEMETRY"))
+	var dlg: ConfirmBox = ConfirmBox.new().configure(tr("CONFIRM_TELEMETRY_MOBILE" if Platform.is_mobile() else "CONFIRM_TELEMETRY"))
 	dlg.confirmed.connect(_set_telemetry.bind(true))
 	dlg.declined.connect(_set_telemetry.bind(false))
 	add_child(dlg)

@@ -11,6 +11,12 @@ const OFFSET: float = 18.0
 ## Hauteur (part de l'écran) des bulles placées dans la marge gauche (surcouches).
 const SIDE_BUBBLE_Y: float = 0.3
 
+## Déclencheurs de la phase de mise : leurs astuces encore en file sont reportées (non vues) dès
+## qu'on vise, pour ne jamais figer une épreuve sur un conseil du tapis.
+const BETTING_TRIGGERS: Array[String] = [
+	"betting_start", "bet_placed", "grigri_owned", "family_owned", "curse_owned", "fortune_owned", "second_round", "creditor",
+]
+
 ## Fonction fournie par l'écran : nom d'ancre -> rectangle global.
 var anchor_rect: Callable = Callable()
 var _queue: Array[Dictionary] = []
@@ -84,6 +90,8 @@ func notify(trigger: String) -> void:
 	if not enabled():
 		return
 	_queue = _queue.filter(func(q: Dictionary) -> bool: return String(q.get("until", "")) != trigger)
+	if trigger == "aiming":
+		_queue = _queue.filter(func(q: Dictionary) -> bool: return not BETTING_TRIGGERS.has(String(q.get("trigger", ""))))
 	if not _current.is_empty() and String(_current.get("until", "")) == trigger:
 		_close_current()
 	var seen: Array = _seen()

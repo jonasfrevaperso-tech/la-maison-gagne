@@ -41,6 +41,8 @@ const CAM_SWAY: float = 0.8
 
 ## Débordement du rendu 3D autour du cadre de la roue (px de maquette).
 const BLEED: float = 280.0
+## Téléphone : définition 3D de la roue selon la qualité (le conteneur, débord compris, est grand).
+const MOBILE_SCALE: Dictionary[String, float] = {"eco": 0.7, "balanced": 0.85, "high": 1.0}
 
 var wheel: WheelModel = null
 var db: ContentDB = null
@@ -109,9 +111,9 @@ func setup(p_wheel: WheelModel, p_db: ContentDB) -> void:
 func _apply_quality() -> void:
 	# La roue est la pièce maîtresse : sur mobile, MSAA 2x conservé sauf en Économie.
 	if Platform.is_mobile():
-		var eco: bool = RenderQuality.level() == "eco"
-		_vp.msaa_3d = Viewport.MSAA_DISABLED if eco else Viewport.MSAA_2X
-		_vp.scaling_3d_scale = 0.75 if eco else 1.0
+		var lvl: String = RenderQuality.level()
+		_vp.msaa_3d = Viewport.MSAA_DISABLED if lvl == "eco" else Viewport.MSAA_2X
+		_vp.scaling_3d_scale = float(MOBILE_SCALE.get(lvl, 1.0))
 	else:
 		_vp.msaa_3d = RenderQuality.msaa(Viewport.MSAA_4X, Viewport.MSAA_2X)
 	if _key_light != null:

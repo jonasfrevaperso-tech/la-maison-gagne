@@ -20,6 +20,8 @@ func start() -> bool:
 		add_child(ap)
 	if args.has("quit-frames"):
 		_quit_later(int(args["quit-frames"]))
+	if args.has("dev-mem"):
+		_mem_report_later(int(args["dev-mem"]))
 	if args.has("dev-hover"):
 		_hover_later(String(args["dev-hover"]))
 	if args.has("shot"):
@@ -128,6 +130,58 @@ func _slot_later() -> void:
 		{"reels": ["chip", "bell", "seven", "horseshoe"], "prize": ""},
 	]
 	rs.call("_show_overlay", SlotOverlay.new().configure(spins, DataRegistry.db))
+
+
+## Mémoire vidéo : total, textures, tampons, et chaque SubViewport (taille, MSAA, mise à jour).
+func _mem_report_later(frames: int) -> void:
+	for _i: int in frames:
+		await get_tree().process_frame
+	var mb: float = 1024.0 * 1024.0
+	print("MEM vidéo %.0f Mo · textures %.0f Mo · tampons %.0f Mo" % [
+		RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_VIDEO_MEM_USED) / mb,
+		RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TEXTURE_MEM_USED) / mb,
+		RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_BUFFER_MEM_USED) / mb,
+	])
+	var seen: Dictionary[RID, Array] = {}
+	for n: Node in get_tree().root.find_children("*", "", true, false):
+		_collect_textures(n, n, seen)
+	var rows: Array = seen.values()
+	rows.sort_custom(func(x: Array, y: Array) -> bool: return int(x[0]) > int(y[0]))
+	var total: float = 0.0
+	for r: Array in rows:
+		total += float(r[0])
+	print("MEM textures atteignables : %d, ≈ %.0f Mo (RGBA8)" % [rows.size(), total / mb])
+	for r: Array in rows.slice(0, 20):
+		print("MEM  tex %5.1f Mo %s" % [float(r[0]) / mb, r[1]])
+	for n: Node in get_tree().root.find_children("*", "SubViewport", true, false):
+		var sv: SubViewport = n as SubViewport
+		print("MEM  %s %s msaa=%d scale=%.2f hdr=%s maj=%d" % [
+			sv.get_parent().name + "/" + sv.name, sv.size, sv.msaa_3d, sv.scaling_3d_scale, sv.use_hdr_2d, sv.render_target_update_mode,
+		])
+
+
+func _collect_textures(o: Object, owner_node: Node, seen: Dictionary[RID, Array], depth: int = 0) -> void:
+	if o == null or depth > 3:
+		return
+	for prop: Dictionary in o.get_property_list():
+		if int(prop["type"]) != TYPE_OBJECT or not (int(prop["usage"]) & PROPERTY_USAGE_STORAGE):
+			continue
+		var v: Variant = o.get(String(prop["name"]))
+		if v is Texture2D and not (v is ViewportTexture):
+			var t: Texture2D = v as Texture2D
+			if not seen.has(t.get_rid()):
+				var label: String = "%dx%d %s ← %s.%s" % [t.get_width(), t.get_height(), t.resource_path, owner_node.get_path(), prop["name"]]
+				seen[t.get_rid()] = [t.get_width() * t.get_height() * 4, label]
+		elif v is Material or v is Mesh or v is StyleBox or v is Theme:
+			_collect_textures(v as Object, owner_node, seen, depth + 1)
+	var sm: ShaderMaterial = o as ShaderMaterial
+	if sm != null and sm.shader != null:
+		for u: Dictionary in sm.shader.get_shader_uniform_list():
+			var tv: Variant = sm.get_shader_parameter(String(u["name"]))
+			if tv is Texture2D and not (tv is ViewportTexture) and not seen.has((tv as Texture2D).get_rid()):
+				var tt: Texture2D = tv as Texture2D
+				var what: String = "%dx%d shader %s ← %s" % [tt.get_width(), tt.get_height(), u["name"], owner_node.get_path()]
+				seen[tt.get_rid()] = [tt.get_width() * tt.get_height() * 4, what]
 
 
 func _quit_later(frames: int) -> void:

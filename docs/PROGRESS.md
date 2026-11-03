@@ -180,3 +180,16 @@ Plan :
 5. Vérification complète (données, tests, banc des épreuves, interface 6 définitions, campagne manette), simulations, docs, exports, publication.
 
 Bilan 1.6.0 : les 5 étapes sont livrées. Tirage des épreuves vérifié uniforme (3 000 lancers, 7,1 % chacune) ; un lancer évite désormais les épreuves des deux précédents. 196 grigris répartis en 10 familles, 96 tests. Argent à l'entrée du Bazar : 11–21 $ (au lieu de 14–66 $). Équilibrage : glouton 41,5 %, expert 49,0 % (voir `docs/BALANCE.md`). `tools/check.sh` vert (96 tests, banc des 14 épreuves, interface, campagne gagnée à la manette seule en 24 tours).
+
+## Version 1.6.0-android — « La Maison dans la poche »
+Plan (cf. `docs/ANDROID.md`) : phases 15 à 20.
+- **Phase 15 — Socle** ✅ (`phase-15-android-socle`) : `Platform`, émulation `--dev-mobile`, surcharges `.mobile`, préréglage d'export Android, clé de publication hors dépôt, `tools/build_android.sh`, icône adaptative.
+- **Phase 16 — Rendu** ✅ (`phase-16-android-rendu`) : moteur Mobile, `RenderQuality` à 3 niveaux, `FrameGovernor`, veille des scènes 3D couvertes, repli OpenGL ES.
+- **Phase 17 — Tactile** ✅ (`phase-17-android-tactile`) : profil d'entrée « doigt », zone sûre, écran de jeu mobile, fiches de cartes, loupe de mise, infobulles à l'appui long, contrôle d'interface mobile dans `check.sh`.
+- **Phase 18 — Gestes** ✅ (`phase-18-android-gestes`) : pavé tactile des épreuves, fléchettes et coffre au doigt, décalage audio du rythme, textes tactiles du tutoriel, vibrations.
+- **Phase 19 — Système** ✅ (`phase-19-android-systeme`) : Retour, arrière-plan, écran allumé, reprise après arrêt forcé.
+- **Phase 20 — Appareil et publication** ✅ (`phase-20-android-release`) : recette sur Pixel 7 (Android 17) par adb.
+
+Recette Pixel 7 (adb, APK release) : installation par-dessus sans perte de sauvegarde ; Vulkan / Forward Mobile sur Mali-G710 ; titre, sélection, cinématique (passage au doigt maintenu), dialogue, astuces, mise glissée sur Rouge, visée, épreuves (Verre parfait, Tour de jetons, Bonneteau) au doigt ; Retour → pause → Retour ferme ; accueil en pleine épreuve → voile de reprise ; arrêt forcé → « Reprendre la partie ».
+Corrigés grâce à l'appareil : le dialogue n'avançait pas au toucher (la boîte de texte arrêtait le clic), astuces de mise en file qui figeaient l'épreuve, voile de reprise créé pendant la propagation d'une notification, consigne de la cinématique coupée, « sur cet ordinateur » dans la question de télémétrie.
+Mesures : mémoire PSS ≈ 1,28 Go dont ≈ 0,94 Go « Graphics » (pilote Mali ; 0,3 Go de mémoire vidéo mesurée par Godot en émulation, surtout tampons de rendu 3D et lueur) — au-dessus de l'objectif de 600 Mo, sans incidence sur un téléphone de 8 Go ; à surveiller sur les modèles 4 Go (qualité Économie). Images : 50e centile 5 ms. La chauffe sur 20 min n'a pas été mesurée (cœurs à 73–87 °C pendant les installations successives, téléphone branché).

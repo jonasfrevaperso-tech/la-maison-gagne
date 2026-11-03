@@ -154,7 +154,7 @@ func _build() -> void:
 	throw_game.position = wheel_view.position
 	throw_game.size = WHEEL_SIZE
 	throw_game.finished.connect(func(q: float) -> void: _throw.on_quality(q))
-	throw_game.hold = func() -> bool: return tutorial != null and tutorial.blocking()
+	throw_game.hold = func() -> bool: return AppLifecycle.holding or (tutorial != null and tutorial.blocking())
 	_stage.add_child(throw_game)
 	_history_box = HBoxContainer.new()
 	_history_box.position = Vector2(MARGIN, 150 + WHEEL_SIZE.y + 6)
