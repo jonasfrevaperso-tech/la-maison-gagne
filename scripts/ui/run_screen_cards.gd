@@ -33,11 +33,11 @@ func show_pocket(index: int) -> void:
 	_pocket_card.position = pos.clamp(Vector2(8, 8), s.stage_size - sz - Vector2(8, 8))
 
 
-## Fiche du pari sous le curseur manette : au-dessus du curseur, sinon en dessous ; jamais sur
-## les barres de grigris et de Fortune.
+## Fiche du pari sous le curseur manette ou sous le doigt : à côté du tapis, à hauteur du point
+## visé ; jamais sur les barres de grigris et de Fortune, jamais sous la loupe.
 func show_bet(spot_id: String) -> void:
 	hide_bet()
-	if spot_id == "" or not InputGlyphs.using_pad or s.state != RunScreen.UiState.BETTING or s._items_mode:
+	if spot_id == "" or not (InputGlyphs.using_pad or InputGlyphs.using_touch) or s.state != RunScreen.UiState.BETTING or s._items_mode:
 		return
 	var r: RunState = s.ctl.run
 	_bet_card = BetCard.build(spot_id, s.table_view.hide_odds, r.wheel, r.chip_value, int(r.slip.chips.get(spot_id, 0)))
@@ -45,11 +45,14 @@ func show_bet(spot_id: String) -> void:
 		return
 	_bet_card.z_index = 5
 	s._stage.add_child(_bet_card)
-	# Manette : la fiche se range à gauche du tapis (sur la roue, inutile pendant les mises), à
-	# hauteur du curseur ; elle ne couvre jamais le tapis ni l'emplacement sélectionné.
-	var at: Vector2 = s.table_view.position + s.table_view.cursor_point()
+	# La fiche se range à côté du tapis, sur la roue (inutile pendant les mises), à hauteur du
+	# point visé ; elle ne couvre jamais le tapis ni l'emplacement visé. Tapis à gauche
+	# (disposition gaucher) : à sa droite.
+	var at: Vector2 = s.table_view.position + s.table_view.aim_point()
 	var sz: Vector2 = _bet_card.get_combined_minimum_size()
 	var x: float = s.table_view.position.x - sz.x - BET_CARD_GAP
+	if s.table_view.position.x + s.table_view.size.x * 0.5 < s.stage_size.x * 0.5:
+		x = minf(s.table_view.position.x + s.table_view.size.x + BET_CARD_GAP, s.stage_size.x - sz.x - 8.0)
 	var y: float = at.y - sz.y * 0.5
 	var max_y: float = s.grigri_bar.position.y - RunScreen.BAR_CAPTION_Y - sz.y - 8.0
 	_bet_card.position = Vector2(maxf(x, 8.0), clampf(y, RunScreen.HUD_STRIP_H + 16.0, max_y))

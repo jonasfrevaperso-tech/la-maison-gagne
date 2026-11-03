@@ -97,6 +97,7 @@ func steps() -> Array[String]:
 
 func _open_trial() -> void:
 	var id: String = trial_ids[_index]
+	HitchMonitor.mark("épreuve " + id)
 	var scr: GDScript = load(TRIAL_SCRIPTS % id) as GDScript
 	var e: Dictionary = DataRegistry.db.get_entry("throw_trials", id)
 	# Au doigt, une épreuve à symboles se joue comme à la manette, avec le pavé de boutons.

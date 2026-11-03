@@ -22,7 +22,18 @@ func build() -> void:
 	var h: HBoxContainer = row()
 	var yes: Button = UiKit.button(tr("BTN_YES"), _yes)
 	h.add_child(yes)
-	h.add_child(UiKit.button(tr("BTN_NO"), _no))
+	var no: Button = UiKit.button(tr("BTN_NO"), _no)
+	h.add_child(no)
+	# Oui ↔ Non seulement : la manette ne quitte jamais la confirmation.
+	for pair: Array in [[yes, no], [no, yes]]:
+		var a: Button = pair[0] as Button
+		var b: NodePath = a.get_path_to(pair[1] as Button)
+		a.focus_neighbor_left = b
+		a.focus_neighbor_right = b
+		a.focus_next = b
+		a.focus_previous = b
+		a.focus_neighbor_top = NodePath(".")
+		a.focus_neighbor_bottom = NodePath(".")
 	yes.call_deferred("grab_focus")
 	closed.connect(queue_free)
 

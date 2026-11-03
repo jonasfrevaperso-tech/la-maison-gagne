@@ -18,6 +18,9 @@ var panel_width: float = 900.0
 ## B / Échap ferme la surcouche (surcouches d'information) ; sinon le retour est ignoré
 ## (choix obligatoires : pacte, événement, boutique).
 var cancel_closes: bool = false
+## Contrôles de l'écran ou de la surcouche du dessous privés de focus tant que celle-ci est
+## ouverte (sinon la navigation manette « s'échappe » vers eux : voisin le plus proche à l'écran).
+var _suspended: Array[Array] = []
 
 
 func _ready() -> void:
@@ -48,6 +51,7 @@ func _ready() -> void:
 	body.add_theme_constant_override("separation", 14)
 	panel.add_child(body)
 	build()
+	_suspend_focus_below()
 	panel.modulate.a = 0.0
 	AudioBus.ui("panel_open")
 	_pop.call_deferred()
@@ -96,6 +100,27 @@ func backdrop() -> Control:
 ## À surcharger : remplit `body`.
 func build() -> void:
 	pass
+
+
+func _suspend_focus_below() -> void:
+	var host: Node = get_parent()
+	if host == null:
+		return
+	for n: Node in host.find_children("*", "Control", true, false):
+		var c: Control = n as Control
+		if c.focus_mode == Control.FOCUS_NONE or c == self or is_ancestor_of(c):
+			continue
+		_suspended.append([c, c.focus_mode])
+		c.focus_mode = Control.FOCUS_NONE
+	tree_exiting.connect(_restore_focus_below)
+
+
+func _restore_focus_below() -> void:
+	for pair: Array in _suspended:
+		var o: Variant = pair[0]
+		if is_instance_valid(o):
+			(o as Control).focus_mode = pair[1] as Control.FocusMode
+	_suspended.clear()
 
 
 func close() -> void:

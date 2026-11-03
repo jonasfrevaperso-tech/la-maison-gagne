@@ -11,6 +11,11 @@ signal reorder_requested(from_uid: int, to_uid: int)
 ## Manette : déplacer d'un cran à gauche (−1) ou à droite (+1).
 signal move_requested(card: GrigriCard, direction: int)
 
+## Cadenas : taille d'un pixel et retrait depuis le coin haut gauche ; le compteur se décale
+## à sa droite quand la carte est verrouillée.
+const LOCK_PX: float = 2.0
+const LOCK_INSET: Vector2 = Vector2(8.0, 8.0)
+const LOCK_COUNTER_SHIFT: float = 20.0
 const CARD_SIZE: Vector2 = Vector2(112, 144)
 const ICON_SIZE: float = 80.0
 const TILT_MAX: float = 0.12
@@ -274,11 +279,11 @@ func _draw() -> void:
 		y += float(fs) + 2.0
 	if show_counter and absf(counter) > 0.001:
 		var ct: String = ("×%.2f" % counter) if counter < 10.0 and not is_equal_approx(counter, round(counter)) else str(int(counter))
-		draw_string(UiKit.font("mono"), r.position + Vector2(6, 22), ct, HORIZONTAL_ALIGNMENT_LEFT, -1, UiKit.fs(16), Palette.EMERALD)
+		var cx: float = 6.0 + (LOCK_COUNTER_SHIFT if locked else 0.0)
+		draw_string(UiKit.font("mono"), r.position + Vector2(cx, 22), ct, HORIZONTAL_ALIGNMENT_LEFT, -1, UiKit.fs(16), Palette.EMERALD)
 	if locked:
-		draw_string(
-			UiKit.font("mono"), Vector2(r.end.x - 22, r.position.y + 22), "🔒", HORIZONTAL_ALIGNMENT_LEFT, -1, UiKit.fs(16), Palette.GOLD_LIGHT
-		)
+		# Coin haut gauche : le haut droit porte la pastille de famille, le bas le nom.
+		_draw_lock(r.position + LOCK_INSET)
 		draw_rect(r, Palette.GOLD_LIGHT, false, 2.0)
 	if price >= 0:
 		var pt: String = "%d $" % price
@@ -295,6 +300,21 @@ func _draw() -> void:
 		)
 	if disabled_look:
 		draw_line(r.position, r.end, Palette.DANGER, 3.0)
+
+
+## Cadenas en pixel art (coin haut gauche = `at`), lisible à toutes les tailles de texte.
+func _draw_lock(at: Vector2) -> void:
+	var u: float = LOCK_PX
+	var o: Vector2 = at
+	draw_rect(Rect2(o + Vector2(-u, -u), Vector2(9.0 * u, 11.0 * u)), Color(Palette.INK, 0.85))
+	# Anse
+	draw_rect(Rect2(o + Vector2(u * 1.0, 0), Vector2(u * 5.0, u)), Palette.GOLD_LIGHT)
+	draw_rect(Rect2(o + Vector2(u * 1.0, 0), Vector2(u, u * 4.0)), Palette.GOLD_LIGHT)
+	draw_rect(Rect2(o + Vector2(u * 5.0, 0), Vector2(u, u * 4.0)), Palette.GOLD_LIGHT)
+	# Corps et serrure
+	draw_rect(Rect2(o + Vector2(0, u * 4.0), Vector2(u * 7.0, u * 5.0)), Palette.GOLD)
+	draw_rect(Rect2(o + Vector2(0, u * 4.0), Vector2(u * 7.0, u)), Palette.GOLD_LIGHT)
+	draw_rect(Rect2(o + Vector2(u * 3.0, u * 5.5), Vector2(u, u * 2.0)), Palette.INK)
 
 
 func _draw_glyph(rect: Rect2, e: Dictionary, rcol: Color) -> void:

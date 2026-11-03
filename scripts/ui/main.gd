@@ -47,6 +47,7 @@ func _ready() -> void:
 	_overlay_layer.add_child(toasts)
 	var post: PostFx = PostFx.new()
 	add_child(post)
+	add_child(HitchMonitor.new())
 	if Platform.is_mobile():
 		add_child(FrameGovernor.new())
 		add_child(TouchHelper.new())

@@ -629,7 +629,16 @@ func _bet_rejected(res: BetSlip.PlaceResult) -> void:
 
 
 func _on_spot_hovered(spot_id: String) -> void:
-	if not (table_view.cursor_active or table_view.touch_aiming) or spot_id == "":
+	if InputGlyphs.using_touch:
+		# Doigt : la fiche suit la visée ; au relâcher, elle reste sur la mise en attente
+		# (« toucher pour confirmer »), sinon elle disparaît.
+		var shown: String = spot_id if spot_id != "" else table_view.pending_spot
+		if shown == "":
+			_cards.hide_bet()
+		else:
+			_cards.show_bet(shown)
+		return
+	if not table_view.cursor_active or spot_id == "":
 		return
 	_cards.show_bet(spot_id)
 
@@ -805,6 +814,7 @@ func _on_victory_closed() -> void:
 
 
 func _show_overlay(o: Control, on_closed: Callable = Callable()) -> void:
+	HitchMonitor.mark("surcouche " + o.get_class() + ":" + String(o.get_script().get_global_name() if o.get_script() else ""))
 	state = UiState.OVERLAY
 	# Fiches flottantes (pari, case) : jamais par-dessus une surcouche.
 	_cards.hide_bet()

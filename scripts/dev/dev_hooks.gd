@@ -39,6 +39,9 @@ func start() -> bool:
 		tb.runs = maxi(int(String(args["dev-trial-bench"])), 1) if String(args["dev-trial-bench"]) != "true" else 3
 		add_child(tb)
 		return true
+	if args.has("dev-confirm-check"):
+		add_child(DevConfirmCheck.new())
+		return true
 	if args.has("dev-ui-check"):
 		add_child(DevUiCheck.new())
 		return true
@@ -59,6 +62,9 @@ func start() -> bool:
 	if args.has("dev-grigris"):
 		for gid: String in String(args["dev-grigris"]).split(","):
 			ShopModel.acquire_grigri(r, DataRegistry.db, gid, &"")
+	if args.has("dev-locked"):
+		for g: GrigriInstance in r.grigris:
+			g.locked = true
 	match String(args.get("dev-phase", "")):
 		"shop":
 			r.money = 30

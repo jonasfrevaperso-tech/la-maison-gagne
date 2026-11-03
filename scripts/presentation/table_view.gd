@@ -64,6 +64,7 @@ var _out_h: float = 0.0
 var _loupe: BetLoupe = null
 var _aim_start: Vector2 = Vector2.ZERO
 var _aim_moved: bool = false
+var _aim_at: Vector2 = Vector2.ZERO
 var _aim_hold: float = 0.0
 
 
@@ -271,6 +272,7 @@ func _touch_input(event: InputEvent) -> void:
 
 
 func _aim(p: Vector2) -> void:
+	_aim_at = p
 	var s: String = spot_at(p)
 	if s != hover_spot:
 		hover_spot = s
@@ -451,6 +453,11 @@ func _make_custom_tooltip(_for_text: String) -> Object:
 
 
 ## Position du curseur manette (coordonnées locales).
+## Point visé au doigt (repère du tapis), ou le curseur manette.
+func aim_point() -> Vector2:
+	return _aim_at if touch_aiming or pending_spot != "" else cursor_point()
+
+
 func cursor_point() -> Vector2:
 	return fine_point(_cx, _cy)
 

@@ -616,3 +616,4 @@ CUTSCENE_HOLD_SKIP_TOUCH,Maintiens le doigt sur l'écran pour passer,Hold your f
 CONFIRM_QUIT,Quitter La Maison Gagne ?,Quit La Maison Gagne?
 CONFIRM_TELEMETRY_MOBILE,"Enregistrer des statistiques de jeu sur ce téléphone (tours, boutique, durée) pour aider à équilibrer le jeu ? Rien n'est envoyé sur Internet. Modifiable dans les options.","Record gameplay statistics on this phone (spins, shop, play time) to help balance the game? Nothing is sent over the Internet. You can change this in the options."
 RESUME_TAP,Touche l'écran pour reprendre l'épreuve,Tap the screen to resume the trial
+HUD_FPS,"%d im/s · pire image %.0f ms","%d fps · worst frame %.0f ms"
