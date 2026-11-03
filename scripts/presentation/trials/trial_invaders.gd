@@ -38,6 +38,8 @@ const INV_B: Array[String] = [
 	"  #     #  ",
 	" #       # ",
 ]
+## Profondeur des jetons-envahisseurs dans la vitrine (m, derrière la vitre).
+const CHIP_Z: float = -0.25
 const RAKE: Array[String] = [
 	"      ##      ",
 	"      ##      ",
@@ -69,6 +71,16 @@ var _bot_axis: float = 0.0
 var _bot_fire: bool = false
 var _boom: Array[Dictionary] = []
 var _ended: bool = false
+# Décor 3D : borne, envahisseurs en jetons sous la vitre, piles de jetons, râteau en laiton.
+var _cab: Dictionary = {}
+var _neighbors: Array[MeshInstance3D] = []
+var _inv3: Array[Node3D] = []
+var _shield3: Array[MeshInstance3D] = []
+var _rake3: Node3D = null
+var _saucer3: Node3D = null
+var _shot_pool: MeshPool = null
+var _bomb_pool: MeshPool = null
+var _fire_flash: float = 0.0
 
 
 func begin() -> void:
@@ -86,6 +98,116 @@ func begin() -> void:
 		cells.fill(1)
 		_shields.append(cells)
 	_bomb_t = p("bomb_every") * slow
+	_build_3d()
+
+
+func _build_3d() -> void:
+	var st: Stage3D = use_3d()
+	st.frontal(0.005, Vector2(960.0, 540.0), 1080.0, 40.0)
+	ArcadeKit3D.room(st, _neighbors)
+	_cab = ArcadeKit3D.cabinet(st, SCREEN, tr("TRIAL_INVADERS_MARQUEE"), Color("140a24"))
+	var px: float = st.px3
+	var ring: StandardMaterial3D = Stage3D.mat(Palette.IVORY, 0.1, 0.4)
+	for i: Dictionary in _inv:
+		var col: Color = ROW_COLORS[int(i["row"]) % ROW_COLORS.size()]
+		var chip: Node3D = Node3D.new()
+		st.root.add_child(chip)
+		var body: MeshInstance3D = MeshInstance3D.new()
+		body.mesh = MeshPool.disc(26.0 * px, 0.05)
+		body.material_override = _glowing(col, 0.55)
+		body.rotation.x = PI * 0.5
+		chip.add_child(body)
+		var edge: MeshInstance3D = MeshInstance3D.new()
+		edge.mesh = MeshPool.disc(19.0 * px, 0.056, 16)
+		edge.material_override = ring
+		edge.rotation.x = PI * 0.5
+		chip.add_child(edge)
+		var core: MeshInstance3D = MeshInstance3D.new()
+		core.mesh = MeshPool.disc(14.0 * px, 0.06, 16)
+		core.material_override = body.material_override
+		core.rotation.x = PI * 0.5
+		chip.add_child(core)
+		for m: Node in chip.get_children():
+			(m as MeshInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		_inv3.append(chip)
+	var gold: StandardMaterial3D = Stage3D.mat(Palette.GOLD, 0.45, 0.3)
+	var gold_dark: StandardMaterial3D = Stage3D.mat(Palette.GOLD_DARK, 0.45, 0.35)
+	var cell_mesh: BoxMesh = BoxMesh.new()
+	cell_mesh.size = Vector3((SHIELD_CELL - 1.0) * px, (SHIELD_CELL - 1.0) * px, 0.12)
+	for k: int in _shields.size():
+		var o: Vector2 = _shield_origin(k)
+		for idx: int in _shields[k].size():
+			var cx: int = idx % SHIELD_COLS
+			var cy: int = floori(float(idx) / SHIELD_COLS)
+			var mi: MeshInstance3D = MeshInstance3D.new()
+			mi.mesh = cell_mesh
+			mi.material_override = gold if (cx + cy) % 2 == 0 else gold_dark
+			mi.position = st.to3(o + (Vector2(cx, cy) + Vector2(0.5, 0.5)) * SHIELD_CELL, CHIP_Z)
+			st.root.add_child(mi)
+			_shield3.append(mi)
+	# Râteau du croupier en laiton.
+	_rake3 = Node3D.new()
+	st.root.add_child(_rake3)
+	Stage3D.box(_rake3, Vector3(CANNON_W * px, 12.0 * px, 0.1), Vector3(0, -8.0 * px, 0), gold)
+	Stage3D.box(_rake3, Vector3(10.0 * px, 34.0 * px, 0.08), Vector3(0, 12.0 * px, 0), Stage3D.mat(Color("6a351f"), 0.0, 0.5))
+	for k2: int in 5:
+		Stage3D.box(_rake3, Vector3(4.0 * px, 10.0 * px, 0.05), Vector3((float(k2) - 2.0) * 14.0 * px, -18.0 * px, 0), gold)
+	# Plaque volante.
+	_saucer3 = Node3D.new()
+	st.root.add_child(_saucer3)
+	Stage3D.box(_saucer3, Vector3(88.0 * px, 28.0 * px, 0.06), Vector3.ZERO, Stage3D.mat(Palette.IVORY, 0.2, 0.3))
+	Stage3D.box(_saucer3, Vector3(68.0 * px, 12.0 * px, 0.07), Vector3.ZERO, _glowing(Palette.GOLD, 1.0))
+	_shot_pool = MeshPool.new(st.root, MeshPool.capsule(4.0 * px, 28.0 * px), Stage3D.glow(Palette.GOLD_LIGHT, 2.5))
+	_bomb_pool = MeshPool.new(st.root, MeshPool.capsule(5.0 * px, 20.0 * px), Stage3D.glow(Color("b03aff"), 2.2))
+
+
+func _glowing(col: Color, energy: float) -> StandardMaterial3D:
+	var m: StandardMaterial3D = Stage3D.mat(col, 0.3, 0.35)
+	m.emission_enabled = true
+	m.emission = col
+	m.emission_energy_multiplier = energy
+	return m
+
+
+func _sync_3d(dt: float) -> void:
+	if _rake3 == null:
+		return
+	var st: Stage3D = stage
+	for k: int in _inv.size():
+		var i: Dictionary = _inv[k]
+		var chip: Node3D = _inv3[k]
+		chip.visible = bool(i["alive"])
+		if chip.visible:
+			chip.position = st.to3(_inv_pos(i), CHIP_Z)
+			# Marche : le jeton se dandine d'une pose à l'autre.
+			chip.rotation = Vector3(0, (0.35 if _frame == 0 else -0.35), sin(t * 3.0 + float(k)) * 0.08)
+	for k2: int in _shields.size():
+		for idx: int in _shields[k2].size():
+			_shield3[k2 * _shields[k2].size() + idx].visible = _shields[k2][idx] == 1
+	_rake3.position = st.to3(Vector2(_x, CANNON_Y), CHIP_Z)
+	_rake3.rotation.z = sin(t * 60.0) * 0.12 if _stun > 0.0 else 0.0
+	_saucer3.visible = _saucer_x >= 0.0
+	if _saucer3.visible:
+		_saucer3.position = st.to3(Vector2(_saucer_x, SAUCER_Y), CHIP_Z)
+		_saucer3.rotation.y = t * 4.0
+	for k3: int in _shots.size():
+		_shot_pool.at(k3).position = st.to3(_shots[k3], CHIP_Z)
+	_shot_pool.hide_from(_shots.size())
+	for k4: int in _bombs.size():
+		var b: MeshInstance3D = _bomb_pool.at(k4)
+		b.position = st.to3(_bombs[k4], CHIP_Z)
+		b.rotation.z = t * 9.0
+	_bomb_pool.hide_from(_bombs.size())
+	# Commandes : le manche suit le canon, le bouton s'enfonce au tir ; l'écran éclaire la borne.
+	_fire_flash = maxf(0.0, _fire_flash - dt * 6.0)
+	var axis: float = clampf(held_vector().x + _bot_axis, -1.0, 1.0)
+	(_cab["stick"] as Node3D).rotation.z = lerpf((_cab["stick"] as Node3D).rotation.z, -axis * 0.45, minf(1.0, dt * 14.0))
+	(_cab["button"] as Node3D).position.y = 0.05 - 0.03 * _fire_flash
+	(_cab["light"] as OmniLight3D).light_energy = 1.2 + 1.4 * _fire_flash + (1.5 if _stun > 0.0 and fmod(t * 8.0, 1.0) < 0.5 else 0.0)
+	for k5: int in _neighbors.size():
+		var m: StandardMaterial3D = _neighbors[k5].material_override as StandardMaterial3D
+		if m != null:
+			m.emission_energy_multiplier = 0.6 + 0.3 * sin(t * (2.0 + float(k5)) + float(k5))
 
 
 func _shield_origin(k: int) -> Vector2:
@@ -118,6 +240,7 @@ func handle(event: InputEvent) -> bool:
 
 
 func fire() -> void:
+	_fire_flash = 1.0
 	if _cool > 0.0 or _stun > 0.0 or _ended:
 		return
 	_cool = p("fire_cooldown")
@@ -144,6 +267,7 @@ func tick(dt: float) -> void:
 	for b: Dictionary in _boom:
 		b["t"] = float(b["t"]) - dt
 	_boom = _boom.filter(func(b: Dictionary) -> bool: return float(b["t"]) > 0.0)
+	_sync_3d(dt)
 	var alive: Array[Dictionary] = _alive()
 	var low: float = 0.0
 	for i: Dictionary in alive:
@@ -306,37 +430,20 @@ func bot_apply(w: Dictionary) -> void:
 
 
 func paint() -> void:
-	ArcadeKit.room(self, size, t)
-	ArcadeKit.cabinet(self, SCREEN, tr("TRIAL_INVADERS_MARQUEE"), 0.5 + 0.5 * sin(t * 5.0))
-	# Tapis vert en bas de l'écran : ce que les envahisseurs veulent atteindre.
-	draw_rect(Rect2(SCREEN.position.x, CANNON_Y + 24.0, SCREEN.size.x, SCREEN.end.y - CANNON_Y - 24.0), Color("0d4630"))
-	for i: Dictionary in _alive():
-		var c: Vector2 = _inv_pos(i)
-		var spr: Array[String] = INV_A if _frame == 0 else INV_B
-		ArcadeKit.sprite(self, c - Vector2(11, 8) * INV_CELL * 0.5, spr, INV_CELL, ROW_COLORS[int(i["row"]) % ROW_COLORS.size()])
-	for k: int in _shields.size():
-		var o: Vector2 = _shield_origin(k)
-		for idx: int in _shields[k].size():
-			if _shields[k][idx] == 1:
-				var cx: int = idx % SHIELD_COLS
-				var cy: int = floori(float(idx) / SHIELD_COLS)
-				var r: Rect2 = Rect2(o + Vector2(cx, cy) * SHIELD_CELL, Vector2(SHIELD_CELL - 1.0, SHIELD_CELL - 1.0))
-				draw_rect(r, Palette.GOLD if (cx + cy) % 2 == 0 else Palette.GOLD_DARK)
-	if _saucer_x >= 0.0:
-		draw_rect(Rect2(_saucer_x - 44.0, SAUCER_Y - 14.0, 88.0, 28.0), Palette.IVORY)
-		draw_rect(Rect2(_saucer_x - 34.0, SAUCER_Y - 6.0, 68.0, 12.0), Palette.GOLD)
-	for s: Vector2 in _shots:
-		draw_rect(Rect2(s - Vector2(3, 14), Vector2(6, 28)), Palette.GOLD_LIGHT)
-	for b: Vector2 in _bombs:
-		draw_rect(Rect2(b - Vector2(4, 10), Vector2(8, 20)), Color("b03aff") if int(b.y / 20.0) % 2 == 0 else Palette.MAGENTA)
+	if stage == null:
+		return
 	for bo: Dictionary in _boom:
 		var a: float = float(bo["t"]) / 0.3
 		for k2: int in 8:
-			var dirv: Vector2 = Vector2.from_angle(TAU * float(k2) / 8.0) * (1.0 - a) * 40.0
-			draw_rect(Rect2((bo["p"] as Vector2) + dirv - Vector2(3, 3), Vector2(6, 6)), Color(bo["col"] as Color, a))
-	var rake_col: Color = Palette.IVORY if _stun <= 0.0 or fmod(t * 12.0, 1.0) < 0.5 else Palette.MULT_RED
-	ArcadeKit.sprite(self, Vector2(_x, CANNON_Y) - Vector2(14, 5) * INV_CELL * 0.5, RAKE, INV_CELL, rake_col)
-	ArcadeKit.glass(self, SCREEN)
+			var dirv: Vector2 = Vector2.from_angle(TAU * float(k2) / 8.0) * (1.0 - a) * 46.0
+			draw_rect(Rect2((bo["p"] as Vector2) + dirv - Vector2(4, 4), Vector2(8, 8)), Color(bo["col"] as Color, a))
+	# Reflet de la vitre bombée (sans lignes de balayage : on regarde une vitrine, pas un tube).
+	draw_rect(Rect2(SCREEN.position, Vector2(SCREEN.size.x, SCREEN.size.y * 0.14)), Color(1, 1, 1, 0.04))
+	var o: Vector2 = SCREEN.position
+	var sz: Vector2 = SCREEN.size
+	var streak: PackedVector2Array = PackedVector2Array([o + Vector2(sz.x * 0.62, 0), o + Vector2(sz.x * 0.72, 0),
+		o + Vector2(sz.x * 0.52, sz.y), o + Vector2(sz.x * 0.42, sz.y)])
+	draw_colored_polygon(streak, Color(1, 1, 1, 0.03))
 	var pct: int = roundi(100.0 * float(_killed) / maxf(float(_total), 1.0))
 	var status: String = tr("TRIAL_INVADERS_STATUS") % pct
 	text(Vector2(SCREEN.position.x + 160.0, SCREEN.position.y + 40.0), status, UiKit.SIZE_BODY, Palette.GOLD_LIGHT, "mono")

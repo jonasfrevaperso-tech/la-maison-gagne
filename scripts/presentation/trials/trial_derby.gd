@@ -13,6 +13,10 @@ const LANE_H: float = 150.0
 const HORSE_COLORS: Array[Color] = [Color("ffd23f"), Color("29e0ff"), Color("ff4d6d"), Color("2ee6a8")]
 const PLACE_SCORES: Array[float] = [1.0, 0.7, 0.45, 0.2]
 const ME: int = 0
+## Décor 3D : mètres par pixel, ampoules de l'auvent, bandes de la toile rayée.
+const PX3: float = 0.005
+const BULBS: int = 30
+const STRIPES: int = 22
 
 var _dist: Array[float] = [0.0, 0.0, 0.0, 0.0]
 var _speed: Array[float] = [0.0, 0.0, 0.0, 0.0]
@@ -27,6 +31,11 @@ var _bot_side: int = -1
 var _ended: bool = false
 var _place: int = -1
 var _bob: Array[float] = [0.0, 0.0, 0.0, 0.0]
+var _horses3: Array[Node3D] = []
+var _bulbs: Array[MeshInstance3D] = []
+var _bulb_on: StandardMaterial3D = null
+var _bulb_off: StandardMaterial3D = null
+var _flag: Node3D = null
 
 
 func begin() -> void:
@@ -34,6 +43,110 @@ func begin() -> void:
 	for k: int in range(1, LANES):
 		_pace[k] = float(paces[(k - 1) % paces.size()]) * rng.randf_range(0.98, 1.02) / slow
 		_bob[k] = rng.randf() * TAU
+	_build_3d()
+
+
+# --------------------------------------------------------------------------- décor 3D
+
+
+func _build_3d() -> void:
+	var st: Stage3D = use_3d()
+	st.frontal(PX3, Vector2(960.0, 540.0), 1080.0, 40.0)
+	st.env.background_color = Color("0c0610")
+	st.env.ambient_light_color = Color(0.45, 0.32, 0.36)
+	st.env.ambient_light_energy = 0.5
+	var r: Node3D = st.root
+	# Toile rayée du fond, auvent festonné, ampoules.
+	var red: StandardMaterial3D = Stage3D.mat(Color("5e0e1c"), 0.0, 0.9)
+	var ivory: StandardMaterial3D = Stage3D.mat(Color("a89878"), 0.0, 0.9)
+	var span: float = 3600.0
+	var sw: float = span / float(STRIPES)
+	for k: int in STRIPES:
+		var x: float = 960.0 - span * 0.5 + sw * (float(k) + 0.5)
+		Stage3D.box(r, Vector3(sw * PX3, 900.0 * PX3, 0.05), st.to3(Vector2(x, 640.0), -1.4), red if k % 2 == 0 else ivory)
+		var fest: MeshInstance3D = Stage3D.cylinder(r, sw * 0.5 * PX3, 0.06, st.to3(Vector2(x, 240.0), -0.2), red if k % 2 == 1 else ivory)
+		fest.rotation.x = PI * 0.5
+	Stage3D.box(r, Vector3(span * PX3, 110.0 * PX3, 0.5), st.to3(Vector2(960.0, 185.0), -0.4), Stage3D.mat(Palette.VELVET, 0.0, 0.7))
+	var lbl: Label3D = Stage3D.text3d(r, tr("TRIAL_DERBY_MARQUEE"), st.to3(Vector2(960.0, 190.0), -0.12), 110, Palette.GOLD_LIGHT,
+		Palette.INK)
+	lbl.pixel_size = 0.0016
+	_bulb_on = Stage3D.glow(Palette.GOLD_LIGHT, 3.0)
+	_bulb_off = Stage3D.mat(Palette.GOLD_DARK, 0.3, 0.4)
+	for k2: int in BULBS:
+		var bx: float = 960.0 - span * 0.45 + span * 0.9 * float(k2) / float(BULBS - 1)
+		_bulbs.append(Stage3D.sphere(r, 9.0 * PX3, st.to3(Vector2(bx, 135.0), -0.12), _bulb_off))
+	# Rails de bois en gradins (une piste par cheval), rail de laiton.
+	var wood: StandardMaterial3D = Stage3D.mat(Color("5a3220"), 0.0, 0.7)
+	var wood2: StandardMaterial3D = Stage3D.mat(Color("4a2818"), 0.0, 0.7)
+	var brass: StandardMaterial3D = Stage3D.mat(Palette.BRONZE, 0.45, 0.3)
+	for k3: int in LANES:
+		var y: float = LANE_Y0 + float(k3) * LANE_H
+		var len_px: float = TRACK_X.y - TRACK_X.x + 320.0
+		Stage3D.box(r, Vector3(len_px * PX3, 26.0 * PX3, 0.8), st.to3(Vector2((TRACK_X.x + TRACK_X.y) * 0.5 + 20.0, y + 18.0), -0.3),
+			wood if k3 % 2 == 0 else wood2)
+		Stage3D.box(r, Vector3(len_px * PX3, 4.0 * PX3, 0.04), st.to3(Vector2((TRACK_X.x + TRACK_X.y) * 0.5 + 20.0, y + 5.0), 0.12), brass)
+		_horses3.append(_build_horse(st, HORSE_COLORS[k3]))
+	# Poteau d'arrivée en damier et fanion.
+	for yy: int in 16:
+		var fy: float = LANE_Y0 - 110.0 + (float(yy) + 0.5) * LANE_H * float(LANES) / 16.0
+		Stage3D.box(r, Vector3(20.0 * PX3, LANE_H * float(LANES) / 16.0 * PX3, 0.1), st.to3(Vector2(TRACK_X.y + 70.0, fy), 0.05),
+			ivory if yy % 2 == 0 else Stage3D.mat(Palette.INK, 0.0, 0.6))
+	_flag = Node3D.new()
+	_flag.position = st.to3(Vector2(TRACK_X.y + 70.0, LANE_Y0 - 150.0), 0.05)
+	r.add_child(_flag)
+	Stage3D.box(_flag, Vector3(0.3, 0.18, 0.01), Vector3(0.15, 0, 0), Stage3D.mat(Palette.GOLD, 0.2, 0.5))
+	# Comptoir du stand au premier plan.
+	Stage3D.box(r, Vector3(span * PX3, 150.0 * PX3, 0.5), st.to3(Vector2(960.0, 1040.0), 0.6), Stage3D.mat(Color("6a1020"), 0.2, 0.4))
+	Stage3D.box(r, Vector3(span * PX3, 12.0 * PX3, 0.55), st.to3(Vector2(960.0, 965.0), 0.6), brass)
+	Stage3D.omni(r, Color(1.0, 0.85, 0.65), 1.4, st.to3(Vector2(960.0, 300.0), 2.5), 9.0)
+
+
+## Cheval de manège : corps laqué, encolure, tête, jambes repliées, selle dorée et barre de laiton.
+func _build_horse(st: Stage3D, col: Color) -> Node3D:
+	var n: Node3D = Node3D.new()
+	st.root.add_child(n)
+	var lacquer: StandardMaterial3D = Stage3D.mat(col, 0.1, 0.25)
+	lacquer.clearcoat_enabled = true
+	lacquer.clearcoat = 0.7
+	var dark: StandardMaterial3D = Stage3D.mat(col.darkened(0.45), 0.1, 0.4)
+	var gilt: StandardMaterial3D = Stage3D.mat(Palette.GOLD, 0.45, 0.3)
+	var body: MeshInstance3D = MeshInstance3D.new()
+	body.mesh = MeshPool.capsule(22.0 * PX3, 120.0 * PX3)
+	body.material_override = lacquer
+	body.rotation.z = PI * 0.5
+	n.add_child(body)
+	var neck: MeshInstance3D = Stage3D.box(n, Vector3(26.0 * PX3, 60.0 * PX3, 0.12), Vector3(52.0 * PX3, 30.0 * PX3, 0), lacquer)
+	neck.rotation.z = -0.5
+	Stage3D.box(n, Vector3(46.0 * PX3, 22.0 * PX3, 0.11), Vector3(78.0 * PX3, 56.0 * PX3, 0), lacquer)
+	Stage3D.box(n, Vector3(10.0 * PX3, 40.0 * PX3, 0.13), Vector3(44.0 * PX3, 44.0 * PX3, 0), dark)  # crinière
+	for k: int in 4:
+		var lx: float = (-40.0 + float(k) * 26.0) * PX3
+		var leg: MeshInstance3D = Stage3D.cylinder(n, 4.0 * PX3, 46.0 * PX3, Vector3(lx, -36.0 * PX3, 0.03 if k % 2 == 0 else -0.03), dark)
+		leg.name = "leg%d" % k
+	Stage3D.box(n, Vector3(40.0 * PX3, 10.0 * PX3, 0.13), Vector3(-6.0 * PX3, 24.0 * PX3, 0), gilt)
+	Stage3D.cylinder(n, 3.0 * PX3, 200.0 * PX3, Vector3(-4.0 * PX3, 40.0 * PX3, 0), gilt)
+	var tail: MeshInstance3D = Stage3D.box(n, Vector3(8.0 * PX3, 40.0 * PX3, 0.06), Vector3(-66.0 * PX3, -4.0 * PX3, 0), dark)
+	tail.rotation.z = 0.6
+	return n
+
+
+func _sync_3d() -> void:
+	if _horses3.is_empty():
+		return
+	var st: Stage3D = stage
+	for k: int in LANES:
+		var y: float = LANE_Y0 + float(k) * LANE_H
+		var x: float = lerpf(TRACK_X.x, TRACK_X.y, _dist[k])
+		var gait: float = _dist[k] * 90.0
+		var lift: float = absf(sin(gait)) * 14.0
+		var h: Node3D = _horses3[k]
+		h.position = st.to3(Vector2(x, y - 60.0 - lift), 0.0)
+		h.rotation.z = sin(gait) * 0.08
+		for l: int in 4:
+			(h.get_node("leg%d" % l) as Node3D).rotation.z = sin(gait + float(l) * 1.6) * 0.5
+	for k2: int in _bulbs.size():
+		_bulbs[k2].material_override = _bulb_on if (int(t * 6.0) + k2) % 2 == 0 else _bulb_off
+	_flag.rotation.y = sin(t * 3.0) * 0.4
 
 
 func _beat() -> float:
@@ -81,6 +194,7 @@ func gallop(side: int) -> void:
 func tick(dt: float) -> void:
 	if _ended:
 		return
+	_sync_3d()
 	_winded = maxf(0.0, _winded - dt)
 	_breath = minf(1.0, _breath + p("breath_regen") * dt)
 	if _bot_side >= 0:
@@ -142,42 +256,10 @@ func bot_apply(w: Dictionary) -> void:
 # --------------------------------------------------------------------------- dessin
 
 
-func _horse(at: Vector2, col: Color, gait: float) -> void:
-	var lift: float = absf(sin(gait)) * 14.0
-	var body: Rect2 = Rect2(at + Vector2(-60, -60 - lift), Vector2(120, 44))
-	draw_rect(body, col)
-	draw_rect(Rect2(body.end.x - 10, body.position.y - 40, 28, 50), col)
-	draw_rect(Rect2(body.end.x + 6, body.position.y - 44, 36, 22), col)
-	draw_rect(Rect2(body.end.x - 4, body.position.y - 48, 12, 12), col.darkened(0.3))
-	for k: int in 4:
-		var lx: float = body.position.x + 10.0 + float(k) * 30.0
-		var swing: float = sin(gait + float(k) * 1.6) * 10.0
-		draw_line(Vector2(lx, body.end.y), Vector2(lx + swing, at.y), col.darkened(0.25), 8.0)
-	var tail: Vector2 = Vector2(body.position.x - 30, body.position.y + 30 + lift)
-	draw_line(Vector2(body.position.x, body.position.y + 8), tail, col.darkened(0.4), 6.0)
-	draw_circle(Vector2(body.end.x + 30, body.position.y - 36), 3.0, Palette.INK)
-
-
 func paint() -> void:
-	# Stand forain : fronton à ampoules, rails, cible d'arrivée.
-	draw_rect(Rect2(-size.x, 0, size.x * 3.0, size.y), Color("1a0c18"))
-	draw_rect(Rect2(-size.x, 150, size.x * 3.0, 90), Palette.VELVET)
-	for k: int in 40:
-		var bx: float = -size.x * 0.5 + float(k) * 80.0
-		var on: bool = (int(t * 6.0) + k) % 2 == 0
-		draw_circle(Vector2(bx, 160), 8.0, Palette.GOLD_LIGHT if on else Palette.GOLD_DARK)
-	text(Vector2(size.x * 0.5, 200.0), tr("TRIAL_DERBY_MARQUEE"), UiKit.SIZE_H2, Palette.GOLD_LIGHT)
-	for k2: int in LANES:
-		var y: float = LANE_Y0 + float(k2) * LANE_H
-		draw_rect(Rect2(TRACK_X.x - 80, y - 110, TRACK_X.y - TRACK_X.x + 200, LANE_H - 10), Color("2a1420") if k2 % 2 == 0 else Color("241020"))
-		draw_line(Vector2(TRACK_X.x - 80, y + 4), Vector2(TRACK_X.y + 120, y + 4), Palette.BRONZE, 4.0)
-		var x: float = lerpf(TRACK_X.x, TRACK_X.y, _dist[k2])
-		_horse(Vector2(x, y), HORSE_COLORS[k2], _dist[k2] * 90.0)
-		if k2 == ME:
-			text(Vector2(TRACK_X.x - 160, y - 50), tr("TRIAL_DERBY_YOU"), UiKit.SIZE_SMALL, HORSE_COLORS[k2])
-	for yy: int in 16:
-		var fy: float = LANE_Y0 - 110.0 + float(yy) * LANE_H * float(LANES) / 16.0
-		draw_rect(Rect2(TRACK_X.y + 60, fy, 20, LANE_H * float(LANES) / 16.0), Palette.IVORY if yy % 2 == 0 else Palette.INK)
+	if stage == null:
+		return
+	text(Vector2(TRACK_X.x - 160, LANE_Y0 + float(ME) * LANE_H - 50), tr("TRIAL_DERBY_YOU"), UiKit.SIZE_BODY, HORSE_COLORS[ME])
 	# Métronome (sabot doré) et souffle.
 	var m: Vector2 = Vector2(size.x * 0.5 - 200.0, size.y - 110.0)
 	var ph: float = fmod(t / _beat(), 1.0)

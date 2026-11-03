@@ -21,6 +21,10 @@ const CUP_Y: float = 930.0
 const GOLD_HALF: float = 60.0
 const SILVER_HALF: float = 140.0
 const SUBSTEPS: int = 4
+## Décor 3D : mètres par pixel, ampoules du caisson, machines voisines de la salle.
+const PX3: float = 0.005
+const BULBS: int = 24
+const NEIGHBOR_X: Array[float] = [-1.0, 1.0]
 
 var _pegs: Array[Vector2] = []
 var _balls: Array[Dictionary] = []
@@ -33,6 +37,14 @@ var _cool: Array[float] = [0.0, 0.0]
 var _bot_side: int = -1
 var _ended: bool = false
 var _lights: float = 0.0
+var _ball_pool: MeshPool = null
+var _flippers: Array[Node3D] = []
+var _bulbs: Array[MeshInstance3D] = []
+var _bulb_on: StandardMaterial3D = null
+var _bulb_off: StandardMaterial3D = null
+var _launcher3: Node3D = null
+var _cup_light: OmniLight3D = null
+var _cup_flash: float = 0.0
 
 
 func begin() -> void:
@@ -44,6 +56,133 @@ func begin() -> void:
 		while x < BOARD.end.x - 40.0:
 			_pegs.append(Vector2(x, y))
 			x += PEG_GAP.x
+	_build_3d()
+
+
+# --------------------------------------------------------------------------- décor 3D
+
+
+func _build_3d() -> void:
+	var st: Stage3D = use_3d()
+	st.frontal(PX3, Vector2(960.0, 540.0), 1080.0, 40.0)
+	st.env.background_color = Color("0c0610")
+	st.env.ambient_light_color = Color(0.4, 0.25, 0.35)
+	st.env.ambient_light_energy = 0.45
+	var r: Node3D = st.root
+	var lacquer: StandardMaterial3D = Stage3D.mat(Color("7a0c1e"), 0.3, 0.25)
+	lacquer.clearcoat_enabled = true
+	lacquer.clearcoat = 0.8
+	var gilt: StandardMaterial3D = Stage3D.mat(Palette.GOLD, 0.45, 0.25)
+	var case_r: Rect2 = BOARD.grow(46.0)
+	var cc: Vector3 = st.to3(case_r.get_center(), -0.3)
+	Stage3D.box(r, Vector3(case_r.size.x * PX3, case_r.size.y * PX3, 0.5), cc, lacquer)
+	# Plateau de laiton brossé (fond) avec rosace gravée.
+	Stage3D.box(r, Vector3(BOARD.size.x * PX3, BOARD.size.y * PX3, 0.02), st.to3(BOARD.get_center(), -0.04), Stage3D.mat(Color("6a5230"),
+		0.7, 0.45))
+	# Rosace gravée : anneaux concentriques à peine plus clairs que le laiton.
+	for ring: int in 4:
+		var ros: MeshInstance3D = MeshInstance3D.new()
+		ros.mesh = MeshPool.disc((220.0 - float(ring) * 50.0) * PX3, 0.004, 48)
+		ros.material_override = Stage3D.mat(Color("6a5230").lightened(0.06 * float(ring % 2 + 1)), 0.45, 0.4)
+		ros.rotation.x = PI * 0.5
+		ros.position = st.to3(Vector2(_center(), BOARD.position.y + 330.0), -0.03 + 0.003 * float(ring))
+		r.add_child(ros)
+	# Cadre chromé.
+	for e: Array in [[Vector2(0, -1), BOARD.size.x], [Vector2(0, 1), BOARD.size.x], [Vector2(-1, 0), BOARD.size.y], [Vector2(1, 0),
+		BOARD.size.y]]:
+		var d: Vector2 = e[0]
+		var len_px: float = float(e[1]) + 40.0
+		var at: Vector2 = BOARD.get_center() + d * (BOARD.size * 0.5 + Vector2(10, 10))
+		var sz: Vector3 = Vector3(len_px * PX3, 20.0 * PX3, 0.08) if d.y != 0.0 else Vector3(20.0 * PX3, len_px * PX3, 0.08)
+		Stage3D.box(r, sz, st.to3(at, 0.0), gilt)
+	# Clous de laiton.
+	var nail: CylinderMesh = MeshPool.disc(PEG_R * PX3, 0.06, 10)
+	var nail_mat: StandardMaterial3D = Stage3D.mat(Color("f0d8a0"), 0.35, 0.3)
+	for peg: Vector2 in _pegs:
+		var mi: MeshInstance3D = MeshInstance3D.new()
+		mi.mesh = nail
+		mi.material_override = nail_mat
+		mi.rotation.x = PI * 0.5
+		mi.position = st.to3(peg, 0.0)
+		r.add_child(mi)
+	# Lanceur, entonnoir, taquets, godets.
+	_launcher3 = Node3D.new()
+	r.add_child(_launcher3)
+	Stage3D.box(_launcher3, Vector3(60.0 * PX3, 22.0 * PX3, 0.08), Vector3.ZERO, gilt)
+	Stage3D.box(r, Vector3(BOARD.size.x * PX3, 3.0 * PX3, 0.03), st.to3(Vector2(_center(), LAUNCH_Y - 30.0), 0.0),
+		Stage3D.mat(Palette.GOLD_DARK, 0.45, 0.3))
+	var c: float = _center()
+	for sd: int in 2:
+		var dir: float = -1.0 if sd == 0 else 1.0
+		var a: Vector2 = Vector2(BOARD.position.x if sd == 0 else BOARD.end.x, FUNNEL_Y)
+		var b: Vector2 = Vector2(c + dir * (KICK_GAP * 0.5 + KICK_HALF_W * 2.0), KICK_Y - 30.0)
+		var rail: MeshInstance3D = Stage3D.box(r, Vector3(a.distance_to(b) * PX3, 6.0 * PX3, 0.06), st.to3((a + b) * 0.5, 0.0), gilt)
+		rail.rotation.z = -(b - a).angle()
+		var x0: float = c + dir * (KICK_GAP * 0.5 + KICK_HALF_W * 2.0)
+		var fl: Node3D = Node3D.new()
+		fl.position = st.to3(Vector2(x0, KICK_Y + 10.0), 0.02)
+		r.add_child(fl)
+		var blade: MeshInstance3D = Stage3D.box(fl, Vector3(KICK_HALF_W * 2.0 * PX3, 12.0 * PX3, 0.07), Vector3(-dir * KICK_HALF_W * PX3,
+			0, 0), Stage3D.mat(Palette.IVORY, 0.3, 0.3))
+		blade.name = "blade"
+		Stage3D.cylinder(fl, 10.0 * PX3, 0.09, Vector3.ZERO, gilt).rotation.x = PI * 0.5
+		_flippers.append(fl)
+	Stage3D.box(r, Vector3(SILVER_HALF * 2.0 * PX3, 50.0 * PX3, 0.1), st.to3(Vector2(c, CUP_Y + 15.0), 0.0), Stage3D.mat(Color("b0b0bc"),
+		0.45, 0.2))
+	Stage3D.box(r, Vector3(GOLD_HALF * 2.0 * PX3, 52.0 * PX3, 0.12), st.to3(Vector2(c, CUP_Y + 15.0), 0.01), Stage3D.glow(Palette.GOLD,
+		0.6))
+	_cup_light = Stage3D.omni(r, Palette.GOLD_LIGHT, 0.6, st.to3(Vector2(c, CUP_Y - 40.0), 0.4), 2.0)
+	# Ampoules du caisson (haut et bas) qui chassent.
+	_bulb_on = Stage3D.glow(Palette.GOLD_LIGHT, 3.0)
+	_bulb_off = Stage3D.mat(Palette.GOLD_DARK, 0.5, 0.4)
+	for k: int in BULBS:
+		var fx: float = case_r.position.x + 12.0 + (case_r.size.x - 24.0) * float(k) / float(BULBS - 1)
+		for y: float in [case_r.position.y + 18.0, case_r.end.y - 18.0]:
+			_bulbs.append(Stage3D.sphere(r, 7.0 * PX3, st.to3(Vector2(fx, y), 0.02), _bulb_off))
+	# Salle : machines voisines de biais, rideau de perles de lumière.
+	for side: float in NEIGHBOR_X:
+		for n: int in 2:
+			var at3: Vector3 = Vector3(side * (3.6 + float(n) * 2.3), cc.y, -1.6 - float(n) * 1.1)
+			var m: MeshInstance3D = Stage3D.box(r, Vector3(2.0, 4.6, 0.6), at3, lacquer)
+			m.rotation.y = -side * 0.5
+			var face: MeshInstance3D = Stage3D.box(m, Vector3(1.5, 3.6, 0.02), Vector3(0, 0, 0.31),
+				Stage3D.glow(Color("5a1030") if n == 0 else Color("103a4a"), 0.35))
+			face.rotation.y = 0.0
+	Stage3D.omni(r, Color(1.0, 0.75, 0.6), 0.8, cc + Vector3(0, 2.5, 4.0), 10.0)
+	var chrome: StandardMaterial3D = Stage3D.mat(Color("f4f6ff"), 0.3, 0.12)
+	chrome.emission_enabled = true
+	chrome.emission = Color("8890a8")
+	chrome.emission_energy_multiplier = 0.25
+	_ball_pool = MeshPool.new(r, _ball_mesh(), chrome)
+
+
+func _ball_mesh() -> SphereMesh:
+	var sm: SphereMesh = SphereMesh.new()
+	sm.radius = BALL_R * PX3
+	sm.height = BALL_R * PX3 * 2.0
+	sm.radial_segments = 16
+	sm.rings = 8
+	return sm
+
+
+func _sync_3d(dt: float) -> void:
+	if _ball_pool == null:
+		return
+	var st: Stage3D = stage
+	for k: int in _balls.size():
+		var b: MeshInstance3D = _ball_pool.at(k)
+		b.position = st.to3(_balls[k]["p"] as Vector2, 0.04)
+		b.rotation.z -= (_balls[k]["v"] as Vector2).x * dt * 0.05
+	_ball_pool.hide_from(_balls.size())
+	_launcher3.position = st.to3(Vector2(_launcher_x(), LAUNCH_Y - 30.0), 0.02)
+	for s2: int in 2:
+		var dir: float = -1.0 if s2 == 0 else 1.0
+		_flippers[s2].rotation.z = dir * 0.35 * _kick[s2]
+	for k2: int in _bulbs.size():
+		var on: bool = int(_lights * 8.0 + float(k2 % BULBS)) % 3 == (0 if k2 < BULBS else 1)
+		_bulbs[k2].material_override = _bulb_on if on else _bulb_off
+	_cup_flash = maxf(0.0, _cup_flash - dt * 2.0)
+	_cup_light.light_energy = 0.6 + 3.0 * _cup_flash
 
 
 func _center() -> float:
@@ -129,6 +268,7 @@ func tick(dt: float) -> void:
 		else:
 			kept.append(b2)
 	_balls = kept
+	_sync_3d(dt)
 	if _launched >= pi("balls") and _balls.is_empty():
 		_ended = true
 		finish(ThrowTrial.mean(_scores))
@@ -214,48 +354,21 @@ func bot_apply(w: Dictionary) -> void:
 
 
 func paint() -> void:
-	# Caisson laqué rouge, néons, plateau de laiton.
-	draw_rect(Rect2(-size.x, 0, size.x * 3.0, size.y), Color("140812"))
-	for k: int in 14:
-		var lx: float = -size.x * 0.5 + float(k) * 260.0
-		draw_rect(Rect2(lx, 0, 6, size.y), Color(Palette.MAGENTA, 0.06 + 0.04 * sin(_lights * 2.0 + k)))
-	var case_r: Rect2 = BOARD.grow(46.0)
-	draw_rect(case_r, Color("5a0c18"))
-	draw_rect(case_r, Palette.GOLD, false, 4.0)
-	for k2: int in 24:
-		var a: float = float(k2) / 24.0
-		var bulb: Vector2 = case_r.position + Vector2(case_r.size.x * a, 0) + Vector2(12, 18)
-		var on: bool = int(_lights * 8.0 + k2) % 3 == 0
-		draw_circle(bulb, 7.0, Palette.GOLD_LIGHT if on else Palette.GOLD_DARK)
-		draw_circle(Vector2(bulb.x, case_r.end.y - 18), 7.0, Palette.GOLD_LIGHT if not on else Palette.GOLD_DARK)
-	draw_rect(BOARD, Color("2a2018"))
-	draw_rect(BOARD, Color(Palette.GOLD, 0.15))
-	for peg: Vector2 in _pegs:
-		draw_circle(peg + Vector2(2, 3), PEG_R, Color(0, 0, 0, 0.4))
-		draw_circle(peg, PEG_R, Color("d8d0c0"))
-	# Lanceur.
-	var lx2: float = _launcher_x()
-	draw_rect(Rect2(lx2 - 30, LAUNCH_Y - 40, 60, 22), Palette.GOLD)
-	draw_line(Vector2(BOARD.position.x, LAUNCH_Y - 30), Vector2(BOARD.end.x, LAUNCH_Y - 30), Palette.GOLD_DARK, 2.0)
-	# Entonnoir, taquets, godets.
+	if stage == null:
+		return
+	# Vitre : reflets en biais par-dessus le plateau 3D ; zones des taquets quand on frappe.
 	var c: float = _center()
-	draw_line(Vector2(BOARD.position.x, FUNNEL_Y), Vector2(c - KICK_GAP * 0.5 - KICK_HALF_W * 2.0, KICK_Y - 30), Palette.GOLD_DARK, 4.0)
-	draw_line(Vector2(BOARD.end.x, FUNNEL_Y), Vector2(c + KICK_GAP * 0.5 + KICK_HALF_W * 2.0, KICK_Y - 30), Palette.GOLD_DARK, 4.0)
 	for s: int in 2:
 		var dir: float = -1.0 if s == 0 else 1.0
 		var x0: float = c + dir * (KICK_GAP * 0.5 + KICK_HALF_W * 2.0)
 		var x1: float = c + dir * KICK_GAP * 0.5
-		var lift: float = 30.0 * _kick[s]
 		var zone: Rect2 = Rect2(minf(x0, x1), KICK_Y - p("kick_window") * widen(), absf(x1 - x0), p("kick_window") * widen() * 2.0)
-		draw_rect(zone, Color(Palette.CYAN, 0.06 + 0.15 * _kick[s]))
-		draw_line(Vector2(x0, KICK_Y + 10), Vector2(x1, KICK_Y - lift), Palette.CYAN if _kick[s] > 0.0 else Palette.IVORY, 8.0)
-	draw_rect(Rect2(c - SILVER_HALF, CUP_Y - 10, SILVER_HALF * 2.0, 50), Color("8a8a96"))
-	draw_rect(Rect2(c - GOLD_HALF, CUP_Y - 10, GOLD_HALF * 2.0, 50), Palette.GOLD)
-	draw_rect(Rect2(BOARD.position.x, CUP_Y - 10, c - SILVER_HALF - BOARD.position.x, 50), Color("201418"))
-	draw_rect(Rect2(c + SILVER_HALF, CUP_Y - 10, BOARD.end.x - c - SILVER_HALF, 50), Color("201418"))
-	for b: Dictionary in _balls:
-		var pos: Vector2 = b["p"]
-		draw_circle(pos, BALL_R, Color("e8e8f0"))
-		draw_circle(pos - Vector2(4, 4), BALL_R * 0.35, Color.WHITE)
+		draw_rect(zone, Color(Palette.CYAN, 0.05 + 0.18 * _kick[s]))
+	var o: Vector2 = BOARD.position
+	var sz: Vector2 = BOARD.size
+	draw_colored_polygon(PackedVector2Array([o + Vector2(sz.x * 0.15, 0), o + Vector2(sz.x * 0.3, 0), o + Vector2(sz.x * 0.05, sz.y), o]),
+		Color(1, 1, 1, 0.035))
+	draw_colored_polygon(PackedVector2Array([o + Vector2(sz.x * 0.7, 0), o + Vector2(sz.x * 0.75, 0), o + Vector2(sz.x * 0.55, sz.y),
+		o + Vector2(sz.x * 0.5, sz.y)]), Color(1, 1, 1, 0.025))
 	# Pastilles : billes jouées.
 	pips(Vector2(c, 70.0), _scores, pi("balls"))
