@@ -46,6 +46,8 @@ var touch_controls: bool = false
 var intro_left: float = 0.0
 var _intro_total: float = 1.0
 var _begun: bool = false
+## « Prêt ? » : la scène est montée mais rien ne bouge encore (le temps de regarder, D-072).
+var _ready_left: float = 0.0
 var _verdict: int = -1
 var _pops: Array[Dictionary] = []
 var _hint: RichTextLabel = null
@@ -177,6 +179,8 @@ func feed(event: InputEvent) -> bool:
 		if confirm_pressed(event) and _intro_total - intro_left > Balance.f("throw_game.trial_intro_min_seconds"):
 			_start()
 		return confirm_pressed(event) or sym_pressed(event) >= 0
+	if _ready_left > 0.0:
+		return confirm_pressed(event) or sym_pressed(event) >= 0
 	return handle(event)
 
 
@@ -185,6 +189,8 @@ func want() -> Dictionary:
 		return {"do": ""}
 	if not _begun:
 		return {"do": "confirm"} if _intro_total - intro_left > Balance.f("throw_game.trial_intro_min_seconds") + 0.1 else {"do": ""}
+	if _ready_left > 0.0:
+		return {"do": ""}
 	return bot_wants()
 
 
@@ -192,6 +198,8 @@ func act(w: Dictionary) -> void:
 	if not _begun:
 		if String(w.get("do", "")) == "confirm":
 			_start()
+		return
+	if _ready_left > 0.0:
 		return
 	bot_apply(w)
 
@@ -220,6 +228,7 @@ func _start() -> void:
 	_keys_label.visible = false
 	_hint.visible = true
 	AudioBus.play("whoosh", 1.3, -8.0)
+	_ready_left = Balance.f("throw_game.pace.ready_seconds")
 	begin()
 
 
@@ -262,6 +271,12 @@ func _process(delta: float) -> void:
 			_keys_label.size = _keys_label_rect.size
 		queue_redraw()
 		return
+	if _ready_left > 0.0:
+		_ready_left -= dt
+		if _ready_left <= 0.0:
+			AudioBus.play("tick", 1.4, -6.0)
+		queue_redraw()
+		return
 	t += dt
 	flash = maxf(flash - dt * 3.0, 0.0)
 	for pop: Dictionary in _pops:
@@ -298,6 +313,9 @@ func _draw() -> void:
 		return
 	paint()
 	_draw_steps()
+	if _ready_left > 0.0:
+		var a: float = clampf(_ready_left / maxf(Balance.f("throw_game.pace.ready_seconds"), 0.01) * 2.0, 0.0, 1.0)
+		text(size * 0.5, tr("TRIAL_READY"), UiKit.SIZE_H1, Color(Palette.GOLD_LIGHT, a), "display", 10)
 	_draw_pops()
 	if _verdict >= 0:
 		var c: Vector2 = play_rect().get_center()

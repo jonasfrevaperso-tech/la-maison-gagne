@@ -8,10 +8,13 @@ extends ThrowTrial
 ## dans une poche coûte une pénalité.
 
 const TABLE: Rect2 = Rect2(360.0, 230.0, 1200.0, 640.0)
-const BALL_R: float = 16.0
-const POCKET_R: float = 38.0
+const BALL_R: float = 22.0
+const POCKET_R: float = 60.0
 const PREVIEW: float = 260.0
-const SUBSTEPS: int = 4
+## Sous-pas : au plus ≈ 1,5 px par pas à pleine vitesse, pour un point de contact juste.
+const SUBSTEPS: int = 24
+const BOT_FORCE_STEPS: int = 24
+const BOT_SIM_MAX_STEPS: int = 60 * 24 * 8
 
 var _shot: int = 0
 var _cue: Vector2 = Vector2.ZERO
@@ -30,6 +33,8 @@ var _wait: float = 0.0
 var _scores: Array[float] = []
 var _mouse_pos: Vector2 = Vector2(-1, -1)
 var _bot_aim: float = 0.0
+var _bot_force: float = -1.0  # force choisie par le bot pour ce coup (simulée), -1 à recalculer
+var _sim: bool = false  # simulation du bot : pas de son
 var _colors: Array[Color] = [Color("ffd23f"), Color("ff4d6d"), Color("29e0ff")]
 
 
@@ -128,9 +133,9 @@ func tick(dt: float) -> void:
 		if _wait >= p("aim_timeout") * slow:
 			_strike()
 			return
-		# Visée progressive : vitesse au carré de l'inclinaison, pour les réglages fins.
+		# Visée progressive : vitesse en puissance de l'inclinaison, pour les réglages fins.
 		var ax: float = clampf(held_vector().x + _bot_aim, -1.0, 1.0)
-		_aim += signf(ax) * ax * ax * p("aim_speed") * dt
+		_aim += signf(ax) * pow(absf(ax), p("aim_curve")) * p("aim_speed") * dt
 		if mouse and _mouse_pos.x >= 0.0 and _mouse_pos.distance_to(_cue) > 30.0:
 			_aim = (_mouse_pos - _cue).angle()
 		if _charging:
@@ -164,7 +169,8 @@ func _physics(h: float) -> void:
 				else:
 					_obj_in = true
 				v = Vector2.ZERO
-				AudioBus.play("ball_land", 1.0, -4.0)
+				if not _sim:
+					AudioBus.play("ball_land", 1.0, -4.0)
 		if pos.x < TABLE.position.x + BALL_R or pos.x > TABLE.end.x - BALL_R:
 			pos.x = clampf(pos.x, TABLE.position.x + BALL_R, TABLE.end.x - BALL_R)
 			v.x = -v.x * p("cushion")
@@ -187,7 +193,8 @@ func _physics(h: float) -> void:
 		if rel > 0.0:
 			_cue_v -= n * rel
 			_obj_v += n * rel
-			AudioBus.play("ball_glass", 1.3, -4.0)
+			if not _sim:
+				AudioBus.play("ball_glass", 1.3, -4.0)
 		var push: float = (BALL_R * 2.0 - d.length()) * 0.5
 		_cue -= n * push
 		_obj += n * push
@@ -195,6 +202,7 @@ func _physics(h: float) -> void:
 
 func _settle() -> void:
 	_rolling = false
+	_bot_force = -1.0
 	var sc: float = 1.0
 	if not _obj_in:
 		var near: float = INF
@@ -211,9 +219,56 @@ func _settle() -> void:
 # --------------------------------------------------------------------------- bot
 
 
-## Force voulue : la blanche doit arriver au contact avec assez d'élan pour que la couleur,
-## qui reçoit la composante normale (cos de la coupe), atteigne la poche avec de la marge.
+## Force voulue : le bot rejoue le coup dans la vraie physique pour quelques forces et garde
+## celle qui empoche (la plus proche de l'estimation analytique) ; calculée une fois par coup.
 func bot_charge() -> float:
+	if _bot_force >= 0.0:
+		return _bot_force
+	var guess: float = _bot_guess()
+	var best: float = guess
+	var best_err: float = INF
+	for k: int in BOT_FORCE_STEPS + 1:
+		var c: float = float(k) / float(BOT_FORCE_STEPS)
+		var err: float = _simulate(_best_plan().x, c)
+		err += absf(c - guess) * 0.01  # à égalité, la force la plus proche du calcul
+		if err < best_err:
+			best_err = err
+			best = c
+	_bot_force = best
+	return best
+
+
+## Joue le coup (angle, force) en accéléré sans toucher à l'état : 0 si la couleur tombe seule,
+## sinon distance de la couleur à la poche la plus proche (+ pénalité si la blanche tombe).
+func _simulate(angle: float, c: float) -> float:
+	var saved: Array = [_cue, _obj, _cue_v, _obj_v, _cue_in, _obj_in]
+	_sim = true
+	_cue_v = Vector2.from_angle(angle) * _speed_for(c)
+	_obj_v = Vector2.ZERO
+	var h: float = 1.0 / 60.0 / float(SUBSTEPS)
+	var steps: int = 0
+	while (_cue_v.length() >= 4.0 or _obj_v.length() >= 4.0) and steps < BOT_SIM_MAX_STEPS:
+		_physics(h)
+		steps += 1
+	var near: float = INF
+	for pk: Vector2 in _pockets():
+		near = minf(near, _obj.distance_to(pk))
+	var err: float = 0.0 if _obj_in else near
+	if _cue_in:
+		err += 1000.0
+	_sim = false
+	_cue = saved[0]
+	_obj = saved[1]
+	_cue_v = saved[2]
+	_obj_v = saved[3]
+	_cue_in = saved[4]
+	_obj_in = saved[5]
+	return err
+
+
+## Estimation analytique : la blanche doit arriver au contact avec assez d'élan pour que la
+## couleur, qui reçoit la composante normale (cos de la coupe), atteigne la poche.
+func _bot_guess() -> float:
 	var plan: Vector4 = _best_plan()
 	var pk: Vector2 = _pockets()[int(plan.z)]
 	var ghost: Vector2 = _obj - (pk - _obj).normalized() * BALL_R * 2.0
@@ -231,7 +286,7 @@ func bot_wants() -> Dictionary:
 		return {"do": ""}
 	var miss: float = angle_difference(_aim, _best_plan().x)
 	if absf(miss) > p("bot_aim_tolerance") and not _charging:
-		return {"do": "axis", "v": Vector2(signf(miss) * clampf(absf(miss) * 6.0, 0.35, 1.0), 0.0)}
+		return {"do": "axis", "v": Vector2(signf(miss) * clampf(pow(absf(miss) * 6.0, 1.0 / p("aim_curve")), 0.35, 1.0), 0.0)}
 	if not _charging:
 		return {"do": "hold"}
 	var target: float = bot_charge()

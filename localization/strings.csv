@@ -662,6 +662,7 @@ OPT_DENSITY_HIGH,Élevée,High
 LOADING_TITLE,La Maison prépare la table…,The House is setting the table…
 LOADING_TIP,Astuce :,Tip:
 TOUCH_THROW,LANCER,THROW
+TRIAL_READY,Prêt ?,Ready?
 TOUCH_EMPTY,VIDER,BANK
 TRIAL_CATCH_WAVE_1,La bruine,The drizzle
 TRIAL_CATCH_WAVE_2,Rafale du ventilateur !,Fan gust!

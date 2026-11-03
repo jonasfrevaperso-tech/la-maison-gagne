@@ -200,8 +200,8 @@
     "trial_intro_seconds": 2.6,
     "trial_intro_min_seconds": 0.4,
     "trial_pause_seconds": 1.0,
-    "charge_seconds": 1.5,
-    "charge_exponent": 1.8,
+    "charge_seconds": 1.9,
+    "charge_exponent": 1.5,
     "charge_wait_seconds": 6.0,
     "power_center_range": [
       0.55,
@@ -234,13 +234,16 @@
       0.9,
       0.7,
       0.45
-    ]
+    ],
+    "pace": {
+      "ready_seconds": 0.6
+    }
   },
   "throw_trials": {
     "_doc": "Réglages des épreuves du lancer (une entrée par épreuve de data/throw/throw_trials.json).",
     "charge": {
       "rounds": 2,
-      "second_narrow": 0.8,
+      "second_narrow": 0.9,
       "rest_seconds": 0.8
     },
     "rhythm": {
@@ -264,13 +267,13 @@
     "bottles": {
       "throws": 3,
       "sweep_seconds": [
+        3.0,
         2.6,
-        2.2,
-        1.9
+        2.3
       ],
-      "power_seconds": 1.5,
-      "power_zone": 0.18,
-      "neck_tolerance": 1.0,
+      "power_seconds": 1.8,
+      "power_zone": 0.28,
+      "neck_tolerance": 1.2,
       "miss_falloff": 3.0,
       "flight_seconds": 0.75,
       "weight_aim": 0.65
@@ -326,19 +329,19 @@
     "tower": {
       "chips": 7,
       "slide_speed": [
-        330.0,
-        480.0
+        260.0,
+        360.0
       ],
-      "perfect_px": 5.0,
+      "perfect_px": 14,
       "chip_w": 320.0,
       "drop_seconds": 4.0
     },
     "shaker": {
       "duration": 6.0,
-      "pump": 0.09,
+      "pump": 0.12,
       "decay": 0.42,
-      "band": 0.17,
-      "band_speed": 0.42,
+      "band": 0.22,
+      "band_speed": 0.34,
       "grace": 0.9
     },
     "pour": {
@@ -427,34 +430,34 @@
       "cols": 8,
       "rows": 4,
       "march_slow": 65,
-      "march_fast": 180,
+      "march_fast": 140,
       "drop_step": 22,
       "cannon_speed": 900.0,
       "fire_cooldown": 0.28,
       "shot_speed": 1500.0,
-      "bomb_every": 1.3,
-      "bomb_speed": 340,
-      "stun_seconds": 0.6,
+      "bomb_every": 1.9,
+      "bomb_speed": 300,
+      "stun_seconds": 0.5,
       "hit_penalty": 0.06,
       "saucer_at": 7.0,
       "saucer_speed": 320.0,
       "saucer_value": 3
     },
     "cave": {
-      "duration": 20.0,
-      "segments": 8,
-      "run_speed": 380,
+      "duration": 19,
+      "segments": 7,
+      "run_speed": 340,
       "jump_speed": 1000.0,
       "gravity": 2600.0,
       "air_control": 1400.0,
       "rope_swing": 0.75,
-      "rope_period": 2.4,
+      "rope_period": 2.8,
       "pit_width": 170,
       "rope_pit_width": 520,
       "fall_depth": 120.0,
       "fall_stun": 0.6,
       "hit_stun": 0.5,
-      "barrel_speed": 180,
+      "barrel_speed": 160,
       "rat_speed": 1.3,
       "weight_distance": 0.6,
       "fall_penalty": 0.06,
@@ -465,14 +468,14 @@
     "pachinko": {
       "balls": 6,
       "ball_every": 1.7,
-      "launcher_speed": 1.3,
+      "launcher_speed": 1.1,
       "gravity": 1400.0,
       "restitution": 0.45,
       "peg_kick": 40.0,
       "funnel_pull": 6.0,
       "max_vx": 800.0,
       "max_vy": 520.0,
-      "kick_window": 45.0,
+      "kick_window": 60,
       "kick_cooldown": 0.35,
       "kick_flight": 0.5,
       "silver_value": 0.4
@@ -499,29 +502,30 @@
     },
     "dice": {
       "throws": 3,
-      "zone_radius": 60.0,
+      "zone_radius": 90,
       "perfect_ratio": 0.3,
       "falloff": 2.5,
-      "speed_min": 300.0,
-      "speed_max": 2200.0,
+      "speed_min": 500,
+      "speed_max": 2200,
       "friction": 900.0,
       "restitution": 0.6,
-      "charge_seconds": 1.2,
-      "aim_speed": 1.2,
+      "charge_seconds": 2.0,
+      "aim_speed": 1.6,
       "no_wall_factor": 0.3,
       "rest_seconds": 1.0,
       "aim_timeout": 5.0,
-      "bot_aim_tolerance": 0.01
+      "bot_aim_tolerance": 0.015,
+      "aim_curve": 3.0
     },
     "derby": {
       "duration": 16.0,
-      "beat_seconds": 0.32,
-      "beat_window": 0.25,
-      "push_off": 0.35,
-      "push": 0.026,
+      "beat_seconds": 0.45,
+      "beat_window": 0.4,
+      "push_off": 0.5,
+      "push": 0.037,
       "drag": 0.56,
       "max_speed": 0.16,
-      "min_gap": 0.2,
+      "min_gap": 0.26,
       "breath_cost": 0.25,
       "breath_regen": 0.3,
       "winded_seconds": 1.2,
@@ -591,11 +595,11 @@
     },
     "billiards": {
       "shots": 3,
-      "speed_min": 200.0,
-      "speed_max": 2200.0,
+      "speed_min": 250,
+      "speed_max": 2200,
       "friction": 520.0,
       "cushion": 0.75,
-      "charge_seconds": 1.3,
+      "charge_seconds": 2.3,
       "aim_speed": 0.9,
       "aim_timeout": 7.0,
       "max_cut": 0.6,
@@ -604,7 +608,8 @@
       "scratch_penalty": 0.3,
       "rest_seconds": 1.0,
       "bot_margin": 1.4,
-      "bot_aim_tolerance": 0.002
+      "bot_aim_tolerance": 0.004,
+      "aim_curve": 3.0
     }
   },
   "slot": {

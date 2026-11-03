@@ -105,8 +105,9 @@ func tick(dt: float) -> void:
 		if _wait >= p("aim_timeout") * slow:
 			_release()  # le croupier perd patience : les dés partent tels quels
 			return
-		var axis: float = held_vector().x + _bot_aim
-		_aim = clampf(_aim + axis * p("aim_speed") * dt, -AIM_LIMIT, AIM_LIMIT)
+		# Visée progressive : stick à fond pour tourner vite, effleuré pour les réglages fins.
+		var axis: float = clampf(held_vector().x + _bot_aim, -1.0, 1.0)
+		_aim = clampf(_aim + signf(axis) * pow(absf(axis), p("aim_curve")) * p("aim_speed") * dt, -AIM_LIMIT, AIM_LIMIT)
 		if mouse and _mouse_pos.x >= 0.0:
 			var d: Vector2 = _mouse_pos - START
 			if d.length() > 20.0:
@@ -191,7 +192,7 @@ func bot_wants() -> Dictionary:
 	var miss: float = plan.x - _aim
 	if absf(miss) > p("bot_aim_tolerance") and not _charging:
 		# Amplitude mini : un vrai stick a une zone morte.
-		return {"do": "axis", "v": Vector2(signf(miss) * clampf(absf(miss) * 8.0, 0.35, 1.0), 0.0)}
+		return {"do": "axis", "v": Vector2(signf(miss) * clampf(pow(absf(miss) * 8.0, 1.0 / p("aim_curve")), 0.35, 1.0), 0.0)}
 	if not _charging:
 		return {"do": "hold"}
 	# Lâcher quand la jauge croise la force voulue (prévue une image à l'avance).
