@@ -15,6 +15,11 @@ const PREVIEW: float = 260.0
 const SUBSTEPS: int = 24
 const BOT_FORCE_STEPS: int = 24
 const BOT_SIM_MAX_STEPS: int = 60 * 24 * 8
+## Décor 3D (caméra frontale = vue de dessus) : mètres par pixel, largeur des bandes, queue.
+const PX3: float = 0.005
+const RAIL_PX: float = 54.0
+const CUSHION_PX: float = 16.0
+const CUE_LEN: float = 420.0
 
 var _shot: int = 0
 var _cue: Vector2 = Vector2.ZERO
@@ -36,10 +41,150 @@ var _bot_aim: float = 0.0
 var _bot_force: float = -1.0  # force choisie par le bot pour ce coup (simulée), -1 à recalculer
 var _sim: bool = false  # simulation du bot : pas de son
 var _colors: Array[Color] = [Color("ffd23f"), Color("ff4d6d"), Color("29e0ff")]
+var _cue3: Node3D = null
+var _obj3: Node3D = null
+var _obj_mat: StandardMaterial3D = null
+var _stick3: Node3D = null
+var _last_cue: Vector2 = Vector2.ZERO
+var _last_obj: Vector2 = Vector2.ZERO
 
 
 func begin() -> void:
 	_rack()
+	_build_3d()
+
+
+# --------------------------------------------------------------------------- décor 3D
+
+
+func _build_3d() -> void:
+	var st: Stage3D = use_3d()
+	st.frontal(PX3, Vector2(960.0, 540.0), 1080.0, 40.0)
+	st.env.background_color = Color("0e0a08")
+	st.env.ambient_light_energy = 0.3
+	st.key.light_energy = 0.2
+	var r: Node3D = st.root
+	Stage3D.box(r, Vector3(30, 20, 0.05), st.to3(Vector2(960, 540), -0.3), Stage3D.mat(Color("1a100c"), 0.0, 0.9))
+	# Tapis, bandes de feutre, cadre d'acajou verni et mouches de nacre.
+	Stage3D.box(r, Vector3((TABLE.size.x + CUSHION_PX * 2.0) * PX3, (TABLE.size.y + CUSHION_PX * 2.0) * PX3, 0.04),
+		st.to3(TABLE.get_center(), -0.02),
+		Stage3D.mat(Color("0a5034"), 0.0, 0.95))
+	var cushion: StandardMaterial3D = Stage3D.mat(Color("08422b"), 0.0, 0.9)
+	var wood: StandardMaterial3D = Stage3D.mat(Color("5a2a12"), 0.0, 0.3)
+	wood.clearcoat_enabled = true
+	wood.clearcoat = 0.8
+	var g: Rect2 = TABLE.grow(RAIL_PX)
+	var cg: Rect2 = TABLE.grow(CUSHION_PX)
+	for e: Array in [[Rect2(g.position, Vector2(g.size.x, RAIL_PX - CUSHION_PX)), 0.16],
+			[Rect2(Vector2(g.position.x, cg.end.y), Vector2(g.size.x, RAIL_PX - CUSHION_PX)), 0.16],
+			[Rect2(Vector2(g.position.x, cg.position.y), Vector2(RAIL_PX - CUSHION_PX, cg.size.y)), 0.16],
+			[Rect2(Vector2(cg.end.x, cg.position.y), Vector2(RAIL_PX - CUSHION_PX, cg.size.y)), 0.16]]:
+		var rr: Rect2 = e[0]
+		Stage3D.box(r, Vector3(rr.size.x * PX3, rr.size.y * PX3, float(e[1])), st.to3(rr.get_center(), float(e[1]) * 0.5), wood)
+	for e2: Rect2 in [Rect2(cg.position, Vector2(cg.size.x, CUSHION_PX)),
+		Rect2(Vector2(cg.position.x, TABLE.end.y), Vector2(cg.size.x, CUSHION_PX)),
+			Rect2(cg.position, Vector2(CUSHION_PX, cg.size.y)), Rect2(Vector2(TABLE.end.x, cg.position.y), Vector2(CUSHION_PX, cg.size.y))]:
+		Stage3D.box(r, Vector3(e2.size.x * PX3, e2.size.y * PX3, 0.07), st.to3(e2.get_center(), 0.035), cushion)
+	var pearl: StandardMaterial3D = Stage3D.mat(Palette.IVORY, 0.2, 0.2)
+	for k: int in 3:
+		var dx: float = TABLE.size.x * (0.25 + 0.25 * float(k))
+		for y: float in [TABLE.position.y - 34.0, TABLE.end.y + 34.0]:
+			Stage3D.sphere(r, 5.0 * PX3, st.to3(Vector2(TABLE.position.x + dx, y), 0.16), pearl)
+	# Poches : trou noir, rebord doré.
+	var gilt: StandardMaterial3D = Stage3D.mat(Palette.GOLD_DARK, 0.45, 0.3)
+	for pk: Vector2 in _pockets():
+		var ring: TorusMesh = TorusMesh.new()
+		ring.inner_radius = POCKET_R * PX3
+		ring.outer_radius = (POCKET_R + 9.0) * PX3
+		ring.rings = 32
+		var rim: MeshInstance3D = MeshInstance3D.new()
+		rim.mesh = ring
+		rim.material_override = gilt
+		rim.rotation.x = PI * 0.5
+		rim.position = st.to3(pk, 0.18)
+		r.add_child(rim)
+		var hole: MeshInstance3D = Stage3D.cylinder(r, POCKET_R * PX3, 0.2, st.to3(pk, 0.078), Stage3D.mat(Color("050302"), 0.0, 1.0))
+		hole.rotation.x = PI * 0.5
+	# Billes laquées : la blanche et la bille de couleur, avec une pastille qui montre le roulement.
+	_cue3 = _build_ball(Palette.IVORY, Color("d11a3c"))
+	_obj_mat = Stage3D.mat(_colors[0], 0.0, 0.15)
+	_obj_mat.clearcoat_enabled = true
+	_obj_mat.clearcoat = 1.0
+	_obj3 = _build_ball(_colors[0], Palette.IVORY, _obj_mat)
+	# Queue : flèche d'érable, bague de laiton, procédé bleu, talon d'ébène.
+	_stick3 = Node3D.new()
+	r.add_child(_stick3)
+	var shaft: MeshInstance3D = Stage3D.cylinder(_stick3, 7.0 * PX3, CUE_LEN * PX3, Vector3(-CUE_LEN * 0.5 * PX3, 0, 0),
+		Stage3D.mat(Color("d8b07a"), 0.0, 0.4), 5.0 * PX3)
+	shaft.rotation.z = -PI * 0.5
+	var butt: MeshInstance3D = Stage3D.cylinder(_stick3, 9.0 * PX3, 140.0 * PX3, Vector3(-(CUE_LEN - 70.0) * PX3, 0, 0),
+		Stage3D.mat(Color("1a0e08"), 0.0, 0.3))
+	butt.rotation.z = -PI * 0.5
+	var ferrule: MeshInstance3D = Stage3D.cylinder(_stick3, 5.5 * PX3, 16.0 * PX3, Vector3(-8.0 * PX3, 0, 0),
+		Stage3D.mat(Palette.IVORY, 0.0, 0.4))
+	ferrule.rotation.z = -PI * 0.5
+	var tip: MeshInstance3D = Stage3D.cylinder(_stick3, 5.5 * PX3, 4.0 * PX3, Vector3(0, 0, 0), Stage3D.mat(Color("2a5aa0"), 0.0, 0.8))
+	tip.rotation.z = -PI * 0.5
+	# Lampe de billard : deux spots chauds au-dessus du tapis.
+	for x: float in [-1.0, 1.0]:
+		var spot: SpotLight3D = SpotLight3D.new()
+		spot.light_color = Color(1.0, 0.9, 0.7)
+		spot.light_energy = 2.6
+		spot.spot_range = 8.0
+		spot.spot_angle = 40.0
+		spot.position = st.to3(TABLE.get_center() + Vector2(x * TABLE.size.x * 0.25, 0), 3.0)
+		r.add_child(spot)
+		spot.shadow_enabled = RenderQuality.shadows()
+	_last_cue = _cue
+	_last_obj = _obj
+
+
+func _build_ball(col: Color, dot: Color, m: StandardMaterial3D = null) -> Node3D:
+	var n: Node3D = Node3D.new()
+	stage.root.add_child(n)
+	var lacquer: StandardMaterial3D = m
+	if lacquer == null:
+		lacquer = Stage3D.mat(col, 0.0, 0.15)
+		lacquer.clearcoat_enabled = true
+		lacquer.clearcoat = 1.0
+	Stage3D.sphere(n, BALL_R * PX3, Vector3.ZERO, lacquer)
+	for f: float in [-1.0, 1.0]:
+		var d: MeshInstance3D = Stage3D.cylinder(n, BALL_R * 0.42 * PX3, BALL_R * 0.2 * PX3, Vector3(0, 0, f * BALL_R * 0.93 * PX3),
+			Stage3D.mat(dot, 0.0, 0.3))
+		d.rotation.x = PI * 0.5
+	return n
+
+
+## La bille roule sans glisser : rotation autour de l'axe perpendiculaire au déplacement.
+func _roll3(n: Node3D, from: Vector2, to: Vector2) -> void:
+	var d: Vector2 = to - from
+	if d.length() < 0.01 or d.length() > 200.0:
+		return
+	var axis: Vector3 = Vector3(d.y, d.x, 0).normalized()
+	n.quaternion = (Quaternion(axis, d.length() / BALL_R) * n.quaternion).normalized()
+
+
+func _process(delta: float) -> void:
+	super(delta)
+	if _cue3 == null:
+		return
+	var st: Stage3D = stage
+	_obj_mat.albedo_color = _colors[_shot % _colors.size()]
+	_roll3(_cue3, _last_cue, _cue)
+	_roll3(_obj3, _last_obj, _obj)
+	_last_cue = _cue
+	_last_obj = _obj
+	_cue3.visible = not _cue_in
+	_obj3.visible = not _obj_in
+	_cue3.position = st.to3(_cue, BALL_R * PX3)
+	_obj3.position = st.to3(_obj, BALL_R * PX3)
+	var aiming: bool = not _rolling and _rest_t <= 0.0 and _shot < pi("shots")
+	_stick3.visible = aiming
+	if aiming:
+		var dir: Vector2 = Vector2.from_angle(_aim)
+		var back: float = 30.0 + _charge * 120.0
+		_stick3.position = st.to3(_cue - dir * back, BALL_R * PX3 * 1.3)
+		_stick3.rotation = Vector3(0, 0.08, -_aim)
 
 
 func _pockets() -> Array[Vector2]:
@@ -309,29 +454,8 @@ func bot_apply(w: Dictionary) -> void:
 
 
 func paint() -> void:
-	draw_rect(Rect2(-size.x, 0, size.x * 3.0, size.y), Color("0e0a08"))
-	# Lampe de billard, bois, tapis, mouches.
-	draw_colored_polygon(PackedVector2Array([Vector2(size.x * 0.5 - 200, 0), Vector2(size.x * 0.5 + 200, 0),
-		Vector2(TABLE.end.x + 80, size.y), Vector2(TABLE.position.x - 80, size.y)]), Color(1, 0.9, 0.6, 0.04))
-	draw_rect(TABLE.grow(54.0), Color("5a3018"))
-	draw_rect(TABLE.grow(54.0), Palette.GOLD_DARK, false, 3.0)
-	draw_rect(TABLE.grow(16.0), Color("0b5a3a"))
-	draw_rect(TABLE, Color("0e6b45"))
-	for k: int in 3:
-		var dx: float = TABLE.size.x * (0.25 + 0.25 * float(k))
-		draw_circle(Vector2(TABLE.position.x + dx, TABLE.position.y - 34), 5.0, Palette.IVORY)
-		draw_circle(Vector2(TABLE.position.x + dx, TABLE.end.y + 34), 5.0, Palette.IVORY)
-	for pk: Vector2 in _pockets():
-		draw_circle(pk, POCKET_R, Color("050302"))
-		draw_arc(pk, POCKET_R, 0, TAU, 24, Palette.GOLD_DARK, 3.0)
-	if not _obj_in:
-		var col: Color = _colors[_shot % _colors.size()]
-		draw_circle(_obj + Vector2(3, 4), BALL_R, Color(0, 0, 0, 0.35))
-		draw_circle(_obj, BALL_R, col)
-		draw_circle(_obj - Vector2(5, 5), 4.0, Color(1, 1, 1, 0.7))
-	if not _cue_in:
-		draw_circle(_cue + Vector2(3, 4), BALL_R, Color(0, 0, 0, 0.35))
-		draw_circle(_cue, BALL_R, Palette.IVORY)
+	if stage == null:
+		return
 	if not _rolling and _rest_t <= 0.0:
 		var dir: Vector2 = Vector2.from_angle(_aim)
 		# Segment de visée court et bille fantôme au premier contact.
@@ -343,11 +467,9 @@ func paint() -> void:
 			hit = minf(PREVIEW, along - sqrt(BALL_R * BALL_R * 4.0 - perp * perp))
 			draw_arc(_cue + dir * hit, BALL_R, 0, TAU, 24, Color(Palette.IVORY, 0.6), 2.0)
 		draw_line(_cue + dir * BALL_R, _cue + dir * hit, Color(Palette.IVORY, 0.6), 2.0)
-		var back: float = 30.0 + _charge * 120.0
-		draw_line(_cue - dir * back, _cue - dir * (back + 420.0), Color("c89a5a"), 10.0)
-		draw_line(_cue - dir * back, _cue - dir * (back + 20.0), Palette.IVORY, 10.0)
 		var g: Rect2 = Rect2(TABLE.end.x + 90.0, TABLE.position.y + 40.0, 36.0, TABLE.size.y - 80.0)
 		draw_rect(g, Color(Palette.INK, 0.9))
-		draw_rect(Rect2(g.position.x, g.end.y - g.size.y * _charge, g.size.x, g.size.y * _charge), Palette.GOLD.lerp(Palette.MULT_RED, _charge))
+		draw_rect(Rect2(g.position.x, g.end.y - g.size.y * _charge, g.size.x, g.size.y * _charge),
+			Palette.GOLD.lerp(Palette.MULT_RED, _charge))
 		draw_rect(g, Palette.GOLD, false, 2.0)
 	pips(Vector2(size.x * 0.5, 120.0), _scores, pi("shots"))

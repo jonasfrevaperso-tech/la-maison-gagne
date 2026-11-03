@@ -426,19 +426,19 @@
       "wrong_penalty": 0.04
     },
     "invaders": {
-      "duration": 18.0,
+      "duration": 19.0,
       "cols": 8,
       "rows": 4,
       "march_slow": 65,
-      "march_fast": 140,
+      "march_fast": 120,
       "drop_step": 22,
       "cannon_speed": 900.0,
-      "fire_cooldown": 0.28,
+      "fire_cooldown": 0.22,
       "shot_speed": 1500.0,
-      "bomb_every": 1.9,
+      "bomb_every": 2.3,
       "bomb_speed": 300,
       "stun_seconds": 0.5,
-      "hit_penalty": 0.06,
+      "hit_penalty": 0.05,
       "saucer_at": 7.0,
       "saucer_speed": 320.0,
       "saucer_value": 3
@@ -579,9 +579,10 @@
       "time_scale": 0.4,
       "partial_weight": 0.5,
       "hit_penalty": 0.12,
-      "bot_horizon": 0.5,
+      "bot_horizon": 0.7,
       "slide_half": 80.0,
-      "sweep_len": 0.7
+      "sweep_len": 0.7,
+      "bot_margin": 10.0
     },
     "juggle": {
       "duration": 16.0,

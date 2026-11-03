@@ -12,6 +12,12 @@ const DOOR: Rect2 = Rect2(1630.0, 500.0, 60.0, 160.0)
 const BODY_R: float = 18.0
 const BEAM_W: float = 6.0
 const LOOK_STEPS: int = 8
+## Décor 3D (caméra frontale = vue de dessus) : mètres par pixel, dalles, coffres, fumée.
+const PX3: float = 0.005
+const TILE_PX: float = 80.0
+const LOCKER_PX: Vector2 = Vector2(80.0, 60.0)
+const BEAM_Z: float = 0.22
+const SMOKE_LAYERS: int = 3
 const BOT_DIRS: Array[Vector2] = [Vector2(1, 0), Vector2(0.7, -0.7), Vector2(0.7, 0.7), Vector2(0, -1), Vector2(0, 1), Vector2.ZERO,
 	Vector2(-1, 0)]
 
@@ -25,6 +31,13 @@ var _best_x: float = START.x
 var _mouse_pos: Vector2 = Vector2(-1, -1)
 var _bot_v: Vector2 = Vector2.ZERO
 var _ended: bool = false
+var _core_pool: MeshPool = null
+var _haze_pool: MeshPool = null
+var _thief3: Node3D = null
+var _wheel3: Node3D = null
+var _beacon: OmniLight3D = null
+var _smoke: Array[StandardMaterial3D] = []
+var _face: float = 0.0
 
 
 func begin() -> void:
@@ -44,6 +57,175 @@ func begin() -> void:
 			"blink":
 				b["gap"] = rng.randf_range(ROOM.position.y + 160.0, ROOM.end.y - 160.0)
 		_beams.append(b)
+	_build_3d()
+
+
+# --------------------------------------------------------------------------- décor 3D
+
+
+func _build_3d() -> void:
+	var st: Stage3D = use_3d()
+	st.frontal(PX3, Vector2(960.0, 540.0), 1080.0, 40.0)
+	st.env.background_color = Color("050608")
+	st.env.ambient_light_color = Color(0.35, 0.4, 0.5)
+	st.env.ambient_light_energy = 0.35
+	st.key.light_energy = 0.25
+	var r: Node3D = st.root
+	_build_floor(st)
+	# Murs de coffres numérotés autour de la salle.
+	var steel: StandardMaterial3D = Stage3D.mat(Color("4a505c"), 0.45, 0.35)
+	var steel_d: StandardMaterial3D = Stage3D.mat(Color("2a2e36"), 0.45, 0.45)
+	var knob: StandardMaterial3D = Stage3D.mat(Palette.GOLD_DARK, 0.45, 0.3)
+	var g: Rect2 = ROOM.grow(60.0)
+	Stage3D.box(r, Vector3(30, 20, 0.05), st.to3(Vector2(960, 540), -0.05), Stage3D.mat(Color("0a0b0e"), 0.0, 0.9))
+	for row: float in [g.position.y + 30.0, g.end.y - 30.0]:
+		var x: float = g.position.x + LOCKER_PX.x * 0.5
+		while x < g.end.x:
+			Stage3D.box(r, Vector3((LOCKER_PX.x - 6.0) * PX3, (LOCKER_PX.y - 6.0) * PX3, 0.5), st.to3(Vector2(x, row), 0.25), steel)
+			Stage3D.cylinder(r, 7.0 * PX3, 0.04, st.to3(Vector2(x, row), 0.51), knob).rotation.x = PI * 0.5
+			x += LOCKER_PX.x
+	for col: float in [g.position.x + 30.0, g.end.x - 30.0]:
+		Stage3D.box(r, Vector3(60.0 * PX3, (g.size.y - 120.0) * PX3, 0.5), st.to3(Vector2(col, g.get_center().y), 0.25), steel_d)
+	# Porte blindée ronde, volant qui tourne.
+	var dc: Vector2 = DOOR.get_center()
+	var door: MeshInstance3D = Stage3D.cylinder(r, 95.0 * PX3, 0.12, st.to3(dc + Vector2(30, 0), 0.45),
+		Stage3D.mat(Color("8a8a96"), 0.45, 0.25))
+	door.rotation.x = PI * 0.5
+	var ring: MeshInstance3D = Stage3D.cylinder(r, 75.0 * PX3, 0.02, st.to3(dc + Vector2(30, 0), 0.52),
+		Stage3D.mat(Palette.GOLD, 0.45, 0.3))
+	ring.rotation.x = PI * 0.5
+	_wheel3 = Node3D.new()
+	_wheel3.position = st.to3(dc + Vector2(30, 0), 0.56)
+	r.add_child(_wheel3)
+	for k: int in 3:
+		var spoke: MeshInstance3D = Stage3D.box(_wheel3, Vector3(110.0 * PX3, 9.0 * PX3, 0.03), Vector3.ZERO,
+			Stage3D.mat(Palette.GOLD_LIGHT, 0.45, 0.3))
+		spoke.rotation.z = PI * float(k) / 3.0
+	Stage3D.sphere(_wheel3, 14.0 * PX3, Vector3.ZERO, Stage3D.mat(Palette.GOLD, 0.45, 0.3))
+	# Émetteurs : pivots des pendules et rails des barrières.
+	var emitter: StandardMaterial3D = Stage3D.mat(Color("1a1c22"), 0.45, 0.4)
+	for b: Dictionary in _beams:
+		match String(b["kind"]):
+			"sweep":
+				Stage3D.box(r, Vector3(34.0 * PX3, 34.0 * PX3, 0.3), st.to3(b["pivot"] as Vector2, 0.15), emitter)
+				Stage3D.sphere(r, 8.0 * PX3, st.to3(b["pivot"] as Vector2, 0.31), Stage3D.glow(Color(1, 0.15, 0.15), 3.0))
+			"blink":
+				for y: float in [ROOM.position.y, ROOM.end.y]:
+					Stage3D.box(r, Vector3(30.0 * PX3, 30.0 * PX3, 0.3), st.to3(Vector2(float(b["x"]), y), 0.15), emitter)
+			"slide":
+				for y2: float in [ROOM.position.y + 6.0, ROOM.end.y - 6.0]:
+					Stage3D.box(r, Vector3(p("slide_half") * 2.0 * PX3, 8.0 * PX3, 0.05), st.to3(Vector2(float(b["x"]), y2), 0.03), emitter)
+	# Faisceaux : cœur lumineux et halo diffusé dans la fumée.
+	var unit: BoxMesh = BoxMesh.new()
+	unit.size = Vector3.ONE
+	_core_pool = MeshPool.new(r, unit, Stage3D.glow(Color(1, 0.2, 0.2), 4.0))
+	var haze: StandardMaterial3D = Stage3D.glow(Color(1, 0.1, 0.15), 1.0)
+	haze.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	haze.albedo_color.a = 0.14
+	_haze_pool = MeshPool.new(r, unit, haze)
+	# Nappes de fumée qui dérivent au-dessus du sol.
+	var noise: NoiseTexture2D = NoiseTexture2D.new()
+	noise.seamless = true
+	noise.width = 256
+	noise.height = 256
+	noise.noise = FastNoiseLite.new()
+	(noise.noise as FastNoiseLite).frequency = 0.012
+	for k2: int in SMOKE_LAYERS:
+		var sm: StandardMaterial3D = StandardMaterial3D.new()
+		sm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		sm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		sm.albedo_texture = noise
+		sm.albedo_color = Color(0.55, 0.58, 0.66, 0.035)
+		sm.uv1_scale = Vector3(2.0 + float(k2), 1.0 + float(k2) * 0.5, 1.0)
+		var quad: MeshInstance3D = Stage3D.box(r, Vector3(ROOM.size.x * PX3, ROOM.size.y * PX3, 0.001),
+			st.to3(ROOM.get_center(), 0.12 + 0.12 * float(k2)), sm)
+		quad.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		_smoke.append(sm)
+	_thief3 = _build_thief(r)
+	_beacon = Stage3D.omni(r, Color(1, 0.1, 0.1), 0.0, st.to3(ROOM.get_center(), 2.0), 9.0)
+	Stage3D.omni(r, Color(0.7, 0.8, 1.0), 0.6, st.to3(ROOM.get_center(), 3.5), 9.0)
+
+
+## Dalles d'acier en léger damier (une seule MultiMesh).
+func _build_floor(st: Stage3D) -> void:
+	var mm: MultiMesh = MultiMesh.new()
+	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.use_colors = true
+	var bm: BoxMesh = BoxMesh.new()
+	bm.size = Vector3((TILE_PX - 4.0) * PX3, (TILE_PX - 4.0) * PX3, 0.02)
+	mm.mesh = bm
+	var nx: int = int(ceil(ROOM.size.x / TILE_PX))
+	var ny: int = int(ceil(ROOM.size.y / TILE_PX))
+	mm.instance_count = nx * ny
+	for i: int in nx * ny:
+		var at: Vector2 = ROOM.position + Vector2((float(i % nx) + 0.5) * TILE_PX, (float(i / nx) + 0.5) * TILE_PX)
+		mm.set_instance_transform(i, Transform3D(Basis.IDENTITY, st.to3(at, -0.01)))
+		mm.set_instance_color(i, Color("1c2028") if (i % nx + i / nx) % 2 == 0 else Color("161a20"))
+	var mmi: MultiMeshInstance3D = MultiMeshInstance3D.new()
+	mmi.multimesh = mm
+	var m: StandardMaterial3D = Stage3D.mat(Color.WHITE, 0.45, 0.35)
+	m.vertex_color_use_as_albedo = true
+	mmi.material_override = m
+	st.root.add_child(mmi)
+
+
+## Cambrioleur vu de dessus : épaules, bonnet, sac à dos, lampe frontale.
+func _build_thief(r: Node3D) -> Node3D:
+	var n: Node3D = Node3D.new()
+	r.add_child(n)
+	n.scale = Vector3.ONE * 1.6
+	var dark: StandardMaterial3D = Stage3D.mat(Color("2a2a36"), 0.0, 0.6)
+	var body: MeshInstance3D = MeshInstance3D.new()
+	body.mesh = MeshPool.capsule(BODY_R * 0.6 * PX3, BODY_R * 2.2 * PX3)
+	body.material_override = dark
+	body.rotation.x = PI * 0.5
+	body.position.z = 0.08
+	body.scale = Vector3(1.0, 1.0, 0.6)
+	body.name = "body"
+	n.add_child(body)
+	var shoulders: MeshInstance3D = Stage3D.box(n, Vector3(BODY_R * 1.2 * PX3, BODY_R * 2.2 * PX3, 0.08), Vector3(0, 0, 0.12), dark)
+	shoulders.name = "shoulders"
+	Stage3D.sphere(n, BODY_R * 0.55 * PX3, Vector3(0, 0, 0.2), Stage3D.mat(Palette.ROULETTE_RED.darkened(0.3), 0.0, 0.7))
+	Stage3D.box(n, Vector3(BODY_R * 0.8 * PX3, BODY_R * 1.4 * PX3, 0.08), Vector3(-BODY_R * 0.7 * PX3, 0, 0.14),
+		Stage3D.mat(Color("5a4030"), 0.0, 0.7))
+	Stage3D.sphere(n, 4.0 * PX3, Vector3(BODY_R * 0.55 * PX3, 0, 0.22), Stage3D.glow(Color(1.0, 0.95, 0.7), 3.0))
+	return n
+
+
+func _sync_3d(dt: float, v: Vector2) -> void:
+	if _core_pool == null:
+		return
+	var st: Stage3D = stage
+	var n: int = 0
+	for b: Dictionary in _beams:
+		for sg: PackedVector2Array in _segments(b, t):
+			var a: Vector3 = st.to3(sg[0], BEAM_Z)
+			var c: Vector3 = st.to3(sg[1], BEAM_Z)
+			var len_m: float = a.distance_to(c)
+			var ang: float = atan2(c.y - a.y, c.x - a.x)
+			var core: MeshInstance3D = _core_pool.at(n)
+			core.position = (a + c) * 0.5
+			core.rotation = Vector3(0, 0, ang)
+			core.scale = Vector3(len_m, BEAM_W * PX3, BEAM_W * PX3)
+			var hz: MeshInstance3D = _haze_pool.at(n)
+			hz.position = core.position
+			hz.rotation = core.rotation
+			hz.scale = Vector3(len_m, BEAM_W * 5.0 * PX3, BEAM_W * 3.0 * PX3)
+			n += 1
+	_core_pool.hide_from(n)
+	_haze_pool.hide_from(n)
+	if v.length() > 0.1 and _stun <= 0.0:
+		_face = lerp_angle(_face, atan2(-v.y, v.x), 1.0 - exp(-12.0 * dt))
+	_thief3.position = st.to3(_pos, 0.0)
+	_thief3.rotation.z = _face
+	# Marche : les épaules se balancent ; clignote quand l'alarme a sonné.
+	var walk: float = sin(t * 14.0) * 0.18 if v.length() > 0.1 and _stun <= 0.0 else 0.0
+	(_thief3.get_node("shoulders") as Node3D).rotation.z = walk
+	_thief3.visible = _invuln <= 0.0 or fmod(t * 10.0, 1.0) < 0.6
+	_wheel3.rotation.z = t * 0.6
+	_beacon.light_energy = 3.0 * _alarm * (0.5 + 0.5 * sin(t * 18.0))
+	for k: int in _smoke.size():
+		_smoke[k].uv1_offset = Vector3(t * 0.01 * float(k + 1), t * 0.004 * float(k % 2 * 2 - 1), 0)
 
 
 func _dur() -> float:
@@ -80,11 +262,12 @@ func _segments(b: Dictionary, at: float) -> Array[PackedVector2Array]:
 	return out
 
 
-func _hit_at(pos: Vector2, at: float) -> bool:
+## `extra` : marge (px) que le bot garde autour des faisceaux dans ses prévisions.
+func _hit_at(pos: Vector2, at: float, extra: float = 0.0) -> bool:
 	for b: Dictionary in _beams:
 		for s: PackedVector2Array in _segments(b, at):
 			var q: Vector2 = Geometry2D.get_closest_point_to_segment(pos, s[0], s[1])
-			if q.distance_to(pos) < BODY_R + BEAM_W * 0.5:
+			if q.distance_to(pos) < BODY_R + BEAM_W * 0.5 + extra:
 				return true
 	return false
 
@@ -109,6 +292,7 @@ func tick(dt: float) -> void:
 		v = d / maxf(d.length(), 60.0)
 	if _stun <= 0.0:
 		_pos += v * p("move_speed") * dt
+	_sync_3d(dt, v)
 	_pos = _pos.clamp(ROOM.position + Vector2.ONE * BODY_R, ROOM.end - Vector2.ONE * BODY_R)
 	_best_x = maxf(_best_x, _pos.x)
 	if _invuln <= 0.0 and _hit_at(_pos, t):
@@ -169,7 +353,7 @@ func _safe(dirv: Vector2) -> bool:
 	var dtk: float = p("bot_horizon") / float(LOOK_STEPS)
 	for s: int in LOOK_STEPS:
 		q = (q + dirv * p("move_speed") * dtk).clamp(ROOM.position + Vector2.ONE * BODY_R, ROOM.end - Vector2.ONE * BODY_R)
-		if _hit_at(q, t + dtk * float(s + 1)):
+		if _hit_at(q, t + dtk * float(s + 1), p("bot_margin")):
 			return false
 	return true
 
@@ -182,41 +366,8 @@ func bot_apply(w: Dictionary) -> void:
 
 
 func paint() -> void:
-	draw_rect(Rect2(-size.x, 0, size.x * 3.0, size.y), Color("07090c"))
-	# Sol de la salle des coffres : dalles d'acier, coffres aux murs.
-	draw_rect(ROOM.grow(30.0), Color("3a3e48"))
-	draw_rect(ROOM, Color("15181e"))
-	var x: float = ROOM.position.x
-	while x < ROOM.end.x:
-		draw_line(Vector2(x, ROOM.position.y), Vector2(x, ROOM.end.y), Color(1, 1, 1, 0.03), 2.0)
-		x += 80.0
-	var y: float = ROOM.position.y
-	while y < ROOM.end.y:
-		draw_line(Vector2(ROOM.position.x, y), Vector2(ROOM.end.x, y), Color(1, 1, 1, 0.03), 2.0)
-		y += 80.0
-	for k: int in 16:
-		var bx: float = ROOM.position.x + 20.0 + float(k) * 92.0
-		for row: float in [ROOM.position.y - 26.0, ROOM.end.y + 4.0]:
-			draw_rect(Rect2(bx, row, 80, 22), Color("4a505c"))
-			draw_circle(Vector2(bx + 40, row + 11), 6.0, Palette.GOLD_DARK)
-	# Porte blindée.
-	draw_rect(DOOR, Palette.GOLD_DARK)
-	draw_circle(DOOR.get_center(), 26.0, Palette.GOLD)
-	for k2: int in 6:
-		var a: float = TAU * float(k2) / 6.0 + t
-		draw_line(DOOR.get_center(), DOOR.get_center() + Vector2.from_angle(a) * 24.0, Palette.GOLD_DARK, 3.0)
-	# Faisceaux.
-	for b: Dictionary in _beams:
-		for s: PackedVector2Array in _segments(b, t):
-			draw_line(s[0], s[1], Color(1, 0.1, 0.15, 0.25), BEAM_W * 4.0)
-			draw_line(s[0], s[1], Color(1, 0.2, 0.2, 0.95), BEAM_W)
-		if String(b["kind"]) == "sweep":
-			draw_circle(b["pivot"] as Vector2, 14.0, Color("9a9aa4"))
-	# Cambrioleur (vu de dessus) et alarme.
-	var col: Color = Palette.IVORY if _invuln <= 0.0 or fmod(t * 10.0, 1.0) < 0.5 else Palette.MULT_RED
-	draw_circle(_pos, BODY_R, Palette.INK)
-	draw_circle(_pos, BODY_R - 4.0, col)
-	draw_circle(_pos + Vector2(6, 0), 5.0, Palette.INK)
+	if stage == null:
+		return
 	if _alarm > 0.0:
 		draw_rect(Rect2(-size.x, 0, size.x * 3.0, size.y), Color(1, 0, 0, 0.18 * _alarm))
 	var prog: float = clampf((_best_x - START.x) / (DOOR.position.x - START.x), 0.0, 1.0)
