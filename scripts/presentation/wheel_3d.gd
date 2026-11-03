@@ -94,6 +94,11 @@ func _ready() -> void:
 	_frame_camera()
 
 
+## Rendu suspendu sous une couverture opaque (épreuve plein écran, boutique).
+func _process(_delta: float) -> void:
+	RenderQuality.sleep_if_covered(_vp)
+
+
 func setup(p_wheel: WheelModel, p_db: ContentDB) -> void:
 	wheel = p_wheel
 	db = p_db
@@ -102,10 +107,15 @@ func setup(p_wheel: WheelModel, p_db: ContentDB) -> void:
 
 ## Qualité selon les réglages : bloom → lueur 3D, mode portable → MSAA et ombres réduits.
 func _apply_quality() -> void:
-	var handheld: bool = Settings.b("video", "handheld")
-	_vp.msaa_3d = Viewport.MSAA_2X if handheld else Viewport.MSAA_4X
+	# La roue est la pièce maîtresse : sur mobile, MSAA 2x conservé sauf en Économie.
+	if Platform.is_mobile():
+		var eco: bool = RenderQuality.level() == "eco"
+		_vp.msaa_3d = Viewport.MSAA_DISABLED if eco else Viewport.MSAA_2X
+		_vp.scaling_3d_scale = 0.75 if eco else 1.0
+	else:
+		_vp.msaa_3d = RenderQuality.msaa(Viewport.MSAA_4X, Viewport.MSAA_2X)
 	if _key_light != null:
-		_key_light.shadow_enabled = not handheld
+		_key_light.shadow_enabled = RenderQuality.shadows()
 	if _env != null:
 		_env.glow_enabled = Settings.f("video", "bloom") > 0.0
 		_env.glow_intensity = 0.4 + 0.8 * Settings.f("video", "bloom")

@@ -63,7 +63,7 @@ func _build_3d() -> void:
 		Stage3D.box(r, Vector3(0.1, 0.006, 0.03), Vector3(sin(a) * 3.6, -0.012, -3.4 + cos(a) * 2.1), Stage3D.mat(Palette.GOLD_DARK, 0.6, 0.4))
 	Stage3D.box(r, Vector3(9, 0.25, 0.5), Vector3(0, 0.05, 2.6), Stage3D.mat(Color(0.18, 0.07, 0.05), 0.0, 0.5))
 	var lamp: OmniLight3D = Stage3D.omni(r, Color(1.0, 0.88, 0.6), 4.0, Vector3(0, 2.4, 0.2), 7.0)
-	lamp.shadow_enabled = not Settings.b("video", "handheld")
+	lamp.shadow_enabled = RenderQuality.shadows()
 	var edge: StandardMaterial3D = Stage3D.mat(Color(0.9, 0.86, 0.78), 0.0, 0.6)
 	var back: StandardMaterial3D = Stage3D.mat(Palette.ROULETTE_RED.darkened(0.35), 0.1, 0.5)
 	var filet: StandardMaterial3D = Stage3D.mat(Palette.GOLD_DARK, 0.7, 0.35)

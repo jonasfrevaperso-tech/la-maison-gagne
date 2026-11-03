@@ -83,13 +83,12 @@ func _ready() -> void:
 
 ## Réglage « portable » : rendu 3D du décor à demi-résolution, sans ombres ni MSAA.
 func _apply_quality() -> void:
-	var handheld: bool = Settings.b("video", "handheld")
-	_vp.msaa_3d = Viewport.MSAA_DISABLED if handheld else Viewport.MSAA_2X
-	_vp.scaling_3d_scale = 0.6 if handheld else 1.0
-	_key.shadow_enabled = not handheld
+	_vp.msaa_3d = RenderQuality.msaa(Viewport.MSAA_2X, Viewport.MSAA_DISABLED)
+	_vp.scaling_3d_scale = RenderQuality.scale_3d(0.6)
+	_key.shadow_enabled = RenderQuality.shadows()
 	_env.glow_enabled = Settings.f("video", "bloom") > 0.0
 	_env.glow_intensity = 0.3 + 0.7 * Settings.f("video", "bloom")
-	_dust.amount = 50 if handheld else 110
+	_dust.amount = int(RenderQuality.pick(110, 50))
 
 
 func set_tint(c: Color) -> void:
@@ -260,6 +259,7 @@ func _push_offscreen(p: Vector2, rest: Vector2) -> Vector2:
 
 
 func _process(delta: float) -> void:
+	RenderQuality.sleep_if_covered(_vp)
 	var rng: RandomNumberGenerator = RngService.cosmetic()
 	# Le lustre a de mauvais contacts.
 	if rng.randf() < FLICKER_CHANCE * JuiceProfile.intensity():

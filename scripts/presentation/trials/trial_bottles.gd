@@ -91,7 +91,7 @@ func _build_3d() -> void:
 	Stage3D.box(r, Vector3(1920.0 * px * 1.3, 0.08, 0.9), Vector3(0, top.y, 0.9), Stage3D.mat(Color(0.42, 0.26, 0.12), 0.2, 0.35))
 	Stage3D.box(r, Vector3(1920.0 * px * 1.3, 2.0, 0.1), Vector3(0, top.y - 1.0, 1.35), Stage3D.mat(Color(0.22, 0.12, 0.06), 0.0, 0.7))
 	var lamp: OmniLight3D = Stage3D.omni(r, Color(1.0, 0.85, 0.6), 2.5, st.to3(Vector2(960, 300), 1.2), 6.0)
-	lamp.shadow_enabled = not Settings.b("video", "handheld")
+	lamp.shadow_enabled = RenderQuality.shadows()
 	# Jeton lancé.
 	_chip3 = Node3D.new()
 	r.add_child(_chip3)

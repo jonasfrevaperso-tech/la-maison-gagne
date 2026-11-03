@@ -56,10 +56,9 @@ func _ready() -> void:
 
 
 func _apply_quality() -> void:
-	var handheld: bool = Settings.b("video", "handheld")
-	_vp.msaa_3d = Viewport.MSAA_DISABLED if handheld else Viewport.MSAA_2X
-	_vp.scaling_3d_scale = 0.7 if handheld else 1.0
-	key.shadow_enabled = not handheld
+	_vp.msaa_3d = RenderQuality.msaa(Viewport.MSAA_2X, Viewport.MSAA_DISABLED)
+	_vp.scaling_3d_scale = RenderQuality.scale_3d(0.7)
+	key.shadow_enabled = RenderQuality.shadows()
 	env.glow_enabled = Settings.f("video", "bloom") > 0.0
 	env.glow_intensity = 0.4 + 0.8 * Settings.f("video", "bloom")
 

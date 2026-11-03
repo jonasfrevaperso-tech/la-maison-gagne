@@ -99,7 +99,7 @@ func _build() -> void:
 		Stage3D.cylinder(_chandelier, 0.03, 0.16, at2, Stage3D.mat(Palette.IVORY))
 		Stage3D.sphere(_chandelier, 0.035, at2 + Vector3(0, 0.12, 0), Stage3D.glow(Palette.GOLD_LIGHT, 3.0))
 	var warm: OmniLight3D = Stage3D.omni(_chandelier, Color(1.0, 0.78, 0.5), 2.6, Vector3(0, -2.2, 0), 9.0)
-	warm.shadow_enabled = not Settings.b("video", "handheld")
+	warm.shadow_enabled = RenderQuality.shadows()
 	# Projecteur qui balaie la salle.
 	_sweep = SpotLight3D.new()
 	_sweep.light_color = Color(0.6, 0.85, 1.0)

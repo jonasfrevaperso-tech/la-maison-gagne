@@ -65,6 +65,9 @@ func setup(p_entry: Dictionary, p_precision: int, p_assist: bool, p_mouse: bool)
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	clip_contents = false
+	if full():
+		RenderQuality.cover(true)
+		tree_exiting.connect(RenderQuality.cover.bind(false))
 	_hint = UiKit.rich("", UiKit.SIZE_SMALL)
 	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_hint.fit_content = true

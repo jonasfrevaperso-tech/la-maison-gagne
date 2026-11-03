@@ -1,7 +1,7 @@
 shader_type canvas_item;
 // CRT léger : courbure, scanlines, aberration chromatique, vignettage. Tout est réglable.
 
-uniform sampler2D screen_tex : hint_screen_texture, filter_linear_mipmap;
+uniform sampler2D screen_tex : hint_screen_texture, filter_linear;
 uniform float intensity : hint_range(0.0, 1.0) = 0.5;
 uniform float curvature : hint_range(0.0, 0.2) = 0.06;
 uniform float scanline_strength : hint_range(0.0, 1.0) = 0.22;

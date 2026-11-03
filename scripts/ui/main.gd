@@ -47,6 +47,8 @@ func _ready() -> void:
 	_overlay_layer.add_child(toasts)
 	var post: PostFx = PostFx.new()
 	add_child(post)
+	if Platform.is_mobile():
+		add_child(FrameGovernor.new())
 	EventBus.screen_requested.connect(_on_screen_requested)
 	EventBus.note_requested.connect(_open_note)
 	var nav: PadNavigator = PadNavigator.new()

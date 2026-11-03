@@ -42,4 +42,4 @@ static func build(st: Stage3D, r: Rect2) -> void:
 	Stage3D.box(root, Vector3(w, 0.06, 1.2), Vector3(0, top_y - 0.03, 0.2), Stage3D.mat(Color(0.4, 0.2, 0.09), 0.25, 0.25))
 	Stage3D.box(root, Vector3(w, 0.03, 0.06), Vector3(0, top_y - 0.03, 0.82), Stage3D.mat(Palette.GOLD_DARK, 0.8, 0.3))
 	var lamp: OmniLight3D = Stage3D.omni(root, Color(1.0, 0.86, 0.62), 2.2, Vector3(0, top_y + 1.6, 1.4), 6.0)
-	lamp.shadow_enabled = not Settings.b("video", "handheld")
+	lamp.shadow_enabled = RenderQuality.shadows()

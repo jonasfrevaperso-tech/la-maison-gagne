@@ -1,6 +1,6 @@
 shader_type canvas_item;
 // Distorsion de chaleur (Pyromane, Brasier) : ondulation verticale du fond d'écran.
-uniform sampler2D screen_tex : hint_screen_texture, filter_linear_mipmap;
+uniform sampler2D screen_tex : hint_screen_texture, filter_linear;
 uniform float strength : hint_range(0.0, 0.02) = 0.004;
 
 void fragment() {

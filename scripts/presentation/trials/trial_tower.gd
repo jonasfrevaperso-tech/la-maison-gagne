@@ -50,7 +50,7 @@ func _build_3d() -> void:
 	Stage3D.box(_root3, Vector3(r.size.x * PX3, 0.06, 0.08), Vector3(0, 0.0, 2.0), Stage3D.mat(Palette.GOLD_DARK, 0.7, 0.35))
 	Stage3D.box(_root3, Vector3(r.size.x * PX3 * 1.2, 12.0, 0.2), Vector3(0, 5.0, -3.0), Stage3D.mat(Color(0.1, 0.05, 0.08), 0.0, 1.0))
 	var lamp: OmniLight3D = Stage3D.omni(_root3, Color(1.0, 0.88, 0.65), 1.2, Vector3(0, 4.0, 2.0), 9.0)
-	lamp.shadow_enabled = not Settings.b("video", "handheld")
+	lamp.shadow_enabled = RenderQuality.shadows()
 	# Piles de jetons décoratives sur les côtés du tapis.
 	var half: float = r.size.x * PX3 * 0.5
 	for side: float in [-1.0, 1.0]:

@@ -96,7 +96,7 @@ func _build_3d() -> void:
 	spot.spot_range = 8.0
 	spot.spot_angle = 32.0
 	spot.position = Vector3(0, 2.6, 2.4)
-	spot.shadow_enabled = not Settings.b("video", "handheld")
+	spot.shadow_enabled = RenderQuality.shadows()
 	r.add_child(spot)
 	spot.look_at(Vector3.ZERO, Vector3.UP)
 	Stage3D.omni(r, Color(1.0, 0.9, 0.75), 2.2, Vector3(0, 0.2, 1.6), 3.5)

@@ -222,7 +222,7 @@ func _build_light() -> void:
 	_lamp.spot_range = 40.0
 	_lamp.spot_angle = 55.0
 	_lamp.spot_attenuation = 0.4
-	_lamp.shadow_enabled = not Settings.b("video", "handheld")
+	_lamp.shadow_enabled = RenderQuality.shadows()
 	# Lampe décalée (en haut à gauche) : son reflet tombe hors du tapis, pas sur les numéros.
 	_lamp.position = _p(view.size * Vector2(0.15, -0.9), 11.0)
 	_board.add_child(_lamp)
@@ -303,6 +303,7 @@ func _chip_mat(k: int) -> StandardMaterial3D:
 
 
 func _process(delta: float) -> void:
+	RenderQuality.sleep_if_covered(_vp)
 	_t += delta
 	if _lamp != null:
 		# La suspension oscille à peine : la lumière vit sur le vernis.

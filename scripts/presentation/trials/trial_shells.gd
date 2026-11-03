@@ -57,7 +57,7 @@ func _build_3d() -> void:
 	Stage3D.cylinder(_lamp, 0.32, 0.22, Vector3(0, -1.65, 0), Stage3D.mat(Color(0.12, 0.3, 0.2), 0.5, 0.4), 0.08)
 	Stage3D.sphere(_lamp, 0.07, Vector3(0, -1.78, 0), Stage3D.glow(Palette.GOLD_LIGHT, 4.0))
 	_lamp_light = Stage3D.omni(_lamp, Color(1.0, 0.85, 0.55), 3.2, Vector3(0, -1.85, 0), 6.0)
-	_lamp_light.shadow_enabled = not Settings.b("video", "handheld")
+	_lamp_light.shadow_enabled = RenderQuality.shadows()
 	var copper: StandardMaterial3D = Stage3D.mat(Color(0.78, 0.45, 0.24), 0.85, 0.22)
 	var rim: StandardMaterial3D = Stage3D.mat(Color(0.5, 0.26, 0.12), 0.7, 0.4)
 	for c: int in 4:

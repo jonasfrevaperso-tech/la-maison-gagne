@@ -583,3 +583,9 @@ FAMILY_TIER_UP,Build activé ! %s,Build active! %s
 SHOP_SLOT,+1 emplacement · %d $,+1 slot · %d $
 SHOP_SLOT_MAX,Emplacements au maximum,Slots maxed out
 SHOP_SLOT_TIP,"Rénovation : un emplacement de grigri de plus pour toute la partie (deux au maximum).","Renovation: one more charm slot for the rest of the run (two at most)."
+QUALITY_LOWERED,Le téléphone peine : qualité abaissée (%s).,Your phone is struggling: quality lowered (%s).
+OPT_QUALITY,Qualité graphique,Graphics quality
+OPT_QUALITY_DESC,"Économie : autonomie maximale. Équilibré : 3D allégée, 60 images/s. Beau : ombres et antialiasing (le téléphone chauffe davantage). La qualité baisse d'elle-même si le téléphone n'arrive plus à suivre.","Eco: maximum battery life. Balanced: lighter 3D, 60 FPS. High: shadows and antialiasing (the phone runs warmer). Quality lowers itself if the phone can't keep up."
+OPT_QUALITY_ECO,Économie,Eco
+OPT_QUALITY_BALANCED,Équilibré,Balanced
+OPT_QUALITY_HIGH,Beau,High

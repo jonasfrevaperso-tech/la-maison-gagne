@@ -28,6 +28,8 @@ func _ready() -> void:
 	var bd: Control = backdrop()
 	if bd != null:
 		add_child(bd)
+		RenderQuality.cover(true)
+		tree_exiting.connect(RenderQuality.cover.bind(false))
 	var dim: ColorRect = ColorRect.new()
 	dim.color = DIM if bd == null else DIM_OVER_BACKDROP
 	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)

@@ -75,7 +75,7 @@ func _build_3d() -> void:
 	_fake_mat.emission = FAKE
 	_fake_mat.emission_energy_multiplier = 0.4
 	var lamp: OmniLight3D = Stage3D.omni(r, Color(1.0, 0.88, 0.65), 4.0, st.to3(Vector2(960, 400), 2.0), 9.0)
-	lamp.shadow_enabled = not Settings.b("video", "handheld")
+	lamp.shadow_enabled = RenderQuality.shadows()
 
 
 func _coin(k: int) -> MeshInstance3D:
