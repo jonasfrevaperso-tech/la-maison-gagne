@@ -85,7 +85,7 @@ func _build_3d() -> void:
 	spot.spot_angle = 22.0
 	spot.position = st.to3(Vector2(960.0, -200.0), 2.0)
 	r.add_child(spot)
-	spot.look_at(st.to3(Vector2(960.0, 700.0), 0.0))
+	spot.look_at_from_position(spot.position, st.to3(Vector2(960.0, 700.0), 0.0))
 	spot.shadow_enabled = RenderQuality.shadows()
 	var cone: MeshInstance3D = MeshInstance3D.new()
 	var cm: CylinderMesh = CylinderMesh.new()

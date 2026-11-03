@@ -252,7 +252,7 @@ func _sync_3d(dt: float) -> void:
 	var bend: float = _tension if _phase == "reel" else 0.0
 	_rod3.rotation.x = -0.75 + 0.25 * bend
 	(_rod3.get_node("reel") as Node3D).rotation.x += (8.0 if _hold else 0.0) * dt
-	var tip: Vector3 = _rod3.global_transform * Vector3(0, 2.6, 0)
+	var tip: Vector3 = (_rod3.global_transform if _rod3.is_inside_tree() else _rod3.transform) * Vector3(0, 2.6, 0)
 	var bob: Vector3 = _w3(_spot_pos(_lure * (_dist if _phase == "reel" else 1.0)), WATER_Y + 0.03)
 	if _phase == "cast":
 		bob = tip + Vector3(0, -0.6, 0)

@@ -388,7 +388,7 @@ func _sync_3d(pulse: float) -> void:
 		var sp: SpotLight3D = _spots3[k2]
 		var target: Vector2 = Vector2(r.position.x + r.size.x * (0.3 + 0.2 * float(k2)) + sin(t * 0.8 + float(k2) * 2.0) * 120.0,
 			r.get_center().y)
-		sp.look_at(stage.to3(target, -1.0))
+		sp.look_at_from_position(sp.position, stage.to3(target, -1.0))
 		sp.light_color = LANE_COLORS[(k2 + int(t / _beat)) % 4]
 		sp.light_energy = 1.2 + 1.5 * pulse
 

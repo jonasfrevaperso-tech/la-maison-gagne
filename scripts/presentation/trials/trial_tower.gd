@@ -49,6 +49,7 @@ func _build_3d() -> void:
 	Stage3D.box(_root3, Vector3(r.size.x * PX3, 0.3, 4.0), Vector3(0, -0.15, 0), Stage3D.mat(Color(0.07, 0.26, 0.15), 0.0, 0.95))
 	Stage3D.box(_root3, Vector3(r.size.x * PX3, 0.06, 0.08), Vector3(0, 0.0, 2.0), Stage3D.mat(Palette.GOLD_DARK, 0.7, 0.35))
 	Stage3D.box(_root3, Vector3(r.size.x * PX3 * 1.2, 12.0, 0.2), Vector3(0, 5.0, -3.0), Stage3D.mat(Color(0.1, 0.05, 0.08), 0.0, 1.0))
+	_build_cashier(r)
 	var lamp: OmniLight3D = Stage3D.omni(_root3, Color(1.0, 0.88, 0.65), 1.2, Vector3(0, 4.0, 2.0), 9.0)
 	lamp.shadow_enabled = RenderQuality.shadows()
 	# Piles de jetons décoratives sur les côtés du tapis.
@@ -61,6 +62,30 @@ func _build_3d() -> void:
 				Stage3D.cylinder(_root3, 0.22, 0.07, at + Vector3(0, 0.035 + 0.075 * float(k), 0), cm)
 	for col: Color in COLORS:
 		_mats.append(Stage3D.mat(col.darkened(0.35), 0.1, 0.45))
+
+
+## Fond de la caisse : boiseries, guichet à barreaux de laiton, présentoirs de jetons, appliques.
+func _build_cashier(r: Rect2) -> void:
+	var w: float = r.size.x * PX3 * 1.2
+	var wood: StandardMaterial3D = Stage3D.mat(Color(0.2, 0.09, 0.05), 0.0, 0.5)
+	var brass: StandardMaterial3D = Stage3D.mat(Palette.GOLD_DARK, 0.45, 0.3)
+	for k: int in 9:
+		var x: float = -w * 0.5 + w * (float(k) + 0.5) / 9.0
+		Stage3D.box(_root3, Vector3(w / 9.0 - 0.08, 7.0, 0.06), Vector3(x, 3.6, -2.88), wood)
+	Stage3D.box(_root3, Vector3(w, 0.08, 0.3), Vector3(0, 1.3, -2.8), brass)
+	for k2: int in 15:
+		Stage3D.cylinder(_root3, 0.02, 2.4, Vector3(-2.8 + float(k2) * 0.4, 2.5, -2.7), brass)
+		# Présentoirs : rangées de jetons debout derrière le guichet.
+	for row: int in 2:
+		Stage3D.box(_root3, Vector3(w * 0.8, 0.06, 0.4), Vector3(0, 0.25 + float(row) * 0.5, -2.85), wood)
+		for c: int in 18:
+			var col: Color = COLORS[(c + row) % COLORS.size()].darkened(0.68)
+			var chip: MeshInstance3D = Stage3D.cylinder(_root3, 0.16, 0.05, Vector3(-3.2 + float(c) * 0.38, 0.44 + float(row) * 0.5, -2.85),
+				Stage3D.mat(col, 0.1, 0.45))
+			chip.rotation.x = PI * 0.5
+	for side: float in [-1.0, 1.0]:
+		Stage3D.sphere(_root3, 0.1, Vector3(side * 3.6, 1.0, -2.75), Stage3D.glow(Palette.GOLD_LIGHT, 2.0))
+		Stage3D.omni(_root3, Color(1.0, 0.75, 0.45), 0.8, Vector3(side * 3.6, 1.0, -2.4), 3.0)
 
 
 ## Plaque n° k (réutilisée d'une image à l'autre) : boîte laquée et liseré doré en façade.
