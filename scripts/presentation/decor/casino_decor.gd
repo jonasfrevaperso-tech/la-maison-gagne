@@ -6,6 +6,7 @@ extends SubViewportContainer
 ## Les objets sont ancrés sur des points de la maquette 1920×1080 : ils suivent la scène quelle
 ## que soit la résolution, et les marges des écrans larges reçoivent quelques objets en plus.
 
+const DUST_AMOUNT: int = 110
 const CAM_HEIGHT: float = 14.0
 const CAM_BACK: float = 6.8
 const CAM_FOV: float = 34.0
@@ -89,14 +90,13 @@ func _ready() -> void:
 	_layout.call_deferred()
 
 
-## Réglage « portable » : rendu 3D du décor à demi-résolution, sans ombres ni MSAA.
+## Qualité selon les réglages graphiques (cf. RenderQuality).
 func _apply_quality() -> void:
-	_vp.msaa_3d = RenderQuality.msaa(Viewport.MSAA_2X, Viewport.MSAA_DISABLED)
-	_vp.scaling_3d_scale = RenderQuality.scale_3d(0.6)
+	RenderQuality.configure(_vp, _env)
 	_key.shadow_enabled = RenderQuality.shadows()
 	_env.glow_enabled = Settings.f("video", "bloom") > 0.0
 	_env.glow_intensity = 0.3 + 0.7 * Settings.f("video", "bloom")
-	_dust.amount = int(RenderQuality.pick(110, 50))
+	_dust.amount = RenderQuality.particles(DUST_AMOUNT)
 
 
 func set_tint(c: Color) -> void:
@@ -171,7 +171,7 @@ func _make_dust() -> CPUParticles3D:
 	m.albedo_texture = DecorProp.soft_dot()
 	q.material = m
 	p.mesh = q
-	p.amount = 110
+	p.amount = DUST_AMOUNT
 	p.lifetime = 12.0
 	p.preprocess = 12.0
 	p.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX

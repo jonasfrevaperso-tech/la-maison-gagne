@@ -617,3 +617,42 @@ CONFIRM_QUIT,Quitter La Maison Gagne ?,Quit La Maison Gagne?
 CONFIRM_TELEMETRY_MOBILE,"Enregistrer des statistiques de jeu sur ce téléphone (tours, boutique, durée) pour aider à équilibrer le jeu ? Rien n'est envoyé sur Internet. Modifiable dans les options.","Record gameplay statistics on this phone (spins, shop, play time) to help balance the game? Nothing is sent over the Internet. You can change this in the options."
 RESUME_TAP,Touche l'écran pour reprendre l'épreuve,Tap the screen to resume the trial
 HUD_FPS,"%d im/s · pire image %.0f ms","%d fps · worst frame %.0f ms"
+OPT_GFX_SECTION,Graphismes,Graphics
+OPT_PRESET,Préréglage,Preset
+OPT_PRESET_LOW,Bas,Low
+OPT_PRESET_MEDIUM,Moyen,Medium
+OPT_PRESET_HIGH,Élevé,High
+OPT_PRESET_ULTRA,Ultra,Ultra
+OPT_PRESET_DECK,Steam Deck / portable,Steam Deck / handheld
+OPT_PRESET_CUSTOM,Personnalisé,Custom
+OPT_PRESET_DESC,Règle tout ce qui suit d'un coup. « Steam Deck / portable » agrandit aussi le texte et limite à 60 images/s. Toucher un réglage passe en Personnalisé.,Sets everything below at once. “Steam Deck / handheld” also enlarges text and caps at 60 fps. Changing any setting switches to Custom.
+OPT_SCALING,Mise à l'échelle 3D,3D upscaling
+OPT_SCALING_BILINEAR,Bilinéaire,Bilinear
+OPT_SCALING_FSR1,AMD FSR 1.0,AMD FSR 1.0
+OPT_SCALING_FSR2,AMD FSR 2.2,AMD FSR 2.2
+OPT_SCALING_DESC,"La 3D est rendue à l'échelle choisie puis agrandie. FSR 1 affine l'image ; FSR 2 reconstruit les détails sur plusieurs images et lisse les bords. La roue et le tapis, rendus sur fond transparent, restent en bilinéaire.","3D is rendered at the chosen scale then upscaled. FSR 1 sharpens the image; FSR 2 rebuilds detail over several frames and smooths edges. The wheel and felt, rendered over a transparent background, stay bilinear."
+OPT_RENDER_SCALE,Échelle de rendu 3D,3D render scale
+OPT_SCALE_NATIVE,100 % (natif),100 % (native)
+OPT_SCALE_QUALITY,77 % (Qualité),77 % (Quality)
+OPT_SCALE_BALANCED,67 % (Équilibré),67 % (Balanced)
+OPT_SCALE_PERF,59 % (Performance),59 % (Performance)
+OPT_SCALE_ULTRA_PERF,50 % (Ultra-performance),50 % (Ultra performance)
+OPT_FSR_SHARPNESS,Netteté FSR,FSR sharpness
+OPT_MSAA,Anticrénelage MSAA,MSAA anti-aliasing
+OPT_POST_AA,Anticrénelage d'écran,Screen-space anti-aliasing
+OPT_AA_FSR2_DESC,FSR 2 fait son propre anticrénelage : MSAA et anticrénelage d'écran sont désactivés.,FSR 2 does its own anti-aliasing: MSAA and screen-space anti-aliasing are disabled.
+OPT_SHADOWS,Ombres,Shadows
+OPT_LEVEL_LOW,Basses,Low
+OPT_LEVEL_MEDIUM,Moyennes,Medium
+OPT_LEVEL_HIGH,Hautes,High
+OPT_ANISO,Filtrage anisotrope,Anisotropic filtering
+OPT_SSAO,Occlusion ambiante (SSAO),Ambient occlusion (SSAO)
+OPT_PARTICLES,Densité des particules,Particle density
+OPT_VSYNC_ADAPTIVE,Adaptative,Adaptive
+OPT_VSYNC_MAILBOX,Mailbox (faible latence),Mailbox (low latency)
+OPT_VSYNC_DESC,"Adaptative : se coupe quand les images/s chutent (moins d'à-coups). Mailbox : sans déchirement, latence réduite.","Adaptive: turns off when the frame rate drops (fewer stutters). Mailbox: no tearing, lower latency."
+OPT_OFF,Désactivé,Off
+OPT_ON,Activée,On
+OPT_DENSITY_LOW,Faible,Low
+OPT_DENSITY_MEDIUM,Moyenne,Medium
+OPT_DENSITY_HIGH,Élevée,High

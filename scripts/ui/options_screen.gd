@@ -23,6 +23,7 @@ var _tabs: TabContainer = null
 var _waiting_action: String = ""
 var _remap_buttons: Dictionary[String, Button] = {}
 var _remap_box: VBoxContainer = null
+var _preset_btn: OptionButton = null
 
 
 var _start_tab: int = 0
@@ -122,6 +123,7 @@ static func _pct(v: float, max_v: float) -> String:
 
 func _on_slider(v: float, section: String, key: String, val: Label, max_v: float) -> void:
 	Settings.set_value(section, key, v)
+	_sync_preset(section, key)
 	val.text = _pct(v, max_v)
 	if section == "audio":
 		AudioBus.ui("click")
@@ -138,12 +140,13 @@ func _check(box: VBoxContainer, label_key: String, section: String, key: String)
 ## Le mode portable change d'autres réglages (bloom, images/s, texte) : l'écran se recharge.
 func _on_check(section: String, key: String, on: bool) -> void:
 	Settings.set_value(section, key, on)
+	_sync_preset(section, key)
 	if section == "video" and key == "handheld":
 		UiKit.clear_cache()
 		GameState.goto(&"options", {"tab": _tabs.current_tab})
 
 
-func _choice(box: VBoxContainer, label_key: String, section: String, key: String, values: Array, label_keys: Array) -> void:
+func _choice(box: VBoxContainer, label_key: String, section: String, key: String, values: Array, label_keys: Array) -> OptionButton:
 	var h: HBoxContainer = _row(box, label_key)
 	var o: OptionButton = OptionButton.new()
 	var cur: Variant = Settings.get_value(section, key)
@@ -153,12 +156,21 @@ func _choice(box: VBoxContainer, label_key: String, section: String, key: String
 			o.select(i)
 	o.item_selected.connect(func(i: int) -> void: _on_choice(section, key, values[i]))
 	h.add_child(o)
+	return o
+
+
+## Un réglage graphique fin a changé : le préréglage affiché passe sur « Personnalisé ».
+func _sync_preset(section: String, key: String) -> void:
+	if section == "video" and RenderQuality.PRESET_KEYS.has(key) and _preset_btn != null:
+		_preset_btn.select(RenderQuality.PRESET_NAMES.find(Settings.s("video", "preset")))
 
 
 ## Changer de mode d'affichage change la liste des résolutions : l'écran se recharge.
 func _on_choice(section: String, key: String, value: Variant) -> void:
 	Settings.set_value(section, key, value)
-	if section == "video" and key == "window_mode":
+	# Mode d'affichage, préréglage ou mise à l'échelle : d'autres lignes changent, l'écran se recharge.
+	_sync_preset(section, key)
+	if section == "video" and key in ["window_mode", "preset", "scaling"]:
 		GameState.goto(&"options", {"tab": _tabs.current_tab})
 
 
@@ -192,15 +204,51 @@ func _video_tab() -> void:
 		_choice(b, "OPT_RENDER_RES", "video", "render_resolution", sizes, size_labels)
 	_desc(b, "OPT_RES_DESC")
 	_choice(b, "OPT_FPS_CAP", "video", "fps_cap", [0, 30, 60, 90, 120, 144], ["OPT_FPS_UNLIMITED", "30", "60", "90", "120", "144"])
-	_check(b, "OPT_VSYNC", "video", "vsync")
+	_choice(b, "OPT_VSYNC", "video", "vsync", Settings.VSYNC_MODES.keys(), ["OPT_OFF", "OPT_ON", "OPT_VSYNC_ADAPTIVE", "OPT_VSYNC_MAILBOX"])
+	_desc(b, "OPT_VSYNC_DESC")
 	_slider(b, "OPT_CRT", "video", "crt", 0.0, 1.0, 0.05)
 	_slider(b, "OPT_BLOOM", "video", "bloom", 0.0, 1.0, 0.05)
 	_check(b, "OPT_SHOW_FPS", "video", "show_fps")
 	_check(b, "OPT_WHEEL_3D", "video", "wheel_3d")
 	_check(b, "OPT_DECOR_3D", "video", "decor_3d")
 	b.add_child(UiKit.label(tr("OPT_WHEEL_3D_DESC"), UiKit.SIZE_SMALL, Palette.SMOKE))
-	_check(b, "OPT_HANDHELD", "video", "handheld")
-	_desc(b, "OPT_HANDHELD_DESC")
+	_graphics(b)
+
+
+## Graphismes (PC) : préréglage, puis chaque réglage fin (toucher l'un d'eux passe en Personnalisé).
+func _graphics(b: VBoxContainer) -> void:
+	b.add_child(UiKit.divider(ROW_W))
+	b.add_child(UiKit.title(tr("OPT_GFX_SECTION"), UiKit.SIZE_H2))
+	var presets: Array = RenderQuality.PRESET_NAMES.duplicate()
+	var preset_labels: Array = presets.map(func(n: Variant) -> String: return "OPT_PRESET_" + String(n).to_upper())
+	_preset_btn = _choice(b, "OPT_PRESET", "video", "preset", presets, preset_labels)
+	_desc(b, "OPT_PRESET_DESC")
+	_choice(
+		b, "OPT_SCALING", "video", "scaling", ["bilinear", "fsr1", "fsr2"],
+		["OPT_SCALING_BILINEAR", "OPT_SCALING_FSR1", "OPT_SCALING_FSR2"]
+	)
+	_desc(b, "OPT_SCALING_DESC")
+	var scales: Array = [1.0, 0.9, 0.77, 0.7, 0.67, 0.59, 0.5]
+	var scale_labels: Array = [
+		"OPT_SCALE_NATIVE", "90 %", "OPT_SCALE_QUALITY", "70 %", "OPT_SCALE_BALANCED", "OPT_SCALE_PERF", "OPT_SCALE_ULTRA_PERF"
+	]
+	_choice(b, "OPT_RENDER_SCALE", "video", "render_scale", scales, scale_labels)
+	var fsr2: bool = Settings.s("video", "scaling") == "fsr2"
+	if Settings.s("video", "scaling") != "bilinear":
+		_slider(b, "OPT_FSR_SHARPNESS", "video", "fsr_sharpness", 0.0, 1.0, 0.05)
+	var aa: OptionButton = _choice(b, "OPT_MSAA", "video", "msaa", [0, 2, 4, 8], ["OPT_OFF", "MSAA 2x", "MSAA 4x", "MSAA 8x"])
+	var post: OptionButton = _choice(b, "OPT_POST_AA", "video", "post_aa", ["none", "fxaa", "taa"], ["OPT_OFF", "FXAA", "TAA"])
+	if fsr2:
+		aa.disabled = true
+		post.disabled = true
+		_desc(b, "OPT_AA_FSR2_DESC")
+	_choice(
+		b, "OPT_SHADOWS", "video", "shadows", ["off", "low", "medium", "high"],
+		["OPT_OFF", "OPT_LEVEL_LOW", "OPT_LEVEL_MEDIUM", "OPT_LEVEL_HIGH"]
+	)
+	_choice(b, "OPT_ANISO", "video", "aniso", [0, 2, 4, 8, 16], ["OPT_OFF", "2x", "4x", "8x", "16x"])
+	_check(b, "OPT_SSAO", "video", "ssao")
+	_choice(b, "OPT_PARTICLES", "video", "particles", ["low", "medium", "high"], ["OPT_DENSITY_LOW", "OPT_DENSITY_MEDIUM", "OPT_DENSITY_HIGH"])
 
 
 ## Téléphone : pas de fenêtre ni de définition ; qualité 3D et cadence (écran 90 Hz du Pixel).

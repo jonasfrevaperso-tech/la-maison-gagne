@@ -15,11 +15,51 @@ func test_pc_profile_unchanged() -> void:
 		check(not Platform.is_mobile(), "PC : pas mobile")
 		var hh: bool = Settings.b("video", "handheld")
 		eq(RenderQuality.level(), "handheld" if hh else "pc", "PC : niveau historique")
-		if not hh:
-			eq(RenderQuality.scale_3d(0.7), 1.0, "PC : rendu 3D plein")
-			eq(RenderQuality.msaa(Viewport.MSAA_4X, Viewport.MSAA_2X), Viewport.MSAA_4X, "PC : MSAA complet")
-			check(RenderQuality.shadows(), "PC : ombres")
+		eq(RenderQuality.scale_3d(), clampf(Settings.f("video", "render_scale"), 0.5, 1.0), "PC : échelle du réglage")
+		check(RenderQuality.scaling_mode(true) == Viewport.SCALING_3D_MODE_BILINEAR, "vue transparente : toujours bilinéaire")
 	)
+
+
+## PC : un préréglage écrit tous les réglages fins ; en toucher un passe en Personnalisé ;
+## « Élevé » reproduit le rendu des versions précédentes (100 %, MSAA 4x, ombres).
+func test_graphics_presets() -> void:
+	_with(0, func() -> void:
+		var saved: Dictionary = {}
+		for k: String in RenderQuality.PRESET_KEYS + ["preset", "handheld"]:
+			saved[k] = Settings.get_value("video", k)
+		Settings.set_value("video", "preset", "high")
+		eq(Settings.s("video", "preset"), "high", "préréglage retenu")
+		eq(RenderQuality.scale_3d(), 1.0, "Élevé : rendu plein")
+		eq(RenderQuality.msaa(Viewport.MSAA_4X), Viewport.MSAA_4X, "Élevé : MSAA 4x")
+		check(RenderQuality.shadows(), "Élevé : ombres")
+		Settings.set_value("video", "preset", "low")
+		check(not RenderQuality.shadows(), "Bas : sans ombres")
+		eq(RenderQuality.scaling_mode(false), Viewport.SCALING_3D_MODE_FSR, "Bas : FSR 1")
+		check(RenderQuality.particles(100) < 100, "Bas : moins de particules")
+		Settings.set_value("video", "msaa", 2)
+		eq(Settings.s("video", "preset"), "custom", "un réglage fin passe en Personnalisé")
+		eq(int(Settings.get_value("video", "msaa")), 2, "le réglage fin est gardé")
+		for k2: String in saved.keys():
+			Settings.override("video", k2, saved[k2])
+		Settings.save_settings()
+	)
+
+
+## Migration : l'ancienne VSync booléenne devient un mode ; un mode portable hérité devient le
+## préréglage Steam Deck.
+func test_vsync_and_handheld_migration() -> void:
+	var cfg: ConfigFile = Settings._cfg
+	var before: ConfigFile = ConfigFile.new()
+	before.parse(cfg.encode_to_text())
+	cfg.set_value("video", "vsync", false)
+	cfg.set_value("video", "handheld", true)
+	if cfg.has_section_key("video", "preset"):
+		cfg.erase_section_key("video", "preset")
+	Settings._migrate()
+	eq(Settings.s("video", "vsync"), "off", "VSync booléenne → « off »")
+	eq(Settings.s("video", "preset"), "deck", "portable → préréglage Steam Deck")
+	Settings._cfg = before
+	Settings.save_settings()
 
 
 func test_mobile_quality_levels() -> void:

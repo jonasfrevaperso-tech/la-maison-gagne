@@ -12,6 +12,12 @@ func start() -> bool:
 	var args: Dictionary = DevMode.args()
 	if Platform.is_emulated():
 		_emulate_mobile()
+	if args.has("dev-set"):
+		# `--dev-set=video/scaling=fsr2;video/render_scale=0.67` : réglages non enregistrés.
+		for pair: String in String(args["dev-set"]).split(";"):
+			var kv: PackedStringArray = pair.split("=")
+			var path: PackedStringArray = kv[0].split("/")
+			Settings.override(path[0], path[1], str_to_var(kv[1]) if kv[1].is_valid_float() else kv[1])
 	if args.has("dev-autoplay"):
 		var ap: DevAutoplay = DevAutoplay.new()
 		ap.spins_wanted = int(args["dev-autoplay"])
@@ -49,7 +55,11 @@ func start() -> bool:
 		var params: Dictionary = {}
 		if args.has("dev-seed-code"):
 			params["seed"] = String(args["dev-seed-code"])
+		if args.has("dev-tab"):
+			params["tab"] = int(String(args["dev-tab"]))
 		GameState.goto(StringName(String(args["dev-screen"])), params)
+		if args.has("dev-scroll"):
+			_scroll_later.call_deferred(int(String(args["dev-scroll"])))
 		return true
 	if not args.has("dev-run"):
 		return false
@@ -285,3 +295,13 @@ func _emulate_mobile() -> void:
 	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 	DisplayServer.window_set_size(win)
 	DisplayServer.window_set_position(usable.position + (usable.size - win) / 2)
+
+
+## `--dev-scroll=N` : fait défiler la liste visible de l'écran ouvert (captures d'options).
+func _scroll_later(px: int) -> void:
+	for _i: int in 20:
+		await get_tree().process_frame
+	for n: Node in get_tree().root.find_children("*", "ScrollContainer", true, false):
+		var sc: ScrollContainer = n as ScrollContainer
+		if sc.is_visible_in_tree():
+			sc.scroll_vertical = px

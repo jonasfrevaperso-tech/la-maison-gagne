@@ -29,7 +29,7 @@ var _t: float = 0.0
 
 ## `at` : point d'émission (coordonnées du conteneur) ; `coins` : pièces d'or seulement.
 static func spawn(parent: Control, at: Vector2, amount: int, coins: bool = false) -> void:
-	var n: int = mini(int(float(amount) * JuiceProfile.intensity()), MAX_CHIPS)
+	var n: int = mini(RenderQuality.particles(int(float(amount) * JuiceProfile.intensity())), MAX_CHIPS)
 	if n <= 0 or DisplayServer.get_name() == "headless":
 		return
 	var b: ChipBurst3D = ChipBurst3D.new()
@@ -44,7 +44,7 @@ func _start(at: Vector2, n: int, coins: bool) -> void:
 	_vp = SubViewport.new()
 	_vp.own_world_3d = true
 	_vp.transparent_bg = true
-	_vp.msaa_3d = Viewport.MSAA_2X
+	RenderQuality.configure(_vp, null, true)
 	add_child(_vp)
 	var env: Environment = Environment.new()
 	env.background_mode = Environment.BG_CLEAR_COLOR

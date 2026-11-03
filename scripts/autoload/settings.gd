@@ -9,7 +9,7 @@ const DEFAULTS: Dictionary = {
 		"window_mode": "fullscreen",
 		"window_size": "1600x900",
 		"render_resolution": "native",
-		"vsync": true,
+		"vsync": "on",
 		"fps_cap": 0,
 		"crt": 0.5,
 		"bloom": 0.6,
@@ -17,7 +17,17 @@ const DEFAULTS: Dictionary = {
 		"wheel_3d": true,
 		"decor_3d": true,
 		"handheld": false,
-		"quality": "balanced"
+		"quality": "balanced",
+		"preset": "high",
+		"scaling": "bilinear",
+		"render_scale": 1.0,
+		"fsr_sharpness": 0.8,
+		"msaa": 4,
+		"post_aa": "none",
+		"shadows": "medium",
+		"aniso": 8,
+		"ssao": false,
+		"particles": "high"
 	},
 	"juice": {"intensity": 1.0, "shake": 1.0, "flashes": true, "reduced_motion": false, "curse_fx": 1.0},
 	"game":
@@ -49,6 +59,10 @@ const ECO_PRESET: Dictionary = {"bloom": 0.0, "fps_cap": 60}
 ## sont gardées (video/handheld_saved) et restaurées quand on désactive le mode.
 const HANDHELD_KEYS: Array[String] = ["video/bloom", "video/fps_cap", "access/text_scale"]
 const WINDOW_MODES: Array[String] = ["windowed", "fullscreen", "exclusive"]
+const VSYNC_MODES: Dictionary = {
+	"off": DisplayServer.VSYNC_DISABLED, "on": DisplayServer.VSYNC_ENABLED,
+	"adaptive": DisplayServer.VSYNC_ADAPTIVE, "mailbox": DisplayServer.VSYNC_MAILBOX,
+}
 ## Mobile (Android) : niveaux de qualité du rendu (cf. RenderQuality).
 const QUALITY_LEVELS: Array[String] = ["eco", "balanced", "high"]
 const MOBILE_FILE: String = "settings_mobile.cfg"
@@ -161,6 +175,11 @@ func _migrate() -> void:
 		if not _cfg.has_section_key("video", "window_mode"):
 			_cfg.set_value("video", "window_mode", "fullscreen" if bool(_cfg.get_value("video", "fullscreen")) else "windowed")
 		_cfg.erase_section_key("video", "fullscreen")
+	# 1.7 : VSync à quatre modes (était un booléen) ; le mode portable devient un préréglage.
+	if _cfg.has_section_key("video", "vsync") and typeof(_cfg.get_value("video", "vsync")) == TYPE_BOOL:
+		_cfg.set_value("video", "vsync", "on" if bool(_cfg.get_value("video", "vsync")) else "off")
+	if not _cfg.has_section_key("video", "preset") and bool(_cfg.get_value("video", "handheld", false)):
+		_write_preset("deck")
 
 
 ## Premier lancement sur console portable (Steam Deck) : texte un peu plus grand et
@@ -168,6 +187,7 @@ func _migrate() -> void:
 func _detect_handheld() -> void:
 	if is_steam_deck():
 		_set_handheld(true)
+		_write_preset("deck")
 
 
 ## Téléphone : réglages par défaut adaptés et langue du système (FR, sinon EN).
@@ -207,6 +227,14 @@ func _set_handheld(on: bool) -> void:
 	_cfg.set_value("video", "handheld", on)
 
 
+## Écrit les réglages fins d'un préréglage graphique (« custom » : rien à écrire).
+func _write_preset(preset: String) -> void:
+	var vals: Dictionary = RenderQuality.preset_values(preset)
+	for k: String in vals.keys():
+		_cfg.set_value("video", k, vals[k])
+	_cfg.set_value("video", "preset", preset)
+
+
 func save_settings() -> void:
 	_cfg.save(_path)
 
@@ -220,8 +248,23 @@ func set_value(section: String, key: String, value: Variant) -> void:
 	if section == "video" and key == "handheld" and bool(value) != b("video", "handheld"):
 		_set_handheld(bool(value))
 		UiKit.clear_cache()
+	if section == "video" and key == "preset":
+		var deck: bool = String(value) == "deck"
+		if deck != b("video", "handheld") and String(value) != "custom":
+			_set_handheld(deck)
+			UiKit.clear_cache()
+		_write_preset(String(value))
+	elif section == "video" and RenderQuality.PRESET_KEYS.has(key):
+		_cfg.set_value("video", "preset", "custom")
 	_cfg.set_value(section, key, value)
 	save_settings()
+	apply()
+	EventBus.settings_changed.emit()
+
+
+## Valeur non enregistrée (outils de développement : captures comparatives).
+func override(section: String, key: String, value: Variant) -> void:
+	_cfg.set_value(section, key, value)
 	apply()
 	EventBus.settings_changed.emit()
 
@@ -257,7 +300,8 @@ func apply() -> void:
 		_apply_window()
 		_apply_render_resolution()
 	Engine.max_fps = int(get_value("video", "fps_cap"))
-	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if b("video", "vsync") else DisplayServer.VSYNC_DISABLED)
+	DisplayServer.window_set_vsync_mode(VSYNC_MODES.get(s("video", "vsync"), DisplayServer.VSYNC_ENABLED) as DisplayServer.VSyncMode)
+	RenderQuality.apply_global()
 	TranslationServer.set_locale(s("game", "locale"))
 	var tree: SceneTree = get_tree()
 	if tree != null and tree.root != null:

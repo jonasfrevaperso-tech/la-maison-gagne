@@ -157,7 +157,7 @@ func puff(amount: int) -> void:
 		return
 	var p: CPUParticles3D = smoke.duplicate() as CPUParticles3D
 	p.one_shot = true
-	p.amount = amount
+	p.amount = RenderQuality.particles(amount)
 	p.explosiveness = 0.85
 	p.initial_velocity_min = 0.3
 	p.initial_velocity_max = 0.9
@@ -180,7 +180,7 @@ func make_smoke(parent: Node3D, at: Vector3) -> CPUParticles3D:
 	m.albedo_texture = soft_dot()
 	q.material = m
 	p.mesh = q
-	p.amount = 18
+	p.amount = RenderQuality.particles(18)
 	p.lifetime = 3.2
 	p.position = at
 	p.direction = Vector3.UP

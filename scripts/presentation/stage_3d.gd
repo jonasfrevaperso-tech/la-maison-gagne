@@ -52,20 +52,21 @@ func _init() -> void:
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	EventBus.settings_changed.connect(_apply_quality)
 	_apply_quality()
 
 
 func _apply_quality() -> void:
-	_vp.msaa_3d = RenderQuality.msaa(Viewport.MSAA_2X, Viewport.MSAA_DISABLED)
-	_vp.scaling_3d_scale = RenderQuality.scale_3d(0.7)
+	RenderQuality.configure(_vp, env, _vp.transparent_bg)
 	key.shadow_enabled = RenderQuality.shadows()
-	env.glow_enabled = Settings.f("video", "bloom") > 0.0
+	env.glow_enabled = Settings.f("video", "bloom") > 0.0 and not _vp.transparent_bg
 	env.glow_intensity = 0.4 + 0.8 * Settings.f("video", "bloom")
 
 
 ## Fond transparent : seule la géométrie se dessine (décor 3D posé sur une interface 2D).
 func set_transparent(on: bool) -> void:
 	_vp.transparent_bg = on
+	RenderQuality.configure(_vp, env, on)
 	if on:
 		env.background_mode = Environment.BG_CLEAR_COLOR
 		env.glow_enabled = false
