@@ -22,12 +22,6 @@
   "id": "rhythm",
   "stage": "panel",
   "weight": 1.0,
-  "touch_pad": [
-   "qte_left",
-   "qte_up",
-   "qte_right",
-   "qte_down"
-  ],
   "name_fr": "Effet",
   "name_en": "Spin",
   "desc_fr": "Un morceau démarre : frappe les notes quand elles passent la ligne, accords compris. Ne tape pas dans le vide.",
@@ -41,7 +35,8 @@
    "Notes fall towards the glowing line.",
    "Hit the right lane as the note reaches the line.",
    "Long notes are held until their end."
-  ]
+  ],
+  "touch_direct": true
  },
  {
   "id": "bottles",
@@ -208,12 +203,6 @@
   "id": "simon",
   "stage": "full",
   "weight": 1.0,
-  "touch_pad": [
-   "qte_left",
-   "qte_up",
-   "qte_right",
-   "qte_down"
-  ],
   "name_fr": "Le Juke-box",
   "name_en": "The Jukebox",
   "desc_fr": "Regarde la mélodie de lumières, puis rejoue-la note par note. Trois mélodies, de plus en plus longues.",
@@ -227,7 +216,8 @@
    "Listen to the tune: each note lights a key.",
    "Play it back in the same order.",
    "Each round adds notes."
-  ]
+  ],
+  "touch_direct": true
  },
  {
   "id": "catch",
@@ -237,13 +227,6 @@
   "name_en": "The Grand Chandelier Rain",
   "desc_fr": "La salle de bal prend l'eau… en jetons. Attrape jetons et plaques sous le lustre qui se balance, évite fausses pièces, bouteilles et cigares, et mets ta pile à l'abri avant qu'elle ne se renverse.",
   "desc_en": "The ballroom is leaking… chips. Catch chips and plaques under the swaying chandelier, dodge fakes, bottles and cigars, and bank your stack before it topples.",
-  "touch_stick": true,
-  "touch_pad": [
-   "ui_spin"
-  ],
-  "touch_labels": {
-   "ui_spin": "TOUCH_EMPTY"
-  },
   "tuto_fr": [
    "Des jetons tombent du lustre : rattrape-les sur le plateau.",
    "Évite fausses pièces, bouteilles et cigares.",
@@ -253,16 +236,13 @@
    "Chips fall from the chandelier: catch them on the tray.",
    "Avoid fake coins, bottles and cigars.",
    "Bank your stack before it topples."
-  ]
+  ],
+  "touch_direct": true
  },
  {
   "id": "highlow",
   "stage": "panel",
   "weight": 1.0,
-  "touch_pad": [
-   "ui_up",
-   "ui_down"
-  ],
   "name_fr": "Plus haut, plus bas",
   "name_en": "Higher or Lower",
   "desc_fr": "La carte suivante sera-t-elle plus haute ou plus basse ? Seul le choix le plus probable compte, et vite.",
@@ -276,18 +256,13 @@
    "One card is face up.",
    "Guess whether the next one is higher or lower.",
    "Cards already played help you count."
-  ]
+  ],
+  "touch_direct": true
  },
  {
   "id": "sort",
   "stage": "panel",
   "weight": 1.0,
-  "touch_pad": [
-   "qte_left",
-   "qte_up",
-   "qte_right",
-   "qte_down"
-  ],
   "name_fr": "Tri des jetons",
   "name_en": "Chip Sorting",
   "desc_fr": "Envoie chaque jeton qui passe dans la fenêtre vers le bac de sa couleur. Le tapis accélère.",
@@ -301,7 +276,8 @@
    "Chips ride in on the conveyor belt.",
    "Send each chip to the bin of its colour.",
    "A chip that falls off the belt is lost."
-  ]
+  ],
+  "touch_direct": true
  },
  {
   "id": "invaders",
@@ -363,15 +339,6 @@
   "name_en": "Pachinko",
   "desc_fr": "Les billes dévalent le plateau de clous. Frappe le taquet gauche ou droit quand elles passent dessus pour les renvoyer dans le godet d'or.",
   "desc_en": "Balls tumble through the pins. Flip the left or right kicker as they pass over it to send them into the gold cup.",
-  "touch_pad": [
-   "qte_left",
-   "qte_right"
-  ],
-  "touch_layout": "split",
-  "touch_labels": {
-   "qte_left": "TOUCH_LEFT",
-   "qte_right": "TOUCH_RIGHT"
-  },
   "tuto_fr": [
    "Les billes dévalent le plateau de clous.",
    "Frappe le taquet au moment où une bille passe dessus.",
@@ -381,7 +348,8 @@
    "Balls tumble down the field of pins.",
    "Kick the flipper as a ball rolls over it.",
    "Hit well, it flies into the golden cup."
-  ]
+  ],
+  "touch_direct": true
  },
  {
   "id": "blackjack",
@@ -536,17 +504,6 @@
   "name_en": "The Juggling Act",
   "desc_fr": "Garde les jetons en l'air : frappe la bonne main quand un jeton redescend sur la ligne dorée. Ils sont de plus en plus nombreux.",
   "desc_en": "Keep the chips in the air: strike the right hand as a chip comes down on the gold line. There are more and more of them.",
-  "touch_pad": [
-   "qte_left",
-   "qte_down",
-   "qte_right"
-  ],
-  "touch_layout": "row",
-  "touch_labels": {
-   "qte_left": "TOUCH_LEFT",
-   "qte_down": "TOUCH_MIDDLE",
-   "qte_right": "TOUCH_RIGHT"
-  },
   "tuto_fr": [
    "Les jetons retombent vers la ligne des mains.",
    "Frappe la main sous le jeton quand il touche la ligne.",
@@ -556,7 +513,8 @@
    "Chips fall back towards the line of hands.",
    "Hit the hand under the chip as it reaches the line.",
    "Another chip joins in every so often."
-  ]
+  ],
+  "touch_direct": true
  },
  {
   "id": "billiards",

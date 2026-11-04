@@ -49,12 +49,16 @@ var touch_controls: bool = false
 ## Tuto de première rencontre (1.9) : "" (épreuve réelle), "demo" (le bot joue sous le carton
 ## des étapes) ou "essai" (le joueur s'essaie, la note ne compte pas).
 var rehearsal: String = ""
+## Au doigt, jeu direct sur les objets (1.9, `touch_direct`) : un toucher devient l'action de
+## l'objet touché (tap_action), sans pavé de boutons émulés.
+var direct: bool = false
 var tuto_lines: Array[String] = []
 ## Part du temps de démo / d'essai écoulée (0..1), dessinée en jauge.
 var rehearsal_u: float = 0.0
 ## Carton d'annonce (nom, règle, commandes) avant que l'épreuve ne commence.
 var intro_left: float = 0.0
 var _intro_total: float = 1.0
+var _tap_held: StringName = &""
 var _begun: bool = false
 ## « Prêt ? » : la scène est montée mais rien ne bouge encore (le temps de regarder, D-072).
 var _ready_left: float = 0.0
@@ -118,7 +122,7 @@ func _place_hint() -> void:
 func _refresh_hint() -> void:
 	var key: String = "TRIAL_%s_HINT" % String(entry.get("id", "")).to_upper()
 	var raw: String = tr(key + "_MOUSE") if mouse and tr(key + "_MOUSE") != key + "_MOUSE" else tr(key)
-	if (mouse or touch_controls) and InputGlyphs.using_touch and tr(key + "_TOUCH") != key + "_TOUCH":
+	if (mouse or touch_controls or direct) and InputGlyphs.using_touch and tr(key + "_TOUCH") != key + "_TOUCH":
 		raw = tr(key + "_TOUCH")
 	raw = raw.replace("{confirm}", "{@click}" if mouse else "{ui_spin}")
 	raw = raw.replace("{move}", "{@mouse}" if mouse else ("{@lstick}" if InputGlyphs.using_pad else "{@arrows}"))
@@ -199,8 +203,38 @@ func feed(event: InputEvent) -> bool:
 			_start()
 		return confirm_pressed(event) or sym_pressed(event) >= 0
 	if _ready_left > 0.0:
-		return confirm_pressed(event) or sym_pressed(event) >= 0
+		return confirm_pressed(event) or sym_pressed(event) >= 0 or (direct and event is InputEventMouse)
+	if direct and event is InputEventMouse:
+		return direct_input(event)
 	return handle(event)
+
+
+## Jeu direct : toucher un objet = appuyer sur son action (relâcher = la relâcher).
+func direct_input(event: InputEvent) -> bool:
+	var mb: InputEventMouseButton = event as InputEventMouseButton
+	if mb == null or mb.button_index != MOUSE_BUTTON_LEFT:
+		return true
+	if mb.pressed:
+		var a: StringName = tap_action(mb.position)
+		if a != &"":
+			_tap_held = a
+			handle(_synth(a, true))
+	elif _tap_held != &"":
+		handle(_synth(_tap_held, false))
+		_tap_held = &""
+	return true
+
+
+## Action de l'objet sous le doigt (à redéfinir par les épreuves jouées en direct) ; &"" sinon.
+func tap_action(_pos: Vector2) -> StringName:
+	return &""
+
+
+func _synth(a: StringName, down: bool) -> InputEventAction:
+	var e: InputEventAction = InputEventAction.new()
+	e.action = a
+	e.pressed = down
+	return e
 
 
 func want() -> Dictionary:

@@ -372,3 +372,8 @@ func paint() -> void:
 		o + Vector2(sz.x * 0.5, sz.y)]), Color(1, 1, 1, 0.025))
 	# Pastilles : billes jouées.
 	pips(Vector2(c, 70.0), _scores, pi("balls"))
+
+
+## Au doigt : le taquet du côté touché.
+func tap_action(pos: Vector2) -> StringName:
+	return &"qte_left" if pos.x < size.x * 0.5 else &"qte_right"

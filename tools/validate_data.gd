@@ -167,6 +167,13 @@ func _validate_entry(db: ContentDB, cat: String, e: Dictionary) -> void:
 		for a: Variant in e.get("touch_pad", []):
 			if not TOUCH_PAD_ACTIONS.has(String(a)) or not InputMap.has_action(StringName(String(a))):
 				errors.append("%s : touch_pad « %s » inconnu" % [eid, a])
+		# 1.9 : jeu direct au doigt — l'épreuve doit traduire le toucher, et n'a pas de pavé.
+		if bool(e.get("touch_direct", false)):
+			var src: String = FileAccess.get_file_as_string("res://scripts/presentation/trials/trial_%s.gd" % String(e.get("id", "")))
+			if not src.contains("func tap_action") and not src.contains("func direct_input"):
+				errors.append("%s : touch_direct sans tap_action ni direct_input" % eid)
+			if e.has("touch_pad") or e.has("touch_stick"):
+				errors.append("%s : touch_direct et pavé émulé à la fois" % eid)
 		# 1.9 : tuto de première rencontre, 2 à 4 étapes par langue.
 		for lang: String in ["fr", "en"]:
 			var steps: Array = e.get("tuto_" + lang, []) as Array

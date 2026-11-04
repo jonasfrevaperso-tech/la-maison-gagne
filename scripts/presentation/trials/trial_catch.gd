@@ -441,7 +441,7 @@ func tick(dt: float) -> void:
 	var wish: float = 0.0
 	if _stun <= 0.0:
 		wish = clampf(held_vector().x + _bot_axis, -1.0, 1.0) * p("tray_speed")
-		if mouse and _mouse_x >= 0.0:
+		if (mouse or direct) and _mouse_x >= 0.0:
 			wish = clampf((_mouse_x - _x) * p("mouse_gain"), -p("tray_speed"), p("tray_speed"))
 	var dv: float = (wish - _v) * minf(1.0, p("tray_accel") * dt)
 	_v += dv
@@ -587,6 +587,8 @@ func bot_apply(want: Dictionary) -> void:
 
 
 func paint() -> void:
+	if direct:
+		_draw_bank_button()
 	_sync_3d(get_process_delta_time())
 	var total: float = _banked + _stack_val
 	var status: String = tr("TRIAL_CATCH_STATUS") % roundi(total)
@@ -611,3 +613,32 @@ func paint() -> void:
 	for b: String in _bonus.keys():
 		text(Vector2(bx, HUD_Y), tr("TRIAL_CATCH_BONUS_" + b.to_upper()), UiKit.SIZE_SMALL, BONUS_COLORS[b])
 		bx += 220.0
+
+
+## Au doigt : le plateau suit le doigt ; toucher le bouton VIDER (sur le comptoir) met la pile
+## à l'abri. Un toucher ailleurs ne vide jamais.
+func direct_input(event: InputEvent) -> bool:
+	var mb: InputEventMouseButton = event as InputEventMouseButton
+	if mb != null and mb.button_index == MOUSE_BUTTON_LEFT:
+		if mb.pressed and mb.position.distance_to(_bank_button()) <= p("bank_button_r"):
+			_bank()
+		elif mb.pressed:
+			_mouse_x = mb.position.x
+		return true
+	var mm: InputEventMouseMotion = event as InputEventMouseMotion
+	if mm != null and mm.button_mask & MOUSE_BUTTON_MASK_LEFT != 0 and mm.position.distance_to(_bank_button()) > p("bank_button_r"):
+		_mouse_x = mm.position.x
+	return true
+
+
+func _bank_button() -> Vector2:
+	var pr: Rect2 = play_rect()
+	return Vector2(pr.end.x - p("bank_button_r") - 40.0, pr.end.y - p("bank_button_r") - 40.0)
+
+
+func _draw_bank_button() -> void:
+	var c: Vector2 = _bank_button()
+	var r: float = p("bank_button_r")
+	draw_circle(c, r, Color(Palette.INK, 0.85))
+	draw_arc(c, r, 0, TAU, 48, Palette.GOLD if _stack_n > 0 else Palette.SMOKE, 4.0)
+	text(c, tr("TOUCH_EMPTY"), UiKit.SIZE_H2, Palette.GOLD_LIGHT if _stack_n > 0 else Palette.SMOKE)

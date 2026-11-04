@@ -104,3 +104,86 @@ func _mm(at: Vector2) -> InputEventMouseMotion:
 	var m: InputEventMouseMotion = InputEventMouseMotion.new()
 	m.position = at
 	return m
+
+
+## Jeu direct au doigt : chaque geste du bot devient un vrai toucher sur l'objet (trouvé en
+## balayant l'écran avec tap_action) ; l'épreuve doit se jouer et bien se noter ainsi.
+func test_direct_touch_plays() -> void:
+	_boot()
+	for id: String in ["simon", "rhythm", "highlow", "sort", "juggle", "pachinko"]:
+		var e: Dictionary = DataRegistry.db.get_entry("throw_trials", id)
+		check(bool(e.get("touch_direct", false)), "%s : jeu direct déclaré" % id)
+		var trial: ThrowTrial = (load(ThrowMinigame.TRIAL_SCRIPTS % id) as GDScript).new() as ThrowTrial
+		trial.setup(e, 1, false, false)
+		trial.direct = true
+		trial.size = ThrowMinigame.PANEL_RECT.size if not trial.full() else UiLayout.DESIGN_SIZE
+		trial._begun = true
+		trial.begin()
+		var spots: Dictionary = {}
+		var release: StringName = &""
+		var guard: int = 0
+		while not trial.finished and guard < 60 * 60:
+			guard += 1
+			if release != &"":
+				trial.feed(_mb(spots[release] as Vector2, false))
+				release = &""
+			var w: Dictionary = trial.bot_wants()
+			var a: StringName = _want_action(w)
+			if a != &"":
+				if not spots.has(a):
+					spots[a] = _find_spot(trial, a)
+				if String(w["do"]) == "release":
+					trial.feed(_mb(spots[a] as Vector2, false))
+				else:
+					trial.feed(_mb(spots[a] as Vector2, true))
+					if id != "rhythm":
+						release = a
+			trial.t += 1.0 / 60.0
+			trial.tick(1.0 / 60.0)
+		check(trial.finished, "%s : terminée au doigt" % id)
+		check(trial.score >= 0.6, "%s : bien jouée au doigt (%.2f)" % [id, trial.score])
+		for s: Variant in spots.values():
+			check((s as Vector2).x >= 0.0, "%s : un objet répond à chaque action" % id)
+		trial.free()
+
+
+func _want_action(w: Dictionary) -> StringName:
+	match String(w.get("do", "")):
+		"sym", "release":
+			return ThrowTrial.QTE_ACTIONS[int(w.get("symbol", 0))]
+		"dir":
+			var d: Vector2i = w["dir"] as Vector2i
+			return &"ui_up" if d == Vector2i.UP else (&"ui_down" if d == Vector2i.DOWN else (&"ui_left" if d == Vector2i.LEFT else &"ui_right"))
+	return &""
+
+
+func _find_spot(trial: ThrowTrial, a: StringName) -> Vector2:
+	var y: float = 0.0
+	while y < trial.size.y:
+		var x: float = 0.0
+		while x < trial.size.x:
+			if trial.tap_action(Vector2(x, y)) == a:
+				return Vector2(x, y)
+			x += 20.0
+		y += 20.0
+	return Vector2(-1, -1)
+
+
+## Pluie au doigt : le plateau suit le doigt ; seul le bouton VIDER met la pile à l'abri.
+func test_catch_direct_bank() -> void:
+	_boot()
+	var c: TrialCatch = (load(ThrowMinigame.TRIAL_SCRIPTS % "catch") as GDScript).new() as TrialCatch
+	c.setup(DataRegistry.db.get_entry("throw_trials", "catch"), 1, false, false)
+	c.direct = true
+	c.size = UiLayout.DESIGN_SIZE
+	c._begun = true
+	c.begin()
+	c._stack_n = 3
+	c._stack_val = 3.0
+	c.feed(_mb(Vector2(500, 600), true))
+	eq(c._banked, 0.0, "toucher le décor ne vide pas")
+	eq(c._mouse_x, 500.0, "le plateau suit le doigt")
+	c.feed(_mb(Vector2(500, 600), false))
+	c.feed(_mb(c._bank_button(), true))
+	eq(c._banked, 3.0, "VIDER met la pile à l'abri")
+	c.free()

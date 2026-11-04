@@ -435,3 +435,12 @@ func _prompt(at: Vector2, sym: int, alpha: float) -> void:
 	var tri: PackedVector2Array = PackedVector2Array([at + d * 12.0, at - d * 5.0 + n * 10.0, at - d * 5.0 - n * 10.0])
 	draw_colored_polygon(tri, Color(Palette.GOLD_LIGHT, alpha))
 	draw_line(at - d * 12.0, at - d * 3.0, Color(Palette.GOLD_LIGHT, alpha), 5.0)
+
+
+## Au doigt : la piste touchée (les pistes sont des bandes horizontales).
+func tap_action(pos: Vector2) -> StringName:
+	var best: int = 0
+	for lane: int in _lanes:
+		if absf(pos.y - _lane_y(lane)) < absf(pos.y - _lane_y(best)):
+			best = lane
+	return QTE_ACTIONS[best]

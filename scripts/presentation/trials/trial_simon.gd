@@ -236,3 +236,11 @@ func _sync_3d() -> void:
 		_btn_light[k].light_energy = 2.5 if on else 0.0
 		var pc: Vector3 = stage.to3(_pad_center(k), 0.0)
 		_btn3[k].position = pc + Vector3(0, 0, -0.06 if on else 0.0)
+
+
+## Au doigt : la touche du juke-box sous le doigt.
+func tap_action(pos: Vector2) -> StringName:
+	for k: int in _keys():
+		if pos.distance_to(_pad_center(k)) < PAD.x * 0.75:
+			return QTE_ACTIONS[k]
+	return &""

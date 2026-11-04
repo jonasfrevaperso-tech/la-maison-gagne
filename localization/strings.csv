@@ -610,7 +610,7 @@ HUD_STAKE_BTN,Mise ×%d,Stake ×%d
 HUD_STAKE_TIP,"Jetons posés à chaque toucher du tapis (1, 2, 5 ou 10).","Chips placed with each tap on the felt (1, 2, 5 or 10)."
 TRIAL_DARTS_HINT_TOUCH,Joystick à gauche pour corriger la visée · LANCER à droite,Joystick on the left to steady the aim · THROW on the right
 TRIAL_SAFE_HINT_TOUCH,Tourne la molette du doigt {@drag} · touche {@tap} pour valider,Turn the dial with your finger {@drag} · tap {@tap} to lock
-TRIAL_CATCH_HINT_TOUCH,Joystick pour déplacer le plateau · VIDER pour mettre la pile à l'abri,Joystick to move the tray · BANK to save your stack
+TRIAL_CATCH_HINT_TOUCH,Fais glisser {@drag} le plateau du doigt · VIDER pour mettre la pile à l'abri,Slide {@drag} the tray with your finger · BANK to save your stack
 TRIAL_MEMORY_HINT_TOUCH,Touche {@tap} une carte pour la retourner,Tap {@tap} a card to flip it
 TRIAL_SHELLS_HINT_TOUCH,Touche {@tap} un gobelet pour le soulever,Tap {@tap} a cup to lift it
 OPT_AUDIO_OFFSET,Décalage audio (ms),Audio offset (ms)
@@ -695,7 +695,7 @@ TRIAL_CAVE_HIT,Aïe !,Ouch!
 TRIAL_CAVE_TREASURE,Trésor !,Treasure!
 TRIAL_PACHINKO_HINT,"{qte_left} taquet gauche · {qte_right} taquet droit, quand la bille passe","{qte_left} left kicker · {qte_right} right kicker, as the ball passes"
 TRIAL_PACHINKO_HINT_MOUSE,"{@click} taquet gauche · {@right_click} taquet droit, quand la bille passe","{@click} left kicker · {@right_click} right kicker, as the ball passes"
-TRIAL_PACHINKO_HINT_TOUCH,GAUCHE ou DROITE quand la bille passe sur le taquet,LEFT or RIGHT as the ball crosses the kicker
+TRIAL_PACHINKO_HINT_TOUCH,Touche {@tap} à gauche ou à droite quand la bille passe sur le taquet,Tap {@tap} left or right as the ball crosses the kicker
 TRIAL_PACHINKO_GOLD,Godet d'or !,Gold cup!
 TRIAL_PACHINKO_SILVER,Argent,Silver
 TRIAL_PACHINKO_GUTTER,Gouttière,Gutter
@@ -757,7 +757,7 @@ TRIAL_LASERS_ALARM,Alarme !,Alarm!
 TRIAL_LASERS_STATUS,Faisceaux touchés : %d,Beams touched: %d
 TRIAL_JUGGLE_HINT,"{qte_left} gauche · {qte_down} milieu · {qte_right} droite, quand le jeton touche la ligne","{qte_left} left · {qte_down} middle · {qte_right} right, as the chip reaches the line"
 TRIAL_JUGGLE_HINT_MOUSE,{@click} sous le jeton qui redescend sur la ligne,{@click} under the chip coming down to the line
-TRIAL_JUGGLE_HINT_TOUCH,"GAUCHE, MILIEU ou DROITE quand le jeton touche la ligne","LEFT, MIDDLE or RIGHT as the chip reaches the line"
+TRIAL_JUGGLE_HINT_TOUCH,Touche {@tap} la main sous le jeton quand il touche la ligne,Tap {@tap} the hand under the chip as it reaches the line
 TRIAL_JUGGLE_DROP,Tombé !,Dropped!
 TRIAL_JUGGLE_STATUS,Rattrapés : %d · jetons en l'air : %d,Caught: %d · chips in the air: %d
 TRIAL_BILLIARDS_HINT,"{move} viser · maintiens {confirm} pour la force, lâche pour jouer","{move} aim · hold {confirm} for power, release to play"
@@ -808,3 +808,7 @@ TRIAL_DERBY_GOOD,Bien,Good
 TRIAL_DERBY_OFF,À contretemps,Off beat
 TRIAL_DERBY_ALTERNATE,Alterne !,Alternate!
 TRIAL_DERBY_BEAT,Frappe sur la ligne,Hit on the line
+TRIAL_SIMON_HINT_TOUCH,Rejoue la mélodie en touchant {@tap} les boutons du juke-box,Play the melody back by tapping {@tap} the jukebox buttons
+TRIAL_RHYTHM_HINT_TOUCH,"Touche {@tap} la piste quand la note passe la ligne, garde le doigt sur les notes longues","Tap {@tap} the lane as the note crosses the line, keep your finger on long notes"
+TRIAL_HIGHLOW_HINT_TOUCH,Touche {@tap} en haut : plus haut · en bas : plus bas,Tap {@tap} the top: higher · the bottom: lower
+TRIAL_SORT_HINT_TOUCH,Touche {@tap} le bac de la couleur du jeton qui passe dans le cadre,Tap {@tap} the bin matching the colour of the chip in the frame

@@ -187,12 +187,14 @@ func _open_trial() -> void:
 	_rehearse_t = 0.0
 	# Au doigt, une épreuve à symboles se joue comme à la manette, avec le pavé de boutons.
 	var pad: Array[String] = []
-	var stick: bool = InputGlyphs.using_touch and bool(e.get("touch_stick", false))
+	var direct: bool = InputGlyphs.using_touch and bool(e.get("touch_direct", false))
+	var stick: bool = InputGlyphs.using_touch and bool(e.get("touch_stick", false)) and not direct
 	var pad_layout: String = String(e.get("touch_layout", ""))
-	if InputGlyphs.using_touch:
+	if InputGlyphs.using_touch and not direct:
 		for a: Variant in e.get("touch_pad", []):
 			pad.append(String(a))
-	trial = (scr.new() as ThrowTrial).setup(e, _precision, _assist, _mouse and pad.is_empty() and not stick)
+	trial = (scr.new() as ThrowTrial).setup(e, _precision, _assist, _mouse and pad.is_empty() and not stick and not direct)
+	trial.direct = direct
 	if practice and not _practice_diff.is_empty():
 		trial.slow = float(_practice_diff.get("slow", trial.slow))
 		trial.widen_k = float(_practice_diff.get("widen", trial.widen_k))

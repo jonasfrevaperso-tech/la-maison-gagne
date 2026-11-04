@@ -191,3 +191,8 @@ func _arrow(at: Vector2, dir: float, col: Color) -> void:
 	draw_arc(at, 30.0, 0, TAU, 28, col, 2.0)
 	draw_colored_polygon(PackedVector2Array([at + Vector2(0, dir * 16.0), at + Vector2(-14, -dir * 10.0), at + Vector2(14, -dir * 10.0)]),
 		col)
+
+
+## Au doigt : moitié haute = plus haut, moitié basse = plus bas.
+func tap_action(pos: Vector2) -> StringName:
+	return &"ui_up" if pos.y < play_rect().get_center().y else &"ui_down"

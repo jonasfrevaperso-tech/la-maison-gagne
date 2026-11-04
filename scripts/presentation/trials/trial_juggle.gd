@@ -313,3 +313,12 @@ func paint() -> void:
 	draw_rect(Rect2(size.x * 0.5 - 300, 120, 600 * left, 10), Palette.GOLD)
 	var caught: int = _marks.filter(func(m: float) -> bool: return m > 0.0).size()
 	text(Vector2(size.x * 0.5, 170.0), tr("TRIAL_JUGGLE_STATUS") % [caught, _chips.size()], UiKit.SIZE_BODY, Palette.IVORY)
+
+
+## Au doigt : la main la plus proche du toucher.
+func tap_action(pos: Vector2) -> StringName:
+	var best: int = 0
+	for k: int in LANES:
+		if absf(pos.x - LANE_X[k]) < absf(pos.x - LANE_X[best]):
+			best = k
+	return [&"qte_left", &"qte_down", &"qte_right"][best]

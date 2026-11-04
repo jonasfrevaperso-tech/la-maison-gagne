@@ -274,3 +274,14 @@ func paint() -> void:
 		draw_line(corner, corner + Vector2(22.0 * sx, 0), Palette.GOLD_LIGHT, 4.0)
 		draw_line(corner, corner + Vector2(0, 22.0 * sy), Palette.GOLD_LIGHT, 4.0)
 	text(Vector2(r.end.x - 110.0, r.position.y + 40.0), "%d / %d" % [_good, pi("chips")], UiKit.SIZE_BODY, Palette.IVORY, "mono")
+
+
+## Au doigt : le bac touché (le plus proche).
+func tap_action(pos: Vector2) -> StringName:
+	var c0: Vector2 = _window().get_center()
+	var best: int = 0
+	for k: int in _kinds():
+		var at: Vector2 = c0 + DIRS[_dir_of(k)] * BIN_GAP
+		if pos.distance_to(at) < pos.distance_to(c0 + DIRS[_dir_of(best)] * BIN_GAP):
+			best = k
+	return QTE_ACTIONS[best]
