@@ -54,6 +54,9 @@ func _ready() -> void:
 	room_index = clampi(room_index, 0, maxi(rooms.size() - 1, 0))
 	_view = MuseumRoom3D.new()
 	add_child(_view)
+	if Platform.is_mobile():  # la salle déborde sous le poinçon et les coins arrondis
+		_view.offset_left = -ThrowMinigame.MOBILE_EDGE_BLEED
+		_view.offset_right = ThrowMinigame.MOBILE_EDGE_BLEED
 	_build_ui()
 	_build_play_layer()
 	_show_room(room_index, 0)
@@ -194,7 +197,7 @@ func _show_room(k: int, focus: int) -> void:
 		b.queue_free()
 	_strip_buttons.clear()
 	for i: int in _view.exhibits.size():
-		var b: Button = UiKit.button(_strip_label(_view.exhibits[i]), play_current, Vector2(0, 56))
+		var b: Button = UiKit.button(_strip_label(_view.exhibits[i]), _on_strip.bind(i), Vector2(0, 56))
 		b.clip_text = true
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.focus_entered.connect(select.bind(i))
@@ -204,6 +207,19 @@ func _show_room(k: int, focus: int) -> void:
 	select(clampi(focus, 0, _strip_buttons.size() - 1))
 	if not _strip_buttons.is_empty():
 		_strip_buttons[_view.focus].call_deferred("grab_focus")
+
+
+## Rangée des objets : au doigt, toucher choisit (« Jouer » lance) ; manette et souris jouent.
+func _on_strip(k: int) -> void:
+	if InputGlyphs.using_touch and not InputGlyphs.using_pad and k != _view.focus:
+		select(k)
+		_strip_buttons[k].grab_focus()
+		return
+	if InputGlyphs.using_touch and not InputGlyphs.using_pad:
+		_strip_buttons[k].grab_focus()
+		_play_btn.grab_focus()
+		return
+	play_current()
 
 
 func _strip_label(trial_id: String) -> String:
@@ -279,7 +295,7 @@ func _on_swipe(event: InputEvent) -> void:
 			var dx: float = x - _drag_x
 			if absf(dx) >= SWIPE_PX:
 				select(_view.focus + (-1 if dx > 0.0 else 1))
-				if InputGlyphs.using_pad and _view.focus < _strip_buttons.size():
+				if _view.focus < _strip_buttons.size():
 					_strip_buttons[_view.focus].grab_focus()
 
 
