@@ -3,8 +3,8 @@
 > Reprise après coupure : lire ce fichier, `CLAUDE.md`, puis `docs/DECISIONS.md`. Lancer `tools/check.sh`.
 
 ## État courant
-- Phase en cours : **Livré (1.3.0)** — suite : test sur un vrai Steam Deck (`docs/STEAM_DECK.md`), sessions humaines (`docs/PLAYTEST.md`), `docs/ROADMAP.md` (1.4)
-- Dernier tag : `v1.3.0`
+- Phase en cours : **Livré (1.8.0 « Le Musée »)** — voir la section 1.8.0 en fin de fichier
+- Dernier tag : `v1.8.0` / `v1.8.0-android`
 
 ## Phase 0 — Reconnaissance ✅
 - Environnement : Godot 4.7.2 (MCP godot OK), Blender 5.2.2, Python 3.14 + numpy 2.4 + Pillow 12, uv, gdtoolkit 4 (installé via uv), git 2.53, 12 cœurs.
@@ -205,3 +205,11 @@ Plan : phases 21 à 27 (remarques de test sur les deux versions).
 - **Phase 27 — Publication** ✅ (`phase-27-release`).
 
 Bilan 1.7.0 : `tools/check.sh` vert (122 tests, banc des 25 épreuves : bot ≥ 0,8, inactif ≤ 0,4, interface PC et mobile 204 vues, confirmations à la manette, campagne gagnée à la manette seule). Les bots des épreuves ne font plus qu'un geste de manette par image, rejoué tel quel par la campagne à la manette. Chauffe : 30 scènes, 124 pipelines en ≈ 3,4 s derrière le carton ; aucune image de plus de 50 ms une fois la partie ouverte (PC). Mémoire vidéo en émulation mobile : ≈ 241 Mo. Pixel 7 (adb) : installation par-dessus la 1.6.0 sans perte de sauvegarde, chauffe par lots de 6 scènes ≈ 5,2 s (au lieu de 11,6 s), fléchettes au joystick en plein écran, lancer complet sans erreur au logcat.
+
+## Version 1.8.0 — « Le Musée » (PC + Android)
+Plan : phases 28 à 32 (remarques de test sur les deux versions).
+- **Phase 28 — Correctifs** ✅ (`phase-28-correctifs`) : dialogues d'acte une fois par profil, cases misées marquées (liseré, pastille, assombrissement en visée), Blackjack lisible, Pluie / Envahisseurs / Cave adoucies.
+- **Phase 29 — Difficulté** ✅ (`phase-29-difficulte`) : bot humain au banc (D-072), « Prêt ? » de 0,6 s, dix épreuves ralenties ou élargies.
+- **Phase 30 — Rework des épreuves** ✅ (`phase-30a` arcade, `phase-30b` table, `phase-30c` adresse, `phase-30d` Élan / Effet / Tri, `phase-30e` harmonisation) : les 14 épreuves à plat passent en 3D (D-073).
+- **Phase 31 — Le Musée** ✅ (`phase-31a-musee-salles`, `phase-31b-musee-jeu`) : cinq salles, 25 maquettes, entraînement à trois difficultés, records et médailles, deux succès (D-074).
+- **Phase 32 — Publication** ✅ (`phase-32-release`).

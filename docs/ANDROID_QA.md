@@ -36,6 +36,13 @@ une main sur un vrai téléphone peut juger. Cocher, noter le modèle et la vers
 - [ ] Coffre-fort : la molette tourne au doigt.
 - [ ] Cartons d'annonce : commandes tactiles affichées ; toucher passe le carton.
 
+## Le Musée
+- [ ] Menu : « Le Musée » sur la ligne de « Nouvelle partie » ; carton de chargement à l'entrée.
+- [ ] Glisser sur la salle passe d'un objet à l'autre ; toucher un objet de la rangée le choisit et le joue.
+- [ ] Boutons « Salle précédente / suivante » ; Retour (geste) revient au menu, ou au musée depuis une épreuve.
+- [ ] Une épreuve « panel » et une épreuve « full » en plein écran, pavé et joystick affichés ; écran de résultat (note, médaille, Rejouer).
+- [ ] Record conservé après fermeture de l'application.
+
 ## Système
 - [x] Bouton/geste Retour : ferme la surcouche, sinon ouvre la pause ; sur le titre, demande avant de quitter.
 - [x] Mise en arrière-plan en pleine épreuve, retour : jeu en pause, rien de perdu.

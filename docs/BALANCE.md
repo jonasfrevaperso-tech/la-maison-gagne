@@ -290,3 +290,37 @@ Les familles de grigris (paliers 2/3/5) renforcent nettement les builds : avec l
 | expert | 1 / 2 | 2 × 100 | 44,0 / 54,0 % (**49,0 %**, erreur type ≈ 3,5 points) |
 
 Glouton dans la cible (35–45 %), expert au niveau de la 1.5.3 (48,0 %).
+
+## Version 1.8.0
+
+Banc des épreuves (`--dev-trial-bench=3`, moyenne de trois graines) avec le bot « humain » de D-072. Critères : bot parfait ≥ 0,8, bot humain ≥ 0,55, inactif ≤ 0,4, durée ≤ 22 s. Les graines changent d'un passage à l'autre : une épreuve proche d'un seuil y oscille de quelques centièmes. Cave : moyenne de cinq passages après ses réglages.
+
+| Épreuve | Bot | Humain | Inactif | Durée |
+|---|---|---|---|---|
+| Élan | 1,00 | 0,60 | 0,00 | 5,7 s |
+| Effet | 1,00 | 0,99 | 0,00 | 12,6 s |
+| Bouteilles | 1,00 | 0,63 | 0,00 | 11,5 s |
+| Mémoire | 1,00 | 1,00 | 0,00 | 6,2 s |
+| Bonneteau | 0,99 | 0,98 | 0,00 | 18,5 s |
+| Fléchettes | 1,00 | 0,79 | 0,05 | 5,9 s |
+| Coffre-fort | 1,00 | 0,81 | 0,00 | 3,5 s |
+| Tour de jetons | 1,00 | 0,67 | 0,17 | 9,8 s |
+| Shaker | 1,00 | 0,68 | 0,00 | 7,8 s |
+| Verre parfait | 1,00 | 0,74 | 0,00 | 6,6 s |
+| Juke-box | 1,00 | 1,00 | 0,00 | 18,0 s |
+| Pluie du Grand Lustre | 0,90 | 0,91 | 0,40 | 19,0 s |
+| Plus haut / plus bas | 1,00 | 1,00 | 0,00 | 7,2 s |
+| Tri des jetons | 1,00 | 1,00 | 0,00 | 14,1 s |
+| Envahisseurs | 1,00 | 0,76 | 0,00 | 13,2 s |
+| Cave | 0,95 | 0,82 | 0,01 | 17,8 s |
+| Pachinko | 0,94 | 0,80 | 0,21 | 13,5 s |
+| Blackjack | 1,00 | 1,00 | 0,00 | 17,3 s |
+| Grattage | 0,88 | 0,85 | 0,00 | 8,1 s |
+| Dés | 1,00 | 0,75 | 0,07 | 13,8 s |
+| Tiercé | 1,00 | 0,97 | 0,00 | 9,8 s |
+| Pêche | 0,94 | 0,84 | 0,02 | 18,3 s |
+| Lasers | 0,86 | 1,00 | 0,00 | 10,0 s |
+| Jonglage | 1,00 | 0,95 | 0,00 | 17,0 s |
+| Billard | 0,96 | 0,91 | 0,20 | 15,6 s |
+
+Réglages de la 1.8 : Billard en quatre coups, visée 0,7 (la note humaine variait de 0,47 à 0,83 sur trois coups) ; Cave en six segments, fosses de 150 px, tonneaux à 140 px/s, rats plus lents, câble saisissable dès 30 % de sa longueur avec une prise ×1,9 (la note humaine tombait parfois sous 0,5 : le parcours n'était pas fini à temps après une chute). Le Musée applique en Détente le ralenti et l'élargissement de l'assistance (×1,4 et ×1,3) et en Expert ×0,85 ; médailles à 0,5 / 0,7 / 0,9.

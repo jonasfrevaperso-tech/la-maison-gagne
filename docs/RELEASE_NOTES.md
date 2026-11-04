@@ -1,3 +1,40 @@
+# Notes de version — 1.8.0 « Le Musée »
+
+Une mise à jour pour les deux versions du jeu. Chaque point précise la version concernée : **[PC]**, **[Android]** ou **[PC + Android]**.
+
+## Le Musée [PC + Android]
+Un nouveau mode, ouvert depuis le menu principal (et depuis le Codex) : **cinq salles en vitrine** où chaque épreuve du lancer est exposée sous la forme d'une maquette 3D, sur un piédestal éclairé, avec son cartel de laiton.
+- **Les salles** : le Bar (Bouteilles, Shaker, Verre parfait, Juke-box, Fléchettes), le Salon des cartes (Bonneteau, Mémoire, Blackjack, Plus haut / plus bas, Grattage, Dés), la Salle d'arcade (Envahisseurs, Pachinko, Tiercé, Effet), le Hall et la Fontaine (Pêche, Jonglage, Pluie, Billard, Élan) et les Coffres (Coffre-fort, Lasers, Cave, Tour, Tri). Les 25 épreuves y sont, chacune une fois.
+- **Se déplacer** : à la manette, gauche / droite entre les objets et LB / RB entre les salles ; à la souris, survoler un objet ; au doigt, glisser sur la salle ou toucher la rangée des objets.
+- **S'entraîner** : « Jouer » lance l'épreuve seule, sans lâcher et sans lien avec une partie, en **Détente** (plus lent, cibles plus larges), **Normal** ou **Expert** (un peu plus rapide).
+- **Records et médailles** : la meilleure note par épreuve et par difficulté, et une médaille **bronze** (50 %), **argent** (70 %) ou **or** (90 %). La Détente plafonne au bronze. Compteur de médailles par salle et au total. Rien de tout cela n'influe sur les parties.
+- **Succès** : « Visite guidée » (une première médaille) et « Conservateur » (l'or aux 25 épreuves).
+- Les épreuves pas encore croisées en partie se jouent aussi, marquées « inédites » sur leur cartel.
+
+## Les épreuves refaites [PC + Android]
+Les quatorze épreuves qui étaient dessinées à plat passent en **3D**, avec un vrai décor :
+- **Arcade** : borne des Envahisseurs sous sa vitre, caves voûtées de la Cave (tonneaux, lampes à huile), plateau de Pachinko sous verre aux clous de laiton, manège forain du Tiercé avec ses chevaux de bois.
+- **Table** : table de blackjack en feutrine avec de vraies cartes et un sabot, cartes 3D de Plus haut / plus bas, table de craps et dés qui roulent, ticket à gratter posé sur le comptoir d'un tabac.
+- **Adresse** : fontaine du hall avec eau animée et carpes pour la Pêche, salle des coffres enfumée traversée de faisceaux pour les Lasers, scène de cabaret sous projecteur pour le Jonglage, billard aux billes laquées et à la queue visible.
+- **Élan** : jauge de laiton gravée devant le rebord de la roue. **Effet** : club de jazz (disque, égaliseur, projecteurs) derrière des pistes lumineuses. **Tri** : tapis roulant à lattes et bacs-gobelets, jetons de casino en relief.
+- **Tour de jetons** : guichet de la caisse en fond (boiseries, barreaux de laiton, présentoirs).
+
+## Un rythme plus humain [PC + Android]
+- Toutes les épreuves sont mesurées par un **bot « humain »** (temps de réaction, gestes imprécis, six gestes par seconde au plus) : chacune doit lui rester jouable. Celles qui allaient trop vite ont été ralenties ou élargies, notamment l'Élan, les Bouteilles, la Tour, le Shaker, les Dés, le Tiercé et le Billard.
+- Chaque épreuve commence par un court « Prêt ? » pour regarder la scène.
+- **Blackjack** : 6 s par décision, distribution plus lente, pause après chaque carte ; la vitesse ne compte qu'après le temps de lecture.
+- **Pluie du Grand Lustre**, **Envahisseurs** et **Cave** : plus lents et plus tolérants.
+- **Billard** : quatre coups, visée plus douce, billes et poches plus grosses.
+
+## Corrections [PC + Android]
+- **Dialogue d'ouverture** : il ne se joue plus qu'une fois par profil ; une nouvelle partie ne rejoue que la réplique à choix. Option Jeu → « Revoir les dialogues de l'histoire ».
+- **Cases misées sur la roue** : un liseré doré et une pastille-jeton (avec le nombre de jetons) marquent chaque case misée ; pendant la visée, les cases non misées s'assombrissent (plus encore en contraste renforcé).
+
+## Android
+- Le Musée se joue au doigt (glisser entre les objets, rangée d'objets en bas, boutons de salle en haut). Au menu, « Le Musée » est sur la ligne de « Nouvelle partie ».
+
+---
+
 # Notes de version — 1.7.0 « Salle de jeux »
 
 Une mise à jour pour les deux versions du jeu. Chaque point précise la version concernée : **[PC]**, **[Android]** ou **[PC + Android]**.
