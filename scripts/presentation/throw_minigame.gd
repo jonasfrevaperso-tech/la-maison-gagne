@@ -8,6 +8,8 @@ extends Control
 ## Temps réel : la vitesse de jeu ne fausse jamais le geste.
 
 signal finished(quality: float)
+## Musée : épreuve d'entraînement terminée (note de l'épreuve, pas de lâcher).
+signal practice_done(score: float)
 
 enum Beat { IDLE, TRIAL, PAUSE, RELEASE, DONE }
 
@@ -40,12 +42,18 @@ var release_point: Vector2 = Vector2.ZERO
 var hold: Callable = Callable()
 ## Calque plein écran (coordonnées de maquette) qui accueille les épreuves à écran dédié.
 var full_host: Control = null
+## Cadre et agrandissement des épreuves « panel » sur PC (le Musée les centre en grand).
+var panel_rect: Rect2 = PANEL_RECT
+var panel_scale: float = 1.0
+## Entraînement du Musée : une épreuve, sans lâcher ; difficulté (museum.difficulty.*).
+var practice: bool = false
 var trial_ids: Array[String] = []
 var trial_scores: Array[float] = []
 var release_score: float = 0.0
 var quality: float = 0.0
 var trial: ThrowTrial = null
 var _index: int = 0
+var _practice_diff: Dictionary = {}
 var _precision: int = 1
 var _assist: bool = false
 var _mouse: bool = false
@@ -66,6 +74,7 @@ func _ready() -> void:
 
 
 func start(precision: int, assist: bool, count: int = -1) -> void:
+	practice = false
 	_precision = precision
 	_assist = assist
 	_mouse = (GameInput.last_was_mouse or InputGlyphs.using_touch) and not InputGlyphs.using_pad
@@ -82,6 +91,34 @@ func start(precision: int, assist: bool, count: int = -1) -> void:
 	_index = 0
 	AudioBus.play("whoosh", 1.2, -6.0)
 	_open_trial()
+
+
+## Musée : joue l'épreuve `id` seule, à la difficulté `difficulty` (relax|normal|expert),
+## sans lâcher ni lien avec une partie ; `practice_done` rend sa note.
+func start_practice(id: String, difficulty: String) -> void:
+	_practice_diff = Balance.data().get("museum", {}).get("difficulty", {}).get(difficulty, {}) as Dictionary
+	var assist: bool = bool(_practice_diff.get("assist", false))
+	_close_trial()
+	practice = true
+	_precision = Balance.i("museum.precision")
+	_assist = assist
+	_mouse = (GameInput.last_was_mouse or InputGlyphs.using_touch) and not InputGlyphs.using_pad
+	trial_ids = [id] as Array[String]
+	trial_scores.clear()
+	release_score = 0.0
+	_grade_t = 0.0
+	_index = 0
+	AudioBus.play("whoosh", 1.2, -6.0)
+	_open_trial()
+
+
+## Interrompt tout (Musée : retour en pleine épreuve).
+func stop() -> void:
+	_close_trial()
+	practice = false
+	beat = Beat.IDLE
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	queue_redraw()
 
 
 ## Force les épreuves (tests, outil de capture).
@@ -101,7 +138,8 @@ func steps() -> Array[String]:
 	var out: Array[String] = []
 	for id: String in trial_ids:
 		out.append(Localization.name_of("throw_trials", id))
-	out.append(tr("THROW_BEAT_RELEASE"))
+	if not practice:
+		out.append(tr("THROW_BEAT_RELEASE"))
 	return out
 
 
@@ -119,6 +157,9 @@ func _open_trial() -> void:
 		for a: Variant in e.get("touch_pad", []):
 			pad.append(String(a))
 	trial = (scr.new() as ThrowTrial).setup(e, _precision, _assist, _mouse and pad.is_empty() and not stick)
+	if practice and not _practice_diff.is_empty():
+		trial.slow = float(_practice_diff.get("slow", trial.slow))
+		trial.widen_k = float(_practice_diff.get("widen", trial.widen_k))
 	trial.touch_controls = not pad.is_empty() or stick
 	if not pad.is_empty():
 		trial.add_child(TouchPad.new().configure(pad, pad_layout, e.get("touch_labels", {}) as Dictionary))
@@ -131,12 +172,14 @@ func _open_trial() -> void:
 	if full_host != null and Platform.is_mobile():
 		_place_mobile(pad, pad_layout, stick)
 	elif full_host != null:
-		var r: Rect2 = Rect2(Vector2.ZERO, UiLayout.DESIGN_SIZE) if trial.full() else PANEL_RECT
+		var r: Rect2 = Rect2(Vector2.ZERO, UiLayout.DESIGN_SIZE) if trial.full() else panel_rect
 		# (gaucher : le pavé est à gauche, le cadre peut rester sur le tapis)
 		if not pad.is_empty() and not trial.full() and not Settings.b("game", "left_handed"):
 			r.position.x -= PANEL_SHIFT_TOUCH_PAD
 		trial.position = r.position
 		trial.size = r.size
+		if not trial.full():
+			trial.scale = Vector2.ONE * panel_scale
 		full_host.add_child(trial)
 	else:
 		trial.position = Vector2(PANEL_INSET, size.y + PANEL_BELOW - PANEL_H)
@@ -235,6 +278,12 @@ func _after_pause() -> void:
 	_index += 1
 	if _index < trial_ids.size():
 		_open_trial()
+		return
+	if practice:
+		practice = false
+		beat = Beat.IDLE
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		practice_done.emit(trial_scores[-1] if not trial_scores.is_empty() else 0.0)
 		return
 	beat = Beat.RELEASE
 	mouse_filter = Control.MOUSE_FILTER_STOP

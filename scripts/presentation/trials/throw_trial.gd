@@ -27,6 +27,8 @@ var precision: int = 1
 var mouse: bool = false
 ## Ralenti d'assistance (> 1 : plus lent).
 var slow: float = 1.0
+## Élargissement des cibles (assistance, difficulté du Musée), lu par widen().
+var widen_k: float = 1.0
 var t: float = 0.0
 var finished: bool = false
 var score: float = 0.0
@@ -65,6 +67,7 @@ func setup(p_entry: Dictionary, p_precision: int, p_assist: bool, p_mouse: bool)
 	assist = p_assist
 	mouse = p_mouse
 	slow = Balance.f("throw_game.assist_slowdown") if assist else 1.0
+	widen_k = Balance.f("throw_game.assist_widen") if assist else 1.0
 	rng = RngService.cosmetic()
 	return self
 
@@ -133,7 +136,7 @@ func pk(key: String, k: int) -> float:
 
 ## Fenêtre de temps élargie par l'assistance.
 func widen() -> float:
-	return Balance.f("throw_game.assist_widen") if assist else 1.0
+	return widen_k
 
 
 # --------------------------------------------------------------------------- à surcharger

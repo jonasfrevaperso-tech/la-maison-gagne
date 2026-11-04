@@ -13,6 +13,7 @@ const SCREEN_ACHIEVEMENTS: StringName = &"achievements"
 const SCREEN_STATS: StringName = &"stats"
 const SCREEN_RACE: StringName = &"seed_race"
 const SCREEN_INTRO: StringName = &"intro"
+const SCREEN_MUSEUM: StringName = &"museum"
 
 ## Délai laissé au thread audio pour libérer les lectures avant de quitter.
 const QUIT_AUDIO_GRACE: float = 0.35
@@ -110,6 +111,11 @@ func log_input(entry: Dictionary) -> void:
 
 
 # --------------------------------------------------------------------------- succès
+
+
+## Succès liés au profil (Musée, collections) hors d'une fin de partie.
+func check_profile_achievements() -> void:
+	_announce(MetaProgress.evaluate(SaveSystem.profile, DataRegistry.db, "profile", MetaProgress.profile_metrics(SaveSystem.profile)))
 
 
 func _announce(ids: Array[String]) -> void:

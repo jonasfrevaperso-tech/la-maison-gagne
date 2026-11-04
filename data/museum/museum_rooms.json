@@ -1,0 +1,87 @@
+[
+  {
+    "id": "bar",
+    "name_fr": "Le Bar",
+    "name_en": "The Bar",
+    "desc_fr": "Comptoir de zinc, bouteilles alignées et juke-box : les épreuves du barman.",
+    "desc_en": "Zinc counter, lined-up bottles and a juke-box: the bartender's trials.",
+    "wall": "3a1a14",
+    "floor": "2a1a10",
+    "accent": "ff4d6d",
+    "exhibits": [
+      "bottles",
+      "shaker",
+      "pour",
+      "simon",
+      "darts"
+    ]
+  },
+  {
+    "id": "cards",
+    "name_fr": "Le Salon des cartes",
+    "name_en": "The Card Room",
+    "desc_fr": "Feutre vert et lampes basses : cartes, gobelets, tickets et dés.",
+    "desc_en": "Green felt and low lamps: cards, cups, tickets and dice.",
+    "wall": "0e2a1e",
+    "floor": "1a120c",
+    "accent": "ffd23f",
+    "exhibits": [
+      "shells",
+      "memory",
+      "blackjack",
+      "highlow",
+      "scratch",
+      "dice"
+    ]
+  },
+  {
+    "id": "arcade",
+    "name_fr": "La Salle d'arcade",
+    "name_en": "The Arcade",
+    "desc_fr": "Bornes, néons et manège : les jeux qui clignotent.",
+    "desc_en": "Cabinets, neon and carousel: the games that blink.",
+    "wall": "140a22",
+    "floor": "1c0f2a",
+    "accent": "29e0ff",
+    "exhibits": [
+      "invaders",
+      "pachinko",
+      "derby",
+      "rhythm"
+    ]
+  },
+  {
+    "id": "hall",
+    "name_fr": "Le Hall et la Fontaine",
+    "name_en": "The Hall and Fountain",
+    "desc_fr": "Marbre, lustre et fontaine : les épreuves d'adresse du grand hall.",
+    "desc_en": "Marble, chandelier and fountain: the skill trials of the great hall.",
+    "wall": "2a2230",
+    "floor": "3a3440",
+    "accent": "e8dcc0",
+    "exhibits": [
+      "fishing",
+      "juggle",
+      "catch",
+      "billiards",
+      "charge"
+    ]
+  },
+  {
+    "id": "vaults",
+    "name_fr": "Les Coffres",
+    "name_en": "The Vaults",
+    "desc_fr": "Acier, faisceaux et cave voûtée : ce que la Maison garde sous clé.",
+    "desc_en": "Steel, beams and a vaulted cellar: what the House keeps under lock.",
+    "wall": "1c2028",
+    "floor": "161a20",
+    "accent": "2ee6a8",
+    "exhibits": [
+      "safe",
+      "lasers",
+      "cave",
+      "tower",
+      "sort"
+    ]
+  }
+]

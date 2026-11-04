@@ -60,6 +60,10 @@ func start() -> bool:
 			params["seed"] = String(args["dev-seed-code"])
 		if args.has("dev-tab"):
 			params["tab"] = int(String(args["dev-tab"]))
+			params["room"] = params["tab"]  # Musée : salle affichée
+		if args.has("dev-trials"):  # Musée : épreuve lancée d'emblée (bot si --dev-autoplay)
+			params["play"] = String(args["dev-trials"]).split(",")[0]
+			params["bot"] = args.has("dev-autoplay")
 		GameState.goto(StringName(String(args["dev-screen"])), params)
 		if args.has("dev-scroll"):
 			_scroll_later.call_deferred(int(String(args["dev-scroll"])))

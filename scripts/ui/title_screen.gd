@@ -62,7 +62,9 @@ func _ready() -> void:
 	var main_row: BoxContainer = HBoxContainer.new() if mobile else VBoxContainer.new()
 	main_row.add_theme_constant_override("separation", MENU_GAP)
 	col.add_child(main_row)
-	var main_w: float = (menu_w - float(MENU_GAP)) * 0.5 if mobile and SaveSystem.has_run() else menu_w
+	# Téléphone : le Musée rejoint la ligne principale (la grille garde trois rangées).
+	var main_n: int = (2 if SaveSystem.has_run() else 1) + 1
+	var main_w: float = (menu_w - float(MENU_GAP) * float(main_n - 1)) / float(main_n) if mobile else menu_w
 	if SaveSystem.has_run():
 		var cont: VBoxContainer = VBoxContainer.new()
 		cont.add_theme_constant_override("separation", 2 if mobile else MENU_GAP)
@@ -79,6 +81,11 @@ func _ready() -> void:
 	var new_btn: Button = UiKit.button(tr("MENU_NEW_RUN"), _on_new, Vector2(main_w, MENU_BUTTON.y))
 	new_btn.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	main_row.add_child(new_btn)
+	if mobile:
+		var museum_btn: Button = UiKit.button(tr("MENU_MUSEUM"), GameState.goto.bind(GameState.SCREEN_MUSEUM),
+			Vector2(main_w, MENU_BUTTON.y))
+		museum_btn.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		main_row.add_child(museum_btn)
 	if first == null:
 		first = new_btn
 	# Entrées secondaires (et Quitter) sur trois colonnes : le menu tient en 16:9 et en 16:10
@@ -205,6 +212,7 @@ func _set_telemetry(on: bool) -> void:
 func _extra_entries() -> Array[Array]:
 	var out: Array[Array] = []
 	var candidates: Array[Array] = [
+		["MENU_MUSEUM", GameState.goto.bind(GameState.SCREEN_MUSEUM), &"museum"],
 		["MENU_DAILY", _on_daily, &"run"],
 		["MENU_RACE", GameState.goto.bind(GameState.SCREEN_RACE), &"seed_race"],
 		["MENU_HALL", GameState.goto.bind(GameState.SCREEN_HALL), &"hall"],
@@ -216,6 +224,8 @@ func _extra_entries() -> Array[Array]:
 		["MENU_PROLOGUE", GameState.goto.bind(GameState.SCREEN_INTRO, {"next": "title"}), &"intro"],
 	]
 	for c: Array in candidates:
+		if c[2] == &"museum" and Platform.is_mobile():
+			continue  # sur la ligne principale
 		if ResourceLoader.exists(Main.SCREENS.get(c[2], "")):
 			out.append([c[0], c[1]])
 	return out

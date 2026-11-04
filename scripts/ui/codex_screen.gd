@@ -64,6 +64,9 @@ func _trials(seen: Dictionary) -> void:
 	var seen_list: Array = seen.get("trials", [])
 	var known: int = all.filter(func(e: Dictionary) -> bool: return seen_list.has(e["id"])).size()
 	section("%s — %d / %d" % [tr("CODEX_TRIALS"), known, all.size()])
+	var to_museum: Button = UiKit.button(tr("CODEX_TO_MUSEUM"), GameState.goto.bind(GameState.SCREEN_MUSEUM))
+	to_museum.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	content.add_child(to_museum)
 	var g: GridContainer = grid(TRIAL_COLS)
 	for e: Dictionary in all:
 		var box: VBoxContainer = VBoxContainer.new()

@@ -768,3 +768,23 @@ TRIAL_BILLIARDS_HINT_MOUSE,"Vise avec {@mouse} · maintiens {@click} pour la for
 TRIAL_BILLIARDS_HINT_TOUCH,"Joystick pour viser · maintiens FRAPPER, lâche pour jouer","Joystick to aim · hold SHOOT, release to play"
 TRIAL_BILLIARDS_POTTED,Dans la poche !,Potted!
 TRIAL_BILLIARDS_SCRATCH,La blanche !,Scratch!
+MENU_MUSEUM,Le Musée,The Museum
+MUSEUM_PREV,Salle précédente,Previous room
+MUSEUM_NEXT,Salle suivante,Next room
+MUSEUM_PLAY,Jouer,Play
+MUSEUM_DIFF_RELAX,Détente,Relaxed
+MUSEUM_DIFF_NORMAL,Normal,Normal
+MUSEUM_DIFF_EXPERT,Expert,Expert
+MUSEUM_RECORD,Record : %s,Best: %s
+MUSEUM_NO_RECORD,Pas encore joué dans cette difficulté,Not played at this difficulty yet
+MUSEUM_UNSEEN,Inédite : jamais croisée en partie,New: never met in a run
+MUSEUM_MEDAL_NONE,Sans médaille,No medal
+MUSEUM_MEDAL_BRONZE,Bronze,Bronze
+MUSEUM_MEDAL_SILVER,Argent,Silver
+MUSEUM_MEDAL_GOLD,Or,Gold
+MUSEUM_COUNT,"Salle : %d/%d médailles · Or : %d/%d","Room: %d/%d medals · Gold: %d/%d"
+MUSEUM_SCORE,Note : %d %%,Score: %d%%
+MUSEUM_NEW_RECORD,Nouveau record !,New best!
+MUSEUM_RETRY,Rejouer,Play again
+MUSEUM_BACK,Retour au musée,Back to the museum
+CODEX_TO_MUSEUM,S'entraîner au Musée,Practice at the Museum

@@ -83,6 +83,7 @@ func default_profile() -> Dictionary:
 		"favorites": [],
 		"history": [],
 		"tier_survival": {"entered": [], "passed": []},
+		"museum": {"records": {}},
 	}
 
 

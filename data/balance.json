@@ -619,5 +619,29 @@
   },
   "audio": {
     "cutscene_ambience_db": -11.0
+  },
+  "museum": {
+    "medal_bronze": 0.5,
+    "medal_silver": 0.7,
+    "medal_gold": 0.9,
+    "panel_scale": 1.5,
+    "precision": 2,
+    "difficulty": {
+      "relax": {
+        "slow": 1.4,
+        "widen": 1.3,
+        "assist": true
+      },
+      "normal": {
+        "slow": 1.0,
+        "widen": 1.0,
+        "assist": false
+      },
+      "expert": {
+        "slow": 0.85,
+        "widen": 0.85,
+        "assist": false
+      }
+    }
   }
 }

@@ -25,6 +25,7 @@ const CATEGORIES: Dictionary[String, Array] = {
 	"slot_prizes": ["res://data/slots", "slot_prizes"],
 	"throw_trials": ["res://data/throw", "throw_trials"],
 	"cutscenes": ["res://data/cutscenes", "cutscenes"],
+	"museum_rooms": ["res://data/museum", "museum_rooms"],
 }
 
 static var _shared: ContentDB = null

@@ -68,7 +68,7 @@ func test_achievement_conditions_use_known_metrics() -> void:
 		"profile": MetaProgress.profile_metrics({}),
 		"shop": {"action": "", "rarity": "", "rerolls_here": 0, "id": ""},
 	}
-	eq(db.count("achievements"), 64)
+	eq(db.count("achievements"), 66)
 	for a: Dictionary in db.list("achievements"):
 		var hook: String = String(a["on"])
 		check(keys.has(hook), "%s : crochet inconnu" % a["id"])

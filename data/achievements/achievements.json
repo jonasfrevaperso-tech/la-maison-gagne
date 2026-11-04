@@ -1130,5 +1130,37 @@
   "desc_fr": "Jouer un tour avec 3 grigris à malus visuel.",
   "desc_en": "Play a spin with 3 visual-curse charms.",
   "icon": "star"
+ },
+ {
+  "id": "ach_museum_first",
+  "on": "profile",
+  "cond": [
+   {
+    "k": "museum_medals",
+    "op": ">=",
+    "v": 1
+   }
+  ],
+  "name_fr": "Visite guidée",
+  "name_en": "Guided Tour",
+  "desc_fr": "Gagner une médaille au Musée.",
+  "desc_en": "Win a medal at the Museum.",
+  "icon": "star"
+ },
+ {
+  "id": "ach_curator",
+  "on": "profile",
+  "cond": [
+   {
+    "k": "museum_gold",
+    "op": ">=",
+    "v": 25
+   }
+  ],
+  "name_fr": "Conservateur",
+  "name_en": "Curator",
+  "desc_fr": "Décrocher l'or aux 25 épreuves du Musée.",
+  "desc_en": "Take gold in all 25 Museum trials.",
+  "icon": "star"
  }
 ]

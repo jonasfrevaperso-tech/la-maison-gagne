@@ -42,6 +42,7 @@ func _initialize() -> void:
 	for cat: String in ContentDB.CATEGORIES.keys():
 		for e: Dictionary in db.list(cat):
 			_validate_entry(db, cat, e)
+	_validate_museum(db)
 	for e: String in warnings:
 		print("avertissement : " + e)
 	for e: String in errors:
@@ -235,3 +236,24 @@ func _validate_value(eid: String, v: Variant) -> void:
 		var vn: StringName = StringName(String((v as Dictionary).get("var", "")))
 		if not EffectRunner.VARIABLES.has(vn):
 			errors.append("%s : variable inconnue '%s'" % [eid, vn])
+
+
+## Musée : chaque épreuve exposée dans exactement une salle, couleurs lisibles.
+func _validate_museum(db: ContentDB) -> void:
+	var count: Dictionary[String, int] = {}
+	for r: Dictionary in db.list("museum_rooms"):
+		var rid: String = "museum_rooms/%s" % String(r.get("id", "?"))
+		for k: String in ["wall", "floor", "accent"]:
+			if not Color.html_is_valid(String(r.get(k, ""))):
+				errors.append("%s : couleur %s invalide" % [rid, k])
+		var ex: Array = r.get("exhibits", []) as Array
+		if ex.is_empty():
+			errors.append("%s : salle vide" % rid)
+		for t: Variant in ex:
+			if db.get_entry("throw_trials", String(t)).is_empty():
+				errors.append("%s : épreuve inconnue « %s »" % [rid, t])
+			count[String(t)] = int(count.get(String(t), 0)) + 1
+	for e: Dictionary in db.list("throw_trials"):
+		var n: int = int(count.get(String(e.get("id", "")), 0))
+		if n != 1:
+			errors.append("throw_trials/%s : exposée %d fois au Musée (1 attendue)" % [String(e.get("id", "")), n])

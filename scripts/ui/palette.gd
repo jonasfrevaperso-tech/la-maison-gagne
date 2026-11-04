@@ -23,6 +23,7 @@ const DANGER: Color = Color("ff4d3d")
 const CHIPS_BLUE: Color = Color("3d8bff")
 const MULT_RED: Color = Color("ff3b5c")
 const BRONZE: Color = Color("cd7f4a")
+const SILVER: Color = Color("c9ced8")
 
 const RARITY: Dictionary = {
 	"common": Color("b8b2c2"),

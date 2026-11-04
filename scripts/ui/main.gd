@@ -16,10 +16,11 @@ const SCREENS: Dictionary[StringName, String] = {
 	&"stats": "res://scenes/meta/stats_screen.tscn",
 	&"seed_race": "res://scenes/meta/seed_race_screen.tscn",
 	&"intro": "res://scenes/ui/intro_cutscene.tscn",
+	&"museum": "res://scenes/meta/museum_screen.tscn",
 }
 
 ## Écrans lourds : carton de chargement (chargement en tâche de fond, chauffe du rendu).
-const HEAVY_SCREENS: Array[StringName] = [&"run", &"summary"]
+const HEAVY_SCREENS: Array[StringName] = [&"run", &"summary", &"museum"]
 ## Images rendues derrière les rideaux fermés avant de les ouvrir (premières compilations) ;
 ## écran lourd : jusqu'à ce qu'aucun pipeline graphique ne se compile plus (borné).
 const SETTLE_FRAMES: int = 3

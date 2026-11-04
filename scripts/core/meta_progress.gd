@@ -120,6 +120,8 @@ static func profile_metrics(profile: Dictionary) -> Dictionary:
 		"seen_grigris": (seen.get("grigris", []) as Array).size(),
 		"achievements": (profile.get("achievements", []) as Array).size(),
 		"challenges_done": (profile.get("challenges_done", []) as Array).size(),
+		"museum_medals": MuseumRecords.medal_count(profile.get("museum", {}) as Dictionary),
+		"museum_gold": MuseumRecords.gold_count(profile.get("museum", {}) as Dictionary),
 	}
 
 
