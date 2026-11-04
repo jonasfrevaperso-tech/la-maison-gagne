@@ -788,3 +788,6 @@ MUSEUM_NEW_RECORD,Nouveau record !,New best!
 MUSEUM_RETRY,Rejouer,Play again
 MUSEUM_BACK,Retour au musée,Back to the museum
 CODEX_TO_MUSEUM,S'entraîner au Musée,Practice at the Museum
+MUSEUM_RESUME,Reprendre,Resume
+MUSEUM_RESTART,Recommencer,Restart
+MUSEUM_QUIT_TRIAL,Quitter l'épreuve,Quit the trial

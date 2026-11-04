@@ -92,13 +92,13 @@ static func _stack(n: Node3D, at: Vector3, count: int, first: int = 0, r: float 
 		c.position = at + Vector3(0, CasinoChip3D.THICK * (0.5 + 1.05 * float(k)), 0)
 
 
-static func _card(n: Node3D, rank: int, suit: int, at: Vector3, rot: Vector3, up: bool = true) -> PlayingCard3D:
+static func _card(n: Node3D, rank: int, suit: int, at: Vector3, rot: Vector3, up: bool = true, k: float = 0.6) -> PlayingCard3D:
 	var c: PlayingCard3D = PlayingCard3D.new()
 	n.add_child(c)
 	c.set_card(rank, suit)
 	c.position = at
 	c.rotation = rot
-	c.scale = Vector3.ONE * 0.6
+	c.scale = Vector3.ONE * k
 	if not up:
 		c.rotation.z += PI
 	return c
@@ -178,8 +178,9 @@ static func _shells(n: Node3D) -> void:
 static func _memory(n: Node3D) -> void:
 	_felt(n)
 	for k: int in 6:
-		_card(n, 1 + k * 2, k % 4, Vector3(-0.24 + 0.24 * float(k % 3), 0.04, -0.1 + 0.22 * float(floori(k / 3.0))), Vector3(0, 0, 0),
-			k % 2 == 0)
+		# Cartes réduites et espacées : elles ne se chevauchent jamais (sinon elles scintillent).
+		var at: Vector3 = Vector3(-0.24 + 0.24 * float(k % 3), 0.04, -0.12 + 0.24 * float(floori(k / 3.0)))
+		_card(n, 1 + k * 2, k % 4, at, Vector3.ZERO, k % 2 == 0, 0.36)
 
 
 static func _blackjack(n: Node3D) -> void:
@@ -191,8 +192,8 @@ static func _blackjack(n: Node3D) -> void:
 
 static func _highlow(n: Node3D) -> void:
 	_felt(n)
-	_card(n, 7, 2, Vector3(-0.12, 0.04, 0.0), Vector3(-0.6, 0, 0))
-	_card(n, 7, 0, Vector3(0.14, 0.04, 0.0), Vector3(-0.6, 0, 0), false)
+	_card(n, 7, 2, Vector3(-0.16, 0.04, 0.0), Vector3(-0.6, 0, 0), true, 0.48)
+	_card(n, 7, 0, Vector3(0.16, 0.04, 0.0), Vector3(-0.6, 0, 0), false, 0.48)
 	Stage3D.text3d(n, "▲ ▼", Vector3(0, 0.38, 0), 64, Palette.GOLD_LIGHT)
 
 

@@ -37,11 +37,15 @@ var _drag_x: float = 0.0
 var _dragging: bool = false
 ## Outillage (--dev-screen=museum --dev-trials=id [--dev-autoplay]) : épreuve lancée d'emblée.
 var _dev_play: String = ""
+## Pause d'une épreuve du Musée (Start / Échap / Retour Android) : Reprendre, Recommencer, Quitter.
+var _pause: PanelContainer = null
+var _focus0: int = 0
 var _dev_bot: bool = false
 
 
 func setup(params: Dictionary) -> void:
 	room_index = int(params.get("room", 0))
+	_focus0 = int(params.get("focus", 0))
 	_dev_play = String(params.get("play", ""))
 	_dev_bot = bool(params.get("bot", false))
 
@@ -59,7 +63,7 @@ func _ready() -> void:
 		_view.offset_right = ThrowMinigame.MOBILE_EDGE_BLEED
 	_build_ui()
 	_build_play_layer()
-	_show_room(room_index, 0)
+	_show_room(room_index, _focus0)
 	AudioBus.play_music("menu")
 	resized.connect(_fit)
 	_fit()
@@ -300,6 +304,10 @@ func _on_swipe(event: InputEvent) -> void:
 
 
 func _input(event: InputEvent) -> void:
+	if _playing != "" and _pause == null:
+		if _play_input(event):
+			get_viewport().set_input_as_handled()
+		return
 	if not _ui.visible:
 		return
 	if GameInput.pressed(event, "bet_cycle_prev") or GameInput.pressed(event, "bet_cycle_next"):
@@ -307,9 +315,68 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
+## Pendant une épreuve, clavier et manette vont à l'épreuve AVANT la navigation commune :
+## B (ui_cancel) est un bouton de jeu (Shaker, Tiercé…). On quitte par la pause.
+## Vrai si l'événement est consommé.
+func _play_input(event: InputEvent) -> bool:
+	if event is InputEventMouse or event is InputEventScreenTouch or event is InputEventScreenDrag:
+		return false  # le pointeur passe par l'interface puis _unhandled_input, comme en partie
+	if GameInput.pressed(event, "pause_menu"):
+		_open_pause()
+		return true
+	return game.handle(event)
+
+
+func _open_pause() -> void:
+	if _pause != null:
+		return
+	AudioBus.ui("panel_open")
+	_pause = UiKit.panel(Color(Palette.VELVET_DEEP, 0.95), Palette.GOLD)
+	_pause.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	_pause.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	_pause.grow_vertical = Control.GROW_DIRECTION_BOTH
+	add_child(_pause)
+	var v: VBoxContainer = VBoxContainer.new()
+	v.add_theme_constant_override("separation", 12)
+	_pause.add_child(v)
+	var title: Label = UiKit.label(Localization.name_of("throw_trials", _playing), UiKit.SIZE_H2, Palette.GOLD_LIGHT, "display")
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	v.add_child(title)
+	var resume: Button = UiKit.button(tr("MUSEUM_RESUME"), _close_pause)
+	PromptBadge.attach(resume, "ui_cancel")
+	v.add_child(resume)
+	v.add_child(UiKit.button(tr("MUSEUM_RESTART"), _restart_play))
+	v.add_child(UiKit.button(tr("MUSEUM_QUIT_TRIAL"), _quit_play))
+	resume.call_deferred("grab_focus")
+
+
+func _close_pause() -> void:
+	if _pause != null:
+		_pause.queue_free()
+		_pause = null
+
+
+func _restart_play() -> void:
+	_close_pause()
+	_end_play()
+	play_current()
+
+
+func _quit_play() -> void:
+	_close_pause()
+	_end_play()
+
+
+func is_paused() -> bool:
+	return _pause != null
+
+
 func go_back() -> void:
+	if _pause != null:
+		_close_pause()
+		return
 	if _playing != "":
-		_end_play()
+		_open_pause()
 		return
 	if _result != null:
 		_close_result()
@@ -334,12 +401,14 @@ func _build_play_layer() -> void:
 	game.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	game.size = UiLayout.DESIGN_SIZE
 	game.full_host = _host
-	game.hold = func() -> bool: return AppLifecycle.holding
+	game.hold = func() -> bool: return AppLifecycle.holding or _pause != null
 	game.practice_done.connect(_on_practice_done)
 	_host.add_child(game)
 
 
 func _fit() -> void:
+	if size.x <= 0.0 or size.y <= 0.0:
+		return
 	UiLayout.fit_frame(_play_layer, size)
 	_host.position = ((_play_layer.size - UiLayout.DESIGN_SIZE) * 0.5).floor()
 	game.panel_rect = Rect2((UiLayout.DESIGN_SIZE - ThrowMinigame.PANEL_RECT.size * Balance.f("museum.panel_scale")) * 0.5,
@@ -361,7 +430,7 @@ func play_current() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if _playing == "" or GameInput.pressed(event, "ui_cancel"):
+	if _playing == "" or _pause != null:
 		return
 	if game.handle(event):
 		get_viewport().set_input_as_handled()

@@ -63,7 +63,8 @@ func _build_3d() -> void:
 	_neon_light = Stage3D.omni(r, Palette.MAGENTA, 1.6, st.to3(Vector2(960, 260), 0.0), 4.0)
 	# Étagère.
 	var shelf_w: float = (SHELF_X.y - SHELF_X.x + 240.0) * px
-	Stage3D.box(r, Vector3(shelf_w, 22.0 * px, 0.32), st.to3(Vector2(960, SHELF_Y + 11.0), 0.0), Stage3D.mat(Color(0.36, 0.21, 0.1), 0.0, 0.6))
+	Stage3D.box(r, Vector3(shelf_w, 22.0 * px, 0.32), st.to3(Vector2(960, SHELF_Y + 11.0), 0.0),
+		Stage3D.mat(Color(0.36, 0.21, 0.1), 0.0, 0.6))
 	for x: float in [SHELF_X.x - 60.0, SHELF_X.y + 60.0]:
 		Stage3D.box(r, Vector3(0.04, 0.12, 0.25), st.to3(Vector2(x, SHELF_Y + 40.0), -0.02), Stage3D.mat(Color(0.3, 0.3, 0.32), 0.8, 0.3))
 	# Bouteilles : corps, épaule, goulot, capsule, étiquette ; verre translucide.
@@ -156,8 +157,9 @@ func _throw_chip() -> void:
 	var zone: float = p("power_zone") * widen()
 	var err_x: float = absf(_aim_lock - _xs[_target]) / (BOTTLE_W * 0.5 * p("neck_tolerance") * widen())
 	var aim_sc: float = 1.0 if err_x <= 1.0 else clampf(1.0 - (err_x - 1.0) / p("miss_falloff"), 0.0, 1.0)
-	var err_p: float = absf(_power - 0.75) / zone
-	var pow_sc: float = 1.0 if err_p <= 0.35 else clampf(1.0 - (err_p - 0.35) / 1.3, 0.0, 1.0)
+	# Plein score dans la bande dorée (± power_zone), puis décroissance jusqu'à ± power_falloff.
+	var err_p: float = absf(_power - p("power_target"))
+	var pow_sc: float = 1.0 if err_p <= zone else clampf(1.0 - (err_p - zone) / maxf(p("power_falloff") - zone, 0.01), 0.0, 1.0)
 	var sc: float = aim_sc * p("weight_aim") + pow_sc * (1.0 - p("weight_aim"))
 	_hit = aim_sc >= 0.99 and pow_sc >= 0.5
 	_scores.append(sc)
@@ -218,7 +220,7 @@ func bot_wants() -> Dictionary:
 			if _phase_t > 0.05 and (_prev_aim - _xs[_target]) * (_aim_x - _xs[_target]) <= 0.0:
 				want = {"do": "confirm"}
 		Phase.POWER:
-			if _phase_t > 0.05 and (_prev_power - 0.75) * (_power - 0.75) <= 0.0:
+			if _phase_t > 0.05 and (_prev_power - p("power_target")) * (_power - p("power_target")) <= 0.0:
 				want = {"do": "confirm"}
 	_prev_aim = _aim_x
 	_prev_power = _power
@@ -288,9 +290,13 @@ func _draw_power() -> void:
 	var r: Rect2 = Rect2(1640, 560, 54, 360)
 	draw_rect(r, Palette.VELVET_DEEP)
 	draw_rect(r, Palette.GOLD, false, 2.0)
+	# Bande dorée = plein score, halo = score partiel ; bornées à la jauge.
 	var zone: float = p("power_zone") * widen()
-	var zy: float = r.end.y - r.size.y * (0.75 + zone)
-	draw_rect(Rect2(r.position.x, zy, r.size.x, r.size.y * zone * 2.0), Color(Palette.GOLD, 0.55))
+	var c: float = p("power_target")
+	for band: Array in [[p("power_falloff"), 0.18], [zone, 0.7]]:
+		var lo: float = clampf(c - float(band[0]), 0.0, 1.0)
+		var hi: float = clampf(c + float(band[0]), 0.0, 1.0)
+		draw_rect(Rect2(r.position.x + 2, r.end.y - r.size.y * hi, r.size.x - 4, r.size.y * (hi - lo)), Color(Palette.GOLD, float(band[1])))
 	var ny: float = r.end.y - r.size.y * _power
 	draw_rect(Rect2(r.position.x - 10, ny - 4, r.size.x + 20, 8), Palette.CYAN)
 	text(Vector2(r.get_center().x, r.position.y - 24), tr("TRIAL_BOTTLES_POWER"), UiKit.SIZE_SMALL, Palette.IVORY)

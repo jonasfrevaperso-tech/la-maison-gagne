@@ -129,7 +129,7 @@ func _build_exhibit(k: int, at: Vector3) -> void:
 	spot.position = at + Vector3(0, 3.6, 1.2)
 	spot.shadow_enabled = RenderQuality.shadows() and k == focus
 	_room.add_child(spot)
-	spot.look_at(at + Vector3(0, PEDESTAL_H + 0.3, 0), Vector3.UP)
+	spot.look_at_from_position(spot.position, at + Vector3(0, PEDESTAL_H + 0.3, 0), Vector3.UP)
 	_spots.append(spot)
 
 
@@ -143,7 +143,7 @@ func set_focus(k: int) -> void:
 func _place_cam() -> void:
 	cam.fov = 42.0
 	cam.position = Vector3(_cam_x + CAM_SHIFT, CAM_HEIGHT, CAM_BACK)
-	cam.look_at(Vector3(_cam_x + CAM_SHIFT, CAM_AIM_Y, 0), Vector3.UP)
+	cam.look_at_from_position(cam.position, Vector3(_cam_x + CAM_SHIFT, CAM_AIM_Y, 0), Vector3.UP)
 
 
 func _process(delta: float) -> void:

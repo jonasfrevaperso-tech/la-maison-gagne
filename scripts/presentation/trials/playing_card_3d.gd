@@ -10,6 +10,9 @@ const SUITS: Array[String] = ["♠", "♥", "♦", "♣"]
 const RANKS_FR: Array[String] = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "V", "D", "R"]
 const RANKS_EN: Array[String] = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
 const FLIP_SPEED: float = 7.0
+## Écart entre les couches d'une face (fond, filets, libellés) : assez large pour ne pas se
+## chevaucher en profondeur vue de loin ou réduite (maquette du Musée).
+const LAYER: float = 0.003
 
 var face_up: bool = true
 ## 0 = dos visible, 1 = face visible (suit `face_up`).
@@ -26,22 +29,22 @@ func _init() -> void:
 	add_child(_pivot)
 	var edge: StandardMaterial3D = Stage3D.mat(Color(0.92, 0.88, 0.8), 0.0, 0.6)
 	Stage3D.box(_pivot, Vector3(SIZE.x, THICK, SIZE.y), Vector3.ZERO, edge)
-	Stage3D.box(_pivot, Vector3(SIZE.x - 0.03, 0.002, SIZE.y - 0.03), Vector3(0, THICK * 0.5 + 0.001, 0),
+	Stage3D.box(_pivot, Vector3(SIZE.x - 0.03, 0.002, SIZE.y - 0.03), Vector3(0, THICK * 0.5 + LAYER, 0),
 		Stage3D.mat(Palette.IVORY.darkened(0.12), 0.0, 0.8))
 	var back: StandardMaterial3D = Stage3D.mat(Palette.ROULETTE_RED.darkened(0.4), 0.1, 0.5)
 	var filet: StandardMaterial3D = Stage3D.mat(Palette.GOLD_DARK, 0.45, 0.35)
-	var by: float = -THICK * 0.5 - 0.001
+	var by: float = -THICK * 0.5 - LAYER
 	Stage3D.box(_pivot, Vector3(SIZE.x - 0.03, 0.002, SIZE.y - 0.03), Vector3(0, by, 0), back)
-	Stage3D.box(_pivot, Vector3(SIZE.x - 0.1, 0.002, 0.018), Vector3(0, by - 0.0015, SIZE.y * 0.38), filet)
-	Stage3D.box(_pivot, Vector3(SIZE.x - 0.1, 0.002, 0.018), Vector3(0, by - 0.0015, -SIZE.y * 0.38), filet)
-	Stage3D.box(_pivot, Vector3(0.018, 0.002, SIZE.y * 0.76), Vector3(-SIZE.x * 0.4, by - 0.0015, 0), filet)
-	Stage3D.box(_pivot, Vector3(0.018, 0.002, SIZE.y * 0.76), Vector3(SIZE.x * 0.4, by - 0.0015, 0), filet)
-	Stage3D.box(_pivot, Vector3(0.1, 0.002, 0.1), Vector3(0, by - 0.0015, 0), filet)
-	_corner_a = _label(Vector3(-SIZE.x * 0.33, THICK * 0.5 + 0.003, -SIZE.y * 0.3), 40)
-	_corner_b = _label(Vector3(SIZE.x * 0.33, THICK * 0.5 + 0.003, SIZE.y * 0.3), 40)
+	Stage3D.box(_pivot, Vector3(SIZE.x - 0.1, 0.002, 0.018), Vector3(0, by - LAYER, SIZE.y * 0.38), filet)
+	Stage3D.box(_pivot, Vector3(SIZE.x - 0.1, 0.002, 0.018), Vector3(0, by - LAYER, -SIZE.y * 0.38), filet)
+	Stage3D.box(_pivot, Vector3(0.018, 0.002, SIZE.y * 0.76), Vector3(-SIZE.x * 0.4, by - LAYER, 0), filet)
+	Stage3D.box(_pivot, Vector3(0.018, 0.002, SIZE.y * 0.76), Vector3(SIZE.x * 0.4, by - LAYER, 0), filet)
+	Stage3D.box(_pivot, Vector3(0.1, 0.002, 0.1), Vector3(0, by - LAYER, 0), filet)
+	_corner_a = _label(Vector3(-SIZE.x * 0.33, THICK * 0.5 + LAYER * 2.5, -SIZE.y * 0.3), 40)
+	_corner_b = _label(Vector3(SIZE.x * 0.33, THICK * 0.5 + LAYER * 2.5, SIZE.y * 0.3), 40)
 	_corner_b.rotation = Vector3(-PI * 0.5, 0, PI)
-	_center = _label(Vector3(0, THICK * 0.5 + 0.003, -0.07), 120)
-	_suit = _label(Vector3(0, THICK * 0.5 + 0.003, 0.17), 90)
+	_center = _label(Vector3(0, THICK * 0.5 + LAYER * 2.5, -0.07), 120)
+	_suit = _label(Vector3(0, THICK * 0.5 + LAYER * 2.5, 0.17), 90)
 
 
 func _label(at: Vector3, px: int) -> Label3D:
@@ -52,6 +55,7 @@ func _label(at: Vector3, px: int) -> Label3D:
 	l.outline_size = 0
 	l.shaded = false
 	l.double_sided = false
+	l.alpha_cut = Label3D.ALPHA_CUT_DISCARD  # opaque : pas de tri de transparence qui clignote
 	l.rotation.x = -PI * 0.5
 	l.position = at
 	_pivot.add_child(l)

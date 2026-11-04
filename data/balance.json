@@ -267,16 +267,18 @@
     "bottles": {
       "throws": 3,
       "sweep_seconds": [
+        3.4,
         3.0,
-        2.6,
-        2.3
+        2.7
       ],
-      "power_seconds": 1.8,
-      "power_zone": 0.28,
-      "neck_tolerance": 1.2,
+      "power_seconds": 1.5,
+      "power_zone": 0.07,
+      "neck_tolerance": 1.6,
       "miss_falloff": 3.0,
       "flight_seconds": 0.75,
-      "weight_aim": 0.65
+      "weight_aim": 0.65,
+      "power_falloff": 0.26,
+      "power_target": 0.72
     },
     "memory": {
       "pairs": 6,
@@ -340,9 +342,9 @@
       "duration": 6.0,
       "pump": 0.12,
       "decay": 0.42,
-      "band": 0.22,
-      "band_speed": 0.34,
-      "grace": 0.9
+      "band": 0.27,
+      "band_speed": 0.3,
+      "grace": 1.1
     },
     "pour": {
       "glasses": 3,
@@ -452,18 +454,18 @@
       "air_control": 1400.0,
       "rope_swing": 0.75,
       "rope_period": 2.8,
-      "pit_width": 150,
+      "pit_width": 140,
       "rope_pit_width": 520,
       "fall_depth": 120.0,
-      "fall_stun": 0.6,
+      "fall_stun": 0.45,
       "hit_stun": 0.5,
       "barrel_speed": 140,
       "rat_speed": 1.1,
       "weight_distance": 0.6,
       "fall_penalty": 0.05,
       "hit_penalty": 0.03,
-      "rope_grab_from": 0.3,
-      "grab_scale": 1.9
+      "rope_grab_from": 0.25,
+      "grab_scale": 2.1
     },
     "pachinko": {
       "balls": 6,
