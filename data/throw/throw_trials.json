@@ -419,8 +419,8 @@
   "weight": 1.0,
   "name_fr": "Le Grattage",
   "name_en": "The Scratchcard",
-  "desc_fr": "Trois trèfles d'or se cachent sous neuf cases, et tu n'en grattes que quatre. Le reflet qui balaie le ticket les trahit à chaque passage : observe, puis gratte.",
-  "desc_en": "Three gold clovers hide under nine cells, and you may scratch only four. The glint sweeping the ticket gives them away on every pass: watch, then scratch.",
+  "desc_fr": "Gratte les trois cases cerclées de pointillés du ticket, entièrement et sans déborder : ce qui est gratté hors des pointillés coûte des points.",
+  "desc_en": "Scratch the ticket's three dotted spots clean without straying: anything scratched outside the dots costs points.",
   "tuto_fr": [
    "Trois cases sont cerclées de pointillés dorés.",
    "Gratte-les entièrement pour révéler leur symbole.",
@@ -461,8 +461,8 @@
   "weight": 1.0,
   "name_fr": "Le Tiercé",
   "name_en": "The Derby",
-  "desc_fr": "Ton cheval de bois galope quand tu alternes gauche et droite au rythme du sabot doré. Trop vite, il s'essouffle. Trois adversaires t'attendent.",
-  "desc_en": "Your wooden horse gallops as you alternate left and right in time with the golden hoof. Too fast and it runs out of breath. Three rivals await.",
+  "desc_fr": "Ton cheval de bois galope quand tu frappes gauche et droite en alternance, sur les notes qui défilent vers la ligne. Hors du temps, il pousse moins ; trop vite, il s'essouffle.",
+  "desc_en": "Your wooden horse gallops as you hit left and right in turn, on the notes scrolling to the line. Off the beat it pushes less; too fast and it runs out of breath.",
   "touch_pad": [
    "qte_left",
    "qte_right"
@@ -564,15 +564,8 @@
   "weight": 1.0,
   "name_fr": "Le Billard",
   "name_en": "The Billiards",
-  "desc_fr": "Trois coups, une bille de couleur à empocher à chaque fois. Vise avec la bille fantôme, dose la force, joue.",
-  "desc_en": "Three shots, one coloured ball to pot each time. Aim with the ghost ball, judge the power, play.",
-  "touch_stick": true,
-  "touch_pad": [
-   "ui_spin"
-  ],
-  "touch_labels": {
-   "ui_spin": "TOUCH_SHOOT"
-  },
+  "desc_fr": "Quatre coups, une bille de couleur à empocher à chaque fois. La trajectoire, la bille fantôme et la poche visée te guident : vise, dose la force, joue.",
+  "desc_en": "Four shots, one coloured ball to pot each time. The path, the ghost ball and the target pocket guide you: aim, judge the power, play.",
   "tuto_fr": [
    "La ligne montre la trajectoire et la bille fantôme le point de contact.",
    "Vise la bille de couleur vers une poche.",

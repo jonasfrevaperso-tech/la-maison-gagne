@@ -151,15 +151,22 @@ func test_dice_plan_lands_in_zone() -> void:
 	dc.free()
 
 
-## Grattage : les trèfles scintillent à chaque passage du reflet.
-func test_scratch_targets_always_glint() -> void:
+## Grattage (1.9) : gratter les zones remplit la note ; déborder la fait baisser.
+func test_scratch_overflow_costs() -> void:
 	var sc: TrialScratch = _trial("scratch") as TrialScratch
 	sc.begin()
-	for _k: int in 60 * 5:
-		sc.t += 1.0 / 60.0
-		sc._reflect(1.0 / 60.0)
-	for i: int in sc._targets:
-		check(sc._seen[i] >= sc._passes, "trèfle %d vu à chaque passage" % i)
+	for k: int in 3:
+		var c: Vector2 = sc._centers[k]
+		var r: float = sc.p("zone_radius") - sc.p("brush") * 0.8
+		var y: float = -r
+		while y <= r:
+			var hw: float = sqrt(maxf(r * r - y * y, 0.0))
+			sc._scratch_line(c + Vector2(-hw, y), c + Vector2(hw, y))
+			y += sc.p("brush") * 0.8
+	near(sc.current_score(), 1.0, 0.02, "trois zones grattées proprement")
+	var clean: float = sc.current_score()
+	sc._scratch_line(sc.FOIL.position + Vector2(30, 30), sc.FOIL.position + Vector2(sc.FOIL.size.x - 30, 30))
+	check(sc.overflow() > 0.0 and sc.current_score() < clean, "le débord coûte des points")
 	sc.free()
 
 

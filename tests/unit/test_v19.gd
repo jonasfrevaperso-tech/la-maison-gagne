@@ -67,3 +67,40 @@ func test_trial_tuto_flow() -> void:
 	g.stop()
 	g.get_parent().remove_child(g)
 	g.free()
+
+
+## Billard au doigt : toucher loin de la blanche ne tire jamais ; revenir sur la bille annule.
+func test_billiards_slingshot() -> void:
+	_boot()
+	var e: Dictionary = DataRegistry.db.get_entry("throw_trials", "billiards")
+	var b: TrialBilliards = (load("res://scripts/presentation/trials/trial_billiards.gd") as GDScript).new() as TrialBilliards
+	b.setup(e, 1, false, true)
+	b.begin()
+	var far: Vector2 = b._cue + Vector2(400, 0) if b._cue.x < 900.0 else b._cue - Vector2(400, 0)
+	b.handle(_mb(far, true))
+	b.handle(_mb(far, false))
+	check(not b._rolling, "un toucher ailleurs ne tire pas")
+	b.handle(_mb(b._cue, true))
+	b.handle(_mm(b._cue + Vector2(20, 0)))
+	b.handle(_mb(b._cue + Vector2(20, 0), false))
+	check(not b._rolling, "relâcher sur la bille annule")
+	b.handle(_mb(b._cue, true))
+	b.handle(_mm(b._cue + Vector2(-200, 0)))
+	b.handle(_mb(b._cue + Vector2(-200, 0), false))
+	check(b._rolling, "tirer en arrière puis lâcher joue")
+	near(b._aim, 0.0, 0.01, "visée à l'opposé du doigt")
+	b.free()
+
+
+func _mb(at: Vector2, down: bool) -> InputEventMouseButton:
+	var m: InputEventMouseButton = InputEventMouseButton.new()
+	m.button_index = MOUSE_BUTTON_LEFT
+	m.pressed = down
+	m.position = at
+	return m
+
+
+func _mm(at: Vector2) -> InputEventMouseMotion:
+	var m: InputEventMouseMotion = InputEventMouseMotion.new()
+	m.position = at
+	return m

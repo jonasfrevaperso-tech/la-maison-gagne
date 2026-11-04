@@ -1,16 +1,23 @@
 class_name TrialBilliards
 extends ThrowTrial
-## LE BILLARD (écran dédié, salon du Grand Zéro, vue de dessus) : trois coups, une bille de
-## couleur à empocher à chaque coup. Viser (stick, flèches, souris) : un court segment montre
-## la trajectoire de la blanche et la « bille fantôme » au contact. Puis maintenir pour doser
-## la force (la jauge va et vient) et lâcher. Collisions élastiques, bandes amorties.
+## LE BILLARD (écran dédié, salon du Grand Zéro, vue de dessus) : quatre coups, une bille de
+## couleur à empocher à chaque coup. Visée (1.9) : trajectoire complète jusqu'au premier rebond,
+## bille fantôme au contact, direction prévue de la couleur et déviation de la blanche ; poche
+## visée mise en évidence. Manette / clavier : viser, maintenir pour doser (la jauge va et vient),
+## lâcher. Souris / doigt : lance-pierre depuis la blanche (tirer en arrière dose la force, revenir
+## sur la bille annule, toucher ailleurs ne tire jamais). Collisions élastiques, bandes amorties.
 ## Note = par coup, 1 si la bille est empochée, sinon sa proximité d'une poche ; la blanche
 ## dans une poche coûte une pénalité.
 
 const TABLE: Rect2 = Rect2(360.0, 230.0, 1200.0, 640.0)
 const BALL_R: float = 22.0
 const POCKET_R: float = 60.0
-const PREVIEW: float = 260.0
+## Longueur maximale tracée après le premier rebond, flèches de la couleur et de la blanche.
+const PREVIEW_BOUNCE: float = 420.0
+const OBJ_ARROW: float = 360.0
+const CUE_ARROW: float = 200.0
+## Chute dans la poche (s) : la bille glisse vers le centre et rapetisse.
+const SINK_TIME: float = 0.3
 ## Sous-pas : au plus ≈ 1,5 px par pas à pleine vitesse, pour un point de contact juste.
 const SUBSTEPS: int = 24
 const BOT_FORCE_STEPS: int = 24
@@ -47,6 +54,13 @@ var _obj_mat: StandardMaterial3D = null
 var _stick3: Node3D = null
 var _last_cue: Vector2 = Vector2.ZERO
 var _last_obj: Vector2 = Vector2.ZERO
+## Lance-pierre (souris / doigt) : glissé en cours depuis la blanche, et point tiré.
+var _sling: bool = false
+var _sling_at: Vector2 = Vector2.ZERO
+## Chute animée : [poche, temps restant] de la couleur et de la blanche.
+var _sink_obj: Array = []
+var _sink_cue: Array = []
+var _pulse: float = 0.0
 
 
 func begin() -> void:
@@ -174,10 +188,13 @@ func _process(delta: float) -> void:
 	_roll3(_obj3, _last_obj, _obj)
 	_last_cue = _cue
 	_last_obj = _obj
-	_cue3.visible = not _cue_in
-	_obj3.visible = not _obj_in
+	_pulse += delta
 	_cue3.position = st.to3(_cue, BALL_R * PX3)
 	_obj3.position = st.to3(_obj, BALL_R * PX3)
+	_cue3.scale = Vector3.ONE
+	_obj3.scale = Vector3.ONE
+	_cue3.visible = _sink3(_cue3, _cue, _sink_cue, delta) if _cue_in else true
+	_obj3.visible = _sink3(_obj3, _obj, _sink_obj, delta) if _obj_in else true
 	var aiming: bool = not _rolling and _rest_t <= 0.0 and _shot < pi("shots")
 	_stick3.visible = aiming
 	if aiming:
@@ -185,6 +202,18 @@ func _process(delta: float) -> void:
 		var back: float = 30.0 + _charge * 120.0
 		_stick3.position = st.to3(_cue - dir * back, BALL_R * PX3 * 1.3)
 		_stick3.rotation = Vector3(0, 0.08, -_aim)
+
+
+## Bille qui tombe : glisse vers le centre de la poche, s'enfonce et rapetisse ; faux une fois tombée.
+func _sink3(n: Node3D, at: Vector2, sink: Array, delta: float) -> bool:
+	if sink.is_empty():
+		return false
+	sink[1] = float(sink[1]) - delta
+	var u: float = 1.0 - clampf(float(sink[1]) / SINK_TIME, 0.0, 1.0)
+	var pos: Vector2 = at.lerp(sink[0] as Vector2, u)
+	n.position = stage.to3(pos, BALL_R * PX3 * (1.0 - u * 1.6))
+	n.scale = Vector3.ONE * (1.0 - u * 0.5)
+	return u < 1.0
 
 
 func _pockets() -> Array[Vector2]:
@@ -208,6 +237,9 @@ func _rack() -> void:
 	_obj_v = Vector2.ZERO
 	_obj_in = false
 	_cue_in = false
+	_sink_obj = []
+	_sink_cue = []
+	_sling = false
 	_rolling = false
 	_charging = false
 	_charge = 0.0
@@ -240,9 +272,28 @@ func _speed_for(c: float) -> float:
 
 
 func handle(event: InputEvent) -> bool:
+	var ready: bool = not _rolling and _rest_t <= 0.0 and _shot < pi("shots")
+	var mb: InputEventMouseButton = event as InputEventMouseButton
+	if mb != null and mb.button_index == MOUSE_BUTTON_LEFT:
+		if mb.pressed and ready and mb.position.distance_to(_cue) <= p("sling_grab"):
+			_sling = true
+			_sling_at = mb.position
+			_charge = 0.0
+		elif not mb.pressed and _sling:
+			_sling = false
+			_sling_at = mb.position
+			if _sling_pull() >= p("sling_fire"):
+				_strike()
+			else:
+				_charge = 0.0  # revenu sur la bille : coup annulé
+				AudioBus.play("click", 0.8, -10.0)
+		return true
 	var mm: InputEventMouseMotion = event as InputEventMouseMotion
 	if mm != null:
 		_mouse_pos = mm.position
+		if _sling:
+			_sling_at = mm.position
+			_sling_update()
 		return true
 	if confirm_pressed(event):
 		_charging = not _rolling and _rest_t <= 0.0
@@ -254,7 +305,21 @@ func handle(event: InputEvent) -> bool:
 	return false
 
 
+## Distance tirée depuis la blanche (pixels).
+func _sling_pull() -> float:
+	return _sling_at.distance_to(_cue)
+
+
+## Le lance-pierre vise à l'opposé du doigt ; la force suit la distance tirée.
+func _sling_update() -> void:
+	var pull: float = _sling_pull()
+	if pull >= p("sling_fire") * 0.5:
+		_aim = (_cue - _sling_at).angle()
+	_charge = clampf((pull - p("sling_fire")) / maxf(p("sling_max") - p("sling_fire"), 1.0), 0.0, 1.0)
+
+
 func _strike() -> void:
+	_sling = false
 	_charging = false
 	_rolling = true
 	_cue_v = Vector2.from_angle(_aim) * _speed_for(_charge)
@@ -274,15 +339,14 @@ func tick(dt: float) -> void:
 				_rack()
 		return
 	if not _rolling:
-		_wait += dt
+		if not _sling:
+			_wait += dt
 		if _wait >= p("aim_timeout") * slow:
 			_strike()
 			return
 		# Visée progressive : vitesse en puissance de l'inclinaison, pour les réglages fins.
 		var ax: float = clampf(held_vector().x + _bot_aim, -1.0, 1.0)
 		_aim += signf(ax) * pow(absf(ax), p("aim_curve")) * p("aim_speed") * dt
-		if mouse and _mouse_pos.x >= 0.0 and _mouse_pos.distance_to(_cue) > 30.0:
-			_aim = (_mouse_pos - _cue).angle()
 		if _charging:
 			_charge += _charge_dir * dt / (p("charge_seconds") * slow)
 			if _charge >= 1.0 or _charge <= 0.0:
@@ -311,16 +375,20 @@ func _physics(h: float) -> void:
 			if pos.distance_to(pk) < POCKET_R:
 				if is_cue:
 					_cue_in = true
+					_sink_cue = [pk, SINK_TIME]
 				else:
 					_obj_in = true
+					_sink_obj = [pk, SINK_TIME]
 				v = Vector2.ZERO
 				if not _sim:
 					AudioBus.play("ball_land", 1.0, -4.0)
 		if pos.x < TABLE.position.x + BALL_R or pos.x > TABLE.end.x - BALL_R:
 			pos.x = clampf(pos.x, TABLE.position.x + BALL_R, TABLE.end.x - BALL_R)
+			_cushion_sound(absf(v.x))
 			v.x = -v.x * p("cushion")
 		if pos.y < TABLE.position.y + BALL_R or pos.y > TABLE.end.y - BALL_R:
 			pos.y = clampf(pos.y, TABLE.position.y + BALL_R, TABLE.end.y - BALL_R)
+			_cushion_sound(absf(v.y))
 			v.y = -v.y * p("cushion")
 		if is_cue:
 			_cue_v = v
@@ -345,6 +413,11 @@ func _physics(h: float) -> void:
 		_obj += n * push
 
 
+func _cushion_sound(sp: float) -> void:
+	if not _sim and sp > p("cushion_sound_speed"):
+		AudioBus.play("ball_wood", 0.7 + rng.randf() * 0.2, linear_to_db(clampf(sp / p("speed_max"), 0.05, 1.0)) - 4.0)
+
+
 func _settle() -> void:
 	_rolling = false
 	_bot_force = -1.0
@@ -357,7 +430,10 @@ func _settle() -> void:
 	if _cue_in:
 		sc = maxf(0.0, sc - p("scratch_penalty"))
 	_scores.append(sc)
-	pop(_obj + Vector2(0, -60), sc, "TRIAL_BILLIARDS_POTTED" if _obj_in else ("TRIAL_BILLIARDS_SCRATCH" if _cue_in else ""))
+	var key: String = "TRIAL_BILLIARDS_POTTED" if _obj_in else ("TRIAL_BILLIARDS_SCRATCH" if _cue_in else "TRIAL_BILLIARDS_CLOSE")
+	if not _obj_in and not _cue_in and sc < p("miss_value") * 0.35:
+		key = "TRIAL_BILLIARDS_MISSED"
+	pop(Vector2(TABLE.get_center().x, TABLE.position.y - 90.0), sc, key)
 	_rest_t = p("rest_seconds")
 
 
@@ -456,20 +532,126 @@ func bot_apply(w: Dictionary) -> void:
 func paint() -> void:
 	if stage == null:
 		return
-	if not _rolling and _rest_t <= 0.0:
-		var dir: Vector2 = Vector2.from_angle(_aim)
-		# Segment de visée court et bille fantôme au premier contact.
-		var hit: float = PREVIEW
-		var to_obj: Vector2 = _obj - _cue
-		var along: float = to_obj.dot(dir)
-		var perp: float = absf(to_obj.cross(dir))
-		if along > 0.0 and perp < BALL_R * 2.0:
-			hit = minf(PREVIEW, along - sqrt(BALL_R * BALL_R * 4.0 - perp * perp))
-			draw_arc(_cue + dir * hit, BALL_R, 0, TAU, 24, Color(Palette.IVORY, 0.6), 2.0)
-		draw_line(_cue + dir * BALL_R, _cue + dir * hit, Color(Palette.IVORY, 0.6), 2.0)
+	if not _rolling and _rest_t <= 0.0 and _shot < pi("shots"):
+		_draw_aim()
 		var g: Rect2 = Rect2(TABLE.end.x + 90.0, TABLE.position.y + 40.0, 36.0, TABLE.size.y - 80.0)
 		draw_rect(g, Color(Palette.INK, 0.9))
 		draw_rect(Rect2(g.position.x, g.end.y - g.size.y * _charge, g.size.x, g.size.y * _charge),
 			Palette.GOLD.lerp(Palette.MULT_RED, _charge))
 		draw_rect(g, Palette.GOLD, false, 2.0)
+		text(Vector2(g.get_center().x, g.position.y - 24.0), tr("TRIAL_BILLIARDS_POWER"), UiKit.SIZE_SMALL, Palette.IVORY)
+		if mouse:
+			# Lance-pierre : anneau de prise autour de la blanche, élastique quand on tire.
+			var ring: Color = Color(Palette.GOLD_LIGHT, 0.35 + 0.25 * sin(_pulse * 4.0))
+			draw_arc(_cue, p("sling_grab"), 0, TAU, 48, ring, 2.0)
+			if _sling:
+				var ok: bool = _sling_pull() >= p("sling_fire")
+				draw_line(_cue, _sling_at, Color(Palette.GOLD_LIGHT if ok else Palette.SMOKE, 0.8), 3.0)
+				draw_circle(_sling_at, 10.0, Palette.GOLD_LIGHT if ok else Palette.SMOKE)
+				if not ok:
+					text(_cue + Vector2(0, -p("sling_grab") - 22.0), tr("TRIAL_BILLIARDS_CANCEL"), UiKit.SIZE_SMALL, Palette.SMOKE)
+	text(Vector2(size.x * 0.5, 80.0), tr("TRIAL_BILLIARDS_SHOT") % [mini(_shot + 1, pi("shots")), pi("shots")], UiKit.SIZE_BODY,
+		Palette.IVORY)
 	pips(Vector2(size.x * 0.5, 120.0), _scores, pi("shots"))
+
+
+## Trace la blanche jusqu'à la couleur ou au premier rebond (puis un segment après), la bille
+## fantôme au contact, la direction prévue de la couleur et la déviation de la blanche.
+func _draw_aim() -> void:
+	var dir: Vector2 = Vector2.from_angle(_aim)
+	var from: Vector2 = _cue
+	var left: float = INF
+	var line: Color = Color(Palette.IVORY, 0.75)
+	var best_pk: Vector2 = _pockets()[int(_best_plan().z)]
+	# Poche conseillée (pointillés) et bille à empocher (halo).
+	_dotted_ring(best_pk, POCKET_R + 14.0, Color(Palette.GOLD_LIGHT, 0.5))
+	draw_arc(_obj, BALL_R + 8.0 + 3.0 * sin(_pulse * 5.0), 0, TAU, 32, Color(_colors[_shot % _colors.size()], 0.8), 3.0)
+	for seg: int in 2:
+		var hit_obj: float = _ray_ball(from, dir, _obj)
+		var hit_wall: Vector3 = _ray_wall(from, dir)
+		var lim: float = minf(left, hit_wall.x)
+		if hit_obj >= 0.0 and hit_obj <= lim:
+			var ghost: Vector2 = from + dir * hit_obj
+			_dashed(from + dir * (BALL_R if seg == 0 else 0.0), ghost, line)
+			draw_arc(ghost, BALL_R, 0, TAU, 32, Color(Palette.IVORY, 0.85), 2.0)
+			var n: Vector2 = (_obj - ghost).normalized()
+			var cut: float = clampf(dir.dot(n), 0.0, 1.0)
+			var obj_to: Vector2 = _obj + n * OBJ_ARROW * cut
+			var col: Color = _colors[_shot % _colors.size()]
+			var pk: int = _pocket_on_ray(_obj, n)
+			if pk >= 0:
+				var pp: Vector2 = _pockets()[pk]
+				draw_arc(pp, POCKET_R + 6.0, 0, TAU, 40, Color(Palette.EMERALD, 0.9), 5.0)
+				obj_to = _obj + n * minf(_obj.distance_to(pp), OBJ_ARROW * maxf(cut, 0.6))
+			_arrow(_obj, obj_to, col)
+			var tang: Vector2 = dir - n * dir.dot(n)
+			if tang.length() > 0.05:
+				_arrow(ghost, ghost + tang.normalized() * CUE_ARROW * tang.length(), Color(Palette.IVORY, 0.5))
+			return
+		var end: Vector2 = from + dir * lim
+		_dashed(from + dir * (BALL_R if seg == 0 else 0.0), end, line)
+		if lim < hit_wall.x:
+			return
+		# Rebond : on reflète la direction sur la bande touchée, et on prolonge un peu.
+		dir = Vector2(-dir.x, dir.y) if hit_wall.y > 0.5 else Vector2(dir.x, -dir.y)
+		from = end
+		left = PREVIEW_BOUNCE
+		line = Color(Palette.IVORY, 0.4)
+		draw_circle(end, 5.0, Color(Palette.IVORY, 0.6))
+
+
+## Distance le long du rayon jusqu'au contact avec la bille en `c` (-1 si manquée).
+func _ray_ball(from: Vector2, dir: Vector2, c: Vector2) -> float:
+	var to: Vector2 = c - from
+	var along: float = to.dot(dir)
+	var perp: float = absf(to.cross(dir))
+	if along <= 0.0 or perp >= BALL_R * 2.0:
+		return -1.0
+	return along - sqrt(BALL_R * BALL_R * 4.0 - perp * perp)
+
+
+## Premier rebond : (distance, 1 si bande verticale, 0 sinon).
+func _ray_wall(from: Vector2, dir: Vector2) -> Vector3:
+	var inner: Rect2 = TABLE.grow(-BALL_R)
+	var tx: float = INF
+	var ty: float = INF
+	if dir.x > 0.0001:
+		tx = (inner.end.x - from.x) / dir.x
+	elif dir.x < -0.0001:
+		tx = (inner.position.x - from.x) / dir.x
+	if dir.y > 0.0001:
+		ty = (inner.end.y - from.y) / dir.y
+	elif dir.y < -0.0001:
+		ty = (inner.position.y - from.y) / dir.y
+	return Vector3(maxf(minf(tx, ty), 0.0), 1.0 if tx < ty else 0.0, 0.0)
+
+
+## Poche que la couleur atteint en ligne droite dans la direction `n` (-1 sinon).
+func _pocket_on_ray(from: Vector2, n: Vector2) -> int:
+	var pk: Array[Vector2] = _pockets()
+	for k: int in pk.size():
+		var to: Vector2 = pk[k] - from
+		if to.dot(n) > 0.0 and absf(to.cross(n)) < POCKET_R * 0.8:
+			return k
+	return -1
+
+
+func _dashed(a: Vector2, b: Vector2, col: Color) -> void:
+	var n: int = maxi(1, int(a.distance_to(b) / 18.0))
+	for k: int in n:
+		if k % 2 == 0:
+			draw_line(a.lerp(b, float(k) / float(n)), a.lerp(b, float(k + 1) / float(n)), col, 3.0)
+
+
+func _dotted_ring(c: Vector2, r: float, col: Color) -> void:
+	for k: int in 24:
+		draw_circle(c + Vector2.from_angle(TAU * float(k) / 24.0 + _pulse) * r, 3.0, col)
+
+
+func _arrow(a: Vector2, b: Vector2, col: Color) -> void:
+	if a.distance_to(b) < 8.0:
+		return
+	draw_line(a, b, col, 4.0)
+	var d: Vector2 = (b - a).normalized()
+	draw_colored_polygon(PackedVector2Array([b + d * 10.0, b - d * 12.0 + d.orthogonal() * 10.0, b - d * 12.0 - d.orthogonal() * 10.0]),
+		col)

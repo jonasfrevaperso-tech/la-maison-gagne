@@ -497,12 +497,14 @@
       "hit_seconds": 0.7
     },
     "scratch": {
-      "duration": 12.0,
-      "tries": 4,
-      "scratch_seconds": 0.6,
-      "sweep_seconds": 1.4,
-      "decoy_chance": 0.3,
-      "time_weight": 0.2
+      "duration": 9.0,
+      "zone_radius": 88.0,
+      "brush": 26.0,
+      "zone_full": 0.9,
+      "overflow_penalty": 1.2,
+      "coin_speed": 560,
+      "bot_inset": 0.85,
+      "end_seconds": 1.0
     },
     "dice": {
       "throws": 3,
@@ -523,22 +525,22 @@
     },
     "derby": {
       "duration": 16.0,
-      "beat_seconds": 0.45,
-      "beat_window": 0.4,
+      "beat_seconds": 0.5,
+      "beat_window": 0.5,
       "push_off": 0.5,
       "push": 0.037,
       "drag": 0.56,
       "max_speed": 0.16,
-      "min_gap": 0.26,
+      "min_gap": 0.28,
       "breath_cost": 0.25,
       "breath_regen": 0.3,
       "winded_seconds": 1.2,
       "par_seconds": 9.5,
       "time_weight": 0.3,
       "rival_paces": [
-        0.095,
         0.088,
-        0.08
+        0.081,
+        0.074
       ]
     },
     "fishing": {
@@ -606,7 +608,7 @@
       "cushion": 0.75,
       "charge_seconds": 2.6,
       "aim_speed": 0.7,
-      "aim_timeout": 7.0,
+      "aim_timeout": 12.0,
       "max_cut": 0.6,
       "miss_value": 0.6,
       "near_range": 380.0,
@@ -614,7 +616,11 @@
       "rest_seconds": 1.0,
       "bot_margin": 1.4,
       "bot_aim_tolerance": 0.004,
-      "aim_curve": 3.0
+      "aim_curve": 3.0,
+      "sling_grab": 110,
+      "sling_fire": 60,
+      "sling_max": 320,
+      "cushion_sound_speed": 120
     }
   },
   "slot": {

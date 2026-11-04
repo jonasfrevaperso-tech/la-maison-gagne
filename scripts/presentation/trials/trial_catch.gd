@@ -550,18 +550,23 @@ func bot_wants() -> Dictionary:
 		if travel <= arrive and arrive < best_t:
 			best_t = arrive
 			goal = lx
-	for it2: Dictionary in _items:
-		var kind2: String = String(it2["kind"])
-		if kind2 in ["chip", "plaque", "bonus"]:
-			continue
-		var pos2: Vector2 = it2["p"]
-		var arrive2: float = (TRAY_Y - pos2.y) / maxf(float(it2["v"]) * _fall_scale(), 1.0)
-		var lx2: float = _landing(it2)
-		if arrive2 > 0.0 and arrive2 < minf(best_t, 0.4) and absf(lx2 - goal) < half + CHIP_R * 1.5:
-			goal = lx2 + (half + CHIP_R * 3.0) * (1.0 if goal >= lx2 else -1.0)
+	# Esquive : plusieurs passes, un écart peut en appeler un autre (deux obstacles voisins).
+	for _pass: int in 3:
+		for it2: Dictionary in _items:
+			var kind2: String = String(it2["kind"])
+			if kind2 in ["chip", "plaque", "bonus"]:
+				continue
+			var pos2: Vector2 = it2["p"]
+			var arrive2: float = (TRAY_Y - pos2.y) / maxf(float(it2["v"]) * _fall_scale(), 1.0)
+			var lx2: float = _landing(it2)
+			if arrive2 > 0.0 and arrive2 < minf(best_t, 0.5) and absf(lx2 - goal) < half + CHIP_R * 1.5:
+				var side: float = 1.0 if goal >= lx2 else -1.0
+				if lx2 + side * (half + CHIP_R * 3.0) < FIELD_X.x or lx2 + side * (half + CHIP_R * 3.0) > FIELD_X.y:
+					side = -side  # contre le bord : on esquive de l'autre côté
+				goal = lx2 + (half + CHIP_R * 3.0) * side
 	# Commande PD : freine à l'approche (le plateau a de l'inertie).
 	var axis: float = clampf(((goal - _x) * 6.0 - _v * 0.9) / p("tray_speed"), -1.0, 1.0)
-	var bank: bool = _stack_n >= int(p("stack_max") * 0.4) or _wobble > 0.4 or _stun > 0.0
+	var bank: bool = _stack_n >= int(p("stack_max") * 0.35) or _wobble > 0.3 or _stun > 0.0
 	if bank and _stack_n > 0:
 		return {"do": "confirm"}
 	return {"do": "axis", "v": Vector2(axis, 0.0)}

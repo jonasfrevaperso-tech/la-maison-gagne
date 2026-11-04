@@ -146,13 +146,12 @@ class HumanBot:
 				_:
 					_last_key = ""  # après avoir vu l'effet du geste, on peut le refaire
 			return g
-		if _held:
-			return {"do": "hold"}
 		while not _stream.is_empty() and float(_stream[0][0]) <= now:
 			_current = _stream.pop_front()[1] as Dictionary
+		# Gâchette maintenue : le stick reste à la main (« hold » porte alors son vecteur).
 		if String(_current.get("do", "")) == "axis":
 			var v: Vector2 = _current["v"] as Vector2
 			var n: float = DevTrialBench.HUMAN_AXIS_NOISE
 			v = (v * (1.0 + rng.randf_range(-n, n)) + Vector2(rng.randf_range(-n, n), rng.randf_range(-n, n))).limit_length(1.0)
-			return {"do": "axis", "v": v}
-		return {"do": ""}
+			return {"do": "hold", "v": v} if _held else {"do": "axis", "v": v}
+		return {"do": "hold"} if _held else {"do": ""}

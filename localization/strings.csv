@@ -573,7 +573,7 @@ TRIAL_HIGHLOW_UP,▲ Plus haut,▲ Higher
 TRIAL_HIGHLOW_DOWN,▼ Plus bas,▼ Lower
 TRIAL_HIGHLOW_GOOD,Bon calcul,Good call
 TRIAL_HIGHLOW_BAD,Mauvais pari,Bad call
-TRIAL_SORT_HINT,"Trie avec {@qte} : chaque couleur part dans la direction de son bouton","Sort with {@qte}: each colour goes the way of its button"
+TRIAL_SORT_HINT,Trie avec {@qte} : chaque couleur part dans la direction de son bouton,Sort with {@qte}: each colour goes the way of its button
 TRIAL_SORT_HINT_MOUSE,{@click} bleu · {@right_click} rouge,{@click} blue · {@right_click} red
 TRIAL_SORT_LEFT_CLICK,Clic G,L-click
 TRIAL_SORT_RIGHT_CLICK,Clic D,R-click
@@ -583,7 +583,7 @@ MENU_CONTINUE_INFO,%s · Palier %d · Échéance %d,%s · Tier %d · Deadline %d
 FAMILY_TIER_UP,Build activé ! %s,Build active! %s
 SHOP_SLOT,+1 emplacement · %d $,+1 slot · %d $
 SHOP_SLOT_MAX,Emplacements au maximum,Slots maxed out
-SHOP_SLOT_TIP,"Rénovation : un emplacement de grigri de plus pour toute la partie (deux au maximum).","Renovation: one more charm slot for the rest of the run (two at most)."
+SHOP_SLOT_TIP,Rénovation : un emplacement de grigri de plus pour toute la partie (deux au maximum).,Renovation: one more charm slot for the rest of the run (two at most).
 QUALITY_LOWERED,Le téléphone peine : qualité abaissée (%s).,Your phone is struggling: quality lowered (%s).
 OPT_QUALITY,Qualité graphique,Graphics quality
 OPT_QUALITY_DESC,"Économie : autonomie maximale. Équilibré : 3D allégée, 60 images/s. Beau : ombres et antialiasing (le téléphone chauffe davantage). La qualité baisse d'elle-même si le téléphone n'arrive plus à suivre.","Eco: maximum battery life. Balanced: lighter 3D, 60 FPS. High: shadows and antialiasing (the phone runs warmer). Quality lowers itself if the phone can't keep up."
@@ -597,7 +597,7 @@ OPT_HAPTICS,Vibrations,Vibration
 OPT_TAP_CONFIRM,Confirmer les mises d'un second toucher,Confirm bets with a second tap
 OPT_TAP_CONFIRM_DESC,"Désactivé : lever le doigt pose le jeton. Activé : le premier toucher vise (la loupe reste affichée), un second toucher sur la même case pose le jeton.","Off: lifting your finger places the chip. On: the first tap aims (the magnifier stays visible), a second tap on the same spot places the chip."
 OPT_REPLAY_STORY,Revoir les dialogues de l'histoire,Replay story dialogues
-OPT_REPLAY_STORY_DESC,"Rejoue les dialogues d'ouverture des actes à chaque partie (sinon, une seule fois par profil).","Plays the act opening dialogues in every run (otherwise only once per profile)."
+OPT_REPLAY_STORY_DESC,"Rejoue les dialogues d'ouverture des actes à chaque partie (sinon, une seule fois par profil).",Plays the act opening dialogues in every run (otherwise only once per profile).
 OPT_LEFT_HANDED,Disposition gaucher,Left-handed layout
 OPT_LEFT_HANDED_DESC,"Inverse la table : le tapis et le bouton Lancer passent à gauche, la roue à droite.","Mirrors the table: the betting layout and the Spin button move to the left, the wheel to the right."
 CARD_BUY,Acheter · %d $,Buy · $%d
@@ -619,7 +619,7 @@ CUTSCENE_HOLD_SKIP_TOUCH,Maintiens le doigt sur l'écran pour passer,Hold your f
 CONFIRM_QUIT,Quitter La Maison Gagne ?,Quit La Maison Gagne?
 CONFIRM_TELEMETRY_MOBILE,"Enregistrer des statistiques de jeu sur ce téléphone (tours, boutique, durée) pour aider à équilibrer le jeu ? Rien n'est envoyé sur Internet. Modifiable dans les options.","Record gameplay statistics on this phone (spins, shop, play time) to help balance the game? Nothing is sent over the Internet. You can change this in the options."
 RESUME_TAP,Touche l'écran pour reprendre l'épreuve,Tap the screen to resume the trial
-HUD_FPS,"%d im/s · pire image %.0f ms","%d fps · worst frame %.0f ms"
+HUD_FPS,%d im/s · pire image %.0f ms,%d fps · worst frame %.0f ms
 OPT_GFX_SECTION,Graphismes,Graphics
 OPT_PRESET,Préréglage,Preset
 OPT_PRESET_LOW,Bas,Low
@@ -715,20 +715,17 @@ TRIAL_BLACKJACK_WIN,Main gagnée,Hand won
 TRIAL_BLACKJACK_LOSE,Main perdue,Hand lost
 TRIAL_BLACKJACK_PUSH,Égalité,Push
 TRIAL_BLACKJACK_RULE,"La donneuse reste sur 17 · on note la décision, pas les cartes","Dealer stands on 17 · the call is graded, not the cards"
-TRIAL_SCRATCH_HINT,{move} choisir une case · maintiens {confirm} pour gratter,{move} pick a cell · hold {confirm} to scratch
-TRIAL_SCRATCH_HINT_MOUSE,Maintiens {@click} sur une case pour la gratter,Hold {@click} on a cell to scratch it
-TRIAL_SCRATCH_HINT_TOUCH,Frotte une case du doigt pour la gratter,Rub a cell with your finger to scratch it
+TRIAL_SCRATCH_HINT,{move} déplacer la pièce · maintiens {confirm} pour gratter dans les pointillés,{move} move the coin · hold {confirm} to scratch inside the dots
+TRIAL_SCRATCH_HINT_MOUSE,Maintiens {@click} et frotte dans les pointillés,Hold {@click} and rub inside the dots
+TRIAL_SCRATCH_HINT_TOUCH,Frotte du doigt {@drag} dans les pointillés,Rub with your finger {@drag} inside the dots
 TRIAL_SCRATCH_TICKET,FORTUNE DU ZÉRO,ZERO FORTUNE
-TRIAL_SCRATCH_STATUS,Grattages restants : %d · trèfles : %d / 3,Scratches left: %d · clovers: %d / 3
-TRIAL_SCRATCH_CLOVER,Trèfle d'or !,Gold clover!
-TRIAL_SCRATCH_BLANK,Perdu,Blank
 TRIAL_DICE_HINT,"{move} viser · maintiens {confirm} pour la force, lâche pour lancer","{move} aim · hold {confirm} for power, release to throw"
 TRIAL_DICE_HINT_MOUSE,"Vise avec {@mouse} · maintiens {@click} pour la force, lâche pour lancer","Aim with {@mouse} · hold {@click} for power, release to throw"
 TRIAL_DICE_HINT_TOUCH,"Joystick pour viser · maintiens LANCER pour la force, lâche pour lancer","Joystick to aim · hold THROW for power, release to throw"
 TRIAL_DICE_NO_WALL,Sans la bande !,Missed the wall!
-TRIAL_DERBY_HINT,Alterne {qte_left} et {qte_right} au rythme du sabot doré,Alternate {qte_left} and {qte_right} in time with the golden hoof
-TRIAL_DERBY_HINT_MOUSE,Alterne {@click} et {@right_click} au rythme du sabot doré,Alternate {@click} and {@right_click} in time with the golden hoof
-TRIAL_DERBY_HINT_TOUCH,Alterne GAUCHE et DROITE au rythme du sabot doré,Alternate LEFT and RIGHT in time with the golden hoof
+TRIAL_DERBY_HINT,"{qte_left} / {qte_right} en alternance, quand la note touche la ligne","{qte_left} / {qte_right} in turn, as the note reaches the line"
+TRIAL_DERBY_HINT_MOUSE,"{@click} / {@right_click} en alternance, quand la note touche la ligne","{@click} / {@right_click} in turn, as the note reaches the line"
+TRIAL_DERBY_HINT_TOUCH,"GAUCHE / DROITE en alternance, quand la note touche la ligne","LEFT / RIGHT in turn, as the note reaches the line"
 TRIAL_DERBY_MARQUEE,LE TIERCÉ DU GRAND ZÉRO,THE GRAND ZERO DERBY
 TRIAL_DERBY_WINDED,Essoufflé !,Winded!
 TRIAL_DERBY_PLACE_1,1er !,1st!
@@ -764,8 +761,8 @@ TRIAL_JUGGLE_HINT_TOUCH,"GAUCHE, MILIEU ou DROITE quand le jeton touche la ligne
 TRIAL_JUGGLE_DROP,Tombé !,Dropped!
 TRIAL_JUGGLE_STATUS,Rattrapés : %d · jetons en l'air : %d,Caught: %d · chips in the air: %d
 TRIAL_BILLIARDS_HINT,"{move} viser · maintiens {confirm} pour la force, lâche pour jouer","{move} aim · hold {confirm} for power, release to play"
-TRIAL_BILLIARDS_HINT_MOUSE,"Vise avec {@mouse} · maintiens {@click} pour la force, lâche pour jouer","Aim with {@mouse} · hold {@click} for power, release to play"
-TRIAL_BILLIARDS_HINT_TOUCH,"Joystick pour viser · maintiens FRAPPER, lâche pour jouer","Joystick to aim · hold SHOOT, release to play"
+TRIAL_BILLIARDS_HINT_MOUSE,Tire en arrière depuis la blanche {@click} et lâche pour jouer · reviens sur la bille pour annuler,Pull back from the cue ball {@click} and let go to play · return to the ball to cancel
+TRIAL_BILLIARDS_HINT_TOUCH,Tire en arrière depuis la blanche {@drag} et lâche pour jouer · reviens sur la bille pour annuler,Pull back from the cue ball {@drag} and let go to play · return to the ball to cancel
 TRIAL_BILLIARDS_POTTED,Dans la poche !,Potted!
 TRIAL_BILLIARDS_SCRATCH,La blanche !,Scratch!
 MENU_MUSEUM,Le Musée,The Museum
@@ -782,7 +779,7 @@ MUSEUM_MEDAL_NONE,Sans médaille,No medal
 MUSEUM_MEDAL_BRONZE,Bronze,Bronze
 MUSEUM_MEDAL_SILVER,Argent,Silver
 MUSEUM_MEDAL_GOLD,Or,Gold
-MUSEUM_COUNT,"Salle : %d/%d médailles · Or : %d/%d","Room: %d/%d medals · Gold: %d/%d"
+MUSEUM_COUNT,Salle : %d/%d médailles · Or : %d/%d,Room: %d/%d medals · Gold: %d/%d
 MUSEUM_SCORE,Note : %d %%,Score: %d%%
 MUSEUM_NEW_RECORD,Nouveau record !,New best!
 MUSEUM_RETRY,Rejouer,Play again
@@ -799,3 +796,15 @@ OPT_TRIAL_TUTOS,Tutos des épreuves,Trial tutorials
 OPT_TRIAL_TUTOS_DESC,"La première fois qu'une épreuve se présente : une courte démonstration, puis un essai qui ne compte pas.","The first time a trial comes up: a short demonstration, then a practice go that doesn't count."
 OPT_RESET_TRIAL_TUTOS,Revoir les tutos des épreuves,Replay the trial tutorials
 TOAST_TRIAL_TUTOS_RESET,Les tutos des épreuves reviendront à la prochaine rencontre.,Trial tutorials will play again next time.
+TRIAL_SCRATCH_REVEALED,Case révélée !,Spot revealed!
+TRIAL_SCRATCH_OVERFLOW,Débord : −%d %%,Overflow: −%d%%
+TRIAL_BILLIARDS_POWER,FORCE,POWER
+TRIAL_BILLIARDS_CANCEL,Lâcher ici annule,Let go here to cancel
+TRIAL_BILLIARDS_SHOT,Coup %d / %d,Shot %d / %d
+TRIAL_BILLIARDS_CLOSE,Tout près,Close
+TRIAL_BILLIARDS_MISSED,Manqué,Missed
+TRIAL_DERBY_PERFECT,Parfait !,Perfect!
+TRIAL_DERBY_GOOD,Bien,Good
+TRIAL_DERBY_OFF,À contretemps,Off beat
+TRIAL_DERBY_ALTERNATE,Alterne !,Alternate!
+TRIAL_DERBY_BEAT,Frappe sur la ligne,Hit on the line

@@ -1,41 +1,51 @@
 class_name TrialScratch
 extends ThrowTrial
-## LE GRATTAGE (écran dédié) : un ticket « Fortune du Zéro » de 9 cases ; trois cachent le
-## trèfle d'or, et on n'a le droit d'en gratter que quatre. Le reflet doré qui balaie le ticket
-## trahit le trèfle : il fait scintiller les trois bonnes cases à CHAQUE passage, les autres
-## seulement de temps en temps. Observer, puis gratter (souris ou doigt sur la case, ou curseur
-## et bouton maintenu à la manette / au clavier).
-## Note = trèfles trouvés / 3, moins une part pour la lenteur. Le tirage ne note rien : seul
-## l'œil compte (les bonnes cases scintillent toujours).
+## LE GRATTAGE (écran dédié, 1.9, refait) : « Gratte les trois cases du ticket sans déborder ».
+## Un ticket « Fortune du Zéro » argenté ; trois zones cerclées de pointillés dorés (trèfle,
+## étoile, sept). On gratte pour de vrai : souris ou doigt en glissant, ou pièce déplacée au
+## stick / aux flèches et bouton maintenu. Chaque zone se remplit à mesure ; ce qui est gratté
+## hors des pointillés coûte des points.
+## Note = part révélée des trois zones, moins la part de débord. Les symboles sont fixes : on
+## note l'adresse, jamais le hasard (D-046).
 
-const GRID: int = 3
-const CELL: Vector2 = Vector2(220.0, 180.0)
-const GAP: float = 24.0
-const TICKET_Y: float = 250.0
-const SYMBOLS: Array[String] = ["☘", "♠", "♦", "★", "☾", "♥"]
-const SCRATCH_DOTS: int = 7
+const SYMBOLS: Array[String] = ["☘", "★", "7"]
+const SYMBOL_COLORS: Array[Color] = [Color("2ee6a8"), Color("ffd23f"), Color("ff4d6d")]
+## Ticket (coordonnées de maquette), pellicule argentée et grille du masque de grattage.
+const TICKET: Rect2 = Rect2(400.0, 250.0, 1120.0, 560.0)
+const FOIL: Rect2 = Rect2(440.0, 360.0, 1040.0, 400.0)
+const CELL: float = 10.0
+const FOIL_COLOR: Color = Color("b8b8c4")
+const FOIL_DARK: Color = Color("8e8e9c")
+## Bande tolérée de part et d'autre des pointillés (ni comptée, ni pénalisée), en pixels.
+const RIM: float = 14.0
+const RIM_IN: float = 6.0
 ## Décor : mètres par pixel du fond 3D, boîtes des étagères, poussière de grattage.
 const PX3: float = 0.005
 const SHELF_BOXES: int = 9
 const BOX_COLORS: Array[Color] = [Color("8a1428"), Color("1f4f8a"), Color("c08a2a"), Color("2e6a3a"), Color("5a2a6a")]
-const DUST_MAX: int = 120
-const DUST_LIFE: float = 0.9
-const FOIL: Color = Color("b8b8c4")
+const DUST_MAX: int = 160
+const DUST_LIFE: float = 0.7
+## Freinage du bot à l'approche de chaque point du parcours (constante de temps, s).
+const BOT_LOOK: float = 0.2
 
-var _targets: Array[int] = []
-var _cells: Array[String] = []
-var _scratch: Array[float] = []
-var _done: Array[bool] = []
-var _tries: int = 0
-var _found: int = 0
-var _cursor: int = 4
-var _holding: bool = false
+var _cols: int = 0
+var _rows: int = 0
+## 0 : pellicule intacte ; 1 : gratté. Index = ligne * _cols + colonne.
+var _mask: PackedByteArray = PackedByteArray()
+## Zone de chaque cellule : 0..2 (dans les pointillés), -1 (hors zone, pénalisé), -2 (liseré toléré).
+var _zone_of: PackedInt32Array = PackedInt32Array()
+var _zone_total: Array[int] = [0, 0, 0]
+var _zone_done: Array[int] = [0, 0, 0]
+var _zone_complete: Array[bool] = [false, false, false]
+var _outside_total: int = 0
+var _outside: int = 0
+var _centers: Array[Vector2] = []
+var _coin: Vector2 = Vector2(960.0, 560.0)
+var _scratching: bool = false
 var _drag: bool = false
-var _sweep: float = 0.0
-var _passes: int = 0
-var _sparkle: Array[float] = []
-var _seen: Array[int] = []
-var _decoys: Array[bool] = []
+var _bot_v: Vector2 = Vector2.ZERO
+var _bot_points: Array[Vector2] = []
+var _sound_t: float = 0.0
 var _ended: bool = false
 var _end_t: float = -1.0
 var _dust: Array[Vector3] = []
@@ -44,22 +54,31 @@ var _neon: Label3D = null
 
 
 func begin() -> void:
-	var idx: Array[int] = []
-	for i: int in GRID * GRID:
-		idx.append(i)
-	for i2: int in range(idx.size() - 1, 0, -1):
-		var j: int = rng.randi_range(0, i2)
-		var tmp: int = idx[i2]
-		idx[i2] = idx[j]
-		idx[j] = tmp
-	_targets = idx.slice(0, 3)
-	for i3: int in GRID * GRID:
-		_cells.append(SYMBOLS[0] if _targets.has(i3) else SYMBOLS[rng.randi_range(1, SYMBOLS.size() - 1)])
-		_scratch.append(0.0)
-		_done.append(false)
-		_sparkle.append(0.0)
-		_seen.append(0)
-		_decoys.append(false)
+	_cols = int(FOIL.size.x / CELL)
+	_rows = int(FOIL.size.y / CELL)
+	_mask.resize(_cols * _rows)
+	_mask.fill(0)
+	_zone_of.resize(_cols * _rows)
+	var r: float = p("zone_radius")
+	# Trois zones réparties sur la pellicule, légèrement décalées en hauteur.
+	for k: int in 3:
+		_centers.append(FOIL.position + Vector2(FOIL.size.x * (0.2 + 0.3 * float(k)), FOIL.size.y * (0.42 + 0.16 * float(k % 2))))
+	for i: int in _cols * _rows:
+		var c: Vector2 = _cell_center(i)
+		var z: int = -1
+		for k: int in 3:
+			var d: float = c.distance_to(_centers[k])
+			if d <= r - RIM_IN:
+				z = k
+			elif d <= r + RIM and z == -1:
+				z = -2
+		_zone_of[i] = z
+		if z >= 0:
+			_zone_total[z] += 1
+		elif z == -1:
+			_outside_total += 1
+	_coin = FOIL.get_center() + Vector2(0, FOIL.size.y * 0.5 + 60.0)
+	_bot_points = _plan_bot()
 	_build_3d()
 
 
@@ -109,87 +128,230 @@ func _build_3d() -> void:
 	lamp.shadow_enabled = RenderQuality.shadows()
 
 
-func _ticket_origin() -> Vector2:
-	var w: float = float(GRID) * CELL.x + float(GRID - 1) * GAP
-	return Vector2(size.x * 0.5 - w * 0.5, TICKET_Y)
 
 
-func _cell_rect(i: int) -> Rect2:
-	var o: Vector2 = _ticket_origin()
-	return Rect2(o + Vector2(float(i % GRID) * (CELL.x + GAP), floorf(float(i) / GRID) * (CELL.y + GAP)), CELL)
+# --------------------------------------------------------------------------- grattage
 
 
-func _cell_at(pos: Vector2) -> int:
-	for i: int in GRID * GRID:
-		if _cell_rect(i).has_point(pos):
-			return i
-	return -1
+## Manette : en grattant, les pointillés retiennent la pièce (la pellicule « résiste » au bord) ;
+## on peut toujours sortir en relâchant. Souris et doigt restent libres.
+func _hold_in(prev: Vector2, to: Vector2) -> Vector2:
+	var lim: float = p("zone_radius") + RIM - p("brush")
+	for k: int in 3:
+		if prev.distance_to(_centers[k]) <= lim + 1.0:
+			var off: Vector2 = to - _centers[k]
+			return _centers[k] + off.limit_length(lim)
+	return to
+
+
+func _cell_center(i: int) -> Vector2:
+	return FOIL.position + Vector2((float(i % _cols) + 0.5) * CELL, (float(i / _cols) + 0.5) * CELL)
+
+
+## Gratte un disque de rayon `brush` autour de `at` ; vrai si au moins une cellule est partie.
+func _stamp(at: Vector2) -> bool:
+	var br: float = p("brush")
+	var x0: int = clampi(int((at.x - br - FOIL.position.x) / CELL), 0, _cols - 1)
+	var x1: int = clampi(int((at.x + br - FOIL.position.x) / CELL), 0, _cols - 1)
+	var y0: int = clampi(int((at.y - br - FOIL.position.y) / CELL), 0, _rows - 1)
+	var y1: int = clampi(int((at.y + br - FOIL.position.y) / CELL), 0, _rows - 1)
+	if at.x + br < FOIL.position.x or at.x - br > FOIL.end.x or at.y + br < FOIL.position.y or at.y - br > FOIL.end.y:
+		return false
+	var any: bool = false
+	for y: int in range(y0, y1 + 1):
+		for x: int in range(x0, x1 + 1):
+			var i: int = y * _cols + x
+			if _mask[i] == 1 or _cell_center(i).distance_to(at) > br:
+				continue
+			_mask[i] = 1
+			any = true
+			var z: int = _zone_of[i]
+			if z >= 0:
+				_zone_done[z] += 1
+			elif z == -1:
+				_outside += 1
+	return any
+
+
+## Gratte le long d'un trait (le geste rapide ne saute pas de cellules).
+func _scratch_line(from: Vector2, to: Vector2) -> void:
+	var n: int = maxi(1, ceili(from.distance_to(to) / (p("brush") * 0.4)))
+	var any: bool = false
+	for k: int in n + 1:
+		any = _stamp(from.lerp(to, float(k) / float(n))) or any
+	if any:
+		_on_scratched(to)
+
+
+func _on_scratched(at: Vector2) -> void:
+	if _sound_t <= 0.0:
+		AudioBus.play("paper", 1.3 + rng.randf() * 0.4, -12.0)
+		_sound_t = 0.07
+	_spawn_dust(at)
+	for k: int in 3:
+		if not _zone_complete[k] and zone_share(k) >= p("zone_full"):
+			_zone_complete[k] = true
+			AudioBus.play("coins", 1.0 + 0.15 * float(k), -6.0)
+			pop(_centers[k] + Vector2(0, -p("zone_radius") - 30.0), 1.0, "TRIAL_SCRATCH_REVEALED")
+	if _zone_complete.count(true) == 3 and not _ended:
+		_end()
+
+
+## Part révélée de la zone k (0..1), ramenée à 1 dès le seuil « zone_full ».
+func zone_share(k: int) -> float:
+	return float(_zone_done[k]) / float(maxi(_zone_total[k], 1))
+
+
+## Débord : cellules grattées hors des pointillés, rapportées à l'aire des trois zones.
+func overflow() -> float:
+	var zone_cells: int = _zone_total[0] + _zone_total[1] + _zone_total[2]
+	return float(_outside) / float(maxi(zone_cells, 1))
+
+
+func current_score() -> float:
+	var rev: float = 0.0
+	for k: int in 3:
+		rev += clampf(zone_share(k) / p("zone_full"), 0.0, 1.0)
+	return clampf(rev / 3.0 - overflow() * p("overflow_penalty"), 0.0, 1.0)
+
+
+func _end() -> void:
+	_ended = true
+	_scratching = false
+	_drag = false
+	_end_t = p("end_seconds")
+	var sc: float = current_score()
+	pop(FOIL.get_center() + Vector2(0, -FOIL.size.y * 0.5 - 40.0), sc)
 
 
 func handle(event: InputEvent) -> bool:
+	if _ended:
+		return true
 	var mb: InputEventMouseButton = event as InputEventMouseButton
 	if mb != null:
 		if mb.button_index == MOUSE_BUTTON_LEFT:
 			_drag = mb.pressed
-			var c: int = _cell_at(mb.position)
-			if c >= 0:
-				_cursor = c
+			if _drag:
+				_coin = mb.position
+				_scratch_line(_coin, _coin)
 		return true
 	var mm: InputEventMouseMotion = event as InputEventMouseMotion
 	if mm != null:
-		var c2: int = _cell_at(mm.position)
-		if c2 >= 0:
-			_cursor = c2
+		var prev: Vector2 = _coin
+		_coin = mm.position
+		if _drag:
+			_scratch_line(prev, _coin)
 		return true
-	var d: Vector2i = dir_pressed(event)
-	if d != Vector2i.ZERO:
-		var x: int = clampi(_cursor % GRID + d.x, 0, GRID - 1)
-		var y: int = clampi(floori(float(_cursor) / GRID) + d.y, 0, GRID - 1)
-		_cursor = y * GRID + x
-		AudioBus.play("tick", 1.2, -10.0)
+	if confirm_pressed(event):
+		_scratching = true
 		return true
-	if confirm_pressed(event) or sym_pressed(event) == 3:
-		_holding = true
-		return true
-	if confirm_released(event) or GameInput.released(event, &"qte_down"):
-		_holding = false
+	if confirm_released(event):
+		_scratching = false
 		return true
 	return false
 
 
 func tick(dt: float) -> void:
-	if _ended:
-		return
-	if _end_t >= 0.0:
-		_end_t -= dt
-		if _end_t <= 0.0:
-			_ended = true
-			var sc: float = float(_found) / 3.0
-			var late: float = clampf(t / (p("duration") * slow), 0.0, 1.0)
-			finish(clampf(sc * (1.0 - p("time_weight") * late), 0.0, 1.0))
-		return
-	_reflect(dt)
-	var rubbing: bool = _holding or _drag
-	if rubbing and not _done[_cursor] and _tries < pi("tries"):
-		_scratch[_cursor] = minf(1.0, _scratch[_cursor] + dt / (p("scratch_seconds") * slow))
-		if rng.randf() < 0.3:
-			AudioBus.play("paper", 1.4 + rng.randf() * 0.3, -14.0)
-		_spawn_dust(_cell_rect(_cursor))
-		if _scratch[_cursor] >= 1.0:
-			_reveal(_cursor)
+	_sound_t -= dt
 	_tick_dust(dt)
-	if t >= p("duration") * slow and _end_t < 0.0:
-		_end_t = 0.6
+	if _ended:
+		_end_t -= dt
+		if _end_t <= 0.0 and not finished:
+			finish(current_score())
+		return
+	if t >= p("duration") * slow:
+		_end()
+		return
+	# Pièce au stick / aux flèches (la souris et le doigt la posent directement).
+	var v: Vector2 = held_vector() + _bot_v
+	if v.length() > 1.0:
+		v = v.normalized()
+	if v.length() > 0.0:
+		var prev: Vector2 = _coin
+		_coin = (_coin + v * p("coin_speed") * dt).clamp(TICKET.position, TICKET.end)
+		if _scratching:
+			_coin = _hold_in(prev, _coin)
+			_scratch_line(prev, _coin)
+	elif _scratching:
+		_scratch_line(_coin, _coin)
 
 
-## Poussière argentée qui s'envole sous la pièce (pseudo-hasard du temps : purement visuel).
-func _spawn_dust(r: Rect2) -> void:
-	for k: int in 2:
-		var h: float = _hash(t * 37.0 + float(k) * 11.0)
-		var h2: float = _hash(t * 53.0 + float(k) * 7.0)
-		var x: float = r.position.x + r.size.x * (1.0 - _scratch[_cursor]) + (h - 0.5) * 60.0
-		_dust.append(Vector3(clampf(x, r.position.x, r.end.x), r.position.y + r.size.y * h2, DUST_LIFE))
-		_dust_v.append(Vector2((h2 - 0.5) * 220.0, -60.0 - h * 120.0))
+# --------------------------------------------------------------------------- bot
+
+
+## Parcours idéal : balayage en lignes de chaque zone, en restant dans les pointillés.
+func _plan_bot() -> Array[Vector2]:
+	var out: Array[Vector2] = []
+	var r: float = p("zone_radius") - p("brush") * p("bot_inset")
+	var stepy: float = p("brush") * 1.2
+	for k: int in 3:
+		var c: Vector2 = _centers[k]
+		var y: float = -r
+		var row: int = 0
+		while y <= r + 0.01:
+			var hw: float = sqrt(maxf(r * r - y * y, 0.0))
+			var a: Vector2 = c + Vector2(-hw, y)
+			var b: Vector2 = c + Vector2(hw, y)
+			out.append(a if row % 2 == 0 else b)
+			out.append(b if row % 2 == 0 else a)
+			y += stepy
+			row += 1
+	return out
+
+
+func _bot_target() -> int:
+	# Saute les points déjà grattés (et ceux d'une zone déjà complète).
+	while not _bot_points.is_empty():
+		var pt: Vector2 = _bot_points[0]
+		var z: int = _nearest_zone(pt)
+		if _zone_complete[z] or (_coin.distance_to(pt) < p("brush") * 0.6):
+			_bot_points.pop_front()
+			continue
+		return z
+	return -1
+
+
+func _nearest_zone(pt: Vector2) -> int:
+	var best: int = 0
+	for k: int in 3:
+		if pt.distance_to(_centers[k]) < pt.distance_to(_centers[best]):
+			best = k
+	return best
+
+
+func bot_wants() -> Dictionary:
+	if _ended:
+		return {"do": "release"} if _scratching else {"do": ""}
+	var z: int = _bot_target()
+	if z < 0:
+		return {"do": "release"} if _scratching else {"do": ""}
+	var pt: Vector2 = _bot_points[0]
+	var inside: bool = _coin.distance_to(_centers[z]) <= p("zone_radius") - p("brush") * 0.3
+	# Relâcher AVANT de quitter la zone (et attendre que ce soit fait), sinon on déborde.
+	if _scratching and not inside:
+		return {"do": "release"}
+	if not _scratching and inside:
+		return {"do": "hold"}
+	var d: Vector2 = pt - _coin
+	return {"do": "axis", "v": d.normalized() * clampf(d.length() / (p("coin_speed") * BOT_LOOK), 0.2, 1.0)}
+
+
+func bot_apply(w: Dictionary) -> void:
+	var act: String = String(w.get("do", ""))
+	_bot_v = (w.get("v", Vector2.ZERO) as Vector2) if act in ["axis", "hold"] else Vector2.ZERO
+	if act == "hold":
+		_scratching = true
+	elif act == "release":
+		_scratching = false
+
+
+# --------------------------------------------------------------------------- copeaux
+
+
+func _spawn_dust(at: Vector2) -> void:
+	for k: int in 3:
+		_dust.append(Vector3(at.x + rng.randf_range(-12.0, 12.0), at.y + rng.randf_range(-8.0, 8.0), DUST_LIFE))
+		_dust_v.append(Vector2(rng.randf_range(-160.0, 160.0), rng.randf_range(-180.0, -40.0)))
 	while _dust.size() > DUST_MAX:
 		_dust.pop_front()
 		_dust_v.pop_front()
@@ -204,169 +366,59 @@ func _tick_dust(dt: float) -> void:
 			_dust_v.remove_at(k)
 
 
-static func _hash(x: float) -> float:
-	return fposmod(sin(x * 12.9898) * 43758.5453, 1.0)
-
-
-## Reflet : une bande dorée balaie le ticket de gauche à droite. Les trèfles scintillent à
-## chaque passage, les leurres une fois sur `decoy_chance` (tirés à l'entrée du reflet).
-func _reflect(dt: float) -> void:
-	var period: float = p("sweep_seconds") * slow
-	var prev: float = _sweep
-	_sweep = fmod(_sweep + dt / period, 1.0)
-	if _sweep < prev:
-		_passes += 1
-		for i: int in GRID * GRID:
-			_decoys[i] = rng.randf() < p("decoy_chance")
-	var o: Vector2 = _ticket_origin()
-	var w: float = float(GRID) * (CELL.x + GAP)
-	for i2: int in GRID * GRID:
-		_sparkle[i2] = maxf(0.0, _sparkle[i2] - dt * 2.5)
-		var cx: float = (_cell_rect(i2).get_center().x - o.x) / w
-		if prev < cx and _sweep >= cx and (_targets.has(i2) or _decoys[i2]) and not _done[i2]:
-			_sparkle[i2] = 1.0
-			_seen[i2] += 1
-			if _targets.has(i2):
-				AudioBus.play("shimmer", 1.6, -16.0)
-
-
-func _reveal(i: int) -> void:
-	_done[i] = true
-	_tries += 1
-	if _targets.has(i):
-		_found += 1
-		pop(_cell_rect(i).get_center() + Vector2(0, -80), 1.0, "TRIAL_SCRATCH_CLOVER")
-		AudioBus.play("coins", 1.2, -4.0)
-	else:
-		pop(_cell_rect(i).get_center() + Vector2(0, -80), 0.0, "TRIAL_SCRATCH_BLANK")
-		AudioBus.play("lose_soft", 1.0, -6.0)
-	if _found >= 3 or _tries >= pi("tries"):
-		_end_t = 0.8
-
-
-# --------------------------------------------------------------------------- bot
-
-
-func bot_wants() -> Dictionary:
-	# Observe deux passages, puis gratte les cases qui ont scintillé à chaque passage.
-	if _passes < 3:
-		return {"do": ""}
-	var best: int = -1
-	var best_seen: int = -1
-	for i: int in GRID * GRID:
-		if not _done[i] and _seen[i] > best_seen:
-			best_seen = _seen[i]
-			best = i
-	# Gestes de manette : relâcher, déplacer le curseur case par case, puis maintenir.
-	if best != _cursor:
-		if _holding:
-			return {"do": "release"}
-		var dx: int = best % GRID - _cursor % GRID
-		var dy: int = floori(float(best) / GRID) - floori(float(_cursor) / GRID)
-		return {"do": "dir", "dir": Vector2i(signi(dx), 0) if dx != 0 else Vector2i(0, signi(dy))}
-	return {"do": "hold"}
-
-
-func bot_apply(w: Dictionary) -> void:
-	match String(w.get("do", "")):
-		"hold":
-			_holding = true
-		"release":
-			_holding = false
-		"dir":
-			var d: Vector2i = w["dir"] as Vector2i
-			var x: int = clampi(_cursor % GRID + d.x, 0, GRID - 1)
-			var y: int = clampi(floori(float(_cursor) / GRID) + d.y, 0, GRID - 1)
-			_cursor = y * GRID + x
-
-
 # --------------------------------------------------------------------------- dessin
 
 
 func paint() -> void:
-	if stage == null:
+	if _cols == 0:
 		return
-	if _neon != null:
-		_neon.modulate.a = 0.85 + 0.15 * sin(t * 23.0) * sin(t * 3.0)
-	var o: Vector2 = _ticket_origin()
-	var w: float = float(GRID) * CELL.x + float(GRID - 1) * GAP
-	var ticket: Rect2 = Rect2(o - Vector2(40, 110), Vector2(w + 80, float(GRID) * (CELL.y + GAP) + 140))
-	_draw_ticket(ticket)
-	text(Vector2(size.x * 0.5, o.y - 60.0), tr("TRIAL_SCRATCH_TICKET"), UiKit.SIZE_H2, Palette.GOLD_LIGHT, "display", 0)
-	for i: int in GRID * GRID:
-		var r: Rect2 = _cell_rect(i)
-		draw_rect(r, Color("fffaf0"))
-		draw_rect(r.grow(-6), Color(Palette.GOLD, 0.15), false, 1.0)
-		if _done[i] or _scratch[i] > 0.0:
-			var col: Color = Palette.EMERALD if _targets.has(i) else Palette.SMOKE_DARK
-			text(r.get_center(), _cells[i], UiKit.SIZE_H1, col, "ui", 0)
-		if not _done[i]:
-			_draw_foil(r, 1.0 - _scratch[i], i)
-			var s: float = _sparkle[i]
-			if s > 0.0:
-				var c: Vector2 = r.get_center()
-				draw_line(c - Vector2(50 * s, 0), c + Vector2(50 * s, 0), Color(1, 0.95, 0.7, s), 4.0)
-				draw_line(c - Vector2(0, 50 * s), c + Vector2(0, 50 * s), Color(1, 0.95, 0.7, s), 4.0)
-				draw_circle(c, 14.0 * s, Color(1, 1, 0.85, s))
-		var sel: bool = i == _cursor and not mouse
-		draw_rect(r, Palette.CYAN if sel else Palette.GOLD_DARK, false, 5.0 if sel else 2.0)
-	# Reflet qui balaie le ticket.
-	var sx: float = o.x + _sweep * float(GRID) * (CELL.x + GAP)
-	draw_colored_polygon(PackedVector2Array([Vector2(sx - 10, ticket.position.y + 20), Vector2(sx + 34, ticket.position.y + 20),
-		Vector2(sx + 10, ticket.end.y - 20), Vector2(sx - 34, ticket.end.y - 20)]), Color(1, 0.9, 0.5, 0.12))
-	for k: int in _dust.size():
-		var d: Vector3 = _dust[k]
-		draw_rect(Rect2(d.x - 2.0, d.y - 2.0, 4.0, 4.0), Color(FOIL, clampf(d.z / DUST_LIFE, 0.0, 1.0)))
-	# Pièce qui gratte.
-	if (_holding or _drag) and not _done[_cursor]:
-		var cr: Rect2 = _cell_rect(_cursor)
-		var cp: Vector2 = Vector2(cr.position.x + cr.size.x * (1.0 - _scratch[_cursor]), cr.get_center().y + sin(t * 30.0) * 40.0)
-		draw_circle(cp + Vector2(4, 6), 30.0, Color(0, 0, 0, 0.35))
-		draw_circle(cp, 30.0, Palette.GOLD)
-		draw_arc(cp, 24.0, 0, TAU, 28, Palette.GOLD_DARK, 3.0)
-		text(cp, "0", UiKit.SIZE_BODY, Palette.GOLD_DARK, "display", 0)
-	var left: int = pi("tries") - _tries
-	text(Vector2(size.x * 0.5, ticket.end.y + 50.0), tr("TRIAL_SCRATCH_STATUS") % [left, _found], UiKit.SIZE_BODY, Palette.IVORY)
-	var tl: float = clampf(1.0 - t / (p("duration") * slow), 0.0, 1.0)
-	draw_rect(Rect2(size.x * 0.5 - 300, ticket.end.y + 90.0, 600, 8), Color(Palette.INK, 0.7))
-	draw_rect(Rect2(size.x * 0.5 - 300, ticket.end.y + 90.0, 600 * tl, 8), Palette.GOLD)
-
-
-## Ticket : papier crème guilloché, bandeau bordeaux, perforations, numéro de série.
-func _draw_ticket(tk: Rect2) -> void:
-	draw_rect(Rect2(tk.position + Vector2(12, 16), tk.size), Color(0, 0, 0, 0.45))
-	draw_rect(tk, Color("f4e7c8"))
-	var band: Rect2 = Rect2(tk.position, Vector2(tk.size.x, 96.0))
-	draw_rect(band, Palette.VELVET)
-	draw_rect(Rect2(band.position.x, band.end.y - 6.0, band.size.x, 6.0), Palette.GOLD)
-	# Guillochis : ondes croisées très pâles sous la grille.
-	for k: int in 14:
-		var pts: PackedVector2Array = PackedVector2Array()
-		var y0: float = band.end.y + 20.0 + float(k) * (tk.size.y - 130.0) / 14.0
-		for j: int in 33:
-			var x: float = tk.position.x + tk.size.x * float(j) / 32.0
-			pts.append(Vector2(x, y0 + sin(float(j) * 0.7 + float(k)) * 10.0))
-		draw_polyline(pts, Color(Palette.VELVET, 0.07), 2.0)
-	# Perforations des bords (demi-cercles sombres).
-	for k2: int in 18:
-		var px: float = tk.position.x + 20.0 + (tk.size.x - 40.0) * float(k2) / 17.0
-		draw_circle(Vector2(px, tk.end.y), 6.0, Color("2a160c"))
-	draw_rect(tk.grow(-10), Palette.GOLD, false, 3.0)
-	text(Vector2(tk.end.x - 110.0, tk.end.y - 26.0), "N° 0%06d" % (int(_hash(float(pi("tries")) + float(_targets[0])) * 999999.0)),
-		UiKit.SIZE_SMALL, Color(Palette.INK, 0.5), "ui", 0)
-
-
-## Pellicule argentée moirée, grattée de droite à gauche en bandes irrégulières.
-func _draw_foil(r: Rect2, cover: float, i: int) -> void:
-	var bh: float = r.size.y / float(SCRATCH_DOTS)
-	for b: int in SCRATCH_DOTS:
-		var bw: float = r.size.x * clampf(cover * 1.4 - float(b % 3) * 0.2, 0.0, 1.0)
-		var shade: float = 0.06 * sin(float(b) * 1.7 + float(i))
-		draw_rect(Rect2(r.position + Vector2(r.size.x - bw, float(b) * bh), Vector2(bw, bh + 1.0)), FOIL.lightened(shade + 0.04))
-		# Grain : quelques reflets fixes sur la part non grattée.
-		for g: int in 6:
-			var gx: float = _hash(float(i * 97 + b * 13 + g)) * r.size.x
-			if gx > r.size.x - bw:
-				draw_rect(Rect2(r.position + Vector2(gx, float(b) * bh + _hash(float(g + i)) * bh), Vector2(3, 3)), Color(1, 1, 1, 0.35))
-	if cover >= 1.0:
-		text(r.get_center(), "?", UiKit.SIZE_H1, Color(FOIL.darkened(0.3), 0.8), "display", 0)
+	# Ticket : carton crème, liseré doré, titre.
+	draw_rect(TICKET.grow(8.0), Palette.GOLD_DARK)
+	draw_rect(TICKET, Color("f4e7c8"))
+	draw_rect(TICKET.grow(-10.0), Color("c8102e"), false, 3.0)
+	text(Vector2(TICKET.get_center().x, TICKET.position.y + 56.0), tr("TRIAL_SCRATCH_TICKET"), UiKit.SIZE_H1, Color("8a1428"), "display", 0)
+	# Dessous : papier, symboles (révélés en grattant).
+	draw_rect(FOIL, Color("fff6dc"))
+	for k: int in 3:
+		var glow: float = 1.0 if _zone_complete[k] else 0.75
+		text(_centers[k], SYMBOLS[k], UiKit.SIZE_H1 * 2, Color(SYMBOL_COLORS[k], glow), "display", 6)
+	# Pellicule : une bande par suite de cellules intactes sur chaque ligne.
+	for y: int in _rows:
+		var x: int = 0
+		while x < _cols:
+			if _mask[y * _cols + x] == 1:
+				x += 1
+				continue
+			var x0: int = x
+			while x < _cols and _mask[y * _cols + x] == 0:
+				x += 1
+			var col: Color = FOIL_COLOR if (y / 4) % 2 == 0 else FOIL_COLOR.lerp(FOIL_DARK, 0.25)
+			draw_rect(Rect2(FOIL.position + Vector2(float(x0) * CELL, float(y) * CELL), Vector2(float(x - x0) * CELL, CELL)), col)
+	# Pointillés dorés des trois zones et part révélée.
+	var r: float = p("zone_radius")
+	for k: int in 3:
+		var dots: int = 36
+		for d: int in dots:
+			var a: float = TAU * float(d) / float(dots) + t * 0.4
+			draw_circle(_centers[k] + Vector2.from_angle(a) * r, 4.0, Palette.GOLD if not _zone_complete[k] else Palette.EMERALD)
+		var share: float = clampf(zone_share(k) / p("zone_full"), 0.0, 1.0)
+		draw_arc(_centers[k], r + 20.0, -PI * 0.5, -PI * 0.5 + TAU * share, 48, Palette.EMERALD if _zone_complete[k] else Palette.GOLD_LIGHT,
+			6.0)
+	# Copeaux argentés.
+	for k2: int in _dust.size():
+		var dd: Vector3 = _dust[k2]
+		draw_rect(Rect2(dd.x - 3.0, dd.y - 3.0, 6.0, 6.0), Color(FOIL_COLOR, clampf(dd.z / DUST_LIFE, 0.0, 1.0)))
+	# Pièce de grattage.
+	var br: float = p("brush")
+	draw_circle(_coin + Vector2(4, 6), br, Color(0, 0, 0, 0.3))
+	draw_circle(_coin, br, Palette.GOLD_DARK if not (_scratching or _drag) else Palette.GOLD)
+	draw_circle(_coin, br * 0.78, Palette.GOLD_LIGHT)
+	text(_coin, "0", UiKit.SIZE_BODY, Palette.GOLD_DARK, "display", 0)
+	# Jauges : temps restant et débord.
+	var left: float = clampf(1.0 - t / maxf(p("duration") * slow, 0.01), 0.0, 1.0)
+	var bar: Rect2 = Rect2(TICKET.position.x, TICKET.end.y + 30.0, TICKET.size.x, 10.0)
+	draw_rect(bar, Palette.VELVET_DEEP)
+	draw_rect(Rect2(bar.position, Vector2(bar.size.x * left, bar.size.y)), Palette.GOLD)
+	var ov: float = overflow() * p("overflow_penalty")
+	text(Vector2(TICKET.end.x - 140.0, TICKET.end.y + 70.0), tr("TRIAL_SCRATCH_OVERFLOW") % roundi(ov * 100.0), UiKit.SIZE_SMALL,
+		Palette.MULT_RED if ov > 0.05 else Palette.SMOKE)

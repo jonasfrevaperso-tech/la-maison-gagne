@@ -5,6 +5,8 @@ extends ThrowTrial
 ## (le sabot doré) : dans le temps, la poussée est pleine ; à côté, elle faiblit. Marteler trop
 ## vite vide la jauge de souffle et le cheval s'essouffle. Trois adversaires à allure fixe.
 ## Note = place (1er… 4e) et temps à l'arrivée, contre trois chevaux pilotés.
+## 1.9 : le rythme se voit — une piste de notes gauche / droite défile vers la ligne de frappe,
+## qui s'illumine (et cliquette) sur chaque temps ; chaque frappe est jugée Parfait / Bien / Raté.
 
 const LANES: int = 4
 const TRACK_X: Vector2 = Vector2(300.0, 1640.0)
@@ -17,6 +19,14 @@ const ME: int = 0
 const PX3: float = 0.005
 const BULBS: int = 30
 const STRIPES: int = 22
+## Piste de rythme : ligne de frappe, défilement (px/s), notes visibles, couleurs gauche / droite.
+const RHYTHM_Y: float = 955.0
+const HIT_X: float = 560.0
+const SCROLL: float = 520.0
+const NOTES_AHEAD: int = 6
+const SIDE_COLORS: Array[Color] = [Color("29e0ff"), Color("ff4d6d")]
+const PERFECT_AT: float = 0.75
+const GOOD_AT: float = 0.35
 
 var _dist: Array[float] = [0.0, 0.0, 0.0, 0.0]
 var _speed: Array[float] = [0.0, 0.0, 0.0, 0.0]
@@ -36,6 +46,9 @@ var _bulbs: Array[MeshInstance3D] = []
 var _bulb_on: StandardMaterial3D = null
 var _bulb_off: StandardMaterial3D = null
 var _flag: Node3D = null
+var _hit_beats: Dictionary[int, bool] = {}
+var _beat_flash: float = 0.0
+var _last_beat: int = -1
 
 
 func begin() -> void:
@@ -176,6 +189,7 @@ func gallop(side: int) -> void:
 		return
 	if side == _last_side:
 		AudioBus.play("sticky", 1.2, -10.0)
+		pop(Vector2(HIT_X, RHYTHM_Y - 130.0), 0.0, "TRIAL_DERBY_ALTERNATE")
 		return
 	_last_side = side
 	var gap: float = t - _last_press
@@ -186,6 +200,9 @@ func gallop(side: int) -> void:
 			_winded = p("winded_seconds")
 			pop(Vector2(TRACK_X.x + 200.0, LANE_Y0 - 70.0), 0.0, "TRIAL_DERBY_WINDED")
 	var timing: float = 1.0 - clampf(_off_beat() / (p("beat_window") * widen()), 0.0, 1.0)
+	_hit_beats[roundi(t / _beat())] = true
+	var key: String = "TRIAL_DERBY_PERFECT" if timing >= PERFECT_AT else ("TRIAL_DERBY_GOOD" if timing >= GOOD_AT else "TRIAL_DERBY_OFF")
+	pop(Vector2(HIT_X, RHYTHM_Y - 130.0), timing, key)
 	var push: float = lerpf(p("push_off"), 1.0, timing) * (0.25 if _winded > 0.0 else 1.0)
 	_speed[ME] = minf(_speed[ME] + p("push") * push, p("max_speed"))
 	AudioBus.play("decor_creak" if side == 0 else "tick", 0.9 + 0.3 * timing, -6.0)
@@ -195,6 +212,13 @@ func tick(dt: float) -> void:
 	if _ended:
 		return
 	_sync_3d()
+	# Métronome : un cliquetis et un éclair de la ligne sur chaque temps.
+	var b: int = floori(t / _beat())
+	if b != _last_beat:
+		_last_beat = b
+		_beat_flash = 1.0
+		AudioBus.play("click", 1.7, -14.0)
+	_beat_flash = maxf(0.0, _beat_flash - dt * 5.0)
 	_winded = maxf(0.0, _winded - dt)
 	_breath = minf(1.0, _breath + p("breath_regen") * dt)
 	if _bot_side >= 0:
@@ -260,14 +284,44 @@ func paint() -> void:
 	if stage == null:
 		return
 	text(Vector2(TRACK_X.x - 160, LANE_Y0 + float(ME) * LANE_H - 50), tr("TRIAL_DERBY_YOU"), UiKit.SIZE_BODY, HORSE_COLORS[ME])
-	# Métronome (sabot doré) et souffle.
-	var m: Vector2 = Vector2(size.x * 0.5 - 200.0, size.y - 110.0)
-	var ph: float = fmod(t / _beat(), 1.0)
-	draw_arc(m, 34.0, 0, TAU, 32, Palette.GOLD_DARK, 3.0)
-	draw_circle(m, 34.0 * (1.0 - ph), Color(Palette.GOLD, 0.25 + 0.6 * (1.0 - ph)))
-	var bw: Rect2 = Rect2(size.x * 0.5 - 120.0, size.y - 120.0, 400.0, 20.0)
+	_draw_rhythm()
+	# Souffle : jauge large, rouge et « Essoufflé » quand elle est vide.
+	var bw: Rect2 = Rect2(1240.0, RHYTHM_Y - 16.0, 420.0, 32.0)
 	draw_rect(bw, Color(Palette.INK, 0.9))
 	var bc: Color = Palette.EMERALD if _winded <= 0.0 else Palette.MULT_RED
+	if _breath < 0.35 and _winded <= 0.0:
+		bc = Palette.GOLD
 	draw_rect(Rect2(bw.position, Vector2(bw.size.x * _breath, bw.size.y)), bc)
 	draw_rect(bw, Palette.GOLD, false, 2.0)
-	text(Vector2(bw.get_center().x, bw.position.y - 22.0), tr("TRIAL_DERBY_BREATH"), UiKit.SIZE_SMALL, Palette.IVORY)
+	var label: String = tr("TRIAL_DERBY_WINDED") if _winded > 0.0 else tr("TRIAL_DERBY_BREATH")
+	text(Vector2(bw.get_center().x, bw.position.y - 24.0), label, UiKit.SIZE_SMALL, Palette.MULT_RED if _winded > 0.0 else Palette.IVORY)
+
+
+## Piste de rythme : les temps à venir défilent vers la ligne, en alternant le côté attendu.
+func _draw_rhythm() -> void:
+	var lane: Rect2 = Rect2(HIT_X - 220.0, RHYTHM_Y - 44.0, 860.0, 88.0)
+	draw_rect(lane, Color(Palette.INK, 0.88))
+	draw_rect(lane, Palette.GOLD_DARK, false, 2.0)
+	var win: float = p("beat_window") * widen() * _beat() * SCROLL
+	draw_rect(Rect2(HIT_X - win, lane.position.y + 4.0, win * 2.0, lane.size.y - 8.0), Color(Palette.GOLD, 0.14 + 0.25 * _beat_flash))
+	draw_line(Vector2(HIT_X, lane.position.y - 6.0), Vector2(HIT_X, lane.end.y + 6.0), Palette.GOLD_LIGHT.lerp(Palette.IVORY, _beat_flash),
+		4.0 + 4.0 * _beat_flash)
+	var next_side: int = 1 - _last_side if _last_side >= 0 else 0
+	var b0: int = floori(t / _beat())
+	var k: int = 0
+	for b: int in range(b0, b0 + NOTES_AHEAD + 1):
+		var x: float = HIT_X + (float(b) * _beat() - t) * SCROLL
+		if x < lane.position.x + 20.0 or x > lane.end.x - 20.0:
+			continue
+		var done: bool = _hit_beats.has(b)
+		var side: int = next_side if k % 2 == 0 else 1 - next_side
+		if not done:
+			k += 1
+		var col: Color = Color(SIDE_COLORS[side], 0.35 if done else 1.0)
+		var c: Vector2 = Vector2(x, RHYTHM_Y)
+		var dx: float = -1.0 if side == 0 else 1.0
+		draw_circle(c, 26.0, Color(Palette.INK, 0.9))
+		draw_arc(c, 26.0, 0, TAU, 32, col, 3.0)
+		draw_colored_polygon(PackedVector2Array([c + Vector2(dx * 14.0, 0), c + Vector2(-dx * 8.0, -12.0), c + Vector2(-dx * 8.0, 12.0)]),
+			col)
+	text(Vector2(HIT_X, lane.position.y - 22.0), tr("TRIAL_DERBY_BEAT"), UiKit.SIZE_SMALL, Palette.GOLD_LIGHT)
