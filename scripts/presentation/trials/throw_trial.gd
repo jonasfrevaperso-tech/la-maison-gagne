@@ -11,6 +11,8 @@ extends Control
 ## `bot_apply()` l'exécute directement.
 
 signal done(score: float)
+## Démonstration du tuto : le joueur appuie pour passer à l'essai.
+signal skip_requested
 
 const GRADE_COLORS: Array[Color] = [Palette.GOLD_LIGHT, Palette.EMERALD, Palette.CYAN, Palette.MAGENTA]
 const CONFIRM_ACTIONS: Array[StringName] = [&"ui_spin", &"bet_place", &"ui_accept"]
@@ -44,6 +46,12 @@ var stage: Stage3D = null
 var bleed_x: float = 0.0
 ## Commandes tactiles à l'écran (pavé, joystick) : un toucher ailleurs ne vaut pas « valider ».
 var touch_controls: bool = false
+## Tuto de première rencontre (1.9) : "" (épreuve réelle), "demo" (le bot joue sous le carton
+## des étapes) ou "essai" (le joueur s'essaie, la note ne compte pas).
+var rehearsal: String = ""
+var tuto_lines: Array[String] = []
+## Part du temps de démo / d'essai écoulée (0..1), dessinée en jauge.
+var rehearsal_u: float = 0.0
 ## Carton d'annonce (nom, règle, commandes) avant que l'épreuve ne commence.
 var intro_left: float = 0.0
 var _intro_total: float = 1.0
@@ -59,6 +67,8 @@ var _art: Texture2D = null
 ## Commandes en grand sur le carton (périphérique actif), placées sous la règle.
 var _keys_label: RichTextLabel = null
 var _keys_label_rect: Rect2 = Rect2()
+## Tuto : carton sauté (1 : sans « Prêt ? », 2 : avec), appliqué une fois dans l'arbre.
+var _skip_intro: int = 0
 
 
 func setup(p_entry: Dictionary, p_precision: int, p_assist: bool, p_mouse: bool) -> ThrowTrial:
@@ -96,6 +106,8 @@ func _ready() -> void:
 	if ResourceLoader.exists(art_path):
 		_art = load(art_path) as Texture2D
 	AudioBus.play("panel_open", 1.0, -6.0)
+	if _skip_intro > 0:
+		_apply_skip_intro()
 
 
 func _place_hint() -> void:
@@ -178,6 +190,10 @@ func in_intro() -> bool:
 func feed(event: InputEvent) -> bool:
 	if finished:
 		return false
+	if rehearsal == "demo":
+		if _any_press(event):
+			skip_requested.emit()
+		return true
 	if not _begun:
 		if confirm_pressed(event) and _intro_total - intro_left > Balance.f("throw_game.trial_intro_min_seconds"):
 			_start()
@@ -195,6 +211,25 @@ func want() -> Dictionary:
 	if _ready_left > 0.0:
 		return {"do": ""}
 	return bot_wants()
+
+
+## Tuto : saute le carton d'annonce (la démo et l'essai montrent l'épreuve tout de suite).
+func skip_intro(ready: bool) -> void:
+	_skip_intro = 2 if ready else 1
+	if is_inside_tree():
+		_apply_skip_intro()
+
+
+func _apply_skip_intro() -> void:
+	_start()
+	if _skip_intro == 1:
+		_ready_left = 0.0
+
+
+func _any_press(event: InputEvent) -> bool:
+	if event is InputEventKey or event is InputEventJoypadButton or event is InputEventMouseButton or event is InputEventScreenTouch:
+		return event.is_pressed() and not event.is_echo()
+	return event is InputEventAction and event.is_pressed()
 
 
 func act(w: Dictionary) -> void:
@@ -320,11 +355,39 @@ func _draw() -> void:
 		var a: float = clampf(_ready_left / maxf(Balance.f("throw_game.pace.ready_seconds"), 0.01) * 2.0, 0.0, 1.0)
 		text(size * 0.5, tr("TRIAL_READY"), UiKit.SIZE_H1, Color(Palette.GOLD_LIGHT, a), "display", 10)
 	_draw_pops()
+	if rehearsal != "":
+		_draw_rehearsal()
 	if _verdict >= 0:
 		var c: Vector2 = play_rect().get_center()
 		draw_rect(Rect2(c.x - size.x * 0.5, c.y - 44.0, size.x, 88.0), Color(Palette.INK, 0.75))
 		var txt: String = "%s : %s" % [Localization.t(entry, "name"), tr(ThrowSkill.grade_key(_verdict as ThrowSkill.Grade))]
 		text(c, txt, UiKit.SIZE_H2, GRADE_COLORS[_verdict], "display", 8)
+
+
+## Tuto : bandeau « DÉMONSTRATION » + étape en cours (la démo défile seule), ou « ESSAI ».
+func _draw_rehearsal() -> void:
+	var pr: Rect2 = play_rect()
+	var top: float = pr.position.y + (70.0 if full() else 34.0)
+	var w: float = minf(pr.size.x - 40.0, 1100.0)
+	if rehearsal == "demo":
+		draw_rect(pr, Color(Palette.INK, 0.28))
+		var k: int = clampi(floori(rehearsal_u * float(tuto_lines.size())), 0, maxi(tuto_lines.size() - 1, 0))
+		var box: Rect2 = Rect2(pr.get_center().x - w * 0.5, top - 30.0, w, 132.0)
+		draw_rect(box, Color(Palette.INK, 0.92))
+		draw_rect(box, Palette.GOLD, false, 2.0)
+		text(Vector2(box.get_center().x, box.position.y + 24.0), "%s · %d/%d" % [tr("TUTO_DEMO"), k + 1, tuto_lines.size()],
+			UiKit.SIZE_SMALL, Palette.GOLD_LIGHT)
+		if not tuto_lines.is_empty():
+			text(Vector2(box.get_center().x, box.position.y + 66.0), tuto_lines[k], UiKit.SIZE_H2 if full() else UiKit.SIZE_BODY, Palette.IVORY,
+				"body")
+		text(Vector2(box.get_center().x, box.end.y - 18.0), tr("TUTO_SKIP"), UiKit.SIZE_SMALL, Palette.SMOKE, "body")
+		draw_rect(Rect2(box.position.x, box.end.y - 4.0, box.size.x * rehearsal_u, 4.0), Palette.GOLD)
+	else:
+		var band: Rect2 = Rect2(pr.get_center().x - w * 0.3, top - 22.0, w * 0.6, 44.0)
+		draw_rect(band, Color(Palette.INK, 0.85))
+		draw_rect(band, Palette.CYAN, false, 2.0)
+		text(band.get_center(), tr("TUTO_REHEARSAL"), UiKit.SIZE_BODY, Palette.CYAN)
+		draw_rect(Rect2(band.position.x, band.end.y - 4.0, band.size.x * (1.0 - rehearsal_u), 4.0), Palette.CYAN)
 
 
 ## Fond d'un écran dédié (déborde largement : couvre aussi les bandes hors maquette).

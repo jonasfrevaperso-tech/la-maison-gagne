@@ -41,3 +41,29 @@ func test_museum_b_reaches_trial() -> void:
 	check(not ms.game.active(), "Quitter l'épreuve")
 	ms.get_parent().remove_child(ms)
 	ms.free()
+
+
+## Tuto de première rencontre : démo → essai (note ignorée) → épreuve réelle ; ensuite plus rien.
+func test_trial_tuto_flow() -> void:
+	_boot()
+	Engine.remove_meta(&"no_trial_tutos")
+	SaveSystem.profile["trials_tutored"] = []
+	var g: ThrowMinigame = ThrowMinigame.new()
+	(Engine.get_main_loop() as SceneTree).root.add_child(g)
+	g.start_with(["charge"] as Array[String], 1, false)
+	eq(g.rehearsing(), "demo", "démo à la première rencontre")
+	check(g.trial.tuto_lines.size() >= 2, "étapes du tuto chargées")
+	g.bot_apply({"do": "confirm"})
+	eq(g.rehearsing(), "essai", "on passe la démo : essai")
+	g.trial.done.emit(1.0)
+	check(g.trial_scores.is_empty(), "la note de l'essai ne compte pas")
+	g._after_pause()
+	eq(g.rehearsing(), "", "puis l'épreuve réelle")
+	check(g.active() and g.trial.in_intro(), "épreuve réelle avec son carton")
+	check(not g.needs_tuto("charge"), "épreuve marquée comme initiée")
+	g.start_with(["charge"] as Array[String], 1, false)
+	eq(g.rehearsing(), "", "déjà vue : directement l'épreuve")
+	Engine.set_meta(&"no_trial_tutos", true)
+	g.stop()
+	g.get_parent().remove_child(g)
+	g.free()

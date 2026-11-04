@@ -167,6 +167,14 @@ func _validate_entry(db: ContentDB, cat: String, e: Dictionary) -> void:
 		for a: Variant in e.get("touch_pad", []):
 			if not TOUCH_PAD_ACTIONS.has(String(a)) or not InputMap.has_action(StringName(String(a))):
 				errors.append("%s : touch_pad « %s » inconnu" % [eid, a])
+		# 1.9 : tuto de première rencontre, 2 à 4 étapes par langue.
+		for lang: String in ["fr", "en"]:
+			var steps: Array = e.get("tuto_" + lang, []) as Array
+			if steps.size() < 2 or steps.size() > 4:
+				errors.append("%s : tuto_%s doit compter 2 à 4 étapes" % [eid, lang])
+			for st: Variant in steps:
+				if String(st).strip_edges() == "":
+					errors.append("%s : étape vide dans tuto_%s" % [eid, lang])
 		if not Balance.data().get("throw_trials", {}).has(String(e.get("id", ""))):
 			errors.append("%s : réglages absents de balance.json (throw_trials)" % eid)
 		if e.has("touch_layout") and not TOUCH_LAYOUTS.has(String(e["touch_layout"])):

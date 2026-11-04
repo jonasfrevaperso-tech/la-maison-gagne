@@ -286,6 +286,8 @@ func _game_tab() -> void:
 	_desc(b, "OPT_THROW_MODE_DESC")
 	_check(b, "OPT_ASSIST", "game", "assist")
 	_check(b, "OPT_TUTORIAL_TIPS", "game", "tutorial_tips")
+	_check(b, "OPT_TRIAL_TUTOS", "game", "trial_tutos")
+	_desc(b, "OPT_TRIAL_TUTOS_DESC")
 	_check(b, "OPT_REPLAY_STORY", "game", "replay_story")
 	_desc(b, "OPT_REPLAY_STORY_DESC")
 	if Platform.is_mobile():
@@ -299,6 +301,7 @@ func _game_tab() -> void:
 	_check(b, "OPT_TELEMETRY", "game", "telemetry")
 	_desc(b, "OPT_TELEMETRY_DESC")
 	b.add_child(UiKit.button(tr("OPT_RESET_TUTORIAL"), _reset_tutorial))
+	b.add_child(UiKit.button(tr("OPT_RESET_TRIAL_TUTOS"), _reset_trial_tutos))
 	if not Platform.is_mobile():
 		b.add_child(UiKit.button(tr("OPT_OPEN_DATA"), _open_data_dir))
 
@@ -412,6 +415,12 @@ func _open_data_dir() -> void:
 func _reset_tutorial() -> void:
 	TutorialDirector.reset()
 	EventBus.toast.emit(tr("TOAST_TUTORIAL_RESET"), &"success")
+
+
+func _reset_trial_tutos() -> void:
+	SaveSystem.profile["trials_tutored"] = []
+	SaveSystem.save_profile()
+	EventBus.toast.emit(tr("TOAST_TRIAL_TUTOS_RESET"), &"success")
 
 
 func go_back() -> void:

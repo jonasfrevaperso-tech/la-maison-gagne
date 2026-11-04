@@ -28,6 +28,7 @@ var _failed: bool = false
 
 
 func _ready() -> void:
+	ThrowMinigame.tutorials = false
 	Settings.set_value("game", "input_mode", "gamepad")
 	Settings.speed_override = 4.0
 	_drive()

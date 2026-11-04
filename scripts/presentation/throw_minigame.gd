@@ -36,6 +36,9 @@ const PANEL_INSET: float = 6.0
 const CONFIRM_ACTIONS: Array[StringName] = [&"ui_spin", &"bet_place", &"ui_accept"]
 const TRIAL_SCRIPTS: String = "res://scripts/presentation/trials/trial_%s.gd"
 
+## Tutos de première rencontre (coupés par les tests et les parcours automatiques).
+static var tutorials: bool = true
+
 var beat: Beat = Beat.IDLE
 ## Point de lâcher (local), là où la bille quitte la main.
 var release_point: Vector2 = Vector2.ZERO
@@ -66,6 +69,10 @@ var _grade_t: float = 0.0
 var _control_delta: float = 0.0
 var _pause_grade: ThrowSkill.Grade = ThrowSkill.Grade.MISS
 var _last_ids: Array[String] = []
+## Tuto de première rencontre en cours ("", "demo", "essai") et son chrono.
+var _rehearsal: String = ""
+var _rehearse_t: float = 0.0
+var _force_tuto: bool = false
 
 
 func _ready() -> void:
@@ -75,6 +82,8 @@ func _ready() -> void:
 
 func start(precision: int, assist: bool, count: int = -1) -> void:
 	practice = false
+	_rehearsal = ""
+	_force_tuto = false
 	_precision = precision
 	_assist = assist
 	_mouse = (GameInput.last_was_mouse or InputGlyphs.using_touch) and not InputGlyphs.using_pad
@@ -95,11 +104,13 @@ func start(precision: int, assist: bool, count: int = -1) -> void:
 
 ## Musée : joue l'épreuve `id` seule, à la difficulté `difficulty` (relax|normal|expert),
 ## sans lâcher ni lien avec une partie ; `practice_done` rend sa note.
-func start_practice(id: String, difficulty: String) -> void:
+func start_practice(id: String, difficulty: String, tuto: bool = false) -> void:
 	_practice_diff = Balance.data().get("museum", {}).get("difficulty", {}).get(difficulty, {}) as Dictionary
 	var assist: bool = bool(_practice_diff.get("assist", false))
 	_close_trial()
 	practice = true
+	_rehearsal = ""
+	_force_tuto = tuto
 	_precision = Balance.i("museum.precision")
 	_assist = assist
 	_mouse = (GameInput.last_was_mouse or InputGlyphs.using_touch) and not InputGlyphs.using_pad
@@ -115,6 +126,7 @@ func start_practice(id: String, difficulty: String) -> void:
 ## Interrompt tout (Musée : retour en pleine épreuve).
 func stop() -> void:
 	_close_trial()
+	_rehearsal = ""
 	practice = false
 	beat = Beat.IDLE
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -127,7 +139,27 @@ func start_with(ids: Array[String], precision: int, assist: bool) -> void:
 	_close_trial()
 	trial_ids = ids
 	_index = 0
+	_rehearsal = ""
 	_open_trial()
+
+
+## Vrai si l'épreuve `id` n'a jamais été initiée (démo + essai à la première rencontre).
+func needs_tuto(id: String) -> bool:
+	if not tutorials or Engine.has_meta(&"no_trial_tutos") or not Settings.b("game", "trial_tutos"):
+		return false
+	return not (SaveSystem.profile.get("trials_tutored", []) as Array).has(id)
+
+
+func mark_tutored(id: String) -> void:
+	if not SaveSystem.profile.has("trials_tutored"):
+		SaveSystem.profile["trials_tutored"] = []
+	var arr: Array = SaveSystem.profile["trials_tutored"]
+	if not arr.has(id):
+		arr.append(id)
+
+
+func rehearsing() -> String:
+	return _rehearsal
 
 
 func active() -> bool:
@@ -149,6 +181,10 @@ func _open_trial() -> void:
 	var scr: GDScript = load(TRIAL_SCRIPTS % id) as GDScript
 	var e: Dictionary = DataRegistry.db.get_entry("throw_trials", id)
 	SaveSystem.mark_seen("trials", id)  # le Codex montre les épreuves déjà jouées
+	if _rehearsal == "" and (_force_tuto or needs_tuto(id)):
+		_rehearsal = "demo"
+	_force_tuto = false
+	_rehearse_t = 0.0
 	# Au doigt, une épreuve à symboles se joue comme à la manette, avec le pavé de boutons.
 	var pad: Array[String] = []
 	var stick: bool = InputGlyphs.using_touch and bool(e.get("touch_stick", false))
@@ -168,7 +204,15 @@ func _open_trial() -> void:
 	trial.hold = hold
 	trial.steps = steps()
 	trial.step = _index
-	trial.done.connect(_on_trial_done)
+	if _rehearsal != "":
+		trial.rehearsal = _rehearsal
+		for line: Variant in e.get("tuto_" + Localization.locale(), e.get("tuto_fr", [])):
+			trial.tuto_lines.append(String(line))
+		trial.skip_intro(_rehearsal == "essai")
+		trial.skip_requested.connect(_next_rehearsal)
+		trial.done.connect(_on_rehearsal_done)
+	else:
+		trial.done.connect(_on_trial_done)
 	if full_host != null and Platform.is_mobile():
 		_place_mobile(pad, pad_layout, stick)
 	elif full_host != null:
@@ -273,7 +317,37 @@ func _on_trial_done(sc: float) -> void:
 			AudioBus.play("lose_soft", 1.0, -4.0)
 
 
+## Tuto : démo → essai → épreuve réelle (même épreuve, nouvelle instance).
+func _next_rehearsal() -> void:
+	if _rehearsal == "":
+		return
+	var id: String = trial_ids[_index]
+	if _rehearsal == "demo":
+		_rehearsal = "essai"
+	else:
+		_rehearsal = ""
+		mark_tutored(id)
+	AudioBus.play("whoosh", 1.3, -8.0)
+	_close_trial()
+	_open_trial()
+
+
+## Fin de la démo ou de l'essai avant le temps : verdict de l'essai affiché, note ignorée.
+func _on_rehearsal_done(sc: float) -> void:
+	if _rehearsal == "demo":
+		_next_rehearsal.call_deferred()
+		return
+	if trial != null:
+		trial.show_verdict(ThrowSkill.beat_grade(sc))
+	beat = Beat.PAUSE
+	_t = 0.0
+
+
 func _after_pause() -> void:
+	if _rehearsal != "":
+		beat = Beat.TRIAL
+		_next_rehearsal()
+		return
 	_close_trial()
 	_index += 1
 	if _index < trial_ids.size():
@@ -373,7 +447,7 @@ func bot_wants() -> Dictionary:
 	match beat:
 		Beat.TRIAL:
 			if trial != null and not _held():
-				return trial.want()
+				return {"do": ""} if _rehearsal == "demo" else trial.want()  # la démo se regarde
 		Beat.RELEASE:
 			if _t >= _release_time - 0.01:
 				return {"do": "confirm"}
@@ -383,7 +457,10 @@ func bot_wants() -> Dictionary:
 func bot_apply(want: Dictionary) -> void:
 	match beat:
 		Beat.TRIAL:
-			if trial != null:
+			if _rehearsal == "demo":
+				if String(want.get("do", "")) == "confirm":
+					_next_rehearsal()
+			elif trial != null:
 				trial.act(want)
 		Beat.RELEASE:
 			if String(want.get("do", "")) == "confirm":
@@ -401,6 +478,8 @@ func _process(delta: float) -> void:
 	var dt: float = delta / maxf(Engine.time_scale, 0.0001)
 	_t += dt
 	match beat:
+		Beat.TRIAL:
+			_tick_rehearsal(dt)
 		Beat.PAUSE:
 			if _t >= Balance.f("throw_game.trial_pause_seconds"):
 				_after_pause()
@@ -412,6 +491,19 @@ func _process(delta: float) -> void:
 			if _grade_t <= 0.0:
 				beat = Beat.IDLE
 	queue_redraw()
+
+
+## Démo : le bot de l'épreuve joue seul ; démo et essai sont bornés dans le temps.
+func _tick_rehearsal(dt: float) -> void:
+	if _rehearsal == "" or trial == null:
+		return
+	_rehearse_t += dt
+	var limit: float = Balance.f("throw_game.tuto_demo_seconds" if _rehearsal == "demo" else "throw_game.rehearsal_seconds")
+	trial.rehearsal_u = clampf(_rehearse_t / maxf(limit, 0.01), 0.0, 1.0)
+	if _rehearsal == "demo" and not trial.finished:
+		trial.act(trial.want())
+	if _rehearse_t >= limit and not trial.finished:
+		_next_rehearsal()
 
 
 # --------------------------------------------------------------------------- dessin

@@ -791,3 +791,11 @@ CODEX_TO_MUSEUM,S'entraîner au Musée,Practice at the Museum
 MUSEUM_RESUME,Reprendre,Resume
 MUSEUM_RESTART,Recommencer,Restart
 MUSEUM_QUIT_TRIAL,Quitter l'épreuve,Quit the trial
+TUTO_DEMO,DÉMONSTRATION,DEMONSTRATION
+TUTO_SKIP,Appuie pour passer à l'essai,Press to skip to the practice go
+TUTO_REHEARSAL,ESSAI — ne compte pas,PRACTICE — doesn't count
+MUSEUM_TUTO,Tuto,Tutorial
+OPT_TRIAL_TUTOS,Tutos des épreuves,Trial tutorials
+OPT_TRIAL_TUTOS_DESC,"La première fois qu'une épreuve se présente : une courte démonstration, puis un essai qui ne compte pas.","The first time a trial comes up: a short demonstration, then a practice go that doesn't count."
+OPT_RESET_TRIAL_TUTOS,Revoir les tutos des épreuves,Replay the trial tutorials
+TOAST_TRIAL_TUTOS_RESET,Les tutos des épreuves reviendront à la prochaine rencontre.,Trial tutorials will play again next time.

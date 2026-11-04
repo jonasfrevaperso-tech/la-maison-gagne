@@ -6,7 +6,17 @@
   "name_fr": "Élan",
   "name_en": "Swing",
   "desc_fr": "Maintiens pour charger la jauge, relâche dans la zone dorée. Deux élans, le second plus serré.",
-  "desc_en": "Hold to charge the gauge, release in the gold zone. Two swings, the second one tighter."
+  "desc_en": "Hold to charge the gauge, release in the gold zone. Two swings, the second one tighter.",
+  "tuto_fr": [
+   "Une jauge monte tant que tu charges.",
+   "Relâche quand l'aiguille est dans la zone dorée.",
+   "Plus tu es au centre de l'or, meilleur est l'élan."
+  ],
+  "tuto_en": [
+   "A gauge rises while you charge.",
+   "Release while the needle is in the golden zone.",
+   "The closer to the centre of the gold, the better."
+  ]
  },
  {
   "id": "rhythm",
@@ -21,7 +31,17 @@
   "name_fr": "Effet",
   "name_en": "Spin",
   "desc_fr": "Un morceau démarre : frappe les notes quand elles passent la ligne, accords compris. Ne tape pas dans le vide.",
-  "desc_en": "A tune kicks in: hit the notes as they cross the line, chords included. Don't hit thin air."
+  "desc_en": "A tune kicks in: hit the notes as they cross the line, chords included. Don't hit thin air.",
+  "tuto_fr": [
+   "Les notes descendent vers la ligne lumineuse.",
+   "Frappe la bonne piste quand la note touche la ligne.",
+   "Les notes longues se maintiennent jusqu'au bout."
+  ],
+  "tuto_en": [
+   "Notes fall towards the glowing line.",
+   "Hit the right lane as the note reaches the line.",
+   "Long notes are held until their end."
+  ]
  },
  {
   "id": "bottles",
@@ -30,7 +50,17 @@
   "name_fr": "Les Bouteilles",
   "name_en": "The Bottles",
   "desc_fr": "Au bar abandonné : fixe la direction quand le viseur passe sur la bouteille désignée, puis la force dans l'or. Trois jetons.",
-  "desc_en": "At the abandoned bar: lock the aim when the sight crosses the marked bottle, then the strength in the gold. Three chips."
+  "desc_en": "At the abandoned bar: lock the aim when the sight crosses the marked bottle, then the strength in the gold. Three chips.",
+  "tuto_fr": [
+   "Le viseur balaie l'étagère : fixe-le sur la bouteille encadrée.",
+   "Puis arrête la jauge de force dans la bande dorée.",
+   "Trois jetons : vise juste, dose bien."
+  ],
+  "tuto_en": [
+   "The sight sweeps the shelf: lock it on the framed bottle.",
+   "Then stop the power gauge in the golden band.",
+   "Three chips: aim true, judge the power."
+  ]
  },
  {
   "id": "memory",
@@ -39,7 +69,17 @@
   "name_fr": "Mémoire des cartes",
   "name_en": "Card Memory",
   "desc_fr": "Retiens les cartes pendant qu'elles sont visibles, puis retrouve toutes les paires avant la fin du sablier. Chaque erreur coûte.",
-  "desc_en": "Memorise the cards while they're face up, then find every pair before the hourglass runs out. Each mistake costs."
+  "desc_en": "Memorise the cards while they're face up, then find every pair before the hourglass runs out. Each mistake costs.",
+  "tuto_fr": [
+   "Regarde bien les cartes avant qu'elles se retournent.",
+   "Retourne-les deux par deux pour former des paires.",
+   "Chaque erreur coûte un peu de note."
+  ],
+  "tuto_en": [
+   "Study the cards before they turn over.",
+   "Flip them two at a time to make pairs.",
+   "Each mistake costs a little score."
+  ]
  },
  {
   "id": "shells",
@@ -48,7 +88,17 @@
   "name_fr": "Bonneteau",
   "name_en": "Shell Game",
   "desc_fr": "La bille est sous un gobelet. Suis-le pendant le mélange et désigne-le. Deux manches, la seconde plus vive.",
-  "desc_en": "The ball is under a cup. Follow it through the shuffle and point at it. Two rounds, the second faster."
+  "desc_en": "The ball is under a cup. Follow it through the shuffle and point at it. Two rounds, the second faster.",
+  "tuto_fr": [
+   "La bille se cache sous un gobelet.",
+   "Suis ce gobelet des yeux pendant le mélange.",
+   "Puis désigne-le. La seconde manche va plus vite."
+  ],
+  "tuto_en": [
+   "The ball hides under a cup.",
+   "Follow that cup with your eyes while they shuffle.",
+   "Then point at it. The second round is faster."
+  ]
  },
  {
   "id": "darts",
@@ -61,6 +111,16 @@
   "touch_stick": true,
   "touch_pad": [
    "ui_spin"
+  ],
+  "tuto_fr": [
+   "Le viseur tremble autour de la cible.",
+   "Corrige-le vers le centre, puis lance.",
+   "Le centre rapporte le plus. Trois fléchettes."
+  ],
+  "tuto_en": [
+   "The sight wobbles around the board.",
+   "Steady it towards the centre, then throw.",
+   "The bullseye scores most. Three darts."
   ]
  },
  {
@@ -70,7 +130,17 @@
   "name_fr": "Coffre-fort",
   "name_en": "Safe Cracker",
   "desc_fr": "Tourne la molette en écoutant les crans : la jauge s'affole près du bon chiffre. Valide les trois chiffres à temps.",
-  "desc_en": "Turn the dial and listen to the clicks: the meter goes wild near the right number. Lock in all three in time."
+  "desc_en": "Turn the dial and listen to the clicks: the meter goes wild near the right number. Lock in all three in time.",
+  "tuto_fr": [
+   "La jauge s'affole près du bon chiffre.",
+   "Tourne la molette, écoute les crans, valide le chiffre.",
+   "Trois chiffres avant la fin du temps."
+  ],
+  "tuto_en": [
+   "The gauge goes wild near the right number.",
+   "Turn the dial, listen to the clicks, lock the number.",
+   "Three numbers before time runs out."
+  ]
  },
  {
   "id": "tower",
@@ -79,7 +149,17 @@
   "name_fr": "Tour de jetons",
   "name_en": "Chip Tower",
   "desc_fr": "Lâche chaque jeton pile sur la pile : ce qui dépasse tombe et le suivant rétrécit. Six jetons, de plus en plus vite.",
-  "desc_en": "Drop each chip right on the stack: overhangs fall off and the next one shrinks. Six chips, faster and faster."
+  "desc_en": "Drop each chip right on the stack: overhangs fall off and the next one shrinks. Six chips, faster and faster.",
+  "tuto_fr": [
+   "Un jeton glisse au-dessus de la pile.",
+   "Lâche-le pile au-dessus : ce qui dépasse tombe.",
+   "La pile s'affine à chaque erreur : reste aligné."
+  ],
+  "tuto_en": [
+   "A chip slides above the stack.",
+   "Drop it right on top: the overhang falls off.",
+   "The stack narrows with each miss: stay aligned."
+  ]
  },
  {
   "id": "shaker",
@@ -93,7 +173,17 @@
   "name_en": "Shaker",
   "desc_fr": "Alterne gauche et droite pour faire mousser, et garde la mousse dans la bande dorée qui se promène.",
   "desc_en": "Alternate left and right to whip up foam, and keep it inside the wandering gold band.",
-  "touch_layout": "split"
+  "touch_layout": "split",
+  "tuto_fr": [
+   "Secoue en alternant les deux boutons.",
+   "La mousse doit rester dans la bande dorée qui se promène.",
+   "Trop mou, elle retombe ; trop fort, elle déborde."
+  ],
+  "tuto_en": [
+   "Shake by alternating the two buttons.",
+   "Keep the foam inside the wandering golden band.",
+   "Too soft, it falls; too hard, it overflows."
+  ]
  },
  {
   "id": "pour",
@@ -102,7 +192,17 @@
   "name_fr": "Le Verre parfait",
   "name_en": "The Perfect Pour",
   "desc_fr": "Maintiens pour verser, relâche avant le trait doré : la mousse monte encore. Trois verres, trois formes.",
-  "desc_en": "Hold to pour, release before the gold line: the foam keeps rising. Three glasses, three shapes."
+  "desc_en": "Hold to pour, release before the gold line: the foam keeps rising. Three glasses, three shapes.",
+  "tuto_fr": [
+   "Maintiens pour verser dans le verre.",
+   "Relâche juste avant le trait doré : la mousse monte encore.",
+   "Au-dessus du trait, ça déborde."
+  ],
+  "tuto_en": [
+   "Hold to pour into the glass.",
+   "Release just before the golden line: the foam keeps rising.",
+   "Above the line, it spills."
+  ]
  },
  {
   "id": "simon",
@@ -117,7 +217,17 @@
   "name_fr": "Le Juke-box",
   "name_en": "The Jukebox",
   "desc_fr": "Regarde la mélodie de lumières, puis rejoue-la note par note. Trois mélodies, de plus en plus longues.",
-  "desc_en": "Watch the light melody, then play it back note by note. Three melodies, longer each time."
+  "desc_en": "Watch the light melody, then play it back note by note. Three melodies, longer each time.",
+  "tuto_fr": [
+   "Écoute la mélodie : chaque note allume une touche.",
+   "Rejoue-la dans le même ordre.",
+   "Chaque manche ajoute des notes."
+  ],
+  "tuto_en": [
+   "Listen to the tune: each note lights a key.",
+   "Play it back in the same order.",
+   "Each round adds notes."
+  ]
  },
  {
   "id": "catch",
@@ -133,7 +243,17 @@
   ],
   "touch_labels": {
    "ui_spin": "TOUCH_EMPTY"
-  }
+  },
+  "tuto_fr": [
+   "Des jetons tombent du lustre : rattrape-les sur le plateau.",
+   "Évite fausses pièces, bouteilles et cigares.",
+   "Mets la pile à l'abri avant qu'elle ne s'écroule."
+  ],
+  "tuto_en": [
+   "Chips fall from the chandelier: catch them on the tray.",
+   "Avoid fake coins, bottles and cigars.",
+   "Bank your stack before it topples."
+  ]
  },
  {
   "id": "highlow",
@@ -146,7 +266,17 @@
   "name_fr": "Plus haut, plus bas",
   "name_en": "Higher or Lower",
   "desc_fr": "La carte suivante sera-t-elle plus haute ou plus basse ? Seul le choix le plus probable compte, et vite.",
-  "desc_en": "Will the next card be higher or lower? Only the most likely call counts, and fast."
+  "desc_en": "Will the next card be higher or lower? Only the most likely call counts, and fast.",
+  "tuto_fr": [
+   "Une carte est retournée.",
+   "Devine si la suivante sera plus haute ou plus basse.",
+   "Les cartes déjà sorties aident à compter."
+  ],
+  "tuto_en": [
+   "One card is face up.",
+   "Guess whether the next one is higher or lower.",
+   "Cards already played help you count."
+  ]
  },
  {
   "id": "sort",
@@ -161,7 +291,17 @@
   "name_fr": "Tri des jetons",
   "name_en": "Chip Sorting",
   "desc_fr": "Envoie chaque jeton qui passe dans la fenêtre vers le bac de sa couleur. Le tapis accélère.",
-  "desc_en": "Send every chip crossing the window to the bin of its colour. The belt speeds up."
+  "desc_en": "Send every chip crossing the window to the bin of its colour. The belt speeds up.",
+  "tuto_fr": [
+   "Les jetons arrivent sur le tapis roulant.",
+   "Envoie chaque jeton dans le bac de sa couleur.",
+   "Un jeton qui tombe du tapis est perdu."
+  ],
+  "tuto_en": [
+   "Chips ride in on the conveyor belt.",
+   "Send each chip to the bin of its colour.",
+   "A chip that falls off the belt is lost."
+  ]
  },
  {
   "id": "invaders",
@@ -177,7 +317,17 @@
   ],
   "touch_labels": {
    "ui_spin": "TOUCH_FIRE"
-  }
+  },
+  "tuto_fr": [
+   "Les jetons-envahisseurs descendent vers le tapis.",
+   "Déplace le râteau et tire, abrité derrière les piles.",
+   "Esquive leurs tirs : touché, tu perds un peu de note."
+  ],
+  "tuto_en": [
+   "Chip invaders march down towards the felt.",
+   "Move the rake and fire, sheltered behind the stacks.",
+   "Dodge their shots: getting hit costs a little score."
+  ]
  },
  {
   "id": "cave",
@@ -193,7 +343,17 @@
   ],
   "touch_labels": {
    "ui_spin": "TOUCH_JUMP"
-  }
+  },
+  "tuto_fr": [
+   "Le groom court vers le trésor du Grand Zéro.",
+   "Saute fosses, tonneaux et rats.",
+   "Aux grandes fosses, attrape le câble puis lâche-le en fin d'élan."
+  ],
+  "tuto_en": [
+   "The bellhop runs towards the Grand Zero's treasure.",
+   "Jump over pits, barrels and rats.",
+   "At wide pits, grab the cable and let go at the end of the swing."
+  ]
  },
  {
   "id": "pachinko",
@@ -211,7 +371,17 @@
   "touch_labels": {
    "qte_left": "TOUCH_LEFT",
    "qte_right": "TOUCH_RIGHT"
-  }
+  },
+  "tuto_fr": [
+   "Les billes dévalent le plateau de clous.",
+   "Frappe le taquet au moment où une bille passe dessus.",
+   "Bien frappée, elle file dans le godet d'or."
+  ],
+  "tuto_en": [
+   "Balls tumble down the field of pins.",
+   "Kick the flipper as a ball rolls over it.",
+   "Hit well, it flies into the golden cup."
+  ]
  },
  {
   "id": "blackjack",
@@ -231,7 +401,17 @@
    "qte_left": "TOUCH_HIT",
    "qte_up": "TOUCH_DOUBLE",
    "qte_right": "TOUCH_STAND"
-  }
+  },
+  "tuto_fr": [
+   "Approche-toi de 21 sans le dépasser.",
+   "Tire, double ou reste avant la fin du chrono.",
+   "On note la justesse de ta décision, pas les cartes."
+  ],
+  "tuto_en": [
+   "Get close to 21 without going over.",
+   "Hit, double or stand before time runs out.",
+   "Your decision is scored, never the cards."
+  ]
  },
  {
   "id": "scratch",
@@ -240,7 +420,17 @@
   "name_fr": "Le Grattage",
   "name_en": "The Scratchcard",
   "desc_fr": "Trois trèfles d'or se cachent sous neuf cases, et tu n'en grattes que quatre. Le reflet qui balaie le ticket les trahit à chaque passage : observe, puis gratte.",
-  "desc_en": "Three gold clovers hide under nine cells, and you may scratch only four. The glint sweeping the ticket gives them away on every pass: watch, then scratch."
+  "desc_en": "Three gold clovers hide under nine cells, and you may scratch only four. The glint sweeping the ticket gives them away on every pass: watch, then scratch.",
+  "tuto_fr": [
+   "Trois cases sont cerclées de pointillés dorés.",
+   "Gratte-les entièrement pour révéler leur symbole.",
+   "Ne déborde pas : gratter hors des pointillés coûte des points."
+  ],
+  "tuto_en": [
+   "Three spots are circled with golden dots.",
+   "Scratch them clean to reveal their symbol.",
+   "Stay inside: scratching outside the dots costs points."
+  ]
  },
  {
   "id": "dice",
@@ -253,6 +443,16 @@
   "touch_stick": true,
   "touch_pad": [
    "ui_spin"
+  ],
+  "tuto_fr": [
+   "Vise la zone dorée derrière la bande du fond.",
+   "Dose la force : les dés doivent rebondir sur la bande.",
+   "Seul l'endroit où ils s'arrêtent compte, pas la face."
+  ],
+  "tuto_en": [
+   "Aim for the golden zone past the back rail.",
+   "Judge the power: the dice must bounce off the rail.",
+   "Only where they stop counts, not the face."
   ]
  },
  {
@@ -271,7 +471,17 @@
   "touch_labels": {
    "qte_left": "TOUCH_LEFT",
    "qte_right": "TOUCH_RIGHT"
-  }
+  },
+  "tuto_fr": [
+   "Les notes défilent vers la ligne : gauche, droite, gauche…",
+   "Frappe le bon côté quand la note touche la ligne.",
+   "Marteler essouffle le cheval : suis le rythme."
+  ],
+  "tuto_en": [
+   "Notes scroll towards the line: left, right, left…",
+   "Hit the right side as the note reaches the line.",
+   "Mashing winds the horse: follow the beat."
+  ]
  },
  {
   "id": "fishing",
@@ -286,7 +496,17 @@
   ],
   "touch_labels": {
    "ui_spin": "TOUCH_FISH"
-  }
+  },
+  "tuto_fr": [
+   "Lance quand la jauge est dans l'or, au-dessus des remous.",
+   "Ferre dès que le flotteur plonge.",
+   "Mouline en gardant la tension du fil dans le vert."
+  ],
+  "tuto_en": [
+   "Cast while the gauge is in the gold, over the ripples.",
+   "Strike as soon as the float dips.",
+   "Reel in while keeping the line tension in the green."
+  ]
  },
  {
   "id": "lasers",
@@ -296,7 +516,17 @@
   "name_en": "The Vault Lasers",
   "desc_fr": "Traverse la salle des coffres jusqu'à la porte blindée sans toucher les faisceaux qui balaient, glissent et clignotent.",
   "desc_en": "Cross the vault to the armoured door without touching the beams that sweep, slide and blink.",
-  "touch_stick": true
+  "touch_stick": true,
+  "tuto_fr": [
+   "Traverse la salle jusqu'à la porte du coffre.",
+   "Les faisceaux balaient, glissent et clignotent.",
+   "Attends l'ouverture, puis faufile-toi."
+  ],
+  "tuto_en": [
+   "Cross the room to the vault door.",
+   "Beams sweep, slide and blink.",
+   "Wait for the gap, then slip through."
+  ]
  },
  {
   "id": "juggle",
@@ -316,7 +546,17 @@
    "qte_left": "TOUCH_LEFT",
    "qte_down": "TOUCH_MIDDLE",
    "qte_right": "TOUCH_RIGHT"
-  }
+  },
+  "tuto_fr": [
+   "Les jetons retombent vers la ligne des mains.",
+   "Frappe la main sous le jeton quand il touche la ligne.",
+   "Un jeton de plus entre en jeu régulièrement."
+  ],
+  "tuto_en": [
+   "Chips fall back towards the line of hands.",
+   "Hit the hand under the chip as it reaches the line.",
+   "Another chip joins in every so often."
+  ]
  },
  {
   "id": "billiards",
@@ -332,6 +572,16 @@
   ],
   "touch_labels": {
    "ui_spin": "TOUCH_SHOOT"
-  }
+  },
+  "tuto_fr": [
+   "La ligne montre la trajectoire et la bille fantôme le point de contact.",
+   "Vise la bille de couleur vers une poche.",
+   "Dose la force : trop fort, la blanche peut tomber."
+  ],
+  "tuto_en": [
+   "The line shows the path, the ghost ball the point of contact.",
+   "Aim the coloured ball at a pocket.",
+   "Judge the power: too hard, the cue ball may drop."
+  ]
  }
 ]

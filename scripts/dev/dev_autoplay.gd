@@ -17,6 +17,7 @@ var _draw_calls: int = 0
 
 
 func _ready() -> void:
+	ThrowMinigame.tutorials = DevMode.args().get("dev-tutos", "0") == "1"
 	if perf:
 		RenderingServer.viewport_set_measure_render_time(get_viewport().get_viewport_rid(), true)
 	_drive()

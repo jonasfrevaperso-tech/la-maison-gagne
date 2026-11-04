@@ -237,7 +237,9 @@
     ],
     "pace": {
       "ready_seconds": 0.6
-    }
+    },
+    "tuto_demo_seconds": 7.0,
+    "rehearsal_seconds": 8.0
   },
   "throw_trials": {
     "_doc": "Réglages des épreuves du lancer (une entrée par épreuve de data/throw/throw_trials.json).",

@@ -182,9 +182,15 @@ func _build_cartel() -> PanelContainer:
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		diffs.add_child(b)
 		_diff_buttons[d] = b
+	var row: HBoxContainer = HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	c.add_child(row)
 	_play_btn = UiKit.button(tr("MUSEUM_PLAY"), play_current, Vector2(0, 64))
+	_play_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	PromptBadge.attach(_play_btn, "ui_accept")
-	c.add_child(_play_btn)
+	row.add_child(_play_btn)
+	# Tuto : démonstration puis essai, puis l'épreuve elle-même (revoir à volonté).
+	row.add_child(UiKit.button(tr("MUSEUM_TUTO"), play_current.bind(true), Vector2(0, 64)))
 	return panel
 
 
@@ -416,7 +422,7 @@ func _fit() -> void:
 
 
 ## Lance l'objet choisi en entraînement, à la difficulté du cartel.
-func play_current() -> void:
+func play_current(tuto: bool = false) -> void:
 	if _view.exhibits.is_empty() or _playing != "":
 		return
 	_playing = _view.exhibits[_view.focus]
@@ -426,7 +432,7 @@ func play_current() -> void:
 	_view.process_mode = Node.PROCESS_MODE_DISABLED
 	_play_layer.visible = true
 	game.panel_scale = Balance.f("museum.panel_scale")
-	game.start_practice(_playing, difficulty)
+	game.start_practice(_playing, difficulty, tuto)
 
 
 func _unhandled_input(event: InputEvent) -> void:

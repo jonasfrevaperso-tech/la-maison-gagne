@@ -7,6 +7,7 @@ const ROOTS: Array[String] = ["res://tests/unit", "res://tests/integration"]
 
 
 func _initialize() -> void:
+	Engine.set_meta(&"no_trial_tutos", true)  # les tests qui en ont besoin le rallument (ThrowMinigame)
 	var filter: String = ""
 	for a: String in OS.get_cmdline_user_args():
 		if a.begins_with("--filter="):

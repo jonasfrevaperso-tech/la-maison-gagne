@@ -40,6 +40,7 @@ const DEFAULTS: Dictionary = {
 		"throw_mode": "skill",
 		"show_probabilities": false,
 		"tutorial_tips": true,
+		"trial_tutos": true,
 		"replay_story": false,
 		"input_mode": "auto",
 		"telemetry": false,
