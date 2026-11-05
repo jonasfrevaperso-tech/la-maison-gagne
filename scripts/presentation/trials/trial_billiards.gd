@@ -8,6 +8,10 @@ extends ThrowTrial
 ## sur la bille annule, toucher ailleurs ne tire jamais). Collisions élastiques, bandes amorties.
 ## Note = par coup, 1 si la bille est empochée, sinon sa proximité d'une poche ; la blanche
 ## dans une poche coûte une pénalité.
+## 2.0 : d'autres billes sur le tapis. La NOIRE est interdite : la blanche ne doit pas la
+## toucher (pénalité), et l'empocher annule le coup ; une bille neutre gêne. Avant de tirer, on
+## choisit l'EFFET : coulé (la blanche suit), rétro (elle revient) ou aucun — haut / bas, clic
+## droit ou la pastille d'effet au doigt.
 
 const TABLE: Rect2 = Rect2(360.0, 230.0, 1200.0, 640.0)
 const BALL_R: float = 22.0
@@ -27,6 +31,11 @@ const PX3: float = 0.005
 const RAIL_PX: float = 54.0
 const CUSHION_PX: float = 16.0
 const CUE_LEN: float = 420.0
+## Billes en plus : la noire (interdite) puis les neutres ; pastille d'effet (coin du tapis).
+const BLACK: Color = Color("15151a")
+const NEUTRAL: Color = Color("8a5cd6")
+const SPIN_KEYS: Array[String] = ["TRIAL_BILLIARDS_SPIN_DRAW", "TRIAL_BILLIARDS_SPIN_NONE", "TRIAL_BILLIARDS_SPIN_FOLLOW"]
+const SPIN_BOX: Rect2 = Rect2(130.0, 700.0, 150.0, 150.0)
 
 var _shot: int = 0
 var _cue: Vector2 = Vector2.ZERO
@@ -61,6 +70,19 @@ var _sling_at: Vector2 = Vector2.ZERO
 var _sink_obj: Array = []
 var _sink_cue: Array = []
 var _pulse: float = 0.0
+## Billes en plus (0 : la noire, puis les neutres) : positions, vitesses, empochées.
+var _xp: Array[Vector2] = []
+var _xv: Array[Vector2] = []
+var _xin: Array[bool] = []
+var _x3: Array[Node3D] = []
+var _x_last: Array[Vector2] = []
+## Effet choisi (-1 rétro, 0 aucun, 1 coulé), appliqué au premier choc de la blanche ; faute
+## (la blanche a touché la noire) pendant le coup en cours.
+var _spin: int = 0
+var _spun: bool = false
+var _foul: bool = false
+var _bot_spin: int = 0
+var _black_on: bool = false
 
 
 func begin() -> void:
@@ -125,6 +147,9 @@ func _build_3d() -> void:
 	_obj_mat.clearcoat_enabled = true
 	_obj_mat.clearcoat = 1.0
 	_obj3 = _build_ball(_colors[0], Palette.IVORY, _obj_mat)
+	for k: int in _xp.size():
+		_x3.append(_build_ball(BLACK if k == 0 else NEUTRAL, Palette.IVORY if k == 0 else Palette.GOLD_LIGHT))
+		_x_last.append(_xp[k])
 	# Queue : flèche d'érable, bague de laiton, procédé bleu, talon d'ébène.
 	_stick3 = Node3D.new()
 	r.add_child(_stick3)
@@ -195,6 +220,11 @@ func _process(delta: float) -> void:
 	_obj3.scale = Vector3.ONE
 	_cue3.visible = _sink3(_cue3, _cue, _sink_cue, delta) if _cue_in else true
 	_obj3.visible = _sink3(_obj3, _obj, _sink_obj, delta) if _obj_in else true
+	for k: int in _x3.size():
+		_roll3(_x3[k], _x_last[k], _xp[k])
+		_x_last[k] = _xp[k]
+		_x3[k].position = st.to3(_xp[k], BALL_R * PX3)
+		_x3[k].visible = not _xin[k]
 	var aiming: bool = not _rolling and _rest_t <= 0.0 and _shot < pi("shots")
 	_stick3.visible = aiming
 	if aiming:
@@ -233,10 +263,14 @@ func _rack() -> void:
 		_obj = obj
 		if _best_plan().y <= p("max_cut"):
 			break
+	_place_extras()
+	_black_on = not _xin[0]
 	_cue_v = Vector2.ZERO
 	_obj_v = Vector2.ZERO
 	_obj_in = false
 	_cue_in = false
+	_spun = false
+	_foul = false
 	_sink_obj = []
 	_sink_cue = []
 	_sling = false
@@ -246,6 +280,59 @@ func _rack() -> void:
 	_charge_dir = 1.0
 	_wait = 0.0
 	_aim = (_obj - _cue).angle()
+
+
+## La noire se pose près de la ligne de jeu (sans la boucher : le coup reste propre), les
+## neutres ailleurs ; aucune ne gêne le meilleur coup.
+func _place_extras() -> void:
+	_xp.clear()
+	_xv.clear()
+	_xin.clear()
+	var with_black: bool = _shot >= pi("black_from")
+	for k: int in 1 + pi("neutrals"):
+		_xp.append(Vector2(-1000, -1000))
+		_xv.append(Vector2.ZERO)
+		_xin.append(k == 0 and not with_black)  # pas encore de noire : rangée hors jeu
+	var plan: Vector4 = _best_plan()
+	var pk: Vector2 = _pockets()[int(plan.z)]
+	var ghost: Vector2 = _obj - (pk - _obj).normalized() * BALL_R * 2.0
+	for k: int in _xp.size():
+		if _xin[k]:
+			continue
+		for _try: int in 80:
+			var at: Vector2 = _random_spot(Vector2(90, 90))
+			if k == 0:
+				# Noire : à côté de la trajectoire de la blanche, à 2,6 – 5 rayons.
+				var u: float = rng.randf_range(0.3, 0.8)
+				var side: Vector2 = (ghost - _cue).normalized().orthogonal() * (1.0 if rng.randf() < 0.5 else -1.0)
+				at = _cue.lerp(ghost, u) + side * BALL_R * rng.randf_range(2.8, 5.0)
+				if not TABLE.grow(-BALL_R * 2.0).has_point(at):
+					continue
+			if _clear_of(at, ghost, pk, k):
+				_xp[k] = at
+				break
+		if _xp[k].x < 0.0:
+			_xin[k] = true  # pas de place : la bille reste au râtelier
+
+
+## Vrai si une bille en `at` laisse libres la blanche, la couleur, les poches et le meilleur coup.
+func _clear_of(at: Vector2, ghost: Vector2, pk: Vector2, k: int) -> bool:
+	var gap: float = BALL_R * 2.3
+	if at.distance_to(_cue) < gap * 1.5 or at.distance_to(_obj) < gap * 1.5:
+		return false
+	for pp: Vector2 in _pockets():
+		if at.distance_to(pp) < POCKET_R + BALL_R * 2.0:
+			return false
+	if _seg_dist(at, _cue, ghost) < gap or _seg_dist(at, _obj, pk) < gap:
+		return false
+	for j: int in k:
+		if not _xin[j] and at.distance_to(_xp[j]) < gap * 1.5:
+			return false
+	return true
+
+
+static func _seg_dist(pt: Vector2, a: Vector2, b: Vector2) -> float:
+	return pt.distance_to(Geometry2D.get_closest_point_to_segment(pt, a, b))
 
 
 func _random_spot(margin: Vector2) -> Vector2:
@@ -274,6 +361,9 @@ func _speed_for(c: float) -> float:
 func handle(event: InputEvent) -> bool:
 	var ready: bool = not _rolling and _rest_t <= 0.0 and _shot < pi("shots")
 	var mb: InputEventMouseButton = event as InputEventMouseButton
+	if mb != null and mb.button_index == MOUSE_BUTTON_LEFT and mb.pressed and ready and SPIN_BOX.has_point(mb.position):
+		set_spin(_spin + 1 if _spin < 1 else -1)  # pastille d'effet : touche pour changer
+		return true
 	if mb != null and mb.button_index == MOUSE_BUTTON_LEFT:
 		if mb.pressed and ready and mb.position.distance_to(_cue) <= p("sling_grab"):
 			_sling = true
@@ -288,12 +378,20 @@ func handle(event: InputEvent) -> bool:
 				_charge = 0.0  # revenu sur la bille : coup annulé
 				AudioBus.play("click", 0.8, -10.0)
 		return true
+	if mb != null and mb.pressed and ready and (mb.button_index == MOUSE_BUTTON_RIGHT or mb.button_index == MOUSE_BUTTON_WHEEL_UP
+			or mb.button_index == MOUSE_BUTTON_WHEEL_DOWN):
+		set_spin(_spin - 1 if mb.button_index == MOUSE_BUTTON_WHEEL_DOWN else (_spin + 1 if _spin < 1 else -1))
+		return true
 	var mm: InputEventMouseMotion = event as InputEventMouseMotion
 	if mm != null:
 		_mouse_pos = mm.position
 		if _sling:
 			_sling_at = mm.position
 			_sling_update()
+		return true
+	var d: Vector2i = dir_pressed(event)
+	if ready and not _charging and d.y != 0:
+		set_spin(_spin - d.y)  # haut : coulé, bas : rétro
 		return true
 	if confirm_pressed(event):
 		_charging = not _rolling and _rest_t <= 0.0
@@ -303,6 +401,13 @@ func handle(event: InputEvent) -> bool:
 			_strike()
 		return true
 	return false
+
+
+func set_spin(v: int) -> void:
+	var nv: int = clampi(v, -1, 1)
+	if nv != _spin:
+		_spin = nv
+		AudioBus.play("click", 1.2 + 0.2 * float(_spin), -8.0)
 
 
 ## Distance tirée depuis la blanche (pixels).
@@ -322,6 +427,8 @@ func _strike() -> void:
 	_sling = false
 	_charging = false
 	_rolling = true
+	_spun = false
+	_foul = false
 	_cue_v = Vector2.from_angle(_aim) * _speed_for(_charge)
 	AudioBus.play("ball_wood", 1.4, -2.0)
 
@@ -356,61 +463,94 @@ func tick(dt: float) -> void:
 	var h: float = dt / float(SUBSTEPS)
 	for _s: int in SUBSTEPS:
 		_physics(h)
-	if _cue_v.length() < 4.0 and _obj_v.length() < 4.0:
+	if _all_still():
 		_settle()
 
 
 func _physics(h: float) -> void:
-	for k: int in 2:
-		var is_cue: bool = k == 0
-		if (is_cue and _cue_in) or (not is_cue and _obj_in):
+	# Toutes les billes : 0 la blanche, 1 la couleur, puis les billes en plus.
+	var pos: Array[Vector2] = [_cue, _obj]
+	pos.append_array(_xp)
+	var vel: Array[Vector2] = [_cue_v, _obj_v]
+	vel.append_array(_xv)
+	var inn: Array[bool] = [_cue_in, _obj_in]
+	inn.append_array(_xin)
+	for k: int in pos.size():
+		if inn[k]:
 			continue
-		var v: Vector2 = _cue_v if is_cue else _obj_v
-		var pos: Vector2 = _cue if is_cue else _obj
+		var v: Vector2 = vel[k]
 		var sp: float = v.length()
 		var dec: float = p("friction") * h
 		v = Vector2.ZERO if sp <= dec else v * ((sp - dec) / sp)
-		pos += v * h
+		var at: Vector2 = pos[k] + v * h
 		for pk: Vector2 in _pockets():
-			if pos.distance_to(pk) < POCKET_R:
-				if is_cue:
-					_cue_in = true
+			if at.distance_to(pk) < POCKET_R:
+				inn[k] = true
+				if k == 0:
 					_sink_cue = [pk, SINK_TIME]
-				else:
-					_obj_in = true
+				elif k == 1:
 					_sink_obj = [pk, SINK_TIME]
 				v = Vector2.ZERO
 				if not _sim:
 					AudioBus.play("ball_land", 1.0, -4.0)
-		if pos.x < TABLE.position.x + BALL_R or pos.x > TABLE.end.x - BALL_R:
-			pos.x = clampf(pos.x, TABLE.position.x + BALL_R, TABLE.end.x - BALL_R)
+				break
+		if at.x < TABLE.position.x + BALL_R or at.x > TABLE.end.x - BALL_R:
+			at.x = clampf(at.x, TABLE.position.x + BALL_R, TABLE.end.x - BALL_R)
 			_cushion_sound(absf(v.x))
 			v.x = -v.x * p("cushion")
-		if pos.y < TABLE.position.y + BALL_R or pos.y > TABLE.end.y - BALL_R:
-			pos.y = clampf(pos.y, TABLE.position.y + BALL_R, TABLE.end.y - BALL_R)
+		if at.y < TABLE.position.y + BALL_R or at.y > TABLE.end.y - BALL_R:
+			at.y = clampf(at.y, TABLE.position.y + BALL_R, TABLE.end.y - BALL_R)
 			_cushion_sound(absf(v.y))
 			v.y = -v.y * p("cushion")
-		if is_cue:
-			_cue_v = v
-			_cue = pos
-		else:
-			_obj_v = v
-			_obj = pos
-	if _cue_in or _obj_in:
-		return
-	# Choc élastique de deux billes de même masse : échange des composantes normales.
-	var d: Vector2 = _obj - _cue
-	if d.length() < BALL_R * 2.0 and d.length() > 0.001:
-		var n: Vector2 = d.normalized()
-		var rel: float = (_cue_v - _obj_v).dot(n)
-		if rel > 0.0:
-			_cue_v -= n * rel
-			_obj_v += n * rel
-			if not _sim:
-				AudioBus.play("ball_glass", 1.3, -4.0)
-		var push: float = (BALL_R * 2.0 - d.length()) * 0.5
-		_cue -= n * push
-		_obj += n * push
+		vel[k] = v
+		pos[k] = at
+	# Chocs élastiques de billes de même masse : échange des composantes normales.
+	for i: int in pos.size():
+		if inn[i]:
+			continue
+		for j: int in range(i + 1, pos.size()):
+			if inn[j]:
+				continue
+			var d: Vector2 = pos[j] - pos[i]
+			if d.length() >= BALL_R * 2.0 or d.length() <= 0.001:
+				continue
+			var n: Vector2 = d.normalized()
+			var rel: float = (vel[i] - vel[j]).dot(n)
+			if rel > 0.0:
+				vel[i] -= n * rel
+				vel[j] += n * rel
+				if i == 0:
+					if not _spun:
+						# Effet : au premier choc, la blanche suit (coulé) ou revient (rétro).
+						_spun = true
+						vel[0] += n * rel * p("spin_k") * float(_spin)
+					if j == 2 and not _xin[0]:
+						_foul = true
+				if not _sim:
+					AudioBus.play("ball_glass", 1.3, -4.0)
+			var push: float = (BALL_R * 2.0 - d.length()) * 0.5
+			pos[i] -= n * push
+			pos[j] += n * push
+	_cue = pos[0]
+	_obj = pos[1]
+	_cue_v = vel[0]
+	_obj_v = vel[1]
+	_cue_in = inn[0]
+	_obj_in = inn[1]
+	for k2: int in _xp.size():
+		_xp[k2] = pos[k2 + 2]
+		_xv[k2] = vel[k2 + 2]
+		_xin[k2] = inn[k2 + 2]
+
+
+## Toutes les billes à l'arrêt (ou empochées).
+func _all_still() -> bool:
+	if _cue_v.length() >= 4.0 or _obj_v.length() >= 4.0:
+		return false
+	for k: int in _xv.size():
+		if not _xin[k] and _xv[k].length() >= 4.0:
+			return false
+	return true
 
 
 func _cushion_sound(sp: float) -> void:
@@ -429,12 +569,26 @@ func _settle() -> void:
 		sc = p("miss_value") * clampf(1.0 - (near - POCKET_R) / p("near_range"), 0.0, 1.0)
 	if _cue_in:
 		sc = maxf(0.0, sc - p("scratch_penalty"))
+	if _foul:
+		sc = maxf(0.0, sc - p("black_penalty"))
+	var black_in: bool = _black_potted()
+	if black_in:
+		sc = 0.0
 	_scores.append(sc)
 	var key: String = "TRIAL_BILLIARDS_POTTED" if _obj_in else ("TRIAL_BILLIARDS_SCRATCH" if _cue_in else "TRIAL_BILLIARDS_CLOSE")
 	if not _obj_in and not _cue_in and sc < p("miss_value") * 0.35:
 		key = "TRIAL_BILLIARDS_MISSED"
+	if _foul:
+		key = "TRIAL_BILLIARDS_FOUL"
+	if black_in:
+		key = "TRIAL_BILLIARDS_BLACK_IN"
 	pop(Vector2(TABLE.get_center().x, TABLE.position.y - 90.0), sc, key)
 	_rest_t = p("rest_seconds")
+
+
+## La noire est tombée pendant ce coup (elle était sur le tapis au départ).
+func _black_potted() -> bool:
+	return _black_on and _xin[0]
 
 
 # --------------------------------------------------------------------------- bot
@@ -448,13 +602,18 @@ func bot_charge() -> float:
 	var guess: float = _bot_guess()
 	var best: float = guess
 	var best_err: float = INF
-	for k: int in BOT_FORCE_STEPS + 1:
-		var c: float = float(k) / float(BOT_FORCE_STEPS)
-		var err: float = _simulate(_best_plan().x, c)
-		err += absf(c - guess) * 0.01  # à égalité, la force la plus proche du calcul
-		if err < best_err:
-			best_err = err
-			best = c
+	var saved_spin: int = _spin
+	for sp: int in [0, 1, -1]:
+		_spin = sp
+		for k: int in BOT_FORCE_STEPS + 1:
+			var c: float = float(k) / float(BOT_FORCE_STEPS)
+			var err: float = _simulate(_best_plan().x, c)
+			err += absf(c - guess) * 0.01 + absf(float(sp)) * 0.005  # à égalité : sans effet, force calculée
+			if err < best_err:
+				best_err = err
+				best = c
+				_bot_spin = sp
+	_spin = saved_spin
 	_bot_force = best
 	return best
 
@@ -462,13 +621,16 @@ func bot_charge() -> float:
 ## Joue le coup (angle, force) en accéléré sans toucher à l'état : 0 si la couleur tombe seule,
 ## sinon distance de la couleur à la poche la plus proche (+ pénalité si la blanche tombe).
 func _simulate(angle: float, c: float) -> float:
-	var saved: Array = [_cue, _obj, _cue_v, _obj_v, _cue_in, _obj_in]
+	var saved: Array = [_cue, _obj, _cue_v, _obj_v, _cue_in, _obj_in, _xp.duplicate(), _xv.duplicate(), _xin.duplicate(), _spun, _foul,
+		_sink_cue, _sink_obj]
 	_sim = true
+	_spun = false
+	_foul = false
 	_cue_v = Vector2.from_angle(angle) * _speed_for(c)
 	_obj_v = Vector2.ZERO
 	var h: float = 1.0 / 60.0 / float(SUBSTEPS)
 	var steps: int = 0
-	while (_cue_v.length() >= 4.0 or _obj_v.length() >= 4.0) and steps < BOT_SIM_MAX_STEPS:
+	while not _all_still() and steps < BOT_SIM_MAX_STEPS:
 		_physics(h)
 		steps += 1
 	var near: float = INF
@@ -477,6 +639,8 @@ func _simulate(angle: float, c: float) -> float:
 	var err: float = 0.0 if _obj_in else near
 	if _cue_in:
 		err += 1000.0
+	if _foul or (_black_on and _xin[0]):
+		err += 800.0
 	_sim = false
 	_cue = saved[0]
 	_obj = saved[1]
@@ -484,6 +648,13 @@ func _simulate(angle: float, c: float) -> float:
 	_obj_v = saved[3]
 	_cue_in = saved[4]
 	_obj_in = saved[5]
+	_xp.assign(saved[6])
+	_xv.assign(saved[7])
+	_xin.assign(saved[8])
+	_spun = saved[9]
+	_foul = saved[10]
+	_sink_cue = saved[11]
+	_sink_obj = saved[12]
 	return err
 
 
@@ -509,6 +680,9 @@ func bot_wants() -> Dictionary:
 	if absf(miss) > p("bot_aim_tolerance") and not _charging:
 		return {"do": "axis", "v": Vector2(signf(miss) * clampf(pow(absf(miss) * 6.0, 1.0 / p("aim_curve")), 0.35, 1.0), 0.0)}
 	if not _charging:
+		bot_charge()
+		if _bot_spin != _spin:
+			return {"do": "dir", "dir": Vector2i(0, -1 if _bot_spin > _spin else 1)}
 		return {"do": "hold"}
 	var target: float = bot_charge()
 	var nxt: float = _charge + _charge_dir / 60.0 / (p("charge_seconds") * slow)
@@ -520,6 +694,8 @@ func bot_wants() -> Dictionary:
 func bot_apply(w: Dictionary) -> void:
 	var act: String = String(w.get("do", ""))
 	_bot_aim = (w.get("v", Vector2.ZERO) as Vector2).x if act == "axis" else 0.0
+	if act == "dir" and not _rolling and not _charging:
+		set_spin(_spin - (w["dir"] as Vector2i).y)
 	if act == "hold" and not _rolling and _rest_t <= 0.0:
 		_charging = true
 	elif act == "release" and _charging:
@@ -550,9 +726,24 @@ func paint() -> void:
 				draw_circle(_sling_at, 10.0, Palette.GOLD_LIGHT if ok else Palette.SMOKE)
 				if not ok:
 					text(_cue + Vector2(0, -p("sling_grab") - 22.0), tr("TRIAL_BILLIARDS_CANCEL"), UiKit.SIZE_SMALL, Palette.SMOKE)
+	_draw_spin()
+	if _black_on and not _xin[0]:
+		draw_arc(_xp[0], BALL_R + 7.0, 0, TAU, 32, Color(Palette.MULT_RED, 0.6 + 0.3 * sin(_pulse * 6.0)), 3.0)
 	text(Vector2(size.x * 0.5, 80.0), tr("TRIAL_BILLIARDS_SHOT") % [mini(_shot + 1, pi("shots")), pi("shots")], UiKit.SIZE_BODY,
 		Palette.IVORY)
 	pips(Vector2(size.x * 0.5, 120.0), _scores, pi("shots"))
+
+
+## Pastille d'effet : une bille blanche vue de face, le point de frappe haut (coulé), centre ou bas
+## (rétro), et son nom.
+func _draw_spin() -> void:
+	var c: Vector2 = SPIN_BOX.get_center() + Vector2(0, -10)
+	var rad: float = SPIN_BOX.size.x * 0.32
+	draw_circle(c, rad + 4.0, Palette.GOLD_DARK)
+	draw_circle(c, rad, Palette.IVORY)
+	draw_circle(c + Vector2(0, -float(_spin) * rad * 0.55), rad * 0.2, Color("2a5aa0"))
+	text(c + Vector2(0, rad + 26.0), tr(SPIN_KEYS[_spin + 1]), UiKit.SIZE_SMALL, Palette.GOLD_LIGHT)
+	text(c + Vector2(0, -rad - 22.0), tr("TRIAL_BILLIARDS_SPIN"), UiKit.SIZE_SMALL, Palette.IVORY)
 
 
 ## Trace la blanche jusqu'à la couleur ou au premier rebond (puis un segment après), la bille
@@ -570,6 +761,16 @@ func _draw_aim() -> void:
 		var hit_obj: float = _ray_ball(from, dir, _obj)
 		var hit_wall: Vector3 = _ray_wall(from, dir)
 		var lim: float = minf(left, hit_wall.x)
+		# Une autre bille en premier sur la trajectoire : contact marqué (rouge pour la noire).
+		for k: int in _xp.size():
+			if _xin[k]:
+				continue
+			var hx: float = _ray_ball(from, dir, _xp[k])
+			if hx >= 0.0 and hx < lim and (hit_obj < 0.0 or hx < hit_obj):
+				var gx: Vector2 = from + dir * hx
+				_dashed(from + dir * (BALL_R if seg == 0 else 0.0), gx, line)
+				draw_arc(gx, BALL_R, 0, TAU, 32, Palette.MULT_RED if k == 0 else Color(Palette.IVORY, 0.85), 3.0)
+				return
 		if hit_obj >= 0.0 and hit_obj <= lim:
 			var ghost: Vector2 = from + dir * hit_obj
 			_dashed(from + dir * (BALL_R if seg == 0 else 0.0), ghost, line)

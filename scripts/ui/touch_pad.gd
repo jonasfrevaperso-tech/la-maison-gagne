@@ -6,7 +6,8 @@ extends CanvasLayer
 ## commandes qu'à la manette, sans code propre au tactile. Plusieurs doigts à la fois.
 ## Disposition (`touch_layout` des données) : « diamond » losange X/Y/B/A (couleurs Xbox),
 ## « row » rangée sous le pouce droit (gauche en disposition gaucher), « split » premier bouton
-## dans le coin bas gauche et second dans le coin bas droit (alterner les deux pouces).
+## dans le coin bas gauche et second dans le coin bas droit (alterner les deux pouces) ; un
+## éventuel troisième se place au-dessus du bouton côté main dominante.
 
 const BUTTON_D: float = 170.0
 const GAP: float = 18.0
@@ -69,7 +70,8 @@ func _ready() -> void:
 	layer = 60
 	_area = _new_area()
 	if layout == "split":
-		_areas.append(_new_area())  # second bouton : coin opposé
+		for k: int in range(1, mini(actions.size(), 3)):
+			_areas.append(_new_area())  # second bouton : coin opposé ; troisième : au-dessus de lui
 	for a: String in actions:
 		var g: String = String(STYLE.get(a, [Color.WHITE, ""])[1])
 		var path: String = "res://assets/glyphs/%s.png" % g
@@ -142,16 +144,19 @@ func _input(event: InputEvent) -> void:
 ## « split » : un bouton par coin bas (ordre inversé en disposition gaucher). Les centres sont
 ## alors en coordonnées de fenêtre, chaque zone ne dessinant que son bouton.
 func _layout_split(safe: Rect2) -> void:
-	var order: Array[String] = actions.duplicate()
+	var order: Array[String] = actions.slice(0, 2)
 	if Settings.b("game", "left_handed"):
 		order.reverse()
+	order.append_array(actions.slice(2, 3))
 	var spots: Array[Vector2] = [
 		Vector2(safe.position.x + MARGIN, safe.end.y - MARGIN - BUTTON_D),
 		Vector2(safe.end.x - MARGIN - BUTTON_D, safe.end.y - MARGIN - BUTTON_D),
 	]
+	# Troisième bouton (ex. SAUT) : au-dessus du bouton du côté de la main dominante.
+	spots.append(spots[0 if Settings.b("game", "left_handed") else 1] - Vector2(0, BUTTON_D + GAP))
 	var areas: Array[Control] = [_area]
 	areas.append_array(_areas)
-	for i: int in mini(order.size(), 2):
+	for i: int in mini(order.size(), areas.size()):
 		areas[i].position = spots[i]
 		areas[i].size = Vector2.ONE * BUTTON_D
 		areas[i].set_meta("action", order[i])

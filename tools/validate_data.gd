@@ -186,8 +186,9 @@ func _validate_entry(db: ContentDB, cat: String, e: Dictionary) -> void:
 			errors.append("%s : réglages absents de balance.json (throw_trials)" % eid)
 		if e.has("touch_layout") and not TOUCH_LAYOUTS.has(String(e["touch_layout"])):
 			errors.append("%s : touch_layout doit valoir %s" % [eid, ", ".join(TOUCH_LAYOUTS)])
-		if String(e.get("touch_layout", "")) == "split" and (e.get("touch_pad", []) as Array).size() != 2:
-			errors.append("%s : la disposition split demande exactement deux boutons" % eid)
+		var split_n: int = (e.get("touch_pad", []) as Array).size()
+		if String(e.get("touch_layout", "")) == "split" and (split_n < 2 or split_n > 3):
+			errors.append("%s : la disposition split demande deux ou trois boutons" % eid)
 		for la: Variant in (e.get("touch_labels", {}) as Dictionary).keys():
 			if not (e.get("touch_pad", []) as Array).has(la):
 				errors.append("%s : touch_labels « %s » hors du pavé" % [eid, la])

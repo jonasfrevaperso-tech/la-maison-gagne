@@ -520,6 +520,8 @@ TRIAL_CHARGE_HINT,"Maintiens {confirm} pour charger, relâche dans l'or","Hold {
 TRIAL_RHYTHM_HINT,"Frappe {@qte} quand la note passe la ligne, maintiens les notes longues","Hit {@qte} as the note crosses the line, hold the long notes"
 TRIAL_RHYTHM_HINT_MOUSE,"Clique {@qte_mouse} quand la note passe la ligne, maintiens les notes longues","Click {@qte_mouse} as the note crosses the line, hold the long notes"
 TRIAL_RHYTHM_LET_GO,TROP TÔT !,LET GO TOO SOON!
+TRIAL_RHYTHM_SLIDE_MISS,Glissé raté,Missed slide
+TRIAL_RHYTHM_SPEEDUP,Le disque s'emballe !,The record speeds up!
 TRIAL_RHYTHM_GROOVE_JAZZ,♪ « Swing du Sous-sol » ♪,♪ “Basement Swing” ♪
 TRIAL_RHYTHM_GROOVE_FUNK,♪ « Funk de la Dette » ♪,♪ “Debt Funk” ♪
 TRIAL_RHYTHM_GROOVE_MAMBO,♪ « Mambo du Croupier » ♪,♪ “Croupier Mambo” ♪
@@ -561,8 +563,12 @@ MENU_PROLOGUE,Prologue,Prologue
 FX_SLOT_PULL,Tirage offert !,Free pull!
 FX_TEMP_XMULT,×Mult au prochain tour,×Mult next spin
 CELEB_MASSIVE,COLOSSAL !,COLOSSAL!
-TRIAL_POUR_HINT,"Maintiens {confirm} pour verser, relâche avant le trait","Hold {confirm} to pour, release before the line"
+TRIAL_POUR_HINT,Maintiens {confirm} pour verser · {move} incliner le verre,Hold {confirm} to pour · {move} tilt the glass
+TRIAL_POUR_HINT_MOUSE,Maintiens {@click} pour verser · bouge {@mouse} à droite pour incliner,Hold {@click} to pour · move {@mouse} right to tilt
+TRIAL_POUR_HINT_TOUCH,Joystick à gauche pour incliner · maintiens à droite pour verser,Joystick on the left to tilt · hold on the right to pour
 TRIAL_POUR_SPILL,Ça déborde !,Spilled!
+TRIAL_POUR_HEAD_THIN,Pas de mousse !,No head!
+TRIAL_POUR_FOAM,Mousse,Foam
 TRIAL_SIMON_HINT,Rejoue la mélodie avec {@qte},Play the melody back with {@qte}
 TRIAL_SIMON_HINT_MOUSE,Rejoue la mélodie en cliquant sur les touches,Play the melody back by clicking the keys
 TRIAL_SIMON_LISTEN,Écoute…,Listen…
@@ -728,9 +734,9 @@ TRIAL_DICE_HINT,"{move} viser · maintiens {confirm} pour la force, lâche pour 
 TRIAL_DICE_HINT_MOUSE,"Vise avec {@mouse} · maintiens {@click} pour la force, lâche pour lancer","Aim with {@mouse} · hold {@click} for power, release to throw"
 TRIAL_DICE_HINT_TOUCH,"Joystick pour viser · maintiens LANCER pour la force, lâche pour lancer","Joystick to aim · hold THROW for power, release to throw"
 TRIAL_DICE_NO_WALL,Sans la bande !,Missed the wall!
-TRIAL_DERBY_HINT,"{qte_left} / {qte_right} en alternance, quand la note touche la ligne","{qte_left} / {qte_right} in turn, as the note reaches the line"
-TRIAL_DERBY_HINT_MOUSE,"{@click} / {@right_click} en alternance, quand la note touche la ligne","{@click} / {@right_click} in turn, as the note reaches the line"
-TRIAL_DERBY_HINT_TOUCH,"GAUCHE / DROITE en alternance, quand la note touche la ligne","LEFT / RIGHT in turn, as the note reaches the line"
+TRIAL_DERBY_HINT,{qte_left} / {qte_right} en alternance sur la note · {qte_up} sauter (▲),{qte_left} / {qte_right} in turn on the note · {qte_up} jump (▲)
+TRIAL_DERBY_HINT_MOUSE,{@click} / {@right_click} en alternance sur la note · {ui_spin} sauter (▲),{@click} / {@right_click} in turn on the note · {ui_spin} jump (▲)
+TRIAL_DERBY_HINT_TOUCH,GAUCHE / DROITE en alternance sur la note · SAUT sur ▲,LEFT / RIGHT in turn on the note · JUMP on ▲
 TRIAL_DERBY_MARQUEE,LE TIERCÉ DU GRAND ZÉRO,THE GRAND ZERO DERBY
 TRIAL_DERBY_WINDED,Essoufflé !,Winded!
 TRIAL_DERBY_PLACE_1,1er !,1st!
@@ -759,16 +765,25 @@ TRIAL_LASERS_HINT,{move} se faufiler jusqu'à la porte du coffre,{move} sneak to
 TRIAL_LASERS_HINT_MOUSE,Guide le cambrioleur avec {@mouse} jusqu'à la porte,Guide the burglar with {@mouse} to the door
 TRIAL_LASERS_HINT_TOUCH,Joystick pour te faufiler jusqu'à la porte du coffre,Joystick to sneak to the vault door
 TRIAL_LASERS_ALARM,Alarme !,Alarm!
+TRIAL_LASERS_SWITCH,Miroir pivoté !,Mirror turned!
+TRIAL_LASERS_OPEN,Rideau dévié : file !,Curtain diverted: go!
+TRIAL_LASERS_CLOSED,Rideau fermé : trouve la dalle,Curtain closed: find the plate
 TRIAL_LASERS_STATUS,Faisceaux touchés : %d,Beams touched: %d
 TRIAL_JUGGLE_HINT,"{qte_left} gauche · {qte_down} milieu · {qte_right} droite, quand le jeton touche la ligne","{qte_left} left · {qte_down} middle · {qte_right} right, as the chip reaches the line"
 TRIAL_JUGGLE_HINT_MOUSE,{@click} sous le jeton qui redescend sur la ligne,{@click} under the chip coming down to the line
 TRIAL_JUGGLE_HINT_TOUCH,Touche {@tap} la main sous le jeton quand il touche la ligne,Tap {@tap} the hand under the chip as it reaches the line
 TRIAL_JUGGLE_DROP,Tombé !,Dropped!
 TRIAL_JUGGLE_STATUS,Rattrapés : %d · jetons en l'air : %d,Caught: %d · chips in the air: %d
-TRIAL_BILLIARDS_HINT,"{move} viser · maintiens {confirm} pour la force, lâche pour jouer","{move} aim · hold {confirm} for power, release to play"
-TRIAL_BILLIARDS_HINT_MOUSE,Tire en arrière depuis la blanche {@click} et lâche pour jouer · reviens sur la bille pour annuler,Pull back from the cue ball {@click} and let go to play · return to the ball to cancel
-TRIAL_BILLIARDS_HINT_TOUCH,Tire en arrière depuis la blanche {@drag} et lâche pour jouer · reviens sur la bille pour annuler,Pull back from the cue ball {@drag} and let go to play · return to the ball to cancel
+TRIAL_BILLIARDS_HINT,"{move} viser · haut / bas : effet · maintiens {confirm} pour la force, lâche pour jouer","{move} aim · up / down: spin · hold {confirm} for power, release to play"
+TRIAL_BILLIARDS_HINT_MOUSE,Tire en arrière depuis la blanche {@click} et lâche pour jouer · {@right_click} : effet,Pull back from the cue ball {@click} and let go to play · {@right_click}: spin
+TRIAL_BILLIARDS_HINT_TOUCH,Tire en arrière depuis la blanche {@drag} et lâche pour jouer · touche la pastille pour l'effet,Pull back from the cue ball {@drag} and let go to play · tap the disc for spin
 TRIAL_BILLIARDS_POTTED,Dans la poche !,Potted!
+TRIAL_BILLIARDS_FOUL,Faute : la noire !,Foul: the black!
+TRIAL_BILLIARDS_BLACK_IN,La noire est tombée !,The black went down!
+TRIAL_BILLIARDS_SPIN,Effet,Spin
+TRIAL_BILLIARDS_SPIN_DRAW,Rétro,Draw
+TRIAL_BILLIARDS_SPIN_NONE,Sans effet,No spin
+TRIAL_BILLIARDS_SPIN_FOLLOW,Coulé,Follow
 TRIAL_BILLIARDS_SCRATCH,La blanche !,Scratch!
 MENU_MUSEUM,Le Musée,The Museum
 MUSEUM_PREV,Salle précédente,Previous room
@@ -808,6 +823,12 @@ OPT_TRIAL_TUTOS_DESC,"La première fois qu'une épreuve se présente : une court
 OPT_RESET_TRIAL_TUTOS,Revoir les tutos des épreuves,Replay the trial tutorials
 TOAST_TRIAL_TUTOS_RESET,Les tutos des épreuves reviendront à la prochaine rencontre.,Trial tutorials will play again next time.
 TRIAL_SCRATCH_REVEALED,Case révélée !,Spot revealed!
+TRIAL_SCRATCH_RULE,Ne gratte pas %s !,Do not scratch %s!
+TRIAL_SCRATCH_TRAP,Piège !,Trap!
+TRIAL_SCRATCH_SHAPE_CIRCLE,le cercle,the circle
+TRIAL_SCRATCH_SHAPE_DIAMOND,le losange,the diamond
+TRIAL_SCRATCH_SHAPE_SQUARE,le carré,the square
+TRIAL_SCRATCH_SHAPE_OVAL,l'ovale,the oval
 TRIAL_SCRATCH_OVERFLOW,Débord : −%d %%,Overflow: −%d%%
 TRIAL_BILLIARDS_POWER,FORCE,POWER
 TRIAL_BILLIARDS_CANCEL,Lâcher ici annule,Let go here to cancel
@@ -817,6 +838,8 @@ TRIAL_BILLIARDS_MISSED,Manqué,Missed
 TRIAL_DERBY_PERFECT,Parfait !,Perfect!
 TRIAL_DERBY_GOOD,Bien,Good
 TRIAL_DERBY_OFF,À contretemps,Off beat
+TRIAL_DERBY_JUMP_OK,Saut !,Jump!
+TRIAL_DERBY_CRASH,Chute !,Fall!
 TRIAL_DERBY_ALTERNATE,Alterne !,Alternate!
 TRIAL_DERBY_BEAT,Frappe sur la ligne,Hit on the line
 TRIAL_SIMON_HINT_TOUCH,Rejoue la mélodie en touchant {@tap} les boutons du juke-box,Play the melody back by tapping {@tap} the jukebox buttons

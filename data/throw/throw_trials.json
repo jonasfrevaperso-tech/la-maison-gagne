@@ -24,17 +24,17 @@
   "weight": 1.0,
   "name_fr": "Effet",
   "name_en": "Spin",
-  "desc_fr": "Un morceau démarre : frappe les notes quand elles passent la ligne, accords compris. Ne tape pas dans le vide.",
-  "desc_en": "A tune kicks in: hit the notes as they cross the line, chords included. Don't hit thin air.",
+  "desc_fr": "Frappe les notes sur la ligne, tiens les notes longues, enchaîne les glissés… et suis le disque quand il s'emballe.",
+  "desc_en": "Hit the notes on the line, hold the long ones, chain the slides… and keep up when the record speeds up.",
   "tuto_fr": [
-   "Les notes descendent vers la ligne lumineuse.",
-   "Frappe la bonne piste quand la note touche la ligne.",
-   "Les notes longues se maintiennent jusqu'au bout."
+   "Frappe chaque note quand elle touche la ligne.",
+   "Glissé : tiens la note, puis frappe le couloir d'arrivée.",
+   "À la fin, le disque s'emballe : ça accélère !"
   ],
   "tuto_en": [
-   "Notes fall towards the glowing line.",
-   "Hit the right lane as the note reaches the line.",
-   "Long notes are held until their end."
+   "Hit each note as it reaches the line.",
+   "Slide: hold the note, then hit the landing lane.",
+   "At the end the record speeds up: faster!"
   ],
   "touch_direct": true
  },
@@ -82,17 +82,17 @@
   "weight": 1.0,
   "name_fr": "Bonneteau",
   "name_en": "Shell Game",
-  "desc_fr": "La bille est sous un gobelet. Suis-le pendant le mélange et désigne-le. Deux manches, la seconde plus vive.",
-  "desc_en": "The ball is under a cup. Follow it through the shuffle and point at it. Two rounds, the second faster.",
+  "desc_fr": "Suis la bille sous les gobelets : 3, puis 4, puis 5. Le croupier feinte, fait tourner trois gobelets d'un coup et accélère.",
+  "desc_en": "Follow the ball under the cups: 3, then 4, then 5. The dealer feints, rotates three cups at once and speeds up.",
   "tuto_fr": [
-   "La bille se cache sous un gobelet.",
-   "Suis ce gobelet des yeux pendant le mélange.",
-   "Puis désigne-le. La seconde manche va plus vite."
+   "Regarde sous quel gobelet est la bille.",
+   "Attention aux feintes : deux gobelets s'élancent puis reviennent.",
+   "Désigne le bon gobelet avant la fin du temps."
   ],
   "tuto_en": [
-   "The ball hides under a cup.",
-   "Follow that cup with your eyes while they shuffle.",
-   "Then point at it. The second round is faster."
+   "Watch which cup hides the ball.",
+   "Beware of feints: two cups dash out, then come back.",
+   "Pick the right cup before time runs out."
   ]
  },
  {
@@ -186,17 +186,21 @@
   "weight": 1.0,
   "name_fr": "Le Verre parfait",
   "name_en": "The Perfect Pour",
-  "desc_fr": "Maintiens pour verser, relâche avant le trait doré : la mousse monte encore. Trois verres, trois formes.",
-  "desc_en": "Hold to pour, release before the gold line: the foam keeps rising. Three glasses, three shapes.",
+  "desc_fr": "Maintiens pour verser, incline le verre pour doser la mousse : boisson au trait doré, col de mousse dans la bande. Trois verres, trois mousses.",
+  "desc_en": "Hold to pour, tilt the glass to control the foam: drink on the gold line, head inside the band. Three glasses, three foams.",
+  "touch_stick": true,
+  "touch_pad": [
+   "ui_spin"
+  ],
   "tuto_fr": [
-   "Maintiens pour verser dans le verre.",
-   "Relâche juste avant le trait doré : la mousse monte encore.",
-   "Au-dessus du trait, ça déborde."
+   "Maintiens pour verser : la boisson monte au trait doré.",
+   "Verre droit, ça mousse ; penché, presque pas.",
+   "Vise un col de mousse dans la bande blanche."
   ],
   "tuto_en": [
-   "Hold to pour into the glass.",
-   "Release just before the golden line: the foam keeps rising.",
-   "Above the line, it spills."
+   "Hold to pour: bring the drink up to the gold line.",
+   "Upright, it foams; tilted, hardly at all.",
+   "Aim for a head of foam inside the white band."
   ]
  },
  {
@@ -387,17 +391,17 @@
   "weight": 1.0,
   "name_fr": "Le Grattage",
   "name_en": "The Scratchcard",
-  "desc_fr": "Gratte les trois cases cerclées de pointillés du ticket, entièrement et sans déborder : ce qui est gratté hors des pointillés coûte des points.",
-  "desc_en": "Scratch the ticket's three dotted spots clean without straying: anything scratched outside the dots costs points.",
+  "desc_fr": "Gratte les zones du ticket sans déborder… sauf celle que le ticket interdit. La pellicule dorée demande deux passages.",
+  "desc_en": "Scratch the ticket's zones without going over… except the one the ticket forbids. Gold foil needs two passes.",
   "tuto_fr": [
-   "Trois cases sont cerclées de pointillés dorés.",
-   "Gratte-les entièrement pour révéler leur symbole.",
-   "Ne déborde pas : gratter hors des pointillés coûte des points."
+   "Lis la consigne : une forme est piégée.",
+   "Gratte les autres zones sans sortir des pointillés.",
+   "La pellicule dorée : repasse une seconde fois."
   ],
   "tuto_en": [
-   "Three spots are circled with golden dots.",
-   "Scratch them clean to reveal their symbol.",
-   "Stay inside: scratching outside the dots costs points."
+   "Read the rule: one shape is a trap.",
+   "Scratch the other zones without leaving the dots.",
+   "Gold foil: go over it a second time."
   ]
  },
  {
@@ -429,26 +433,28 @@
   "weight": 1.0,
   "name_fr": "Le Tiercé",
   "name_en": "The Derby",
-  "desc_fr": "Ton cheval de bois galope quand tu frappes gauche et droite en alternance, sur les notes qui défilent vers la ligne. Hors du temps, il pousse moins ; trop vite, il s'essouffle.",
-  "desc_en": "Your wooden horse gallops as you hit left and right in turn, on the notes scrolling to the line. Off the beat it pushes less; too fast and it runs out of breath.",
+  "desc_fr": "Alterne gauche et droite au rythme pour faire galoper ton cheval de bois, saute les haies sur la note dorée. Les rivaux sprintent à la fin.",
+  "desc_en": "Alternate left and right on the beat to gallop your wooden horse, jump the hurdles on the gold note. Rivals sprint at the end.",
   "touch_pad": [
    "qte_left",
-   "qte_right"
+   "qte_right",
+   "qte_up"
   ],
   "touch_layout": "split",
   "touch_labels": {
    "qte_left": "TOUCH_LEFT",
-   "qte_right": "TOUCH_RIGHT"
+   "qte_right": "TOUCH_RIGHT",
+   "qte_up": "TOUCH_JUMP"
   },
   "tuto_fr": [
-   "Les notes défilent vers la ligne : gauche, droite, gauche…",
-   "Frappe le bon côté quand la note touche la ligne.",
-   "Marteler essouffle le cheval : suis le rythme."
+   "Alterne gauche / droite quand la note touche la ligne.",
+   "Note dorée ▲ : SAUTE la haie, sinon chute.",
+   "Garde du souffle : les rivaux sprintent à la fin."
   ],
   "tuto_en": [
-   "Notes scroll towards the line: left, right, left…",
-   "Hit the right side as the note reaches the line.",
-   "Mashing winds the horse: follow the beat."
+   "Alternate left / right as the note reaches the line.",
+   "Gold note ▲: JUMP the hurdle, or you fall.",
+   "Save your breath: rivals sprint at the end."
   ]
  },
  {
@@ -482,18 +488,18 @@
   "weight": 1.0,
   "name_fr": "Les Lasers du Coffre",
   "name_en": "The Vault Lasers",
-  "desc_fr": "Traverse la salle des coffres jusqu'à la porte blindée sans toucher les faisceaux qui balaient, glissent et clignotent.",
-  "desc_en": "Cross the vault to the armoured door without touching the beams that sweep, slide and blink.",
+  "desc_fr": "Faufile-toi entre les faisceaux. Un rideau laser barre la porte : marche sur la dalle pour faire pivoter le miroir, puis file avant qu'il ne revienne.",
+  "desc_en": "Slip between the beams. A laser curtain blocks the door: step on the plate to turn the mirror, then rush before it swings back.",
   "touch_stick": true,
   "tuto_fr": [
-   "Traverse la salle jusqu'à la porte du coffre.",
-   "Les faisceaux balaient, glissent et clignotent.",
-   "Attends l'ouverture, puis faufile-toi."
+   "Évite les faisceaux rouges jusqu'à la porte.",
+   "Le rideau barre la porte : marche sur la dalle verte.",
+   "Le miroir dévie le rideau quelques secondes : file !"
   ],
   "tuto_en": [
-   "Cross the room to the vault door.",
-   "Beams sweep, slide and blink.",
-   "Wait for the gap, then slip through."
+   "Dodge the red beams to reach the door.",
+   "The curtain blocks the door: step on the green plate.",
+   "The mirror diverts it for a few seconds: go!"
   ]
  },
  {
@@ -522,17 +528,17 @@
   "weight": 1.0,
   "name_fr": "Le Billard",
   "name_en": "The Billiards",
-  "desc_fr": "Quatre coups, une bille de couleur à empocher à chaque fois. La trajectoire, la bille fantôme et la poche visée te guident : vise, dose la force, joue.",
-  "desc_en": "Four shots, one coloured ball to pot each time. The path, the ghost ball and the target pocket guide you: aim, judge the power, play.",
+  "desc_fr": "Empoche la bille de couleur sans toucher la noire. Choisis ton effet : coulé, rétro ou sans effet. Quatre coups.",
+  "desc_en": "Pot the coloured ball without touching the black. Pick your spin: follow, draw or none. Four shots.",
   "tuto_fr": [
-   "La ligne montre la trajectoire et la bille fantôme le point de contact.",
-   "Vise la bille de couleur vers une poche.",
-   "Dose la force : trop fort, la blanche peut tomber."
+   "Vise la bille de couleur vers la poche entourée.",
+   "Ne touche pas la noire, cerclée de rouge !",
+   "Haut / bas : effet coulé ou rétro, puis dose la force."
   ],
   "tuto_en": [
-   "The line shows the path, the ghost ball the point of contact.",
-   "Aim the coloured ball at a pocket.",
-   "Judge the power: too hard, the cue ball may drop."
+   "Aim the coloured ball at the circled pocket.",
+   "Don't touch the black ball, ringed in red!",
+   "Up / down: follow or draw spin, then set the power."
   ]
  }
 ]

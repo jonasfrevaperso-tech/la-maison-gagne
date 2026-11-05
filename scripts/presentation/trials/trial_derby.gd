@@ -7,6 +7,9 @@ extends ThrowTrial
 ## Note = place (1er… 4e) et temps à l'arrivée, contre trois chevaux pilotés.
 ## 1.9 : le rythme se voit — une piste de notes gauche / droite défile vers la ligne de frappe,
 ## qui s'illumine (et cliquette) sur chaque temps ; chaque frappe est jugée Parfait / Bien / Raté.
+## 2.0 : des haies. Sur certains temps, la note est un saut doré (▲) : appuyer sur SAUTER à ce
+## temps-là fait franchir la haie ; la manquer fait chuter le cheval (vitesse perdue, sonné).
+## Les rivaux, plus prudents au départ, sprintent dans le dernier tiers.
 
 const LANES: int = 4
 const TRACK_X: Vector2 = Vector2(300.0, 1640.0)
@@ -25,6 +28,8 @@ const HIT_X: float = 560.0
 const SCROLL: float = 520.0
 const NOTES_AHEAD: int = 6
 const SIDE_COLORS: Array[Color] = [Color("29e0ff"), Color("ff4d6d")]
+const JUMP_COLOR: Color = Color("ffd23f")
+const HURDLE_LOOK: int = 3
 const PERFECT_AT: float = 0.75
 const GOOD_AT: float = 0.35
 
@@ -49,6 +54,16 @@ var _flag: Node3D = null
 var _hit_beats: Dictionary[int, bool] = {}
 var _beat_flash: float = 0.0
 var _last_beat: int = -1
+## Temps de saut (numéros de temps) ; sauts réussis ; chute en cours ; saut en l'air.
+var _jumps: Array[int] = []
+var _jumped: Dictionary[int, bool] = {}
+var _stun: float = 0.0
+var _leap: float = 0.0
+var _bot_jump: bool = false
+## Haies 3D de ton couloir (une par saut, posée là où le cheval arrivera) et des rivaux.
+var _hurdles3: Dictionary[int, Node3D] = {}
+var _rival_hurdles: Array[float] = []
+var _rival_leap: Array[float] = [0.0, 0.0, 0.0, 0.0]
 
 
 func begin() -> void:
@@ -56,7 +71,15 @@ func begin() -> void:
 	for k: int in range(1, LANES):
 		_pace[k] = float(paces[(k - 1) % paces.size()]) * rng.randf_range(0.98, 1.02) / slow
 		_bob[k] = rng.randf() * TAU
+	for v: Variant in Balance.arr("throw_trials.derby.jump_beats"):
+		_jumps.append(int(v))
+	for v2: Variant in Balance.arr("throw_trials.derby.rival_hurdles"):
+		_rival_hurdles.append(float(v2))
 	_build_3d()
+	for d: float in _rival_hurdles:
+		for k2: int in range(1, LANES):
+			var hn: Node3D = _build_hurdle()
+			hn.position = stage.to3(Vector2(lerpf(TRACK_X.x, TRACK_X.y, d), LANE_Y0 + float(k2) * LANE_H - 18.0), 0.0)
 
 
 # --------------------------------------------------------------------------- décor 3D
@@ -114,6 +137,22 @@ func _build_3d() -> void:
 	Stage3D.omni(r, Color(1.0, 0.85, 0.65), 1.4, st.to3(Vector2(960.0, 300.0), 2.5), 9.0)
 
 
+## Haie de manège, lisible de face : deux poteaux blancs et deux barres croisées rayées.
+func _build_hurdle() -> Node3D:
+	var n: Node3D = Node3D.new()
+	stage.root.add_child(n)
+	var white: StandardMaterial3D = Stage3D.mat(Palette.IVORY, 0.0, 0.5)
+	var red: StandardMaterial3D = Stage3D.mat(Palette.ROULETTE_RED, 0.0, 0.5)
+	for side: float in [-1.0, 1.0]:
+		Stage3D.box(n, Vector3(7.0 * PX3, 64.0 * PX3, 0.06), Vector3(side * 26.0 * PX3, 32.0 * PX3, 0.2), white)
+		for k: int in 4:
+			var seg: MeshInstance3D = Stage3D.box(n, Vector3(15.0 * PX3, 6.0 * PX3, 0.04),
+				Vector3(side * (-21.0 + 14.0 * float(k)) * PX3 * 0.95, (8.0 + 14.0 * float(k)) * PX3 * 1.6, 0.22),
+				red if k % 2 == 0 else white)
+			seg.rotation.z = side * 0.95
+	return n
+
+
 ## Cheval de manège : corps laqué, encolure, tête, jambes repliées, selle dorée et barre de laiton.
 func _build_horse(st: Stage3D, col: Color) -> Node3D:
 	var n: Node3D = Node3D.new()
@@ -152,9 +191,13 @@ func _sync_3d() -> void:
 		var x: float = lerpf(TRACK_X.x, TRACK_X.y, _dist[k])
 		var gait: float = _dist[k] * 90.0
 		var lift: float = absf(sin(gait)) * 14.0
+		var leap: float = _leap if k == ME else _rival_leap[k]
+		lift += sin(clampf(leap, 0.0, 1.0) * PI) * 90.0
 		var h: Node3D = _horses3[k]
 		h.position = st.to3(Vector2(x, y - 60.0 - lift), 0.0)
-		h.rotation.z = sin(gait) * 0.08
+		h.rotation.z = sin(gait) * 0.08 + (cos(clampf(leap, 0.0, 1.0) * PI) * 0.25 if leap > 0.0 else 0.0)
+		if k == ME and _stun > 0.0:
+			h.rotation.z = -0.35
 		for l: int in 4:
 			(h.get_node("leg%d" % l) as Node3D).rotation.z = sin(gait + float(l) * 1.6) * 0.5
 	for k2: int in _bulbs.size():
@@ -175,6 +218,9 @@ func _off_beat() -> float:
 func handle(event: InputEvent) -> bool:
 	var k: int = sym_pressed(event)
 	var d: Vector2i = dir_pressed(event)
+	if (k == 1 and not mouse) or d == Vector2i.UP or (confirm_pressed(event) and not event is InputEventMouseButton):
+		jump()
+		return true
 	if k == 0 or d == Vector2i.LEFT:
 		gallop(0)
 		return true
@@ -184,8 +230,29 @@ func handle(event: InputEvent) -> bool:
 	return false
 
 
+## Temps de saut le plus proche de l'instant présent (ou -1).
+func _jump_beat_now() -> int:
+	var b: int = roundi(t / _beat())
+	return b if _jumps.has(b) else -1
+
+
+func jump() -> void:
+	if _finish_t[ME] >= 0.0 or _ended or _stun > 0.0 or _leap > 0.0:
+		return
+	var b: int = _jump_beat_now()
+	var timing: float = 1.0 - clampf(_off_beat() / (p("jump_window") * widen()), 0.0, 1.0)
+	if b < 0 or _jumped.has(b) or timing <= 0.0:
+		pop(Vector2(HIT_X, RHYTHM_Y - 130.0), 0.0, "TRIAL_DERBY_OFF")
+		return
+	_jumped[b] = true
+	_hit_beats[b] = true
+	_leap = 0.001
+	pop(Vector2(HIT_X, RHYTHM_Y - 130.0), timing, "TRIAL_DERBY_JUMP_OK")
+	AudioBus.play("whoosh", 1.2, -6.0)
+
+
 func gallop(side: int) -> void:
-	if _finish_t[ME] >= 0.0 or _ended:
+	if _finish_t[ME] >= 0.0 or _ended or _stun > 0.0:
 		return
 	if side == _last_side:
 		AudioBus.play("sticky", 1.2, -10.0)
@@ -220,6 +287,23 @@ func tick(dt: float) -> void:
 		AudioBus.play("click", 1.7, -14.0)
 	_beat_flash = maxf(0.0, _beat_flash - dt * 5.0)
 	_winded = maxf(0.0, _winded - dt)
+	_stun = maxf(0.0, _stun - dt)
+	if _leap > 0.0:
+		_leap += dt / p("leap_seconds")
+		if _leap >= 1.0:
+			_leap = 0.0
+	# Haie manquée : le temps de saut est passé sans saut → chute.
+	for jb: int in _jumps:
+		if not _jumped.has(jb) and t > (float(jb) + p("jump_window")) * _beat() and _finish_t[ME] < 0.0:
+			_jumped[jb] = false
+			_stun = p("crash_seconds")
+			_speed[ME] *= p("crash_keep")
+			pop(Vector2(TRACK_X.x + 200.0, LANE_Y0 - 70.0), 0.0, "TRIAL_DERBY_CRASH")
+			AudioBus.play("decor_topple", 1.0, -2.0)
+	_place_my_hurdles()
+	if _bot_jump:
+		_bot_jump = false
+		jump()
 	_breath = minf(1.0, _breath + p("breath_regen") * dt)
 	if _bot_side >= 0:
 		gallop(_bot_side)
@@ -227,7 +311,15 @@ func tick(dt: float) -> void:
 	_speed[ME] -= _speed[ME] * p("drag") * dt  # frottement proportionnel : allure d'équilibre
 	for k: int in LANES:
 		if k != ME:
-			_speed[k] = _pace[k] * (1.0 + 0.08 * sin(t * 1.7 + _bob[k]))
+			var sprint: float = p("rival_sprint") if _dist[k] >= p("sprint_from") else p("rival_start")
+			_speed[k] = _pace[k] * sprint * (1.0 + 0.08 * sin(t * 1.7 + _bob[k]))
+			for d: float in _rival_hurdles:
+				if _dist[k] < d and _dist[k] + _speed[k] * dt >= d - 0.02 and _rival_leap[k] <= 0.0:
+					_rival_leap[k] = 0.001
+			if _rival_leap[k] > 0.0:
+				_rival_leap[k] += dt / p("leap_seconds")
+				if _rival_leap[k] >= 1.0:
+					_rival_leap[k] = 0.0
 		if _finish_t[k] < 0.0:
 			_dist[k] = minf(1.0, _dist[k] + _speed[k] * dt)
 			if _dist[k] >= 1.0:
@@ -260,21 +352,42 @@ func _end() -> void:
 	finish(clampf(place_sc * (1.0 - p("time_weight")) + time_sc * p("time_weight"), 0.0, 1.0))
 
 
+## Haies de ton couloir : chacune est posée (puis fixée) là où le cheval sera à son temps.
+func _place_my_hurdles() -> void:
+	if stage == null:
+		return
+	for jb: int in _jumps:
+		var dt_beat: float = float(jb) * _beat() - t
+		if _hurdles3.has(jb) or dt_beat > float(HURDLE_LOOK) * _beat():
+			continue
+		var d: float = minf(_dist[ME] + _speed[ME] * maxf(dt_beat, 0.0), 0.98)
+		var hn: Node3D = _build_hurdle()
+		hn.position = stage.to3(Vector2(lerpf(TRACK_X.x, TRACK_X.y, d) + 40.0, LANE_Y0 + float(ME) * LANE_H - 18.0), 0.0)
+		_hurdles3[jb] = hn
+
+
 # --------------------------------------------------------------------------- bot
 
 
 func bot_wants() -> Dictionary:
-	# Frappe sur chaque temps (alterné), jamais plus vite que le souffle ne le permet.
-	if _off_beat() < 0.03 and t - _last_press > _beat() * 0.6:
-		return {"do": "sym", "symbol": 2 if _last_side == 0 else 0}
+	# Frappe sur chaque temps (alterné), saute sur les temps de haie.
+	var jb: int = _jump_beat_now()
+	if jb >= 0 and not _jumped.has(jb) and _off_beat() < p("jump_window") * 0.5:
+		return {"do": "sym", "symbol": 1}
+	if _off_beat() < 0.03:
+		if jb < 0 and t - _last_press > _beat() * 0.6:
+			return {"do": "sym", "symbol": 2 if _last_side == 0 else 0}
 	return {"do": ""}
 
 
 func bot_apply(w: Dictionary) -> void:
+	_bot_side = -1
 	if String(w.get("do", "")) == "sym":
-		_bot_side = 0 if int(w.get("symbol", 0)) == 0 else 1
-	else:
-		_bot_side = -1
+		var sym: int = int(w.get("symbol", 0))
+		if sym == 1:
+			_bot_jump = true
+		else:
+			_bot_side = 0 if sym == 0 else 1
 
 
 # --------------------------------------------------------------------------- dessin
@@ -314,11 +427,18 @@ func _draw_rhythm() -> void:
 		if x < lane.position.x + 20.0 or x > lane.end.x - 20.0:
 			continue
 		var done: bool = _hit_beats.has(b)
+		var c: Vector2 = Vector2(x, RHYTHM_Y)
+		if _jumps.has(b):
+			# Saut : note dorée plus grande, flèche vers le haut.
+			var jc: Color = Color(JUMP_COLOR, 0.35 if _jumped.has(b) else 1.0)
+			draw_circle(c, 34.0, Color(Palette.INK, 0.9))
+			draw_arc(c, 34.0, 0, TAU, 32, jc, 5.0)
+			draw_colored_polygon(PackedVector2Array([c + Vector2(0, -18), c + Vector2(-15, 12), c + Vector2(15, 12)]), jc)
+			continue
 		var side: int = next_side if k % 2 == 0 else 1 - next_side
 		if not done:
 			k += 1
 		var col: Color = Color(SIDE_COLORS[side], 0.35 if done else 1.0)
-		var c: Vector2 = Vector2(x, RHYTHM_Y)
 		var dx: float = -1.0 if side == 0 else 1.0
 		draw_circle(c, 26.0, Color(Palette.INK, 0.9))
 		draw_arc(c, 26.0, 0, TAU, 32, col, 3.0)

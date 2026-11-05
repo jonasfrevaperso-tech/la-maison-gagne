@@ -1,15 +1,17 @@
 class_name TrialShells
 extends ThrowTrial
-## BONNETEAU (écran dédié) : un croupier fantôme cache la bille sous l'un de trois gobelets de
-## cuivre et les mélange, de plus en plus vite. Suivre le bon gobelet et le désigner
-## (gauche / droite puis confirmer, ou cliquer). Trois manches, la dernière avec un quatrième
-## gobelet ; le temps de réflexion est compté.
+## BONNETEAU (écran dédié, 2.0) : un croupier cache la bille sous un gobelet de cuivre et les
+## mélange, de plus en plus vite. Suivre le bon gobelet et le désigner (gauche / droite puis
+## confirmer, ou cliquer). Trois manches de 3, 4 puis 5 gobelets. Le croupier triche : il
+## feinte (deux gobelets s'élancent puis reviennent), fait tourner trois gobelets d'un coup,
+## et accélère pendant la dernière manche. Le temps de réflexion est compté.
 
 enum Phase { SHOW, HIDE, SHUFFLE, PICK, REVEAL }
 
 const CUP: Vector2 = Vector2(190.0, 210.0)
 const TABLE_Y: float = 700.0
-const SPACING: float = 380.0
+const SPACING: float = 340.0
+const MAX_CUPS: int = 5
 
 var _phase: Phase = Phase.SHOW
 var _round: int = 0
@@ -17,7 +19,8 @@ var _round: int = 0
 var _slot: Array[int] = [0, 1, 2]
 var _cups: int = 3
 var _ball: int = 0
-var _swaps: Array[Vector2i] = []
+## Mouvements du croupier : {"s": créneaux concernés, "kind": "swap" | "feint" | "cycle"}.
+var _swaps: Array[Dictionary] = []
 var _swap_i: int = 0
 var _swap_t: float = 0.0
 var _lift: float = 1.0
@@ -30,6 +33,7 @@ var _cup3: Array[Node3D] = []
 var _ball3: MeshInstance3D = null
 var _lamp: Node3D = null
 var _lamp_light: OmniLight3D = null
+var _dealer: Figure3D = null
 
 
 func begin() -> void:
@@ -60,7 +64,7 @@ func _build_3d() -> void:
 	_lamp_light.shadow_enabled = RenderQuality.shadows()
 	var copper: StandardMaterial3D = Stage3D.mat(Color(0.78, 0.45, 0.24), 0.85, 0.22)
 	var rim: StandardMaterial3D = Stage3D.mat(Color(0.5, 0.26, 0.12), 0.7, 0.4)
-	for c: int in 4:
+	for c: int in MAX_CUPS:
 		var cup: Node3D = Node3D.new()
 		r.add_child(cup)
 		Stage3D.cylinder(cup, 0.3, 0.62, Vector3(0, 0.31, 0), copper, 0.19)
@@ -70,16 +74,32 @@ func _build_3d() -> void:
 			Stage3D.cylinder(cup, 0.3 - 0.11 * y / 0.62 + 0.006, 0.014, Vector3(0, y, 0), rim)
 		_cup3.append(cup)
 	_ball3 = Stage3D.sphere(r, 0.1, Vector3.ZERO, Stage3D.mat(Palette.IVORY, 0.0, 0.2))
+	# Le croupier, derrière la caisse : gilet sombre, canotier.
+	_dealer = Figure3D.new().build(1.9, {"coat": Color(0.12, 0.1, 0.14), "trim": Palette.GOLD_DARK, "hat": "top",
+		"hat_col": Color(0.08, 0.06, 0.06)})
+	_dealer.position = Vector3(0, -1.0, -2.0)
+	r.add_child(_dealer)
 
 
 ## Position 3D d'un créneau (même ordre que _slot_x).
 func _slot3(s: float) -> float:
-	return (s - float(_cups - 1) * 0.5) * 0.9
+	return (s - float(_cups - 1) * 0.5) * (0.9 if _cups <= 4 else 0.82)
 
 
 func _sync_3d() -> void:
 	var sway: float = sin(t * 1.3) * 0.18
 	_lamp.rotation.z = sway * 0.6
+	if _dealer != null:
+		# Il s'affaire pendant le mélange, jubile quand on rate, patiente sinon.
+		var anim: StringName = &"idle"
+		if _phase == Phase.SHUFFLE:
+			anim = &"walk"
+		elif _phase == Phase.REVEAL and not _scores.is_empty() and _scores[-1] <= 0.0:
+			anim = &"cheer"
+		_dealer.animate(anim, t * (1.0 / maxf(_swap_time(), 0.1)), 1.0 / 60.0, 0.6)
+		if _phase == Phase.SHUFFLE and _swap_i < _swaps.size():
+			var sl: Array = _swaps[_swap_i]["s"] as Array
+			_dealer.position.x = lerpf(_dealer.position.x, _slot3(float(int(sl[0]) + int(sl[1])) * 0.5) * 0.6, 0.15)
 	for c: int in _cup3.size():
 		var cup: Node3D = _cup3[c]
 		cup.visible = c < _cups
@@ -116,13 +136,24 @@ func _new_round() -> void:
 	for k: int in n:
 		var a: int = rng.randi_range(0, _cups - 1)
 		var b: int = (a + 1 + rng.randi_range(0, _cups - 2)) % _cups
-		_swaps.append(Vector2i(a, b))
+		var roll: float = rng.randf()
+		if roll < pk("cycle_share", _round) and _cups >= 3:
+			var c: int = (b + 1 + rng.randi_range(0, _cups - 3)) % _cups
+			while c == a or c == b:
+				c = (c + 1) % _cups
+			_swaps.append({"s": [a, b, c], "kind": "cycle"})
+		elif roll < pk("cycle_share", _round) + pk("feint_share", _round) and k < n - 1:
+			_swaps.append({"s": [a, b], "kind": "feint"})  # jamais en dernier : on finit sur un vrai échange
+		else:
+			_swaps.append({"s": [a, b], "kind": "swap"})
 	_swap_i = 0
 	_swap_t = 0.0
 
 
+## Durée d'un mouvement : la dernière manche accélère jusqu'à `accel` fois la durée de départ.
 func _swap_time() -> float:
-	return pk("swap_seconds", _round) * slow
+	var u: float = float(_swap_i) / maxf(float(_swaps.size() - 1), 1.0)
+	return pk("swap_seconds", _round) * slow * lerpf(1.0, pk("accel", _round), u)
 
 
 func _slot_x(s: float) -> float:
@@ -134,15 +165,36 @@ func _cup_pos(c: int) -> Vector2:
 	var x: float = _slot_x(float(_slot[c]))
 	var y: float = TABLE_Y
 	if _phase == Phase.SHUFFLE and _swap_i < _swaps.size():
-		var sw: Vector2i = _swaps[_swap_i]
+		var sw: Dictionary = _swaps[_swap_i]
+		var sl: Array = sw["s"] as Array
+		var i: int = sl.find(_slot[c])
+		if i < 0:
+			return Vector2(x, y)
 		var u: float = clampf(_swap_t / _swap_time(), 0.0, 1.0)
 		u = u * u * (3.0 - 2.0 * u)
-		if _slot[c] == sw.x or _slot[c] == sw.y:
-			var from: float = float(_slot[c])
-			var to: float = float(sw.y if _slot[c] == sw.x else sw.x)
-			x = _slot_x(lerpf(from, to, u))
-			y += (40.0 if _slot[c] == sw.x else -40.0) * sin(u * PI)
+		var to: int = int(sl[(i + 1) % sl.size()])
+		var from: float = float(_slot[c])
+		if String(sw["kind"]) == "feint":
+			# Feinte : les deux gobelets s'élancent, se croisent presque, et reviennent.
+			x = _slot_x(lerpf(from, float(to), sin(u * PI) * p("feint_reach")))
+		else:
+			x = _slot_x(lerpf(from, float(to), u))
+		y += [40.0, -40.0, 0.0][i] * sin(u * PI)
 	return Vector2(x, y)
+
+
+## Applique le mouvement terminé : échange, rotation à trois, ou rien (feinte).
+func _apply_move(sw: Dictionary) -> void:
+	if String(sw["kind"]) == "feint":
+		return
+	var sl: Array = sw["s"] as Array
+	var moved: Dictionary[int, int] = {}
+	for c: int in _cups:
+		var i: int = sl.find(_slot[c])
+		if i >= 0:
+			moved[c] = int(sl[(i + 1) % sl.size()])
+	for c: int in moved:
+		_slot[c] = moved[c]
 
 
 func handle(event: InputEvent) -> bool:
@@ -226,12 +278,7 @@ func tick(dt: float) -> void:
 		Phase.SHUFFLE:
 			_swap_t += dt
 			if _swap_t >= _swap_time():
-				var sw: Vector2i = _swaps[_swap_i]
-				for c: int in _cups:
-					if _slot[c] == sw.x:
-						_slot[c] = sw.y
-					elif _slot[c] == sw.y:
-						_slot[c] = sw.x
+				_apply_move(_swaps[_swap_i])
 				AudioBus.play("cloth", 1.5 + 0.1 * float(_swap_i % 3), -8.0)
 				_swap_i += 1
 				_swap_t = 0.0

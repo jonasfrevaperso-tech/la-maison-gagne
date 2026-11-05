@@ -252,14 +252,18 @@
       "rest_seconds": 0.8
     },
     "rhythm": {
-      "bars": 4,
-      "notes": 11,
-      "holds": 3,
+      "bars": 5,
+      "notes": 15,
+      "holds": 2,
+      "slides": 2,
+      "slide_partial": 0.5,
       "hold_steps": [
         3,
         4
       ],
       "assist_fewer": 3,
+      "speedup_bars": 2,
+      "speedup": 1.2,
       "travel_seconds": 2.4,
       "stray_penalty": 0.03,
       "bpm_jazz": 112,
@@ -295,20 +299,36 @@
     "shells": {
       "rounds": 3,
       "swaps": [
-        6,
+        7,
         9,
         11
       ],
       "swap_seconds": [
-        0.38,
-        0.3,
-        0.26
+        0.4,
+        0.36,
+        0.34
       ],
-      "pick_seconds": 5.0,
+      "accel": [
+        1.0,
+        0.9,
+        0.7
+      ],
+      "feint_share": [
+        0.15,
+        0.2,
+        0.2
+      ],
+      "cycle_share": [
+        0.0,
+        0.15,
+        0.25
+      ],
+      "feint_reach": 0.42,
+      "pick_seconds": 6.0,
       "cups": [
         3,
-        3,
-        4
+        4,
+        5
       ]
     },
     "darts": {
@@ -354,14 +374,28 @@
     "pour": {
       "glasses": 3,
       "fill_seconds": [
-        1.5,
-        1.1,
-        1.8
+        2.6,
+        2.2,
+        2.8
       ],
-      "settle": 0.035,
+      "foam_ratio": [
+        0.4,
+        0.7,
+        1.0
+      ],
+      "tilt_foam_min": 0.12,
+      "tilt_speed": 1.4,
+      "tilt_mouse_px": 160.0,
+      "foam_settle_seconds": 4.0,
+      "foam_to_liquid": 0.35,
+      "head_target": 0.1,
+      "head_band": 0.03,
+      "head_falloff": 0.08,
+      "w_level": 0.6,
+      "judge_after_seconds": 1.0,
+      "serve_seconds": 9.0,
       "perfect": 0.02,
-      "falloff": 0.14,
-      "wait_seconds": 5.0,
+      "falloff": 0.12,
       "rest_seconds": 0.7
     },
     "simon": {
@@ -512,12 +546,16 @@
       "hit_seconds": 0.7
     },
     "scratch": {
-      "duration": 9.0,
-      "zone_radius": 88.0,
-      "brush": 26.0,
+      "duration": 13.0,
+      "zone_radius": 74.0,
+      "brush": 24.0,
       "zone_full": 0.9,
       "overflow_penalty": 1.2,
-      "coin_speed": 560,
+      "trap_penalty": 1.0,
+      "trap_warn": 0.06,
+      "double_zones": 1,
+      "layer_gap": 0.35,
+      "coin_speed": 600,
       "bot_inset": 0.85,
       "end_seconds": 1.0
     },
@@ -552,6 +590,23 @@
       "winded_seconds": 1.2,
       "par_seconds": 9.5,
       "time_weight": 0.3,
+      "jump_beats": [
+        5,
+        11,
+        16
+      ],
+      "jump_window": 0.4,
+      "leap_seconds": 0.45,
+      "crash_seconds": 0.9,
+      "crash_keep": 0.25,
+      "rival_hurdles": [
+        0.3,
+        0.6,
+        0.85
+      ],
+      "rival_start": 0.95,
+      "rival_sprint": 1.15,
+      "sprint_from": 0.66,
       "rival_paces": [
         0.088,
         0.081,
@@ -585,7 +640,7 @@
       "pause_seconds": 0.6
     },
     "lasers": {
-      "duration": 16.0,
+      "duration": 20.0,
       "first_beam": 420.0,
       "beam_spacing": 260.0,
       "beam_speed": 1.1,
@@ -600,10 +655,12 @@
       "time_scale": 0.4,
       "partial_weight": 0.5,
       "hit_penalty": 0.12,
-      "bot_horizon": 0.7,
+      "bot_horizon": 1.0,
       "slide_half": 80.0,
       "sweep_len": 0.7,
-      "bot_margin": 10.0
+      "bot_margin": 10.0,
+      "switch_seconds": 9.0,
+      "bot_rush": 2.0
     },
     "juggle": {
       "duration": 16.0,
@@ -635,7 +692,11 @@
       "sling_grab": 110,
       "sling_fire": 60,
       "sling_max": 320,
-      "cushion_sound_speed": 120
+      "cushion_sound_speed": 120,
+      "neutrals": 1,
+      "black_from": 1,
+      "black_penalty": 0.5,
+      "spin_k": 0.7
     }
   },
   "slot": {

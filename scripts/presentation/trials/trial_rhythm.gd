@@ -7,6 +7,9 @@ extends ThrowTrial
 ## Clavier : flèches ; manette : X / Y / B / A ; souris : clics gauche / droit (deux couloirs).
 ## Note = moyenne des notes (une note longue lâchée trop tôt ne vaut qu'une partie), moins une
 ## pénalité par frappe dans le vide.
+## 2.0 : des GLISSÉS (note longue qui finit dans un autre couloir : tenir, puis frapper ce
+## couloir au bout de la traînée) et le disque qui S'EMBALLE sur les dernières mesures (le
+## morceau accélère, notes comprises). Les notes vivent en « temps du morceau » (`_st`).
 
 const LANE_KEYS: Array[String] = ["pad_x", "pad_y", "pad_b", "pad_a"]
 const MOUSE_KEYS: Array[String] = ["mouse_left", "mouse_right"]
@@ -45,6 +48,13 @@ var _last_beat: int = -1
 var _eq3: Array[MeshInstance3D] = []
 var _spots3: Array[SpotLight3D] = []
 var _record3: Node3D = null
+## Temps du morceau (avance plus vite quand le disque s'emballe) et lecteur du morceau.
+var _st: float = 0.0
+var _speed_from: float = 1e9
+var _song: AudioStreamPlayer = null
+var _song_stream: AudioStream = null
+## Glissé : couloir d'arrivée de chaque note (-1 : aucune).
+var _slide_to: PackedInt32Array = PackedInt32Array()
 
 
 func begin() -> void:
@@ -56,6 +66,7 @@ func begin() -> void:
 	var steps: int = pi("bars") * 8
 	var want: int = pi("notes") - (pi("assist_fewer") if assist else 0)
 	var holds: int = pi("holds") - (1 if assist else 0)
+	var slides: int = pi("slides") - (1 if assist else 0)
 	var hold_len: Array = Balance.arr("throw_trials.rhythm.hold_steps")
 	# Une note à la fois, au moins un temps entre deux notes (croches surtout sur les temps).
 	var step: int = 2
@@ -67,10 +78,16 @@ func begin() -> void:
 			lane = (lane + 1 + rng.randi_range(0, _lanes - 2)) % _lanes
 		prev_lane = lane
 		var len_steps: int = 0
-		if holds > 0 and made > 0 and step + 8 < steps and rng.randf() < 0.45:
+		var slide: int = -1
+		if holds + slides > 0 and made > 0 and step + 8 < steps and rng.randf() < 0.5:
 			len_steps = int(hold_len[rng.randi_range(0, hold_len.size() - 1)])
-			holds -= 1
-		_add(step, lane, len_steps)
+			if slides > 0 and (holds == 0 or rng.randf() < 0.5):
+				slides -= 1
+				slide = (lane + 1 + rng.randi_range(0, _lanes - 2)) % _lanes
+				prev_lane = slide
+			else:
+				holds -= 1
+		_add(step, lane, len_steps, slide)
 		made += 1
 		var gap: int = [2, 2, 2, 3, 4][rng.randi_range(0, 4)]
 		step += len_steps + gap
@@ -80,13 +97,16 @@ func begin() -> void:
 	if not _times.is_empty():
 		_end = maxf(_end, _times[_times.size() - 1] + _dur[_dur.size() - 1] + _window() + 0.4)
 	AudioBus.duck_music(true)
-	AudioBus.play("groove_" + _groove, 1.0, -2.0)
+	_song = AudioBus.play_get("groove_" + _groove, 1.0, -2.0)
+	_song_stream = _song.stream if _song != null else null
 	# Téléphone : le son sort en retard ; l'horloge de l'épreuve part d'autant en arrière pour que
 	# notes, image et jugement tombent sur ce qu'on entend (PC : décalage nul).
-	t = -Platform.audio_offset()
+	_st = -Platform.audio_offset()
+	_speed_from = _lead + float(maxi(pi("bars") - pi("speedup_bars"), 0)) * 4.0 * _beat
 
 
-func _add(step: int, lane: int, len_steps: int) -> void:
+func _add(step: int, lane: int, len_steps: int, slide: int = -1) -> void:
+	_slide_to.append(slide)
 	_times.append(_lead + float(step) * _beat * 0.5)
 	_lane_of.append(lane)
 	_scores.append(-1.0)
@@ -95,6 +115,12 @@ func _add(step: int, lane: int, len_steps: int) -> void:
 
 
 ## Fenêtre propre au rythme (plus large que l'invite d'effet : on suit une musique).
+## Vitesse du morceau : 1, puis le disque s'emballe sur une mesure jusqu'à `speedup`.
+func _rate() -> float:
+	var u: float = clampf((_st - _speed_from) / (_beat * 4.0), 0.0, 1.0)
+	return lerpf(1.0, p("speedup"), u * u * (3.0 - 2.0 * u))
+
+
 func _window() -> float:
 	return (p("window_seconds") + p("perfect_seconds")) * widen()
 
@@ -124,12 +150,20 @@ func _released(event: InputEvent, lane: int) -> bool:
 
 func tap(lane: int) -> void:
 	_lane_flash[lane] = 1.0
+	# Glissé : on tient la note d'un couloir et on frappe celui d'arrivée au bout de la traînée.
+	for hl: int in _lanes:
+		var hi: int = _holding[hl]
+		if hi >= 0 and _slide_to[hi] == lane and absf(_st - (_times[hi] + _dur[hi])) <= _window():
+			_holding[hl] = -1
+			AudioBus.play(LANE_SFX[lane], 1.1, -3.0)
+			_close_hold(hi, 1.0)
+			return
 	var best: int = -1
 	var best_err: float = 1e9
 	for i: int in _times.size():
 		if _scores[i] >= 0.0 or _lane_of[i] != lane:
 			continue
-		var err: float = t - _times[i]
+		var err: float = _st - _times[i]
 		if absf(err) <= _window() and absf(err) < absf(best_err):
 			best = i
 			best_err = err
@@ -167,16 +201,17 @@ func _release(lane: int) -> void:
 	if i < 0:
 		return
 	var tail: float = _times[i] + _dur[i]
-	var held: float = clampf((t - _times[i]) / maxf(_dur[i], 0.01), 0.0, 1.0)
-	if t >= tail - p("release_seconds") * widen():
-		held = 1.0
+	var held: float = clampf((_st - _times[i]) / maxf(_dur[i], 0.01), 0.0, 1.0)
+	if _st >= tail - p("release_seconds") * widen():
+		held = 1.0 if _slide_to[i] < 0 else p("slide_partial")
 	_close_hold(i, held)
 
 
 func _close_hold(i: int, held: float) -> void:
 	var sc: float = _press_sc[i] * (0.35 + 0.65 * held)
 	_scores[i] = sc
-	pop(Vector2(HIT_X + POP_DX, _lane_y(_lane_of[i]) - 26.0), sc, "" if held >= 1.0 else "TRIAL_RHYTHM_LET_GO")
+	var key: String = "" if held >= 1.0 else ("TRIAL_RHYTHM_SLIDE_MISS" if _slide_to[i] >= 0 else "TRIAL_RHYTHM_LET_GO")
+	pop(Vector2(HIT_X + POP_DX, _lane_y(_lane_of[i]) - 26.0), sc, key)
 	if held >= 1.0:
 		AudioBus.play("chime", 1.2, -6.0)
 		_combo += 1
@@ -187,24 +222,31 @@ func _close_hold(i: int, held: float) -> void:
 
 
 func tick(dt: float) -> void:
-	# Note longue tenue jusqu'au bout (plus la fenêtre) : validée sans attendre le lâcher.
+	_st += dt * _rate()
+	if _song != null and _song.stream == _song_stream and _song.playing:
+		_song.pitch_scale = _rate()  # le disque s'emballe : tempo et hauteur montent ensemble
+	# Note longue tenue jusqu'au bout (plus la fenêtre) : validée sans attendre le lâcher ;
+	# glissé non conclu : à moitié.
 	for lane: int in _lanes:
 		var hi: int = _holding[lane]
-		if hi >= 0 and t >= _times[hi] + _dur[hi] + p("release_seconds") * widen():
+		if hi < 0:
+			continue
+		var slide: bool = _slide_to[hi] >= 0
+		if _st >= _times[hi] + _dur[hi] + (_window() if slide else p("release_seconds") * widen()):
 			_holding[lane] = -1
-			_close_hold(hi, 1.0)
+			_close_hold(hi, p("slide_partial") if slide else 1.0)
 	for l: int in 4:
 		_lane_flash[l] = maxf(_lane_flash[l] - dt * 4.0, 0.0)
-	var b: int = int(floor(t / _beat))
+	var b: int = int(floor(_st / _beat))
 	if b != _last_beat:
 		_last_beat = b
 	for i: int in _times.size():
-		if _scores[i] == -1.0 and t - _times[i] > _window():
+		if _scores[i] == -1.0 and _st - _times[i] > _window():
 			_scores[i] = 0.0
 			_combo = 0
 			pop(Vector2(HIT_X + POP_DX, _lane_y(_lane_of[i]) - 26.0), 0.0, "THROW_TAP_MISSED")
 			AudioBus.play("lose_soft", 1.2, -12.0)
-	if t >= _end:
+	if _st >= _end:
 		for lane: int in _lanes:
 			if _holding[lane] >= 0:
 				_close_hold(_holding[lane], 1.0)
@@ -219,10 +261,12 @@ func tick(dt: float) -> void:
 func bot_wants() -> Dictionary:
 	for lane: int in _lanes:
 		var hi: int = _holding[lane]
-		if hi >= 0 and t >= _times[hi] + _dur[hi]:
+		if hi >= 0 and _st >= _times[hi] + _dur[hi]:
+			if _slide_to[hi] >= 0:
+				return {"do": "sym", "symbol": _slide_to[hi]}
 			return {"do": "release", "symbol": lane}
 	for i: int in _times.size():
-		if _scores[i] == -1.0 and absf(t - _times[i]) < 0.02:
+		if _scores[i] == -1.0 and absf(_st - _times[i]) < 0.02:
 			return {"do": "sym", "symbol": _lane_of[i]}
 	return {"do": ""}
 
@@ -246,14 +290,16 @@ func paint() -> void:
 	var r: Rect2 = play_rect()
 	var travel: float = p("travel_seconds")
 	var lane_h: float = (r.size.y - 90.0) / float(_lanes)
-	var count_in: int = 4 - int(floor(t / _beat))
+	var count_in: int = 4 - int(floor(_st / _beat))
 	var title: String = tr("TRIAL_RHYTHM_GROOVE_" + _groove.to_upper())
 	text(Vector2(r.get_center().x, r.position.y + 24.0), title, UiKit.SIZE_BODY, Palette.GOLD_LIGHT)
 	if _combo >= 3:
 		text(Vector2(r.end.x - 90.0, r.position.y + 24.0), tr("TRIAL_COMBO") % _combo, UiKit.SIZE_BODY, Palette.EMERALD)
-	if count_in > 0 and t < _lead:
+	if _rate() > 1.01:
+		text(Vector2(r.get_center().x, r.position.y + 52.0), tr("TRIAL_RHYTHM_SPEEDUP"), UiKit.SIZE_BODY, Palette.MULT_RED)
+	if count_in > 0 and _st < _lead:
 		text(Vector2(r.get_center().x, r.position.y + 52.0), str(count_in), UiKit.SIZE_H2, Palette.IVORY)
-	var beat_pulse: float = 1.0 - fposmod(t, _beat) / _beat
+	var beat_pulse: float = 1.0 - fposmod(_st, _beat) / _beat
 	_draw_stage(r, beat_pulse)
 	for l: int in _lanes:
 		var y: float = _lane_y(l)
@@ -264,9 +310,9 @@ func paint() -> void:
 		draw_rect(Rect2(Vector2(lane_r.position.x, lane_r.end.y - 3.0), Vector2(lane_r.size.x, 3.0)),
 			Color(LANE_COLORS[l], 0.35 + 0.5 * _lane_flash[l]))
 		# Repères de mesure qui défilent avec les notes.
-		var first: int = int(ceil((t - 0.2) / _beat))
+		var first: int = int(ceil((_st - 0.2) / _beat))
 		for bk: int in range(first, first + int(travel / _beat) + 2):
-			var u: float = (float(bk) * _beat - t) / travel
+			var u: float = (float(bk) * _beat - _st) / travel
 			if u < 0.0 or u > 1.0:
 				continue
 			var x: float = HIT_X + u * (lane_r.end.x - HIT_X - 10.0)
@@ -283,7 +329,7 @@ func paint() -> void:
 			_draw_hold(r, i, travel)
 		if _scores[i] == -2.0:
 			continue
-		var u2: float = (_times[i] - t) / travel
+		var u2: float = (_times[i] - _st) / travel
 		if u2 > 1.0 or u2 < -0.3:
 			continue
 		var x2: float = HIT_X + u2 * (r.end.x - 30.0 - HIT_X)
@@ -302,22 +348,30 @@ func _draw_hold(r: Rect2, i: int, travel: float) -> void:
 	var ny: float = _lane_y(_lane_of[i])
 	var span: float = r.end.x - 30.0 - HIT_X
 	var held: bool = _scores[i] == -2.0
-	var u_head: float = maxf((_times[i] - t) / travel, 0.0) if held else (_times[i] - t) / travel
-	var u_tail: float = (_times[i] + _dur[i] - t) / travel
+	var u_head: float = maxf((_times[i] - _st) / travel, 0.0) if held else (_times[i] - _st) / travel
+	var u_tail: float = (_times[i] + _dur[i] - _st) / travel
 	if u_tail < -0.1:
 		return
 	var x0: float = HIT_X + clampf(u_head, -0.3, 1.0) * span
 	var x1: float = HIT_X + clampf(u_tail, -0.3, 1.0) * span
 	if x1 <= x0:
 		return
-	var glow: float = 0.75 + 0.25 * sin(t * 18.0) if held else 0.45
+	var glow: float = 0.75 + 0.25 * sin(_st * 18.0) if held else 0.45
 	draw_rect(Rect2(x0, ny - 13.0, x1 - x0, 26.0), Color(lc, 0.25 * glow))
 	draw_rect(Rect2(x0, ny - 7.0, x1 - x0, 14.0), Color(lc, glow))
 	draw_rect(Rect2(x0, ny - 7.0, x1 - x0, 14.0), Color(Palette.IVORY, 0.35 * glow), false, 2.0)
 	draw_circle(Vector2(x1, ny), 12.0, Color(lc, glow))
 	draw_circle(Vector2(x1, ny), 6.0, Color(Palette.IVORY, glow))
+	if _slide_to[i] >= 0:
+		# Glissé : la traînée bifurque vers le couloir d'arrivée, où attend son bouton.
+		var to: int = _slide_to[i]
+		var ty: float = _lane_y(to)
+		var tc: Color = LANE_COLORS[to]
+		draw_line(Vector2(x1, ny), Vector2(x1 + 24.0, ty), Color(tc, glow), 8.0)
+		draw_circle(Vector2(x1 + 24.0, ty), PROMPT * 0.72, Color(tc, 0.3))
+		_prompt(Vector2(x1 + 24.0, ty), to, 0.9)
 	if held:
-		draw_circle(Vector2(HIT_X, ny), PROMPT * 0.75, Color(lc, 0.25 + 0.15 * sin(t * 20.0)))
+		draw_circle(Vector2(HIT_X, ny), PROMPT * 0.75, Color(lc, 0.25 + 0.15 * sin(_st * 20.0)))
 
 
 ## Scène de cabaret : rideau sombre, égaliseur qui bat la mesure, projecteurs colorés.
@@ -378,18 +432,18 @@ func _sync_3d(pulse: float) -> void:
 		return
 	var r: Rect2 = play_rect()
 	for k: int in _eq3.size():
-		var h: float = (0.25 + 0.75 * absf(sin(t * 2.3 + float(k) * 0.7) * cos(t * 1.1 + float(k) * 0.31))) * (0.55 + 0.45 * pulse)
+		var h: float = (0.25 + 0.75 * absf(sin(_st * 2.3 + float(k) * 0.7) * cos(_st * 1.1 + float(k) * 0.31))) * (0.55 + 0.45 * pulse)
 		var bh: float = maxf(h * (r.size.y - 60.0) * 0.45, 4.0) * PX3
 		var bar: MeshInstance3D = _eq3[k]
 		bar.scale.y = bh
 		bar.position.y = stage.to3(Vector2(0, r.end.y - 20.0)).y + bh * 0.5
-	_record3.rotation.z = -t * RECORD_RPM / 60.0 * TAU
+	_record3.rotation.z = -_st * RECORD_RPM / 60.0 * TAU
 	for k2: int in _spots3.size():
 		var sp: SpotLight3D = _spots3[k2]
-		var target: Vector2 = Vector2(r.position.x + r.size.x * (0.3 + 0.2 * float(k2)) + sin(t * 0.8 + float(k2) * 2.0) * 120.0,
+		var target: Vector2 = Vector2(r.position.x + r.size.x * (0.3 + 0.2 * float(k2)) + sin(_st * 0.8 + float(k2) * 2.0) * 120.0,
 			r.get_center().y)
 		sp.look_at_from_position(sp.position, stage.to3(target, -1.0))
-		sp.light_color = LANE_COLORS[(k2 + int(t / _beat)) % 4]
+		sp.light_color = LANE_COLORS[(k2 + int(_st / _beat)) % 4]
 		sp.light_energy = 1.2 + 1.5 * pulse
 
 
@@ -401,20 +455,20 @@ func _draw_stage(r: Rect2, pulse: float) -> void:
 	var bars: int = 34
 	var w: float = (r.size.x - 40.0) / float(bars)
 	for k: int in bars:
-		var h: float = (0.25 + 0.75 * absf(sin(t * 2.3 + float(k) * 0.7) * cos(t * 1.1 + float(k) * 0.31))) * (0.55 + 0.45 * pulse)
+		var h: float = (0.25 + 0.75 * absf(sin(_st * 2.3 + float(k) * 0.7) * cos(_st * 1.1 + float(k) * 0.31))) * (0.55 + 0.45 * pulse)
 		var bh: float = h * (r.size.y - 60.0) * 0.8
 		var col: Color = LANE_COLORS[k % LANE_COLORS.size()]
 		draw_rect(Rect2(r.position.x + 20.0 + float(k) * w + 2.0, r.end.y - 20.0 - bh, w - 4.0, bh), Color(col, 0.07))
 	for k: int in 3:
-		var cx: float = r.position.x + r.size.x * (0.3 + 0.2 * float(k)) + sin(t * 0.8 + float(k) * 2.0) * 120.0
-		draw_circle(Vector2(cx, r.position.y + r.size.y * 0.55), 150.0, Color(LANE_COLORS[(k + int(t / _beat)) % 4], 0.04 + 0.04 * pulse))
+		var cx: float = r.position.x + r.size.x * (0.3 + 0.2 * float(k)) + sin(_st * 0.8 + float(k) * 2.0) * 120.0
+		draw_circle(Vector2(cx, r.position.y + r.size.y * 0.55), 150.0, Color(LANE_COLORS[(k + int(_st / _beat)) % 4], 0.04 + 0.04 * pulse))
 
 
 ## Barre de progression du morceau.
 func pips_line(r: Rect2) -> void:
 	var bar: Rect2 = Rect2(r.position.x + 20.0, r.end.y - 14.0, r.size.x - 40.0, 6.0)
 	draw_rect(bar, Palette.VELVET_DEEP)
-	draw_rect(Rect2(bar.position, Vector2(bar.size.x * clampf(t / maxf(_end, 0.01), 0.0, 1.0), bar.size.y)), Palette.GOLD)
+	draw_rect(Rect2(bar.position, Vector2(bar.size.x * clampf(_st / maxf(_end, 0.01), 0.0, 1.0), bar.size.y)), Palette.GOLD)
 
 
 ## Invite : glyphe de manette, bouton de souris, ou flèche dessinée.

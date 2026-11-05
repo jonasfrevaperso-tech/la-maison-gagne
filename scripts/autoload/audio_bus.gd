@@ -142,11 +142,18 @@ func _variants(sfx_id: String) -> Array:
 
 ## Joue un SFX (variante et pitch aléatoires). `pitch` multiplie le pitch de base.
 func play(sfx_id: String, pitch: float = 1.0, volume_db: float = 0.0, bus: String = "SFX") -> void:
+	play_get(sfx_id, pitch, volume_db, bus)
+
+
+## Comme play(), mais rend le lecteur (null si rien ne joue) : pour suivre ou modifier un son
+## long en cours (vitesse d'un morceau). Le lecteur appartient à la réserve : vérifier que son
+## `stream` est toujours celui qu'on a lancé avant d'y toucher.
+func play_get(sfx_id: String, pitch: float = 1.0, volume_db: float = 0.0, bus: String = "SFX") -> AudioStreamPlayer:
 	if _silent or _hushed:
-		return
+		return null
 	var v: Array = _variants(sfx_id)
 	if v.is_empty():
-		return
+		return null
 	var rng: RandomNumberGenerator = RngService.cosmetic()
 	var p: AudioStreamPlayer = _pool[_pool_next]
 	_pool_next = (_pool_next + 1) % _pool.size()
@@ -155,6 +162,7 @@ func play(sfx_id: String, pitch: float = 1.0, volume_db: float = 0.0, bus: Strin
 	p.volume_db = volume_db + float(_mix.get(sfx_id, 0.0))
 	p.bus = bus
 	p.play()
+	return p
 
 
 ## Identifiants de tous les effets sonores mixés (table d'écoute des options).

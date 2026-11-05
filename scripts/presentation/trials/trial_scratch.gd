@@ -5,11 +5,19 @@ extends ThrowTrial
 ## étoile, sept). On gratte pour de vrai : souris ou doigt en glissant, ou pièce déplacée au
 ## stick / aux flèches et bouton maintenu. Chaque zone se remplit à mesure ; ce qui est gratté
 ## hors des pointillés coûte des points.
-## Note = part révélée des trois zones, moins la part de débord. Les symboles sont fixes : on
-## note l'adresse, jamais le hasard (D-046).
+## 2.0 : quatre zones de formes variées (cercle, losange, carré, ovale) ; l'une est PIÉGÉE, et
+## le ticket dit laquelle ne pas gratter. Certaines zones ont une pellicule double (dorée) : il
+## faut repasser une seconde fois (une couche part au plus tous les `layer_gap` s).
+## Note = part révélée des trois bonnes zones, moins le débord, moins le piège gratté. Les
+## symboles sont fixes : on note l'adresse et l'attention, jamais le hasard (D-046).
 
-const SYMBOLS: Array[String] = ["☘", "★", "7"]
-const SYMBOL_COLORS: Array[Color] = [Color("2ee6a8"), Color("ffd23f"), Color("ff4d6d")]
+const SYMBOLS: Array[String] = ["☘", "★", "7", "♣"]
+const SYMBOL_COLORS: Array[Color] = [Color("2ee6a8"), Color("ffd23f"), Color("ff4d6d"), Color("7aa7ff")]
+const ZONES: int = 4
+## Formes possibles des zones (clé de texte « TRIAL_SCRATCH_SHAPE_<FORME> »).
+const SHAPES: Array[String] = ["circle", "diamond", "square", "oval"]
+const TRAP_COLOR: Color = Color("3a0a12")
+const DOUBLE_COLOR: Color = Color("d8b44a")
 ## Ticket (coordonnées de maquette), pellicule argentée et grille du masque de grattage.
 const TICKET: Rect2 = Rect2(400.0, 250.0, 1120.0, 560.0)
 const FOIL: Rect2 = Rect2(440.0, 360.0, 1040.0, 400.0)
@@ -30,13 +38,18 @@ const BOT_LOOK: float = 0.2
 
 var _cols: int = 0
 var _rows: int = 0
-## 0 : pellicule intacte ; 1 : gratté. Index = ligne * _cols + colonne.
+## Couches de pellicule restantes (0 : gratté). Index = ligne * _cols + colonne.
 var _mask: PackedByteArray = PackedByteArray()
-## Zone de chaque cellule : 0..2 (dans les pointillés), -1 (hors zone, pénalisé), -2 (liseré toléré).
+## Instant du dernier arrachage de couche (une couche à la fois sur la pellicule double).
+var _last_t: PackedFloat32Array = PackedFloat32Array()
+## Zone de chaque cellule : 0..3 (dans les pointillés), -1 (hors zone, pénalisé), -2 (liseré toléré).
 var _zone_of: PackedInt32Array = PackedInt32Array()
-var _zone_total: Array[int] = [0, 0, 0]
-var _zone_done: Array[int] = [0, 0, 0]
-var _zone_complete: Array[bool] = [false, false, false]
+var _zone_total: Array[int] = [0, 0, 0, 0]
+var _zone_done: Array[int] = [0, 0, 0, 0]
+var _zone_complete: Array[bool] = [false, false, false, false]
+var _shape: Array[String] = []
+var _double: Array[bool] = []
+var _trap: int = 0
 var _outside_total: int = 0
 var _outside: int = 0
 var _centers: Array[Vector2] = []
@@ -51,28 +64,41 @@ var _end_t: float = -1.0
 var _dust: Array[Vector3] = []
 var _dust_v: Array[Vector2] = []
 var _neon: Label3D = null
+var _trap_warned: bool = false
 
 
 func begin() -> void:
 	_cols = int(FOIL.size.x / CELL)
 	_rows = int(FOIL.size.y / CELL)
-	_mask.resize(_cols * _rows)
-	_mask.fill(0)
 	_zone_of.resize(_cols * _rows)
+	_last_t.resize(_cols * _rows)
+	_last_t.fill(-10.0)
 	var r: float = p("zone_radius")
-	# Trois zones réparties sur la pellicule, légèrement décalées en hauteur.
-	for k: int in 3:
-		_centers.append(FOIL.position + Vector2(FOIL.size.x * (0.2 + 0.3 * float(k)), FOIL.size.y * (0.42 + 0.16 * float(k % 2))))
+	# Quatre zones réparties sur la pellicule, en quinconce ; formes tirées sans doublon.
+	var shapes: Array[String] = SHAPES.duplicate()
+	for k: int in ZONES:
+		_centers.append(FOIL.position + Vector2(FOIL.size.x * (0.14 + 0.24 * float(k)), FOIL.size.y * (0.4 + 0.2 * float(k % 2))))
+		_shape.append(shapes.pop_at(rng.randi_range(0, shapes.size() - 1)))
+		_double.append(false)
+	_trap = rng.randi_range(0, ZONES - 1)
+	var good: Array[int] = []
+	for k: int in ZONES:
+		if k != _trap:
+			good.append(k)
+	for k: int in pi("double_zones"):
+		_double[good.pop_at(rng.randi_range(0, good.size() - 1))] = true
+	_mask.resize(_cols * _rows)
 	for i: int in _cols * _rows:
 		var c: Vector2 = _cell_center(i)
 		var z: int = -1
-		for k: int in 3:
-			var d: float = c.distance_to(_centers[k])
+		for k: int in ZONES:
+			var d: float = _dist(k, c - _centers[k])
 			if d <= r - RIM_IN:
 				z = k
 			elif d <= r + RIM and z == -1:
 				z = -2
 		_zone_of[i] = z
+		_mask[i] = 2 if z >= 0 and _double[z] else 1
 		if z >= 0:
 			_zone_total[z] += 1
 		elif z == -1:
@@ -80,6 +106,24 @@ func begin() -> void:
 	_coin = FOIL.get_center() + Vector2(0, FOIL.size.y * 0.5 + 60.0)
 	_bot_points = _plan_bot()
 	_build_3d()
+
+
+## Distance « de forme » : vaut le rayon de la zone sur ses pointillés, quelle que soit la forme
+## (homogène de degré 1 : d(k·v) = k·d(v)). Aires voisines d'une forme à l'autre.
+func _dist(k: int, off: Vector2) -> float:
+	match _shape[k]:
+		"diamond":
+			return (absf(off.x) + absf(off.y)) * 0.8
+		"square":
+			return maxf(absf(off.x), absf(off.y)) * 1.12
+		"oval":
+			return Vector2(off.x * 0.78, off.y * 1.3).length()
+	return off.length()
+
+
+## Bonne zone (à gratter) : toutes sauf le piège.
+func is_good(k: int) -> bool:
+	return k != _trap
 
 
 # --------------------------------------------------------------------------- décor 3D
@@ -137,10 +181,11 @@ func _build_3d() -> void:
 ## on peut toujours sortir en relâchant. Souris et doigt restent libres.
 func _hold_in(prev: Vector2, to: Vector2) -> Vector2:
 	var lim: float = p("zone_radius") + RIM - p("brush")
-	for k: int in 3:
-		if prev.distance_to(_centers[k]) <= lim + 1.0:
+	for k: int in ZONES:
+		if _dist(k, prev - _centers[k]) <= lim + 1.0:
 			var off: Vector2 = to - _centers[k]
-			return _centers[k] + off.limit_length(lim)
+			var d: float = _dist(k, off)
+			return _centers[k] + (off * (lim / d) if d > lim else off)
 	return to
 
 
@@ -161,10 +206,13 @@ func _stamp(at: Vector2) -> bool:
 	for y: int in range(y0, y1 + 1):
 		for x: int in range(x0, x1 + 1):
 			var i: int = y * _cols + x
-			if _mask[i] == 1 or _cell_center(i).distance_to(at) > br:
+			if _mask[i] == 0 or _cell_center(i).distance_to(at) > br or t - _last_t[i] < p("layer_gap"):
 				continue
-			_mask[i] = 1
+			_mask[i] -= 1
+			_last_t[i] = t
 			any = true
+			if _mask[i] > 0:
+				continue
 			var z: int = _zone_of[i]
 			if z >= 0:
 				_zone_done[z] += 1
@@ -188,12 +236,20 @@ func _on_scratched(at: Vector2) -> void:
 		AudioBus.play("paper", 1.3 + rng.randf() * 0.4, -12.0)
 		_sound_t = 0.07
 	_spawn_dust(at)
-	for k: int in 3:
+	for k: int in ZONES:
 		if not _zone_complete[k] and zone_share(k) >= p("zone_full"):
 			_zone_complete[k] = true
-			AudioBus.play("coins", 1.0 + 0.15 * float(k), -6.0)
-			pop(_centers[k] + Vector2(0, -p("zone_radius") - 30.0), 1.0, "TRIAL_SCRATCH_REVEALED")
-	if _zone_complete.count(true) == 3 and not _ended:
+			if is_good(k):
+				AudioBus.play("coins", 1.0 + 0.15 * float(k), -6.0)
+				pop(_centers[k] + Vector2(0, -p("zone_radius") - 30.0), 1.0, "TRIAL_SCRATCH_REVEALED")
+		if k == _trap and zone_share(k) > p("trap_warn") and not _trap_warned:
+			_trap_warned = true
+			AudioBus.play("lose_soft", 1.2, -4.0)
+			pop(_centers[k] + Vector2(0, -p("zone_radius") - 30.0), 0.0, "TRIAL_SCRATCH_TRAP")
+	var good_done: bool = true
+	for k: int in ZONES:
+		good_done = good_done and (_zone_complete[k] or not is_good(k))
+	if good_done and not _ended:
 		_end()
 
 
@@ -202,17 +258,21 @@ func zone_share(k: int) -> float:
 	return float(_zone_done[k]) / float(maxi(_zone_total[k], 1))
 
 
-## Débord : cellules grattées hors des pointillés, rapportées à l'aire des trois zones.
+## Débord : cellules grattées hors des pointillés, rapportées à l'aire des bonnes zones.
 func overflow() -> float:
-	var zone_cells: int = _zone_total[0] + _zone_total[1] + _zone_total[2]
+	var zone_cells: int = 0
+	for k: int in ZONES:
+		zone_cells += _zone_total[k] if is_good(k) else 0
 	return float(_outside) / float(maxi(zone_cells, 1))
 
 
 func current_score() -> float:
 	var rev: float = 0.0
-	for k: int in 3:
-		rev += clampf(zone_share(k) / p("zone_full"), 0.0, 1.0)
-	return clampf(rev / 3.0 - overflow() * p("overflow_penalty"), 0.0, 1.0)
+	for k: int in ZONES:
+		if is_good(k):
+			rev += clampf(zone_share(k) / p("zone_full"), 0.0, 1.0)
+	var trap: float = zone_share(_trap) * p("trap_penalty")
+	return clampf(rev / float(ZONES - 1) - overflow() * p("overflow_penalty") - trap, 0.0, 1.0)
 
 
 func _end() -> void:
@@ -284,19 +344,38 @@ func _plan_bot() -> Array[Vector2]:
 	var out: Array[Vector2] = []
 	var r: float = p("zone_radius") - p("brush") * p("bot_inset")
 	var stepy: float = p("brush") * 1.2
-	for k: int in 3:
-		var c: Vector2 = _centers[k]
-		var y: float = -r
-		var row: int = 0
-		while y <= r + 0.01:
-			var hw: float = sqrt(maxf(r * r - y * y, 0.0))
-			var a: Vector2 = c + Vector2(-hw, y)
-			var b: Vector2 = c + Vector2(hw, y)
-			out.append(a if row % 2 == 0 else b)
-			out.append(b if row % 2 == 0 else a)
-			y += stepy
-			row += 1
+	for k: int in ZONES:
+		if not is_good(k):
+			continue
+		for pass_i: int in (2 if _double[k] else 1):
+			var c: Vector2 = _centers[k]
+			var y: float = -r * 1.5
+			var row: int = 0
+			while y <= r * 1.5 + 0.01:
+				var hw: float = _half_width(k, y, r)
+				if hw >= 0.0:
+					var a: Vector2 = c + Vector2(-hw, y)
+					var b: Vector2 = c + Vector2(hw, y)
+					out.append(a if row % 2 == pass_i % 2 else b)
+					out.append(b if row % 2 == pass_i % 2 else a)
+					row += 1
+				y += stepy
 	return out
+
+
+## Demi-largeur de la zone k à la hauteur y (pour une distance de forme r) ; -1 hors zone.
+func _half_width(k: int, y: float, r: float) -> float:
+	if _dist(k, Vector2(0, y)) > r:
+		return -1.0
+	var hi: float = r * 2.0
+	var lo: float = 0.0
+	for it: int in 16:
+		var mid: float = (lo + hi) * 0.5
+		if _dist(k, Vector2(mid, y)) <= r:
+			lo = mid
+		else:
+			hi = mid
+	return lo
 
 
 func _bot_target() -> int:
@@ -304,7 +383,7 @@ func _bot_target() -> int:
 	while not _bot_points.is_empty():
 		var pt: Vector2 = _bot_points[0]
 		var z: int = _nearest_zone(pt)
-		if _zone_complete[z] or (_coin.distance_to(pt) < p("brush") * 0.6):
+		if (_zone_complete[z] and not _double[z]) or (_coin.distance_to(pt) < p("brush") * 0.6):
 			_bot_points.pop_front()
 			continue
 		return z
@@ -313,7 +392,7 @@ func _bot_target() -> int:
 
 func _nearest_zone(pt: Vector2) -> int:
 	var best: int = 0
-	for k: int in 3:
+	for k: int in ZONES:
 		if pt.distance_to(_centers[k]) < pt.distance_to(_centers[best]):
 			best = k
 	return best
@@ -326,7 +405,7 @@ func bot_wants() -> Dictionary:
 	if z < 0:
 		return {"do": "release"} if _scratching else {"do": ""}
 	var pt: Vector2 = _bot_points[0]
-	var inside: bool = _coin.distance_to(_centers[z]) <= p("zone_radius") - p("brush") * 0.3
+	var inside: bool = _dist(z, _coin - _centers[z]) <= p("zone_radius") - p("brush") * 0.3
 	# Relâcher AVANT de quitter la zone (et attendre que ce soit fait), sinon on déborde.
 	if _scratching and not inside:
 		return {"do": "release"}
@@ -379,31 +458,41 @@ func paint() -> void:
 	text(Vector2(TICKET.get_center().x, TICKET.position.y + 56.0), tr("TRIAL_SCRATCH_TICKET"), UiKit.SIZE_H1, Color("8a1428"), "display", 0)
 	# Dessous : papier, symboles (révélés en grattant).
 	draw_rect(FOIL, Color("fff6dc"))
-	for k: int in 3:
+	for k: int in ZONES:
 		var glow: float = 1.0 if _zone_complete[k] else 0.75
-		text(_centers[k], SYMBOLS[k], UiKit.SIZE_H1 * 2, Color(SYMBOL_COLORS[k], glow), "display", 6)
+		text(_centers[k], SYMBOLS[k] if is_good(k) else "✕", UiKit.SIZE_H1 * 2, Color(SYMBOL_COLORS[k] if is_good(k) else TRAP_COLOR, glow),
+			"display", 6)
 	# Pellicule : une bande par suite de cellules intactes sur chaque ligne.
 	for y: int in _rows:
 		var x: int = 0
 		while x < _cols:
-			if _mask[y * _cols + x] == 1:
+			var x0: int = x
+			var layers: int = _mask[y * _cols + x]
+			if layers == 0:
 				x += 1
 				continue
-			var x0: int = x
-			while x < _cols and _mask[y * _cols + x] == 0:
+			while x < _cols and _mask[y * _cols + x] == layers:
 				x += 1
 			var col: Color = FOIL_COLOR if (y / 4) % 2 == 0 else FOIL_COLOR.lerp(FOIL_DARK, 0.25)
+			if layers == 2:
+				col = DOUBLE_COLOR if (y / 4) % 2 == 0 else DOUBLE_COLOR.darkened(0.12)
 			draw_rect(Rect2(FOIL.position + Vector2(float(x0) * CELL, float(y) * CELL), Vector2(float(x - x0) * CELL, CELL)), col)
-	# Pointillés dorés des trois zones et part révélée.
+	# Pointillés dorés des zones (le long de leur forme) et part révélée des bonnes zones.
 	var r: float = p("zone_radius")
-	for k: int in 3:
-		var dots: int = 36
+	for k: int in ZONES:
+		var dots: int = 40
 		for d: int in dots:
-			var a: float = TAU * float(d) / float(dots) + t * 0.4
-			draw_circle(_centers[k] + Vector2.from_angle(a) * r, 4.0, Palette.GOLD if not _zone_complete[k] else Palette.EMERALD)
+			var u: Vector2 = Vector2.from_angle(TAU * float(d) / float(dots) + t * 0.4)
+			draw_circle(_centers[k] + u * (r / _dist(k, u)), 4.0, Palette.GOLD if not _zone_complete[k] or not is_good(k) else Palette.EMERALD)
+		if not is_good(k):
+			continue
 		var share: float = clampf(zone_share(k) / p("zone_full"), 0.0, 1.0)
-		draw_arc(_centers[k], r + 20.0, -PI * 0.5, -PI * 0.5 + TAU * share, 48, Palette.EMERALD if _zone_complete[k] else Palette.GOLD_LIGHT,
-			6.0)
+		var bar: Rect2 = Rect2(_centers[k] + Vector2(-50, r * 1.3 + 14.0), Vector2(100, 6))
+		draw_rect(bar, Color(Palette.INK, 0.5))
+		draw_rect(Rect2(bar.position, Vector2(bar.size.x * share, bar.size.y)), Palette.EMERALD if _zone_complete[k] else Palette.GOLD_LIGHT)
+	# Consigne du ticket : la forme à NE PAS gratter.
+	var rule: String = tr("TRIAL_SCRATCH_RULE") % tr("TRIAL_SCRATCH_SHAPE_" + _shape[_trap].to_upper())
+	text(Vector2(TICKET.get_center().x, TICKET.position.y + 100.0), rule, UiKit.SIZE_H2, Palette.MULT_RED, "display", 0)
 	# Copeaux argentés.
 	for k2: int in _dust.size():
 		var dd: Vector3 = _dust[k2]

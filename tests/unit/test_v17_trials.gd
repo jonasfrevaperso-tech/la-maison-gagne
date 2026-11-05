@@ -151,22 +151,32 @@ func test_dice_plan_lands_in_zone() -> void:
 	dc.free()
 
 
-## Grattage (1.9) : gratter les zones remplit la note ; déborder la fait baisser.
+## Grattage (2.0) : gratter les bonnes zones (deux passes sur la pellicule double) remplit la
+## note ; déborder et gratter le piège la font baisser.
 func test_scratch_overflow_costs() -> void:
 	var sc: TrialScratch = _trial("scratch") as TrialScratch
 	sc.begin()
-	for k: int in 3:
-		var c: Vector2 = sc._centers[k]
-		var r: float = sc.p("zone_radius") - sc.p("brush") * 0.8
-		var y: float = -r
-		while y <= r:
-			var hw: float = sqrt(maxf(r * r - y * y, 0.0))
-			sc._scratch_line(c + Vector2(-hw, y), c + Vector2(hw, y))
-			y += sc.p("brush") * 0.8
-	near(sc.current_score(), 1.0, 0.02, "trois zones grattées proprement")
+	for pass_i: int in 2:
+		sc.t += 1.0  # une couche par passage
+		for k: int in TrialScratch.ZONES:
+			if not sc.is_good(k):
+				continue
+			var c: Vector2 = sc._centers[k]
+			var r: float = sc.p("zone_radius") - sc.p("brush") * 0.8
+			var y: float = -r * 1.5
+			while y <= r * 1.5:
+				var hw: float = sc._half_width(k, y, r)
+				if hw >= 0.0:
+					sc._scratch_line(c + Vector2(-hw, y), c + Vector2(hw, y))
+				y += sc.p("brush") * 0.8
+	near(sc.current_score(), 1.0, 0.03, "bonnes zones grattées proprement")
 	var clean: float = sc.current_score()
+	sc.t += 1.0
+	sc._scratch_line(sc._centers[sc._trap] + Vector2(-30, 0), sc._centers[sc._trap] + Vector2(30, 0))
+	check(sc.current_score() < clean - 0.05, "gratter le piège coûte des points")
+	var trapped: float = sc.current_score()
 	sc._scratch_line(sc.FOIL.position + Vector2(30, 30), sc.FOIL.position + Vector2(sc.FOIL.size.x - 30, 30))
-	check(sc.overflow() > 0.0 and sc.current_score() < clean, "le débord coûte des points")
+	check(sc.overflow() > 0.0 and sc.current_score() < trapped, "le débord coûte des points")
 	sc.free()
 
 
