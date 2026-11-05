@@ -11,6 +11,8 @@ const SECONDS_PER_SHOP: float = 35.0
 const MAX_SPINS_PER_RUN: int = 400
 const MIN_OFFERS: int = 8
 const THROW_SKILL_SD: float = 0.15
+## Palier à partir duquel la campagne se resserre (cible : 3 à 4 tours par échéance réglée).
+const TIGHT_FROM: int = 3
 
 var opts: Dictionary = {
 	"runs": "100", "bot": "greedy", "character": "all", "risk": "0", "seed": "1", "out": "user://dev/sim", "quiet": "false", "report": "false"
@@ -42,13 +44,18 @@ func _initialize() -> void:
 		write_report(summary)
 	print(
 		(
-			"Simulation %s : %d runs, victoire %.1f %%, palier moyen %.2f, durée estimée %.1f min, %d ms"
+			(
+				"Simulation %s : %d runs, victoire %.1f %%, palier moyen %.2f, durée estimée %.1f min, "
+				+ "tours/échéance (palier ≥ 3) %.1f, argent %.1f $, %d ms"
+			)
 			% [
 				opts["bot"],
 				n,
 				float(summary["win_rate"]) * 100.0,
 				float(summary["avg_tier"]),
 				float(summary["avg_minutes"]),
+				float(summary["deadline_spins_median"]),
+				float(summary["deadline_money_avg"]),
 				int(summary["elapsed_ms"])
 			]
 		)
@@ -89,6 +96,8 @@ func play_run(db: ContentDB, cid: String, risk: int, seed_value: int, bot_kind: 
 		tel.append(RunTelemetry.run_start(ctl.run, "bot:" + bot_kind, String(ProjectSettings.get_setting("application/config/version"))))
 	var spins: int = 0
 	var shops: int = 0
+	var deadline_spins: Array[int] = []  # tours pour régler chaque échéance gagnée (palier ≥ TIGHT_FROM)
+	var deadline_money: Array[int] = []
 	var best: int = 0
 	var reached_tier: int = 1
 	while spins < MAX_SPINS_PER_RUN:
@@ -98,6 +107,10 @@ func play_run(db: ContentDB, cid: String, risk: int, seed_value: int, bot_kind: 
 				bot.place_bets(ctl)
 				var pre: Dictionary = RunTelemetry.snapshot(run)
 				var out: RunController.SpinOutcome = ctl.spin(bot.aim(ctl), _throw_skill())
+				if out.deadline_won and int(pre["tier"]) >= TIGHT_FROM:
+					deadline_spins.append(int(pre["spins_used"]) + 1)
+				if out.deadline_won or out.deadline_failed:
+					deadline_money.append(ctl.run.money)
 				if with_tel:
 					tel.append(RunTelemetry.spin(pre, ctl.run, out.ctx, SECONDS_PER_SPIN))
 					if out.deadline_won or out.deadline_failed:
@@ -150,6 +163,8 @@ func play_run(db: ContentDB, cid: String, risk: int, seed_value: int, bot_kind: 
 		"fail_score": r.deadline_score,
 		"fail_debt": r.debt,
 		"zeros": r.zeros_hit,
+		"deadline_spins": deadline_spins,
+		"deadline_money": deadline_money,
 	}
 
 
@@ -165,7 +180,15 @@ func summarize(db: ContentDB, results: Array[Dictionary]) -> Dictionary:
 	var picks: Dictionary = {}
 	var offers: Dictionary = {}
 	var fail_ratio: Array[float] = []
+	var dl_spins: Array[int] = []
+	var dl_money: float = 0.0
+	var dl_count: int = 0
 	for r: Dictionary in results:
+		for x: Variant in r.get("deadline_spins", []):
+			dl_spins.append(int(x))
+		for m: Variant in r.get("deadline_money", []):
+			dl_money += float(m)
+			dl_count += 1
 		if bool(r["won"]):
 			wins += 1
 		tier_sum += float(r["tier"])
@@ -210,7 +233,18 @@ func summarize(db: ContentDB, results: Array[Dictionary]) -> Dictionary:
 		"mean_pick": mean_pick,
 		"avg_fail_ratio": avg_fail,
 		"offers": offers,
+		"deadline_spins_median": _median(dl_spins),
+		"deadline_money_avg": dl_money / maxf(float(dl_count), 1.0),
 	}
+
+
+static func _median(xs: Array[int]) -> float:
+	if xs.is_empty():
+		return 0.0
+	var v: Array[int] = xs.duplicate()
+	v.sort()
+	var m: int = v.size() / 2
+	return float(v[m]) if v.size() % 2 == 1 else (float(v[m - 1]) + float(v[m])) * 0.5
 
 
 func export_csv(results: Array[Dictionary], summary: Dictionary) -> void:
@@ -256,7 +290,9 @@ func write_report(s: Dictionary) -> void:
 		"Bot : **%s** · runs : %d · risque %s · durée de simulation %d ms" % [opts["bot"], s["runs"], opts["risk"], s["elapsed_ms"]]
 	)
 	lines.append("")
-	lines.append("- Taux de victoire : **%.1f %%** (objectif bot compétent : 35–45 %%)" % (float(s["win_rate"]) * 100.0))
+	var win_pct: float = float(s["win_rate"]) * 100.0
+	lines.append("- Taux de victoire : **%.1f %%** (objectif 2.0 : glouton ≈ 20–25 %%, hasard ≤ 3 %%, cf. D-085)" % win_pct)
+	lines.append("- Tours par échéance réglée (palier ≥ 3, médiane) : %.1f (objectif 3–4)" % float(s["deadline_spins_median"]))
 	lines.append("- Palier moyen atteint : %.2f / %d" % [s["avg_tier"], Balance.i("run.tiers")])
 	lines.append("- Durée estimée d'un run : %.1f min (objectif 35–50 min pour un run gagnant)" % s["avg_minutes"])
 	lines.append("- Progression moyenne de la dette au moment de l'échec : %.0f %%" % (float(s["avg_fail_ratio"]) * 100.0))

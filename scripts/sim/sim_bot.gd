@@ -2,6 +2,7 @@ class_name SimBot
 extends RefCounted
 ## Bots de simulation. Trois profils :
 ## - random   : paris et achats aléatoires (plancher).
+## - nobuy    : paris du glouton, n'achète jamais rien (doit perdre vers l'acte 2).
 ## - greedy   : stratégie de voisinage + extérieurs, achats par heuristique de tags/rareté.
 ## - synergy  : comme greedy, mais évalue chaque offre par Monte-Carlo (score moyen simulé).
 ## - expert   : choisit sa disposition de paris parmi des candidates de chaque type (pleins,
@@ -257,6 +258,8 @@ func aim(ctl: RunController) -> int:
 
 func shop(ctl: RunController) -> void:
 	var run: RunState = ctl.run
+	if kind == "nobuy":
+		return
 	if kind == "random":
 		var offers: Array = run.shop_state.get("grigris", [])
 		if not offers.is_empty():

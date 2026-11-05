@@ -20,13 +20,13 @@
     ],
     "tier_debts": [
       180,
-      460,
-      1050,
-      2350,
-      5000,
-      10200,
-      20000,
-      37000
+      500,
+      3200,
+      8000,
+      16000,
+      32000,
+      66000,
+      135000
     ],
     "deadline_kinds": [
       "small",
@@ -38,7 +38,7 @@
       1.5,
       2.0
     ],
-    "spins_per_deadline": 4,
+    "spins_per_deadline": 5,
     "endless_debt_growth": 1.9,
     "event_chance_per_tier": 0.4,
     "tutorial_tiers": 3,
@@ -114,14 +114,14 @@
   "economy": {
     "start_money": 8,
     "deadline_rewards": [
+      3,
       4,
-      5,
-      6
+      5
     ],
     "money_per_unused_spin": 1,
     "interest_step": 5,
     "interest_per_step": 1,
-    "interest_cap": 5,
+    "interest_cap": 3,
     "sell_ratio": 0.5,
     "zero_tax_money": 2
   },
@@ -183,9 +183,9 @@
     "same_pocket_weight_penalty": 0.5
   },
   "rarity_cost": {
-    "common": 5,
-    "rare": 7,
-    "legendary": 12,
+    "common": 6,
+    "rare": 8,
+    "legendary": 13,
     "cursed": 3
   },
   "throw_game": {

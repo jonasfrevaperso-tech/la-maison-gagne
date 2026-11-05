@@ -1,12 +1,13 @@
 # Rapport d'équilibrage (généré par `scripts/sim/sim_main.gd`)
 
-Bot : **greedy** · runs : 600 · risque 0 · durée de simulation 44246 ms
+Bot : **greedy** · runs : 500 · risque 0 · durée de simulation 43223 ms
 
-- Taux de victoire : **39.0 %** (objectif bot compétent : 35–45 %)
-- Palier moyen atteint : 5.69 / 8
-- Durée estimée d'un run : 21.1 min (objectif 35–50 min pour un run gagnant)
+- Taux de victoire : **24.2 %** (objectif 2.0 : glouton ≈ 20–25 %, hasard ≤ 3 %, cf. D-085)
+- Tours par échéance réglée (palier ≥ 3, médiane) : 3.0 (objectif 3–4)
+- Palier moyen atteint : 5.29 / 8
+- Durée estimée d'un run : 21.6 min (objectif 35–50 min pour un run gagnant)
+- Grigris dominants : 16 · délaissés : 32 (sur 179 mesurés)
 - Progression moyenne de la dette au moment de l'échec : 68 %
-- Grigris dominants : 30 · délaissés : 35 (sur 179 mesurés)
 
 Limites : les bots visent mieux ou moins bien qu'un humain (erreur de ±1 case dans 35 % des lancers) et le bot « synergy »
 estime chaque offre sur 12 tours simulés, ce qui sous-évalue les grigris à croissance lente (ex. Ouroboros, Tirelire).
@@ -18,309 +19,207 @@ ni la valeur d'un tour supplémentaire ni celle des améliorations économiques 
 | Palier | Runs l'atteignant |
 |---|---|
 | 1 | 100.0 % |
-| 2 | 97.0 % |
-| 3 | 90.2 % |
-| 4 | 77.0 % |
-| 5 | 64.8 % |
-| 6 | 53.8 % |
-| 7 | 45.7 % |
-| 8 | 40.8 % |
-| Victoire | 39.0 % |
+| 2 | 100.0 % |
+| 3 | 97.8 % |
+| 4 | 77.6 % |
+| 5 | 53.4 % |
+| 6 | 39.6 % |
+| 7 | 32.2 % |
+| 8 | 28.0 % |
+| Victoire | 24.2 % |
 
 ## Par personnage
 
 | Personnage | Runs | Victoires | Palier moyen |
 |---|---|---|---|
-| lea | 120 | 35.8 % | 5.67 |
-| vic | 120 | 36.7 % | 5.70 |
-| odile | 120 | 36.7 % | 5.43 |
-| barnabe | 120 | 43.3 % | 5.88 |
-| marthe | 120 | 42.5 % | 5.78 |
+| lea | 100 | 38.0 % | 5.99 |
+| vic | 100 | 24.0 % | 5.27 |
+| odile | 100 | 23.0 % | 5.09 |
+| barnabe | 100 | 16.0 % | 4.83 |
+| marthe | 100 | 20.0 % | 5.25 |
 
-## Grigris — taux de choix quand proposé (moyenne 23.5 %, 179 grigris proposés ≥ 8 fois)
+## Grigris — taux de choix quand proposé (moyenne 20.3 %, 179 grigris proposés ≥ 8 fois)
 
 Dominant : > 2× la moyenne. Délaissé : < 0,25× la moyenne. Le taux brut dépend de la rareté, d'où cette mesure conditionnelle.
 
 | Grigri | Proposé | Choisi | Taux | × moyenne | Statut |
 |---|---|---|---|---|---|
-| g_auctioneer | 100 | 91 | 91 % | 3.87 | dominant |
-| g_chain_reaction | 96 | 87 | 91 % | 3.85 | dominant |
-| g_lucette_photo | 89 | 78 | 88 % | 3.73 | dominant |
-| g_patience | 204 | 178 | 87 % | 3.71 | dominant |
-| g_piggy_bank | 207 | 166 | 80 % | 3.41 | dominant |
-| g_pendulum | 96 | 72 | 75 % | 3.19 | dominant |
-| g_window_shopper | 109 | 80 | 73 % | 3.12 | dominant |
-| g_stockbroker | 99 | 72 | 73 % | 3.09 | dominant |
-| g_monogram | 91 | 63 | 69 % | 2.94 | dominant |
-| g_tram_conductor | 81 | 56 | 69 % | 2.94 | dominant |
-| g_ash_collector | 105 | 67 | 64 % | 2.71 | dominant |
-| g_ladder | 77 | 49 | 64 % | 2.71 | dominant |
-| g_accordion | 101 | 64 | 63 % | 2.69 | dominant |
-| g_fortune_cookie | 99 | 61 | 62 % | 2.62 | dominant |
-| g_bishop | 112 | 69 | 62 % | 2.62 | dominant |
-| g_glass_heart | 94 | 57 | 61 % | 2.58 | dominant |
-| g_salon_echo | 105 | 62 | 59 % | 2.51 | dominant |
-| g_red_carpet | 96 | 54 | 56 % | 2.39 | dominant |
-| g_gilded_cage | 98 | 55 | 56 % | 2.39 | dominant |
-| g_marksman | 104 | 58 | 56 % | 2.37 | dominant |
-| g_tram_line | 86 | 46 | 53 % | 2.27 | dominant |
-| g_glass_cutter | 119 | 62 | 52 % | 2.21 | dominant |
-| g_night_owl | 98 | 51 | 52 % | 2.21 | dominant |
-| g_funhouse_mirror | 102 | 53 | 52 % | 2.21 | dominant |
-| g_sommelier | 91 | 45 | 49 % | 2.10 | dominant |
-| g_bow_tie | 99 | 48 | 48 % | 2.06 | dominant |
-| g_double_or_nothing | 91 | 44 | 48 % | 2.06 | dominant |
-| g_neighbours | 83 | 40 | 48 % | 2.05 | dominant |
-| g_minimalist | 97 | 46 | 47 % | 2.02 | dominant |
-| g_last_call | 91 | 43 | 47 % | 2.01 | dominant |
-| g_twin_dice | 79 | 36 | 46 % | 1.94 | ok |
-| g_window_dresser | 125 | 56 | 45 % | 1.90 | ok |
-| g_bell_choir | 96 | 43 | 45 % | 1.90 | ok |
-| g_twin_flame | 89 | 39 | 44 % | 1.86 | ok |
-| g_cracked_monocle | 101 | 44 | 44 % | 1.85 | ok |
-| g_insomniac | 97 | 42 | 43 % | 1.84 | ok |
-| g_seven_sisters | 89 | 38 | 43 % | 1.82 | ok |
-| g_compound_interest | 101 | 43 | 43 % | 1.81 | ok |
-| g_geometer | 235 | 100 | 43 % | 1.81 | ok |
-| g_high_roller | 97 | 41 | 42 % | 1.80 | ok |
-| g_hourglass | 98 | 41 | 42 % | 1.78 | ok |
-| g_ruby_slipper | 107 | 44 | 41 % | 1.75 | ok |
-| g_miser | 237 | 95 | 40 % | 1.70 | ok |
-| g_metro_map | 98 | 39 | 40 % | 1.69 | ok |
-| g_shoe_shine | 245 | 97 | 40 % | 1.68 | ok |
-| g_zero_lover | 91 | 32 | 35 % | 1.49 | ok |
-| g_eternity_clock | 55 | 19 | 35 % | 1.47 | ok |
-| g_quartet | 238 | 77 | 32 % | 1.38 | ok |
-| g_column_drummer | 246 | 77 | 31 % | 1.33 | ok |
-| g_straight_razor | 246 | 75 | 30 % | 1.30 | ok |
-| g_croupier_wink | 97 | 29 | 30 % | 1.27 | ok |
-| g_night_glasses | 230 | 67 | 29 % | 1.24 | ok |
-| g_baker | 269 | 75 | 28 % | 1.19 | ok |
-| g_outsider | 248 | 69 | 28 % | 1.18 | ok |
-| g_phoenix | 47 | 13 | 28 % | 1.18 | ok |
-| g_ledger | 91 | 25 | 27 % | 1.17 | ok |
-| g_city_block | 96 | 25 | 26 % | 1.11 | ok |
-| g_bookie | 96 | 25 | 26 % | 1.11 | ok |
-| g_horseshoe | 254 | 64 | 25 % | 1.07 | ok |
-| g_odd_pair | 238 | 59 | 25 % | 1.05 | ok |
-| g_maestro | 37 | 9 | 24 % | 1.03 | ok |
-| g_hinge | 256 | 61 | 24 % | 1.01 | ok |
-| g_cracked_chip | 265 | 56 | 21 % | 0.90 | ok |
-| g_red_ribbon | 257 | 52 | 20 % | 0.86 | ok |
-| g_ashtray | 220 | 44 | 20 % | 0.85 | ok |
-| g_golden_rake | 56 | 11 | 20 % | 0.84 | ok |
-| g_rubber_ball | 253 | 49 | 19 % | 0.82 | ok |
-| g_steel_toes | 248 | 47 | 19 % | 0.81 | ok |
-| g_so_close | 260 | 48 | 18 % | 0.78 | ok |
-| g_silver_tongue | 49 | 9 | 18 % | 0.78 | ok |
-| g_low_lamp | 245 | 45 | 18 % | 0.78 | ok |
-| g_first_drink | 221 | 40 | 18 % | 0.77 | ok |
-| g_spare_change | 249 | 45 | 18 % | 0.77 | ok |
-| g_brass_knuckles | 256 | 46 | 18 % | 0.76 | ok |
-| g_tramway | 255 | 45 | 18 % | 0.75 | ok |
-| g_weighted_chip | 276 | 48 | 17 % | 0.74 | ok |
-| g_high_heels | 253 | 44 | 17 % | 0.74 | ok |
-| g_loaded_die | 243 | 42 | 17 % | 0.73 | ok |
-| g_dice_cup | 249 | 43 | 17 % | 0.73 | ok |
-| g_marathon | 244 | 42 | 17 % | 0.73 | ok |
-| g_paper_crown | 257 | 44 | 17 % | 0.73 | ok |
-| g_cufflinks | 225 | 38 | 17 % | 0.72 | ok |
-| g_lucky_seven | 249 | 42 | 17 % | 0.72 | ok |
-| g_umbrella | 258 | 43 | 17 % | 0.71 | ok |
-| g_crown_jewels | 42 | 7 | 17 % | 0.71 | ok |
-| g_empty_pockets | 221 | 36 | 16 % | 0.69 | ok |
-| g_sugar_cube | 234 | 38 | 16 % | 0.69 | ok |
-| g_doric_column | 257 | 40 | 16 % | 0.66 | ok |
-| g_slow_waltz | 245 | 38 | 16 % | 0.66 | ok |
-| g_billiard_chalk | 233 | 36 | 15 % | 0.66 | ok |
-| g_double_down | 39 | 6 | 15 % | 0.65 | ok |
-| g_coat_check | 247 | 38 | 15 % | 0.65 | ok |
-| g_house_rules | 242 | 37 | 15 % | 0.65 | ok |
-| g_egg_box | 279 | 42 | 15 % | 0.64 | ok |
-| g_ouroboros | 40 | 6 | 15 % | 0.64 | ok |
-| g_six_pack | 234 | 35 | 15 % | 0.64 | ok |
-| g_black_cat | 275 | 41 | 15 % | 0.63 | ok |
-| g_scarlet_streak | 249 | 37 | 15 % | 0.63 | ok |
-| g_neon_sign | 252 | 37 | 15 % | 0.62 | ok |
-| g_matchbox | 257 | 37 | 14 % | 0.61 | ok |
-| g_wax_stamp | 223 | 31 | 14 % | 0.59 | ok |
-| g_house_key | 44 | 6 | 14 % | 0.58 | ok |
-| g_ruby_brooch | 249 | 33 | 13 % | 0.56 | ok |
-| g_green_visor | 267 | 35 | 13 % | 0.56 | ok |
-| g_gin_flask | 92 | 12 | 13 % | 0.55 | ok |
-| g_metro_ticket | 247 | 32 | 13 % | 0.55 | ok |
-| g_chandelier | 47 | 6 | 13 % | 0.54 | ok |
-| g_dealer_hand | 47 | 6 | 13 % | 0.54 | ok |
-| g_perpetual_motion | 40 | 5 | 12 % | 0.53 | ok |
-| g_house_of_cards | 41 | 5 | 12 % | 0.52 | ok |
-| g_blueprint | 115 | 14 | 12 % | 0.52 | ok |
-| g_jackpot_tokens | 115 | 14 | 12 % | 0.52 | ok |
-| g_velvet_glove | 223 | 27 | 12 % | 0.51 | ok |
-| g_magnet_shoes | 251 | 30 | 12 % | 0.51 | ok |
-| g_metropolis | 53 | 6 | 11 % | 0.48 | ok |
-| g_folding_fan | 224 | 24 | 11 % | 0.46 | ok |
-| g_even_sock | 257 | 27 | 11 % | 0.45 | ok |
-| g_cigarette_holder | 277 | 29 | 10 % | 0.45 | ok |
-| g_odd_duck | 261 | 26 | 10 % | 0.42 | ok |
-| g_gardener | 91 | 9 | 10 % | 0.42 | ok |
-| g_tip_jar | 236 | 23 | 10 % | 0.41 | ok |
-| g_red_tape | 259 | 25 | 10 % | 0.41 | ok |
-| g_lottery_ticket | 259 | 25 | 10 % | 0.41 | ok |
-| g_boss_cigar | 261 | 25 | 10 % | 0.41 | ok |
-| g_magnifier | 263 | 25 | 10 % | 0.40 | ok |
-| g_notary_ring | 116 | 11 | 9 % | 0.40 | ok |
-| g_india_ink | 257 | 24 | 9 % | 0.40 | ok |
-| g_gold_tooth | 103 | 9 | 9 % | 0.37 | ok |
-| g_half_moon | 253 | 22 | 9 % | 0.37 | ok |
-| g_undertaker | 254 | 22 | 9 % | 0.37 | ok |
-| g_bellhop | 254 | 22 | 9 % | 0.37 | ok |
-| g_insurance | 94 | 8 | 9 % | 0.36 | ok |
-| g_grand_zero | 48 | 4 | 8 % | 0.35 | ok |
-| g_cartographer | 97 | 8 | 8 % | 0.35 | ok |
-| g_double_espresso | 282 | 23 | 8 % | 0.35 | ok |
-| g_metronome | 111 | 9 | 8 % | 0.34 | ok |
-| g_revenge | 51 | 4 | 8 % | 0.33 | ok |
-| g_dying_neon | 245 | 19 | 8 % | 0.33 | ok |
-| g_census | 80 | 6 | 8 % | 0.32 | ok |
-| g_lipstick | 249 | 18 | 7 % | 0.31 | ok |
-| g_pocket_slot | 254 | 18 | 7 % | 0.30 | ok |
-| g_glass_blower | 250 | 17 | 7 % | 0.29 | ok |
-| g_pickpocket | 109 | 7 | 6 % | 0.27 | ok |
-| g_grandmaster | 50 | 3 | 6 % | 0.26 | ok |
-| g_archivist | 52 | 3 | 6 % | 0.25 | délaissé |
-| g_seamstress | 87 | 5 | 6 % | 0.24 | délaissé |
-| g_zero_hero | 240 | 13 | 5 % | 0.23 | délaissé |
-| g_infinite_chip | 59 | 3 | 5 % | 0.22 | délaissé |
-| g_lucky_penny | 265 | 13 | 5 % | 0.21 | délaissé |
-| g_coin_bucket | 288 | 14 | 5 % | 0.21 | délaissé |
-| g_tarot_reader | 252 | 12 | 5 % | 0.20 | délaissé |
-| g_compass | 106 | 5 | 5 % | 0.20 | délaissé |
-| g_ballroom | 43 | 2 | 5 % | 0.20 | délaissé |
-| g_notary_stamp | 94 | 4 | 4 % | 0.18 | délaissé |
-| g_groom_bell | 265 | 11 | 4 % | 0.18 | délaissé |
-| g_monocle | 249 | 10 | 4 % | 0.17 | délaissé |
-| g_twin_city | 51 | 2 | 4 % | 0.17 | délaissé |
-| g_landlord | 103 | 4 | 4 % | 0.17 | délaissé |
-| g_pearl_necklace | 106 | 4 | 4 % | 0.16 | délaissé |
-| g_secret_pocket | 275 | 10 | 4 % | 0.15 | délaissé |
-| g_coupon_book | 111 | 4 | 4 % | 0.15 | délaissé |
-| g_spiderweb | 114 | 4 | 4 % | 0.15 | délaissé |
-| g_jeweller | 94 | 3 | 3 % | 0.14 | délaissé |
-| g_compound | 95 | 3 | 3 % | 0.13 | délaissé |
-| g_deck_of_fate | 36 | 1 | 3 % | 0.12 | délaissé |
-| g_lodestone | 117 | 3 | 3 % | 0.11 | délaissé |
-| g_oracle | 49 | 1 | 2 % | 0.09 | délaissé |
-| g_fortune_teller | 100 | 2 | 2 % | 0.09 | délaissé |
-| g_rainmaker | 108 | 2 | 2 % | 0.08 | délaissé |
-| g_philosophers_stone | 61 | 1 | 2 % | 0.07 | délaissé |
-| g_trapdoor | 81 | 1 | 1 % | 0.05 | délaissé |
-| g_zero_tithe | 90 | 1 | 1 % | 0.05 | délaissé |
-| g_after_hours | 94 | 1 | 1 % | 0.05 | délaissé |
-| g_sealing_wax | 100 | 1 | 1 % | 0.04 | délaissé |
-| g_bank_vault | 36 | 0 | 0 % | 0.00 | délaissé |
-| g_overtime | 96 | 0 | 0 % | 0.00 | délaissé |
-| g_scrap_dealer | 104 | 0 | 0 % | 0.00 | délaissé |
-| g_alchemist | 107 | 0 | 0 % | 0.00 | délaissé |
-| g_forger | 85 | 0 | 0 % | 0.00 | délaissé |
-
-## Version 1.5
-Seules évolutions du cœur : le tour offert par la machine à sous survit à une échéance remboursée sur le même tour, et un paquet ne peut plus être acheté sans place libre. La qualité du lancer est désormais moyenne(2 épreuves) × 0,65 + lâcher × 0,35, recalée sur la même référence (0,65) : la correspondance qualité → contrôle (`ThrowSkill.control_bonus`) ne change pas.
-
-| Bot | Parties | Victoire | 1.4 |
-|---|---|---|---|
-| greedy, lancer neutre | 600 | **39,8 %** | — |
-| expert, lancer neutre (graines 201–204) | 240 | **47,1 %** (31,7 / 50,0 / 55,0 / 51,7) | 45,5 % |
-| expert, lancers adroits (`--throw-skill=0.8`) | 240 | **54,2 %** | 56,2 % (0,7) |
-
-L'écart de l'expert neutre (+1,6 point) est inférieur à l'erreur type (≈ 3,2 points sur 240 parties) : aucun réglage modifié. Le banc des épreuves (`--dev-trial-bench`) garantit que chaque épreuve est réussie par un joueur appliqué (≥ 0,8) et ratée sans rien faire (≤ 0,4).
-
-## Version 1.5.1
-Nouvelle courbe de dettes `[180, 460, 1050, 2350, 5000, 10200, 20000, 37000]` (ancienne `[240, 600, 1200, 2500, 4800, 8500, 14000, 21000]`), sans fin ×1,9 par palier. Courbes candidates comparées au bot glouton (400 parties chacune) :
-
-| Courbe | Dernier palier | Victoire glouton |
-|---|---|---|
-| ancienne | 21 000 | 39,2 % |
-| ×2,2 régulier | 90 000 | 17,0 % |
-| ×2,1 régulier | 72 000 | 22,2 % |
-| début 220, fin 48 000 | 48 000 | 31,8 % |
-| début 200, fin 38 000 | 38 000 | 36,5 % |
-| **retenue** : début 180, fin 37 000 | 37 000 | **40,0 %** |
-
-Vérification finale avec tout le contenu 1.5.1 (machine à sous plus fréquente, Sceau Cloche, 9 nouveaux grigris dont des ×Mult croissants, épreuves durcies) :
-
-| Bot | Parties | Victoire | 1.5 |
-|---|---|---|---|
-| glouton | 600 | **39,0 %** | 39,8 % |
-| expert, lancer neutre | 60 | **45,0 %** (erreur type ≈ 6,4 points) | 47,1 % |
-
-Le début plus doux compense des premiers paliers où le joueur n'a pas encore de build ; la fin plus raide demande de vrais moteurs multiplicatifs (les grigris ×Mult croissants permettent des tours à plusieurs millions). Le total d'un tour est plafonné à 10¹⁸.
-
-« Photo de Lucette » et « Réaction en chaîne » ressortent « dominants » (≈ 90 % de choix) : le bot glouton surévalue l'étiquette ×Mult. Leurs gains ont été réduits (+0,2 par jackpot ; +×0,35 par relance) sans effet sur le taux de choix, et le taux de victoire reste dans la cible : artefact du bot, à confirmer avec des parties humaines.
-
-## Version 1.5.2
-
-La machine à sous passe à quatre rouleaux avec deux symboles de plus (citron, fer à cheval) pour garder des combinaisons rares : paire ≈ 56 %, brelan ≈ 6,9 %, carré ≈ 0,3 % (cotes calculées par énumération, vérifiées par `test_v14_slot`). Les carrés ont des lots dédiés (`slot_prizes.json`), en repli sur le brelan puis la paire.
-
-| Bot | Parties | Victoire | 1.5.1 |
-|---|---|---|---|
-| glouton | 600 | **43,3 %** | 39,0 % |
-
-La hausse (+4,3 points) vient des lots de la machine à sous, plus variés et plus fréquents (paires à 4 rouleaux) ; elle reste dans la cible de 35–45 %, aucun réglage modifié. Correction qui touche l'adresse : aux Fléchettes, un appui immédiat ne tombe plus au centre (le banc des épreuves reste vert : bot ≥ 0,8, inactif ≤ 0,4 sur les 14 épreuves).
-
-### Correctif 1.5.3
-
-Mesure experte de la 1.5.2 : **56,0 %** (100 parties) — trop haut. La machine à sous pèse ≈ 17 points (glouton 25,8 % avec `slot.max_pulls=0`) ; le plafond de tirages et le seuil du « gros coup » n'ont pas d'effet mesurable, ce sont les lots ×Mult qui comptent. Réglages : brelan/carré/paire de cerises ×1,5 / ×2 / +1, paire de diamants ×1,25, carré de fers ×1,5 ; poids du 7 9 → 7, du diamant 5 → 4.
-
-| Bot | Graine | Parties | Victoire |
-|---|---|---|---|
-| glouton | 1 / 2 / 3 | 3 × 600 | 44,2 / 37,0 / 40,0 % (**40,4 %**) |
-| expert | 1 / 2 | 2 × 100 | 51,0 / 45,0 % (**48,0 %**, erreur type ≈ 3,5 points) |
-
-L'expert reste au niveau des versions précédentes (47,1 % en 1.5, 45,0 % en 1.5.1).
-
-## Version 1.6.0
-
-Les familles de grigris (paliers 2/3/5) renforcent nettement les builds : avec l'économie de la 1.5.3, le bot glouton (qui valorise les grigris de ses familles) gagnait 55–58 % des parties. On garde la force des builds et on réduit l'argent du début de partie : récompenses d'échéance 4 / 5 / 6 $, intérêts plafonnés à 5 $, prix 5 / 7 / 12 $ (maudit 3 $), paquets 5 / 5 / 7 $, gains d'argent de la machine réduits (brelan de 7 +3 $, de cloches +6 $). L'emplacement de grigri achetable (14 $ puis 24 $, deux au plus) donne un débouché à l'argent. Argent à l'entrée du Bazar : 11–21 $ (14–66 $ en 1.5.3).
-
-Épreuves allégées (rythme une note à la fois avec notes longues, bouteilles, tri, mémoire) : banc d'essai vert, bots ≥ 0,94, joueur inactif ≤ 0,16.
-
-| Bot | Graine | Parties | Victoire |
-|---|---|---|---|
-| glouton | 1 / 2 / 3 | 3 × 600 | 42,0 / 41,8 / 40,7 % (**41,5 %**) |
-| expert | 1 / 2 | 2 × 100 | 44,0 / 54,0 % (**49,0 %**, erreur type ≈ 3,5 points) |
-
-Glouton dans la cible (35–45 %), expert au niveau de la 1.5.3 (48,0 %).
-
-## Version 1.8.0
-
-Banc des épreuves (`--dev-trial-bench=3`, moyenne de trois graines) avec le bot « humain » de D-072. Critères : bot parfait ≥ 0,8, bot humain ≥ 0,55, inactif ≤ 0,4, durée ≤ 22 s. Les graines changent d'un passage à l'autre : une épreuve proche d'un seuil y oscille de quelques centièmes. Cave : moyenne de cinq passages après ses réglages.
-
-| Épreuve | Bot | Humain | Inactif | Durée |
-|---|---|---|---|---|
-| Élan | 1,00 | 0,60 | 0,00 | 5,7 s |
-| Effet | 1,00 | 0,99 | 0,00 | 12,6 s |
-| Bouteilles | 1,00 | 0,63 | 0,00 | 11,5 s |
-| Mémoire | 1,00 | 1,00 | 0,00 | 6,2 s |
-| Bonneteau | 0,99 | 0,98 | 0,00 | 18,5 s |
-| Fléchettes | 1,00 | 0,79 | 0,05 | 5,9 s |
-| Coffre-fort | 1,00 | 0,81 | 0,00 | 3,5 s |
-| Tour de jetons | 1,00 | 0,67 | 0,17 | 9,8 s |
-| Shaker | 1,00 | 0,68 | 0,00 | 7,8 s |
-| Verre parfait | 1,00 | 0,74 | 0,00 | 6,6 s |
-| Juke-box | 1,00 | 1,00 | 0,00 | 18,0 s |
-| Pluie du Grand Lustre | 0,90 | 0,91 | 0,40 | 19,0 s |
-| Plus haut / plus bas | 1,00 | 1,00 | 0,00 | 7,2 s |
-| Tri des jetons | 1,00 | 1,00 | 0,00 | 14,1 s |
-| Envahisseurs | 1,00 | 0,76 | 0,00 | 13,2 s |
-| Cave | 0,95 | 0,82 | 0,01 | 17,8 s |
-| Pachinko | 0,94 | 0,80 | 0,21 | 13,5 s |
-| Blackjack | 1,00 | 1,00 | 0,00 | 17,3 s |
-| Grattage | 0,88 | 0,85 | 0,00 | 8,1 s |
-| Dés | 1,00 | 0,75 | 0,07 | 13,8 s |
-| Tiercé | 1,00 | 0,97 | 0,00 | 9,8 s |
-| Pêche | 0,94 | 0,84 | 0,02 | 18,3 s |
-| Lasers | 0,86 | 1,00 | 0,00 | 10,0 s |
-| Jonglage | 1,00 | 0,95 | 0,00 | 17,0 s |
-| Billard | 0,96 | 0,91 | 0,20 | 15,6 s |
-
-Réglages de la 1.8 : Billard en quatre coups, visée 0,7 (la note humaine variait de 0,47 à 0,83 sur trois coups) ; Cave en six segments, fosses de 150 px, tonneaux à 140 px/s, rats plus lents, câble saisissable dès 30 % de sa longueur avec une prise ×1,9 (la note humaine tombait parfois sous 0,5 : le parcours n'était pas fini à temps après une chute). Le Musée applique en Détente le ralenti et l'élargissement de l'assistance (×1,4 et ×1,3) et en Expert ×0,85 ; médailles à 0,5 / 0,7 / 0,9.
+| g_piggy_bank | 188 | 142 | 76 % | 3.71 | dominant |
+| g_chain_reaction | 109 | 72 | 66 % | 3.25 | dominant |
+| g_auctioneer | 85 | 49 | 58 % | 2.83 | dominant |
+| g_salon_echo | 86 | 47 | 55 % | 2.69 | dominant |
+| g_insomniac | 96 | 49 | 51 % | 2.51 | dominant |
+| g_patience | 157 | 80 | 51 % | 2.50 | dominant |
+| g_lucette_photo | 62 | 31 | 50 % | 2.46 | dominant |
+| g_last_call | 93 | 46 | 49 % | 2.43 | dominant |
+| g_sommelier | 113 | 55 | 49 % | 2.39 | dominant |
+| g_hourglass | 85 | 40 | 47 % | 2.31 | dominant |
+| g_red_carpet | 83 | 38 | 46 % | 2.25 | dominant |
+| g_ladder | 71 | 32 | 45 % | 2.22 | dominant |
+| g_window_shopper | 70 | 31 | 44 % | 2.18 | dominant |
+| g_ledger | 92 | 38 | 41 % | 2.03 | dominant |
+| g_bishop | 68 | 28 | 41 % | 2.02 | dominant |
+| g_ash_collector | 76 | 31 | 41 % | 2.00 | dominant |
+| g_neon_sign | 230 | 91 | 40 % | 1.94 | ok |
+| g_paper_crown | 216 | 83 | 38 % | 1.89 | ok |
+| g_night_owl | 71 | 27 | 38 % | 1.87 | ok |
+| g_geometer | 188 | 71 | 38 % | 1.86 | ok |
+| g_cracked_chip | 261 | 98 | 38 % | 1.85 | ok |
+| g_baker | 190 | 71 | 37 % | 1.84 | ok |
+| g_outsider | 201 | 75 | 37 % | 1.83 | ok |
+| g_tram_conductor | 70 | 26 | 37 % | 1.83 | ok |
+| g_odd_pair | 191 | 70 | 37 % | 1.80 | ok |
+| g_slow_waltz | 229 | 82 | 36 % | 1.76 | ok |
+| g_column_drummer | 196 | 70 | 36 % | 1.76 | ok |
+| g_tram_line | 71 | 25 | 35 % | 1.73 | ok |
+| g_empty_pockets | 228 | 80 | 35 % | 1.72 | ok |
+| g_miser | 160 | 56 | 35 % | 1.72 | ok |
+| g_bell_choir | 69 | 24 | 35 % | 1.71 | ok |
+| g_blueprint | 104 | 36 | 35 % | 1.70 | ok |
+| g_first_drink | 240 | 82 | 34 % | 1.68 | ok |
+| g_glass_heart | 71 | 24 | 34 % | 1.66 | ok |
+| g_compound_interest | 69 | 23 | 33 % | 1.64 | ok |
+| g_night_glasses | 202 | 67 | 33 % | 1.63 | ok |
+| g_marathon | 228 | 75 | 33 % | 1.62 | ok |
+| g_marksman | 73 | 24 | 33 % | 1.62 | ok |
+| g_pendulum | 70 | 23 | 33 % | 1.61 | ok |
+| g_cracked_monocle | 67 | 22 | 33 % | 1.61 | ok |
+| g_stockbroker | 64 | 21 | 33 % | 1.61 | ok |
+| g_accordion | 49 | 16 | 33 % | 1.60 | ok |
+| g_house_rules | 258 | 83 | 32 % | 1.58 | ok |
+| g_monogram | 78 | 25 | 32 % | 1.58 | ok |
+| g_high_roller | 50 | 16 | 32 % | 1.57 | ok |
+| g_horseshoe | 176 | 56 | 32 % | 1.56 | ok |
+| g_matchbox | 242 | 77 | 32 % | 1.56 | ok |
+| g_gin_flask | 107 | 34 | 32 % | 1.56 | ok |
+| g_twin_flame | 73 | 23 | 32 % | 1.55 | ok |
+| g_straight_razor | 155 | 48 | 31 % | 1.52 | ok |
+| g_shoe_shine | 159 | 49 | 31 % | 1.51 | ok |
+| g_gilded_cage | 62 | 19 | 31 % | 1.51 | ok |
+| g_fortune_cookie | 66 | 20 | 30 % | 1.49 | ok |
+| g_low_lamp | 217 | 65 | 30 % | 1.47 | ok |
+| g_neighbours | 65 | 19 | 29 % | 1.44 | ok |
+| g_high_heels | 191 | 55 | 29 % | 1.42 | ok |
+| g_quartet | 176 | 50 | 28 % | 1.40 | ok |
+| g_croupier_wink | 74 | 21 | 28 % | 1.39 | ok |
+| g_twin_dice | 60 | 17 | 28 % | 1.39 | ok |
+| g_minimalist | 68 | 19 | 28 % | 1.37 | ok |
+| g_house_of_cards | 43 | 12 | 28 % | 1.37 | ok |
+| g_window_dresser | 73 | 20 | 27 % | 1.35 | ok |
+| g_double_or_nothing | 64 | 17 | 27 % | 1.31 | ok |
+| g_velvet_glove | 192 | 50 | 26 % | 1.28 | ok |
+| g_metro_map | 74 | 19 | 26 % | 1.26 | ok |
+| g_boss_cigar | 272 | 69 | 25 % | 1.25 | ok |
+| g_bow_tie | 72 | 18 | 25 % | 1.23 | ok |
+| g_red_ribbon | 194 | 48 | 25 % | 1.22 | ok |
+| g_zero_lover | 54 | 13 | 24 % | 1.18 | ok |
+| g_ruby_slipper | 84 | 20 | 24 % | 1.17 | ok |
+| g_scarlet_streak | 191 | 44 | 23 % | 1.13 | ok |
+| g_ashtray | 155 | 35 | 23 % | 1.11 | ok |
+| g_steel_toes | 173 | 38 | 22 % | 1.08 | ok |
+| g_tramway | 166 | 36 | 22 % | 1.07 | ok |
+| g_spare_change | 157 | 34 | 22 % | 1.06 | ok |
+| g_cufflinks | 186 | 40 | 22 % | 1.06 | ok |
+| g_sugar_cube | 173 | 37 | 21 % | 1.05 | ok |
+| g_hinge | 197 | 42 | 21 % | 1.05 | ok |
+| g_bookie | 71 | 15 | 21 % | 1.04 | ok |
+| g_double_espresso | 265 | 55 | 21 % | 1.02 | ok |
+| g_black_cat | 181 | 37 | 20 % | 1.00 | ok |
+| g_egg_box | 194 | 39 | 20 % | 0.99 | ok |
+| g_loaded_die | 180 | 36 | 20 % | 0.98 | ok |
+| g_funhouse_mirror | 51 | 10 | 20 % | 0.96 | ok |
+| g_so_close | 182 | 34 | 19 % | 0.92 | ok |
+| g_green_visor | 188 | 35 | 19 % | 0.92 | ok |
+| g_umbrella | 172 | 32 | 19 % | 0.91 | ok |
+| g_brass_knuckles | 186 | 34 | 18 % | 0.90 | ok |
+| g_metropolis | 45 | 8 | 18 % | 0.87 | ok |
+| g_grandmaster | 45 | 8 | 18 % | 0.87 | ok |
+| g_glass_cutter | 68 | 12 | 18 % | 0.87 | ok |
+| g_lucky_seven | 153 | 27 | 18 % | 0.87 | ok |
+| g_ouroboros | 47 | 8 | 17 % | 0.84 | ok |
+| g_dice_cup | 151 | 25 | 17 % | 0.81 | ok |
+| g_six_pack | 178 | 29 | 16 % | 0.80 | ok |
+| g_city_block | 86 | 14 | 16 % | 0.80 | ok |
+| g_wax_stamp | 176 | 28 | 16 % | 0.78 | ok |
+| g_weighted_chip | 185 | 29 | 16 % | 0.77 | ok |
+| g_india_ink | 163 | 25 | 15 % | 0.75 | ok |
+| g_seven_sisters | 68 | 10 | 15 % | 0.72 | ok |
+| g_pearl_necklace | 75 | 11 | 15 % | 0.72 | ok |
+| g_even_sock | 225 | 33 | 15 % | 0.72 | ok |
+| g_ruby_brooch | 185 | 27 | 15 % | 0.72 | ok |
+| g_lipstick | 193 | 28 | 15 % | 0.71 | ok |
+| g_doric_column | 200 | 29 | 14 % | 0.71 | ok |
+| g_half_moon | 213 | 30 | 14 % | 0.69 | ok |
+| g_folding_fan | 181 | 25 | 14 % | 0.68 | ok |
+| g_metronome | 97 | 13 | 13 % | 0.66 | ok |
+| g_gold_tooth | 62 | 8 | 13 % | 0.63 | ok |
+| g_house_key | 47 | 6 | 13 % | 0.63 | ok |
+| g_lottery_ticket | 174 | 22 | 13 % | 0.62 | ok |
+| g_coat_check | 169 | 21 | 12 % | 0.61 | ok |
+| g_billiard_chalk | 162 | 20 | 12 % | 0.61 | ok |
+| g_insurance | 81 | 10 | 12 % | 0.61 | ok |
+| g_magnet_shoes | 178 | 21 | 12 % | 0.58 | ok |
+| g_rubber_ball | 162 | 19 | 12 % | 0.58 | ok |
+| g_odd_duck | 197 | 23 | 12 % | 0.57 | ok |
+| g_double_down | 52 | 6 | 12 % | 0.57 | ok |
+| g_red_tape | 179 | 20 | 11 % | 0.55 | ok |
+| g_cigarette_holder | 200 | 22 | 11 % | 0.54 | ok |
+| g_bellhop | 183 | 20 | 11 % | 0.54 | ok |
+| g_after_hours | 103 | 11 | 11 % | 0.52 | ok |
+| g_dying_neon | 191 | 20 | 10 % | 0.51 | ok |
+| g_cartographer | 67 | 7 | 10 % | 0.51 | ok |
+| g_jackpot_tokens | 58 | 6 | 10 % | 0.51 | ok |
+| g_tarot_reader | 165 | 17 | 10 % | 0.51 | ok |
+| g_seamstress | 78 | 8 | 10 % | 0.50 | ok |
+| g_eternity_clock | 49 | 5 | 10 % | 0.50 | ok |
+| g_metro_ticket | 185 | 18 | 10 % | 0.48 | ok |
+| g_overtime | 96 | 9 | 9 % | 0.46 | ok |
+| g_perpetual_motion | 22 | 2 | 9 % | 0.45 | ok |
+| g_zero_hero | 156 | 14 | 9 % | 0.44 | ok |
+| g_magnifier | 182 | 16 | 9 % | 0.43 | ok |
+| g_revenge | 24 | 2 | 8 % | 0.41 | ok |
+| g_pocket_slot | 165 | 13 | 8 % | 0.39 | ok |
+| g_pickpocket | 79 | 6 | 8 % | 0.37 | ok |
+| g_golden_rake | 27 | 2 | 7 % | 0.36 | ok |
+| g_compound | 87 | 6 | 7 % | 0.34 | ok |
+| g_secret_pocket | 180 | 12 | 7 % | 0.33 | ok |
+| g_rainmaker | 76 | 5 | 7 % | 0.32 | ok |
+| g_silver_tongue | 31 | 2 | 6 % | 0.32 | ok |
+| g_chandelier | 32 | 2 | 6 % | 0.31 | ok |
+| g_glass_blower | 170 | 10 | 6 % | 0.29 | ok |
+| g_gardener | 69 | 4 | 6 % | 0.28 | ok |
+| g_monocle | 177 | 10 | 6 % | 0.28 | ok |
+| g_undertaker | 160 | 9 | 6 % | 0.28 | ok |
+| g_coin_bucket | 184 | 10 | 5 % | 0.27 | ok |
+| g_notary_ring | 68 | 3 | 4 % | 0.22 | délaissé |
+| g_census | 69 | 3 | 4 % | 0.21 | délaissé |
+| g_tip_jar | 162 | 7 | 4 % | 0.21 | délaissé |
+| g_notary_stamp | 71 | 3 | 4 % | 0.21 | délaissé |
+| g_crown_jewels | 25 | 1 | 4 % | 0.20 | délaissé |
+| g_phoenix | 26 | 1 | 4 % | 0.19 | délaissé |
+| g_spiderweb | 80 | 3 | 4 % | 0.18 | délaissé |
+| g_groom_bell | 223 | 7 | 3 % | 0.15 | délaissé |
+| g_archivist | 32 | 1 | 3 % | 0.15 | délaissé |
+| g_zero_tithe | 65 | 2 | 3 % | 0.15 | délaissé |
+| g_scrap_dealer | 67 | 2 | 3 % | 0.15 | délaissé |
+| g_bank_vault | 36 | 1 | 3 % | 0.14 | délaissé |
+| g_alchemist | 74 | 2 | 3 % | 0.13 | délaissé |
+| g_compass | 76 | 2 | 3 % | 0.13 | délaissé |
+| g_landlord | 80 | 2 | 2 % | 0.12 | délaissé |
+| g_maestro | 41 | 1 | 2 % | 0.12 | délaissé |
+| g_lucky_penny | 219 | 5 | 2 % | 0.11 | délaissé |
+| g_forger | 69 | 1 | 1 % | 0.07 | délaissé |
+| g_fortune_teller | 71 | 1 | 1 % | 0.07 | délaissé |
+| g_sealing_wax | 73 | 1 | 1 % | 0.07 | délaissé |
+| g_lodestone | 69 | 0 | 0 % | 0.00 | délaissé |
+| g_grand_zero | 27 | 0 | 0 % | 0.00 | délaissé |
+| g_philosophers_stone | 25 | 0 | 0 % | 0.00 | délaissé |
+| g_twin_city | 32 | 0 | 0 % | 0.00 | délaissé |
+| g_ballroom | 31 | 0 | 0 % | 0.00 | délaissé |
+| g_dealer_hand | 27 | 0 | 0 % | 0.00 | délaissé |
+| g_trapdoor | 72 | 0 | 0 % | 0.00 | délaissé |
+| g_coupon_book | 69 | 0 | 0 % | 0.00 | délaissé |
+| g_deck_of_fate | 30 | 0 | 0 % | 0.00 | délaissé |
+| g_oracle | 31 | 0 | 0 % | 0.00 | délaissé |
+| g_infinite_chip | 29 | 0 | 0 % | 0.00 | délaissé |
+| g_jeweller | 62 | 0 | 0 % | 0.00 | délaissé |
