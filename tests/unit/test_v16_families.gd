@@ -17,23 +17,26 @@ func test_every_grigri_has_a_family() -> void:
 
 
 func test_tier_thresholds() -> void:
-	var def: Dictionary = ContentDB.shared().get_entry("families", "rouge_noir")
+	var def: Dictionary = ContentDB.shared().get_entry("families", "chances")
 	eq(Families.tier_index(def, 1), -1, "1 grigri : aucun palier")
 	eq(Families.tier_index(def, 2), 0, "2 grigris : palier 1")
+	eq(Families.tier_index(def, 3), 0, "3 grigris : toujours palier 1")
 	eq(Families.tier_index(def, 4), 1, "4 grigris : palier 2")
-	eq(Families.tier_index(def, 9), 2, "au-delà : palier max")
-	eq(Families.next_threshold(def, 3), 5, "prochain seuil")
-	eq(Families.next_threshold(def, 5), 0, "tous atteints")
+	eq(Families.tier_index(def, 6), 1, "6 grigris : toujours palier 2")
+	eq(Families.tier_index(def, 7), 2, "7 grigris : build complet")
+	eq(Families.next_threshold(def, 3), 4, "prochain seuil")
+	eq(Families.next_threshold(def, 5), 7, "dernier seuil : la famille entière")
+	eq(Families.next_threshold(def, 7), 0, "tous atteints")
 
 
 func test_disabled_grigri_does_not_count() -> void:
 	var c: RunController = _ctl(3, ["g_even_sock", "g_odd_duck"])
-	eq(int(Families.counts(c.run, c.db).get("rouge_noir", 0)), 2, "deux Rouge & Noir")
+	eq(int(Families.counts(c.run, c.db).get("chances", 0)), 2, "deux Chances simples")
 	c.run.grigris[c.run.grigris.size() - 1].disabled = true
-	eq(int(Families.counts(c.run, c.db).get("rouge_noir", 0)), 1, "désactivé : non compté")
+	eq(int(Families.counts(c.run, c.db).get("chances", 0)), 1, "désactivé : non compté")
 
 
-## Palier 1 de Rouge & Noir : +3 Mult par pari extérieur gagnant (à grigris égaux par ailleurs).
+## Palier 1 des Chances simples : +3 Mult par chance simple gagnante (à grigris égaux par ailleurs).
 func test_family_tier_adds_mult() -> void:
 	for s: int in range(1, 60):
 		var a: RunController = _ctl(s, ["g_even_sock", "g_odd_duck"])

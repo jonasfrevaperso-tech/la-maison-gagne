@@ -21,12 +21,12 @@
     "tier_debts": [
       180,
       500,
-      3200,
-      8000,
-      16000,
-      32000,
-      66000,
-      135000
+      2300,
+      5600,
+      11200,
+      22400,
+      46000,
+      94000
     ],
     "deadline_kinds": [
       "small",
@@ -129,8 +129,8 @@
     "slot_upgrade_base": 14,
     "slot_upgrade_step": 10,
     "slot_upgrade_max": 2,
-    "family_bias": 0.6,
-    "family_bias_cap": 2.0,
+    "family_bias": 1.0,
+    "family_bias_cap": 3.0,
     "grigri_offers": 3,
     "pack_offers": 2,
     "contract_offers": 1,

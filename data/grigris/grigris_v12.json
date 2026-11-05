@@ -6,7 +6,7 @@
    "seal",
    "mult"
   ],
-  "family": "atelier",
+  "family": "sceaux",
   "icon": "g_wax_stamp",
   "sfx": "stamp",
   "name_fr": "Cachet de cire",
@@ -34,7 +34,7 @@
    "seal",
    "mult"
   ],
-  "family": "atelier",
+  "family": "sceaux",
   "icon": "g_notary_ring",
   "sfx": "stamp",
   "name_fr": "Chevalière du notaire",
@@ -65,7 +65,7 @@
    "seal",
    "pockets"
   ],
-  "family": "atelier",
+  "family": "sceaux",
   "icon": "g_sealing_wax",
   "sfx": "stamp",
   "name_fr": "Bâton de cire",
@@ -92,7 +92,7 @@
    "seal",
    "retrigger"
   ],
-  "family": "atelier",
+  "family": "sceaux",
   "icon": "g_archivist",
   "sfx": "paper",
   "name_fr": "L'Archiviste",
@@ -125,7 +125,7 @@
    "seal",
    "chips"
   ],
-  "family": "atelier",
+  "family": "sceaux",
   "icon": "g_red_tape",
   "sfx": "paper",
   "name_fr": "Paperasse",
@@ -159,7 +159,7 @@
    "xmult",
    "curse"
   ],
-  "family": "pacte",
+  "family": "sceaux",
   "icon": "g_cursed_seal",
   "sfx": "curse",
   "name_fr": "Sceau maudit",
@@ -196,7 +196,7 @@
    "endless",
    "xmult"
   ],
-  "family": "moteur",
+  "family": "maison",
   "icon": "g_insomniac",
   "sfx": "ghost",
   "name_fr": "Insomniaque",
@@ -232,7 +232,7 @@
    "growth",
    "xmult"
   ],
-  "family": "moteur",
+  "family": "ressorts",
   "icon": "g_eternity_clock",
   "sfx": "clock",
   "name_fr": "Horloge d'éternité",
@@ -281,7 +281,7 @@
    "endless",
    "mult"
   ],
-  "family": "moteur",
+  "family": "ressorts",
   "icon": "g_marathon",
   "sfx": "tick",
   "name_fr": "Marathon",
@@ -319,7 +319,7 @@
    "endless",
    "spins"
   ],
-  "family": "moteur",
+  "family": "maison",
   "icon": "g_after_hours",
   "sfx": "clock",
   "name_fr": "Après la fermeture",
@@ -354,7 +354,7 @@
    "destroy",
    "economy"
   ],
-  "family": "atelier",
+  "family": "pourboires",
   "icon": "g_undertaker",
   "sfx": "coin",
   "name_fr": "Croque-mort",
@@ -383,7 +383,7 @@
    "growth",
    "mult"
   ],
-  "family": "atelier",
+  "family": "chantier",
   "icon": "g_ash_collector",
   "sfx": "fire",
   "name_fr": "Collectionneur de cendres",
@@ -423,7 +423,7 @@
    "destroy",
    "fortune"
   ],
-  "family": "etoile",
+  "family": "fortune",
   "icon": "g_glass_blower",
   "sfx": "glass",
   "name_fr": "Souffleur de verre",
@@ -451,7 +451,7 @@
    "destroy",
    "budget"
   ],
-  "family": "atelier",
+  "family": "mise",
   "icon": "g_scrap_dealer",
   "sfx": "clang",
   "name_fr": "Ferrailleur",
@@ -480,7 +480,7 @@
    "reroll",
    "chance"
   ],
-  "family": "etoile",
+  "family": "marchand",
   "icon": "g_lottery_ticket",
   "sfx": "jingle",
   "name_fr": "Ticket à gratter",
@@ -515,7 +515,7 @@
    "growth",
    "chips"
   ],
-  "family": "banque",
+  "family": "marchand",
   "icon": "g_window_dresser",
   "sfx": "card_flip",
   "name_fr": "Étalagiste",
@@ -556,7 +556,7 @@
    "economy",
    "curse"
   ],
-  "family": "pacte",
+  "family": "marchand",
   "icon": "g_impatient",
   "sfx": "curse",
   "name_fr": "L'Impatient",
@@ -593,7 +593,7 @@
    "fortune",
    "economy"
   ],
-  "family": "etoile",
+  "family": "fortune",
   "icon": "g_tarot_reader",
   "sfx": "card_use",
   "name_fr": "Liseuse de tarot",
@@ -622,7 +622,7 @@
    "growth",
    "mult"
   ],
-  "family": "etoile",
+  "family": "fortune",
   "icon": "g_fortune_cookie",
   "sfx": "card_use",
   "name_fr": "Biscuit chinois",
@@ -661,7 +661,7 @@
   "tags": [
    "fortune"
   ],
-  "family": "etoile",
+  "family": "fortune",
   "icon": "g_deck_of_fate",
   "sfx": "card_flip",
   "name_fr": "Jeu du destin",
@@ -690,7 +690,7 @@
    "bets",
    "mult"
   ],
-  "family": "plein",
+  "family": "chevaux",
   "icon": "g_hinge",
   "sfx": "click",
   "name_fr": "Charnière",
@@ -725,7 +725,7 @@
    "bets",
    "chips"
   ],
-  "family": "plein",
+  "family": "chevaux",
   "icon": "g_seamstress",
   "sfx": "cloth",
   "name_fr": "Couturière",
@@ -760,7 +760,7 @@
    "bets",
    "mult"
   ],
-  "family": "plein",
+  "family": "chevaux",
   "icon": "g_quartet",
   "sfx": "chime",
   "name_fr": "Quatuor",
@@ -795,7 +795,7 @@
    "bets",
    "chips"
   ],
-  "family": "plein",
+  "family": "lignes",
   "icon": "g_six_pack",
   "sfx": "chips",
   "name_fr": "Pack de six",
@@ -830,7 +830,7 @@
    "bets",
    "xmult"
   ],
-  "family": "plein",
+  "family": "lignes",
   "icon": "g_tram_line",
   "sfx": "tick",
   "name_fr": "Ligne de tramway",
@@ -865,7 +865,7 @@
    "bets",
    "mult"
   ],
-  "family": "plein",
+  "family": "lignes",
   "icon": "g_city_block",
   "sfx": "stone",
   "name_fr": "Pâté de maisons",
@@ -899,7 +899,7 @@
    "ball",
    "mult"
   ],
-  "family": "main",
+  "family": "bille",
   "icon": "g_magnet_shoes",
   "sfx": "magnet",
   "name_fr": "Chaussures aimantées",
@@ -979,7 +979,7 @@
    "pockets",
    "chips"
   ],
-  "family": "atelier",
+  "family": "matieres",
   "icon": "g_census",
   "sfx": "paper",
   "name_fr": "Recensement",
@@ -1010,7 +1010,7 @@
    "pockets",
    "xmult"
   ],
-  "family": "numeros",
+  "family": "lignes",
   "icon": "g_twin_city",
   "sfx": "double",
   "name_fr": "Ville jumelle",

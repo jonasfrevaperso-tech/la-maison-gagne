@@ -125,3 +125,12 @@ Format : D-NNN · date · décision · raison · alternatives écartées.
   | Expert | environ 25 % | petit échantillon |
 
   À partir du palier 3, une échéance réglée prend en médiane 3 tours. La partie réelle battait nettement les bots : la cible de 35 à 45 % pour un joueur qui construit un build correspond donc à un glouton vers 20 à 25 %. Le recalage se fera avec les archives « Exporter mes données » (`tools/telemetry_report.py --human`). Le résumé du simulateur affiche désormais les tours par échéance et l'argent en poche.
+- **D-086 · 28 builds de 7 grigris.** Les 196 grigris sont redécoupés en 28 familles thématiques de 7 (`data/families/families.json`), avec des paliers à 2, 4 et 7 : le palier 7 est le build complet. `validate_data` exige exactement 7 membres par famille et ces trois seuils.
+  - **Familles** : Rouge & Noir, Séries, Chances simples, Grand Tapis, Plein, Chevaux & Carrés, Lignes, Zéro, Coffre, Mise, Marchand, Pourboires, Horloge, Ressorts, Vices, Salon, Maison, Main sûre, Bille folle, Relances, Arrosage, Consolation, Dorures, Verre & Acier, Sceaux, Chantier, Diseuse, Chance.
+  - **Maudits** : quelques grigris maudits sont rangés dans une famille thématique comme option risquée (Éclipse dans Rouge & Noir, Pacte du Zéro dans Zéro, etc.).
+  - **Emblèmes** : un emblème par famille (`tools/gen_family_icons.py`).
+  - **Construire un build** : un 7 demande les deux emplacements de grigri achetables (5 + 2). Le biais de boutique vers les familles commencées passe donc à 1,0 (plafond ×4 au lieu de ×3).
+  - **Effet mesuré** : au simulateur, le bot glouton n'atteint 4 dans une famille que dans environ 18 % des parties, et jamais 7.
+  - **Dettes** : la courbe de D-085 est ramenée à 70 % dès le palier 3 (2 300, 5 600, 11 200, 22 400, 46 000, 94 000). Résultat : glouton 15 %, hasard 0,7 %, 3 tours par échéance.
+  - **Sauvegardes** : aucune migration n'est nécessaire. La famille est lue dans la définition du grigri, et une partie en cours reprend avec les nouveaux paliers.
+

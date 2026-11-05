@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://vhqnvwxkux8s"
-path="res://.godot/imported/fam_pacte.png-d0c7bc876900f046411aa46e1b9bdd8f.ctex"
+uid="uid://baltviflfbtyj"
+path="res://.godot/imported/fam_coffre.png-587fb7225421f207c54ef1fe53510b7a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/families/fam_pacte.png"
-dest_files=["res://.godot/imported/fam_pacte.png-d0c7bc876900f046411aa46e1b9bdd8f.ctex"]
+source_file="res://assets/families/fam_coffre.png"
+dest_files=["res://.godot/imported/fam_coffre.png-587fb7225421f207c54ef1fe53510b7a.ctex"]
 
 [params]
 

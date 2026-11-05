@@ -291,7 +291,7 @@ func write_report(s: Dictionary) -> void:
 	)
 	lines.append("")
 	var win_pct: float = float(s["win_rate"]) * 100.0
-	lines.append("- Taux de victoire : **%.1f %%** (objectif 2.0 : glouton ≈ 20–25 %%, hasard ≤ 3 %%, cf. D-085)" % win_pct)
+	lines.append("- Taux de victoire : **%.1f %%** (objectif 2.0 : glouton ≈ 15–25 %%, hasard ≤ 3 %%, cf. D-085, D-086)" % win_pct)
 	lines.append("- Tours par échéance réglée (palier ≥ 3, médiane) : %.1f (objectif 3–4)" % float(s["deadline_spins_median"]))
 	lines.append("- Palier moyen atteint : %.2f / %d" % [s["avg_tier"], Balance.i("run.tiers")])
 	lines.append("- Durée estimée d'un run : %.1f min (objectif 35–50 min pour un run gagnant)" % s["avg_minutes"])

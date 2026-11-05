@@ -108,7 +108,7 @@ func _fill_grid(g: GridContainer, ids: Array[String], seen_list: Array, kind: St
 			g.add_child(unknown)
 
 
-## En-tête d'une famille : emblème, nom, description et paliers (2 / 3 / 5).
+## En-tête d'une famille : emblème, nom, description et paliers (2 / 4 / 7).
 func _family_header(fam: Dictionary) -> Control:
 	var fid: String = String(fam["id"])
 	var col: Color = FamilyUi.color(fid)

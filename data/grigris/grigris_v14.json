@@ -6,7 +6,7 @@
    "mult",
    "curse_fx"
   ],
-  "family": "moteur",
+  "family": "vices",
   "icon": "g_gin_flask",
   "sfx": "glass",
   "name_fr": "Flasque de gin",
@@ -38,7 +38,7 @@
    "chips",
    "curse_fx"
   ],
-  "family": "arrosage",
+  "family": "vices",
   "icon": "g_cigarette_holder",
   "sfx": "fire",
   "name_fr": "Fume-cigarette",
@@ -70,7 +70,7 @@
    "xmult",
    "curse_fx"
   ],
-  "family": "main",
+  "family": "maison",
   "icon": "g_cracked_monocle",
   "sfx": "crack",
   "name_fr": "Monocle fêlé",
@@ -107,7 +107,7 @@
    "money",
    "curse_fx"
   ],
-  "family": "banque",
+  "family": "pourboires",
   "icon": "g_dying_neon",
   "sfx": "zap",
   "name_fr": "Néon agonisant",
@@ -145,7 +145,7 @@
    "chips",
    "curse_fx"
   ],
-  "family": "moteur",
+  "family": "vices",
   "icon": "g_double_espresso",
   "sfx": "tick",
   "name_fr": "Double serré",
@@ -177,7 +177,7 @@
    "xmult",
    "curse_fx"
   ],
-  "family": "numeros",
+  "family": "lignes",
   "icon": "g_funhouse_mirror",
   "sfx": "shimmer",
   "name_fr": "Miroir de foire",
@@ -223,7 +223,7 @@
    "mult",
    "curse_fx"
   ],
-  "family": "rouge_noir",
+  "family": "couleurs",
   "icon": "g_night_glasses",
   "sfx": "sigh",
   "name_fr": "Lunettes de nuit",

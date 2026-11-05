@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dtb0dxulyq26h"
-path="res://.godot/imported/fam_etoile.png-dd2671a7affa83c359a28b47ddbacab6.ctex"
+uid="uid://crdkuq8ssht3o"
+path="res://.godot/imported/fam_chance.png-e0a4fdd68ddbfe850bddc76c1bc792db.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/families/fam_etoile.png"
-dest_files=["res://.godot/imported/fam_etoile.png-dd2671a7affa83c359a28b47ddbacab6.ctex"]
+source_file="res://assets/families/fam_chance.png"
+dest_files=["res://.godot/imported/fam_chance.png-e0a4fdd68ddbfe850bddc76c1bc792db.ctex"]
 
 [params]
 

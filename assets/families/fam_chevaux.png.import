@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bu44oh2nvoufx"
-path="res://.godot/imported/fam_banque.png-a995c05a9d34a26c2e88ce39dd03f120.ctex"
+uid="uid://ruiqpsn8kr1a"
+path="res://.godot/imported/fam_chevaux.png-576a7fe9f79d9d13491f381722e4d4b7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/families/fam_banque.png"
-dest_files=["res://.godot/imported/fam_banque.png-a995c05a9d34a26c2e88ce39dd03f120.ctex"]
+source_file="res://assets/families/fam_chevaux.png"
+dest_files=["res://.godot/imported/fam_chevaux.png-576a7fe9f79d9d13491f381722e4d4b7.ctex"]
 
 [params]
 

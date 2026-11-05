@@ -18,6 +18,9 @@ const REQUIRED_BY_CAT: Dictionary = {
 	"slot_prizes": ["match", "symbol", "do"],
 }
 const RARITIES: Array[String] = ["common", "rare", "legendary", "cursed"]
+## 2.0 (D-086) : chaque famille compte exactement FAMILY_SIZE grigris, paliers à FAMILY_TIERS.
+const FAMILY_SIZE: int = 7
+const FAMILY_TIERS: Array[int] = [2, 4, 7]
 ## Boutons possibles du pavé tactile des épreuves (cf. TouchPad.STYLE, qui dépend des autoloads).
 const TOUCH_PAD_ACTIONS: Array[String] = ["qte_left", "qte_up", "qte_right", "qte_down", "ui_up", "ui_down", "ui_spin"]
 ## Dispositions du pavé tactile (cf. TouchPad.LAYOUTS ; recopiées : outil lancé sans autoloads).
@@ -93,6 +96,17 @@ func _validate_entry(db: ContentDB, cat: String, e: Dictionary) -> void:
 	if cat == "grigris" and not db.has_entry("families", String(e.get("family", ""))):
 		errors.append("%s : famille inconnue « %s »" % [eid, String(e.get("family", ""))])
 	if cat == "families":
+		var members: int = 0
+		for g: Dictionary in db.list("grigris"):
+			if String(g.get("family", "")) == String(e["id"]):
+				members += 1
+		if members != FAMILY_SIZE:
+			errors.append("%s : %d grigris (il en faut %d)" % [eid, members, FAMILY_SIZE])
+		var ns: Array[int] = []
+		for td2: Variant in e.get("tiers", []):
+			ns.append(int((td2 as Dictionary).get("n", 0)))
+		if ns != FAMILY_TIERS:
+			errors.append("%s : paliers %s (attendu %s)" % [eid, str(ns), str(FAMILY_TIERS)])
 		var last_n: int = 0
 		for td: Variant in e.get("tiers", []):
 			var tier: Dictionary = td as Dictionary

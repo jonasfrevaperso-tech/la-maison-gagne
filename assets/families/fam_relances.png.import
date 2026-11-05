@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bfa02ouhpmp0p"
-path="res://.godot/imported/fam_numeros.png-c12ba024bb9984ae6d685440771d7bf3.ctex"
+uid="uid://da2h8jhur0o4o"
+path="res://.godot/imported/fam_relances.png-f447b1b5b39e6e7ce27ed6763a53b59d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/families/fam_numeros.png"
-dest_files=["res://.godot/imported/fam_numeros.png-c12ba024bb9984ae6d685440771d7bf3.ctex"]
+source_file="res://assets/families/fam_relances.png"
+dest_files=["res://.godot/imported/fam_relances.png-f447b1b5b39e6e7ce27ed6763a53b59d.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bi7xqv0pelo38"
-path="res://.godot/imported/fam_moteur.png-0b794dfdec050a48a9b9362bd1891377.ctex"
+uid="uid://cjk22agcqv1up"
+path="res://.godot/imported/fam_mise.png-c1e1bfbeaa8c3522c6c41e5af1fa69fe.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/families/fam_moteur.png"
-dest_files=["res://.godot/imported/fam_moteur.png-0b794dfdec050a48a9b9362bd1891377.ctex"]
+source_file="res://assets/families/fam_mise.png"
+dest_files=["res://.godot/imported/fam_mise.png-c1e1bfbeaa8c3522c6c41e5af1fa69fe.ctex"]
 
 [params]
 

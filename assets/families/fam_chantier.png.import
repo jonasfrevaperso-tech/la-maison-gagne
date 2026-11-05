@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bi3a4tbyhuc4s"
-path="res://.godot/imported/fam_atelier.png-4ee34f0902536be15ed7c131da8579a4.ctex"
+uid="uid://dn5mqgvomldod"
+path="res://.godot/imported/fam_chantier.png-6297b38599ea525b604729c24060b330.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/families/fam_atelier.png"
-dest_files=["res://.godot/imported/fam_atelier.png-4ee34f0902536be15ed7c131da8579a4.ctex"]
+source_file="res://assets/families/fam_chantier.png"
+dest_files=["res://.godot/imported/fam_chantier.png-6297b38599ea525b604729c24060b330.ctex"]
 
 [params]
 

@@ -253,3 +253,25 @@ func test_data_export_zip() -> void:
 	check(trials.contains(",museum,darts,normal,0.8,"), "la ligne de l'épreuve est dans trials.csv")
 	zip.close()
 	DirAccess.remove_absolute(path)
+
+
+## Builds 2.0 : 28 familles de 7 ; le build complet (7) active le palier le plus fort.
+func test_families_of_seven() -> void:
+	var db: ContentDB = ContentDB.shared()
+	eq(db.list("families").size(), 28, "28 familles")
+	var c: RunController = RunController.new(db)
+	c.new_run("lea", 0, 5)
+	var members: Array[String] = []
+	for g: Dictionary in db.list("grigris"):
+		if String(g.get("family", "")) == "pleins":
+			members.append(String(g["id"]))
+	eq(members.size(), 7, "7 grigris dans Le Plein")
+	c.run.grigri_slots = 8
+	for gid: String in members:
+		c.run.add_grigri(gid)
+	var act: Array[Dictionary] = Families.active(c.run, db)
+	var tier: int = -1
+	for fa: Dictionary in act:
+		if String(fa["id"]) == "pleins":
+			tier = int(fa["tier"])
+	eq(tier, 2, "build complet : palier 7 actif")

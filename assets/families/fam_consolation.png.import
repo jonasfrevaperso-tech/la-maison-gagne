@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dmpr43dxwg78f"
-path="res://.godot/imported/fam_rouge_noir.png-d04a99b539ca35466723d4158c02061d.ctex"
+uid="uid://h8rpib74qa0s"
+path="res://.godot/imported/fam_consolation.png-346bfd1132c82306c85efa31a0144d72.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/families/fam_rouge_noir.png"
-dest_files=["res://.godot/imported/fam_rouge_noir.png-d04a99b539ca35466723d4158c02061d.ctex"]
+source_file="res://assets/families/fam_consolation.png"
+dest_files=["res://.godot/imported/fam_consolation.png-346bfd1132c82306c85efa31a0144d72.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bux1hp6h4l7af"
-path="res://.godot/imported/fam_plein.png-e613648caef24a7107ae10b3b53c26e6.ctex"
+uid="uid://vjv37anblinq"
+path="res://.godot/imported/fam_pleins.png-af66e9dd5342f1870baa04ef7bccbbfa.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/families/fam_plein.png"
-dest_files=["res://.godot/imported/fam_plein.png-e613648caef24a7107ae10b3b53c26e6.ctex"]
+source_file="res://assets/families/fam_pleins.png"
+dest_files=["res://.godot/imported/fam_pleins.png-af66e9dd5342f1870baa04ef7bccbbfa.ctex"]
 
 [params]
 
