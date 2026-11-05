@@ -6,6 +6,9 @@ extends ThrowTrial
 ## B rouge à droite, A vert en bas (au clavier, les flèches dans les mêmes directions ; à la
 ## souris : bleu clic gauche, rouge clic droit). Le tapis accélère. Note = jetons bien triés, moins une
 ## pénalité par appui à vide ou mauvais bac.
+## 2.0 : des jetons PIÉGÉS (noirs, croix rouge : à laisser passer), DOUBLES (deux couleurs : un
+## appui par couleur), à RETOURNER (dos gris : la couleur n'apparaît qu'en entrant dans la
+## fenêtre), et des bacs qui TOURNENT en cours de partie (les couleurs changent de bouton).
 
 const CHIP_R: float = 26.0
 ## Couleur de chaque symbole (0 gauche/X, 1 haut/Y, 2 droite/B, 3 bas/A).
@@ -19,6 +22,8 @@ const BIN_GAP: Vector2 = Vector2(175.0, 122.0)
 const PX3: float = 0.005
 const SLAT_PX: float = 36.0
 const BIN_R: float = 34.0
+const TRAP_COLOR: Color = Color("16161c")
+const BACK_COLOR: Color = Color("8a8a96")
 
 var _chips: Array[Dictionary] = []
 var _spawned: int = 0
@@ -30,6 +35,10 @@ var _slats: MeshPool = null
 var _rollers: Array[Node3D] = []
 var _bins3: Array[MeshInstance3D] = []
 var _bin_mats: Array[StandardMaterial3D] = []
+## Couleur du bac de chaque bouton (bouton k → couleur _perm[k]) ; éclair au changement.
+var _perm: Array[int] = [0, 1, 2, 3]
+var _spin_flash: float = 0.0
+var _half_credit: float = 0.0
 
 
 func begin() -> void:
@@ -122,8 +131,17 @@ func _sync_3d() -> void:
 	# Jetons : sur le tapis, puis envolés vers leur bac.
 	for c: Dictionary in _chips:
 		if not c.has("n"):
-			var chip: Node3D = CasinoChip3D.build(st.root, _color(int(c["kind"])), CHIP_R * PX3)
+			var chip: Node3D = CasinoChip3D.build(st.root, _chip_color(c), CHIP_R * PX3)
+			if String(c["type"]) == "double":
+				var inner: MeshInstance3D = Stage3D.cylinder(chip, CHIP_R * 0.55 * PX3, 0.03, Vector3(0, 0, 0.012),
+					Stage3D.mat(_color(int(c["kind2"])), 0.1, 0.4))
+				inner.rotation.x = PI * 0.5
 			c["n"] = chip
+		if String(c["type"]) == "flip" and not bool(c["shown"]) and _revealed(c):
+			# Le jeton se retourne : on remplace le dos gris par la face colorée.
+			c["shown"] = true
+			(c["n"] as Node3D).queue_free()
+			c["n"] = CasinoChip3D.build(st.root, _color(int(c["kind"])), CHIP_R * PX3)
 		var node: Node3D = c["n"]
 		var pos: Vector2 = c["p"]
 		var lift: float = 0.0
@@ -140,7 +158,7 @@ func _sync_3d() -> void:
 		for ch: Dictionary in _chips:
 			if bool(ch["done"]) and _dir_of(int(ch["to"])) == k:
 				hot = maxf(hot, 1.0 - float(ch["t"]) / 0.45)
-		_bin_mats[k].emission_energy_multiplier = 0.2 + 2.5 * hot
+		_bin_mats[k].emission_energy_multiplier = 0.2 + 2.5 * hot + 2.0 * _spin_flash
 		_bins3[k].scale = Vector3.ONE * (1.0 + 0.15 * hot)
 
 
@@ -149,6 +167,49 @@ func _kinds() -> int:
 
 
 ## Couleur effective : à la souris, le symbole 1 (clic droit) désigne le rouge (B, à droite).
+## Couleur affichée d'un jeton : noir (piège), dos gris (pas encore retourné), sinon la sienne.
+func _chip_color(c: Dictionary) -> Color:
+	match String(c["type"]):
+		"trap":
+			return TRAP_COLOR
+		"flip":
+			return _color(int(c["kind"])) if _revealed(c) else BACK_COLOR
+	return _color(int(c["kind"]))
+
+
+## Jeton à retourner : sa couleur apparaît quand il entre dans la fenêtre.
+func _revealed(c: Dictionary) -> bool:
+	return String(c["type"]) != "flip" or (c["p"] as Vector2).x >= _window().position.x - CHIP_R * p("flip_lead")
+
+
+## Bouton (0..kinds-1) qui mène au bac de la couleur `kind`.
+func _key_for(kind: int) -> int:
+	return _perm.find(kind)
+
+
+## Les bacs tournent : chaque bouton envoie vers une autre couleur.
+func _rotate_bins() -> void:
+	if _kinds() == 2:
+		_perm = [_perm[1], _perm[0], 2, 3]
+	else:
+		_perm = [_perm[3], _perm[0], _perm[1], _perm[2]]
+	_spin_flash = 1.0
+	_recolor_bins()
+	AudioBus.play("whoosh", 0.8, -4.0)
+	pop(_window().get_center() + Vector2(0, -BIN_GAP.y - 70.0), 0.5, "TRIAL_SORT_BINS_TURN")
+
+
+func _recolor_bins() -> void:
+	for k: int in _kinds():
+		var d: int = _dir_of(k)
+		if d >= _bins3.size():
+			continue
+		var col: Color = _color(_perm[k])
+		(_bins3[d].material_override as StandardMaterial3D).albedo_color = col
+		_bin_mats[d].albedo_color = col.darkened(0.6)
+		_bin_mats[d].emission = col
+
+
 func _color(kind: int) -> Color:
 	return COLORS[_dir_of(kind)]
 
@@ -184,16 +245,25 @@ func sort(k: int) -> void:
 			continue
 		var pos: Vector2 = c["p"]
 		if w.has_point(pos):
+			var color: int = _perm[k]
+			var kind: String = String(c["type"])
+			if kind == "double" and int(c["half"]) < 0 and (color == int(c["kind"]) or color == int(c["kind2"])):
+				c["half"] = color  # première moitié : le jeton attend la seconde couleur
+				AudioBus.play("chip_place", 1.0 + 0.1 * float(k), -4.0)
+				return
 			c["done"] = true
 			c["to"] = k
-			if int(c["kind"]) == k:
+			var want: int = int(c["kind"])
+			if kind == "double":
+				want = int(c["kind2"]) if int(c["half"]) == int(c["kind"]) else int(c["kind"])
+			if kind != "trap" and _revealed(c) and color == want:
 				_good += 1
 				AudioBus.play("chip_place", 1.0 + 0.1 * float(k))
 				pop(pos + Vector2(0, -60), 1.0, "")
 			else:
 				_wrong += 1
 				AudioBus.play("error", 1.0, -6.0)
-				pop(pos + Vector2(0, -60), 0.0, "")
+				pop(pos + Vector2(0, -60), 0.0, "TRIAL_SORT_TRAP" if kind == "trap" else "")
 			return
 	_wrong += 1
 	AudioBus.play("sticky", 1.3, -10.0)
@@ -202,13 +272,28 @@ func sort(k: int) -> void:
 func tick(dt: float) -> void:
 	if _ended:
 		return
+	_spin_flash = maxf(0.0, _spin_flash - dt * 2.0)
 	_spawn_t -= dt
 	if _spawn_t <= 0.0 and _spawned < pi("chips"):
 		_spawned += 1
 		var r: Rect2 = play_rect()
 		var kind: int = rng.randi_range(0, _kinds() - 1)
-		_chips.append({"p": Vector2(r.position.x + 24.0, r.get_center().y), "kind": kind, "done": false, "to": -1, "t": 0.0})
-		_spawn_t = p("gap_px") / _speed()
+		var kind2: int = (kind + 1 + rng.randi_range(0, _kinds() - 2)) % _kinds()
+		var type: String = "normal"
+		var roll: float = rng.randf()
+		if _spawned > pi("plain_first"):
+			if roll < p("trap_share"):
+				type = "trap"
+			elif roll < p("trap_share") + p("double_share"):
+				type = "double"
+			elif roll < p("trap_share") + p("double_share") + p("flip_share"):
+				type = "flip"
+		_chips.append({"p": Vector2(r.position.x + 24.0, r.get_center().y), "kind": kind, "kind2": kind2, "type": type,
+			"half": -1, "shown": false, "done": false, "to": -1, "t": 0.0})
+		_spawn_t = p("gap_px") / _speed() * (p("double_gap") if type == "double" else 1.0)
+		for at: Variant in Balance.arr("throw_trials.sort.turn_at"):
+			if _spawned == int(at):
+				_rotate_bins()
 	var kept: Array[Dictionary] = []
 	for c: Dictionary in _chips:
 		var pos: Vector2 = c["p"]
@@ -223,7 +308,15 @@ func tick(dt: float) -> void:
 		pos.x += _speed() * dt
 		c["p"] = pos
 		if pos.x > play_rect().end.x + 30.0:
-			AudioBus.play("lose_soft", 1.2, -10.0)
+			if String(c["type"]) == "trap":
+				_good += 1  # piège laissé passer : bien joué
+			elif String(c["type"]) == "double" and int(c["half"]) >= 0:
+				_half_credit += 0.5
+			else:
+				AudioBus.play("lose_soft", 1.2, -10.0)
+			if c.has("n"):
+				(c["n"] as Node3D).queue_free()
+				c.erase("n")
 			continue
 		kept.append(c)
 	for c3: Dictionary in _chips:
@@ -233,15 +326,19 @@ func tick(dt: float) -> void:
 	_sync_3d()
 	if _spawned >= pi("chips") and _chips.is_empty():
 		_ended = true
-		var sc: float = float(_good) / float(pi("chips")) - p("wrong_penalty") * float(_wrong)
+		var sc: float = (float(_good) + _half_credit) / float(pi("chips")) - p("wrong_penalty") * float(_wrong)
 		finish(clampf(sc, 0.0, 1.0))
 
 
 func bot_wants() -> Dictionary:
 	var w: Rect2 = _window()
 	for c: Dictionary in _chips:
-		if not bool(c["done"]) and w.has_point(c["p"] as Vector2):
-			return {"do": "sym", "symbol": int(c["kind"])}
+		if bool(c["done"]) or not w.has_point(c["p"] as Vector2) or String(c["type"]) == "trap" or not _revealed(c):
+			continue
+		var color: int = int(c["kind"])
+		if String(c["type"]) == "double" and int(c["half"]) == color:
+			color = int(c["kind2"])
+		return {"do": "sym", "symbol": _key_for(color)}
 	return {"do": ""}
 
 
@@ -266,6 +363,21 @@ func paint() -> void:
 		else:
 			text(at, PAD_LABEL[k] if InputGlyphs.using_pad else KEYS_LABEL[k], UiKit.SIZE_H2, Palette.IVORY, "display", 0)
 	# Fenêtre de tri : équerres dorées.
+	# Marques : croix du piège, « ? » du jeton pas encore retourné, moitié déjà triée du double.
+	for c: Dictionary in _chips:
+		if bool(c["done"]):
+			continue
+		var cp: Vector2 = c["p"]
+		match String(c["type"]):
+			"trap":
+				draw_line(cp + Vector2(-12, -12), cp + Vector2(12, 12), Palette.MULT_RED, 5.0)
+				draw_line(cp + Vector2(-12, 12), cp + Vector2(12, -12), Palette.MULT_RED, 5.0)
+			"flip":
+				if not _revealed(c):
+					text(cp, "?", UiKit.SIZE_BODY, Palette.INK, "display", 0)
+			"double":
+				if int(c["half"]) >= 0:
+					draw_arc(cp, CHIP_R + 6.0, 0, TAU, 28, _color(int(c["half"])), 4.0)
 	var w: Rect2 = _window()
 	draw_rect(w, Color(Palette.GOLD_LIGHT, 0.08))
 	for corner: Vector2 in [w.position, Vector2(w.end.x, w.position.y), w.end, Vector2(w.position.x, w.end.y)]:

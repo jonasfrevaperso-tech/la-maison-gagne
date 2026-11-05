@@ -274,12 +274,22 @@
       "release_seconds": 0.2
     },
     "bottles": {
-      "throws": 3,
+      "throws": 4,
+      "modes": [
+        "still",
+        "move",
+        "wind",
+        "move_wind"
+      ],
       "sweep_seconds": [
         3.4,
+        3.2,
         3.0,
-        2.7
+        3.0
       ],
+      "shelf_speed": 110.0,
+      "wind_min": 70.0,
+      "wind_max": 150.0,
       "power_seconds": 1.5,
       "power_zone": 0.07,
       "neck_tolerance": 1.6,
@@ -354,14 +364,29 @@
       "time_limit": 18.0
     },
     "tower": {
-      "chips": 7,
+      "chips": 8,
       "slide_speed": [
-        260.0,
-        360.0
+        220.0,
+        300.0
       ],
-      "perfect_px": 14,
+      "perfect_px": 16,
       "chip_w": 320.0,
-      "drop_seconds": 4.0
+      "drop_seconds": 4.0,
+      "plain_first": 1,
+      "heavy_share": 0.25,
+      "light_share": 0.3,
+      "heavy_speed": 0.8,
+      "light_speed": 1.25,
+      "sway_px": 5.0,
+      "sway_seconds": 2.4,
+      "light_sway": 0.35,
+      "heavy_calm": 0.25,
+      "wind_from": 2,
+      "wind_push": 80.0,
+      "light_wind": 2.0,
+      "heavy_wind": 0.5,
+      "gust_every": 2.8,
+      "gust_seconds": 1.4
     },
     "shaker": {
       "duration": 6.0,
@@ -466,11 +491,21 @@
       "reveal_seconds": 0.8
     },
     "sort": {
-      "chips": 12,
-      "speed_start": 180.0,
-      "speed_end": 300.0,
+      "chips": 14,
+      "speed_start": 170.0,
+      "speed_end": 270.0,
       "gap_px": 230.0,
-      "wrong_penalty": 0.04
+      "double_gap": 1.4,
+      "wrong_penalty": 0.04,
+      "plain_first": 2,
+      "trap_share": 0.14,
+      "double_share": 0.14,
+      "flip_share": 0.18,
+      "flip_lead": 0.5,
+      "turn_at": [
+        6,
+        10
+      ]
     },
     "invaders": {
       "duration": 19.0,

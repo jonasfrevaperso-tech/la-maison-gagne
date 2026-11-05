@@ -157,3 +157,56 @@ func test_lasers_switch_opens_curtain() -> void:
 	check(l._open_t > 0.0, "dalle foulée : rideau dévié")
 	check(not l._hit_at(at, l.t), "rideau dévié : la voie est libre")
 	l.free()
+
+
+## Tri : un piège trié est une faute ; un double demande ses deux couleurs ; les bacs tournent.
+func test_sort_types_and_turning_bins() -> void:
+	_boot()
+	var s: TrialSort = _trial("sort") as TrialSort
+	var at: Vector2 = s._window().get_center()
+	s._chips.append({"p": at, "kind": 0, "kind2": 2, "type": "trap", "half": -1, "shown": true, "done": false, "to": -1, "t": 0.0})
+	s.sort(0)
+	eq(s._wrong, 1, "piège trié : faute")
+	s._chips.clear()
+	s._chips.append({"p": at, "kind": 0, "kind2": 2, "type": "double", "half": -1, "shown": true, "done": false, "to": -1, "t": 0.0})
+	s.sort(2)
+	s.sort(0)
+	eq(s._good, 1, "double : deux couleurs, un jeton bien trié")
+	s._rotate_bins()
+	check(s._perm != [0, 1, 2, 3], "les bacs ont tourné")
+	eq(s._perm[s._key_for(1)], 1, "le bot retrouve le bon bouton")
+	s.free()
+
+
+## Bouteilles : le vent dévie le point d'arrivée, et le tir est jugé à l'arrivée.
+func test_bottles_wind_drift() -> void:
+	_boot()
+	var b: TrialBottles = _trial("bottles") as TrialBottles
+	b._wind = 120.0
+	b._shelf_v = 0.0
+	b._aim_lock = b._xs[b._target]
+	b._pow_sc = 1.0
+	b._land()
+	check(not b._hit, "visée pile sur la bouteille mais vent ignoré : raté")
+	b._throw = 1
+	b._next_target()
+	b._wind = 120.0
+	b._aim_lock = b._xs[b._target] - 120.0
+	b._land()
+	check(b._hit, "visée corrigée du vent : touché")
+	b.free()
+
+
+## Tour : la pose se juge dans le repère de la pile qui oscille ; les légers l'agitent.
+func test_tower_sway_and_kinds() -> void:
+	_boot()
+	var tw: TrialTower = _trial("tower") as TrialTower
+	var calm: float = tw._sway_amp()
+	tw._stack.append(Vector2(tw._stack[-1].x, tw._stack[-1].y))
+	tw._kinds.append(TrialTower.Kind.LIGHT)
+	check(tw._sway_amp() > calm, "pile plus haute et légère : plus d'oscillation")
+	tw._sway = 40.0
+	tw._x = tw._stack[-1].x + tw._off(tw._stack.size())
+	tw.drop()
+	eq(tw._perfects, 1, "sommet décalé par l'oscillation, visé où il est : pile !")
+	tw.free()

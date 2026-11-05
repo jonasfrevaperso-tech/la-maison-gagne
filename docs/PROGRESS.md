@@ -226,3 +226,8 @@ Plan : phases 33 à 40 (remarques de test sur les deux versions).
 - **Phase 40 — Publication** ✅ (`phase-40-release`) : builds faits avec le Godot 4.7.2 officiel (`~/.local/opt/godot-4.7.2/bin` placé en tête du PATH, car le Godot de Fedora est en 4.7.1). Recette sur le Pixel 7 consignée dans `docs/QA_1.9.md`. APK de 42,6 Mo (39,5 Mo en 1.8.0).
 
 Banc 1.9.0 (épreuves modifiées, bot parfait / bot humain) : Bouteilles 1,00 / 0,78–0,80 · Shaker 1,00 / 0,87–0,96 · Cave 0,99–1,00 / 0,75–0,93 · Billard 1,00 / 0,92 · Grattage 1,00 / 0,94 · Tiercé 1,00 / 0,95 · Pluie 0,98–0,99. Partie automatique PC et mobile sans erreur de script ; 133 tests.
+
+## Version 2.0.0 — « La Grande Saison » (PC + Android)
+Plan : phases 41 à 53 (50 épreuves, 28 builds de 7 grigris, difficulté resserrée, export des données).
+- **Phase 41 — Correctifs** ✅ (`phase-41-correctifs`) : Pluie, Pachinko, Cave (personnage animé, accrochage amorti), tutos ralentis (D-082).
+- **Phase 42 — Dix épreuves approfondies** ✅ (`phase-42a`, `phase-42b`) : D-083. Banc (bot / humain) : Verre 1,00 / 0,76–0,91 · Bonneteau 0,99 / 0,99 · Grattage 0,92 / 0,96 · Tiercé 0,94 / 0,62 · Effet 1,00 / 0,97 · Billard 1,00 / 0,71–0,92 · Lasers 0,94–1,00 · Tri 1,00 / 1,00 · Bouteilles 0,84–1,00 / 0,76–0,79 · Tour 1,00 / 0,62–0,76.

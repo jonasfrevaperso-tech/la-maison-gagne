@@ -44,17 +44,17 @@
   "weight": 1.0,
   "name_fr": "Les Bouteilles",
   "name_en": "The Bottles",
-  "desc_fr": "Au bar abandonné : fixe la direction quand le viseur passe sur la bouteille désignée, puis la force dans l'or. Trois jetons.",
-  "desc_en": "At the abandoned bar: lock the aim when the sight crosses the marked bottle, then the strength in the gold. Three chips.",
+  "desc_fr": "Quatre jetons, quatre règles : étagère fixe, étagère qui défile, ventilateur qui dévie le jeton, puis les deux. Fixe la visée, puis la force.",
+  "desc_en": "Four chips, four rules: still shelf, moving shelf, a fan that pushes the chip, then both. Lock the aim, then the strength.",
   "tuto_fr": [
-   "Le viseur balaie l'étagère : fixe-le sur la bouteille encadrée.",
-   "Puis arrête la jauge de force dans la bande dorée.",
-   "Trois jetons : vise juste, dose bien."
+   "Fixe la visée sur la bouteille encadrée, puis la force dans l'or.",
+   "Étagère qui défile : vise là où la bouteille SERA.",
+   "Ventilateur : décale ta visée contre la flèche du vent."
   ],
   "tuto_en": [
-   "The sight sweeps the shelf: lock it on the framed bottle.",
-   "Then stop the power gauge in the golden band.",
-   "Three chips: aim true, judge the power."
+   "Lock the aim on the framed bottle, then the strength in the gold.",
+   "Moving shelf: aim where the bottle WILL be.",
+   "Fan: shift your aim against the wind arrow."
   ]
  },
  {
@@ -143,17 +143,17 @@
   "weight": 1.0,
   "name_fr": "Tour de jetons",
   "name_en": "Chip Tower",
-  "desc_fr": "Lâche chaque jeton pile sur la pile : ce qui dépasse tombe et le suivant rétrécit. Six jetons, de plus en plus vite.",
-  "desc_en": "Drop each chip right on the stack: overhangs fall off and the next one shrinks. Six chips, faster and faster.",
+  "desc_fr": "Empile les jetons qui glissent. La pile oscille de plus en plus, les rafales poussent le jeton, et les jetons lourds (or) ou légers (verre) changent tout.",
+  "desc_en": "Stack the sliding chips. The stack sways more and more, gusts push the chip, and heavy (gold) or light (glass) chips change everything.",
   "tuto_fr": [
-   "Un jeton glisse au-dessus de la pile.",
-   "Lâche-le pile au-dessus : ce qui dépasse tombe.",
-   "La pile s'affine à chaque erreur : reste aligné."
+   "Lâche le jeton pile au-dessus de la pile : ce qui dépasse tombe.",
+   "La pile oscille : vise le sommet là où il est, pas où il était.",
+   "Rafale : le jeton accélère ou freine. Le verre la sent double, l'or calme la pile."
   ],
   "tuto_en": [
-   "A chip slides above the stack.",
-   "Drop it right on top: the overhang falls off.",
-   "The stack narrows with each miss: stay aligned."
+   "Drop the chip right above the stack: the overhang falls.",
+   "The stack sways: aim at the top where it is, not where it was.",
+   "Gust: the chip speeds up or slows. Glass feels it double, gold calms the stack."
   ]
  },
  {
@@ -269,17 +269,17 @@
   "weight": 1.0,
   "name_fr": "Tri des jetons",
   "name_en": "Chip Sorting",
-  "desc_fr": "Envoie chaque jeton qui passe dans la fenêtre vers le bac de sa couleur. Le tapis accélère.",
-  "desc_en": "Send every chip crossing the window to the bin of its colour. The belt speeds up.",
+  "desc_fr": "Trie chaque jeton dans le bac de sa couleur. Laisse passer les jetons piégés, trie les doubles deux fois, guette les jetons retournés… et suis les bacs quand ils tournent.",
+  "desc_en": "Sort each chip into its colour's bin. Let trapped chips pass, sort doubles twice, watch the face-down chips… and follow the bins when they turn.",
   "tuto_fr": [
-   "Les jetons arrivent sur le tapis roulant.",
-   "Envoie chaque jeton dans le bac de sa couleur.",
-   "Un jeton qui tombe du tapis est perdu."
+   "Envoie chaque jeton vers le bac de sa couleur.",
+   "Jeton noir à croix : laisse-le passer. Double : deux appuis.",
+   "Les bacs tournent : regarde leur couleur, pas la touche !"
   ],
   "tuto_en": [
-   "Chips ride in on the conveyor belt.",
    "Send each chip to the bin of its colour.",
-   "A chip that falls off the belt is lost."
+   "Black chip with a cross: let it pass. Double: two presses.",
+   "The bins turn: watch their colour, not the key!"
   ],
   "touch_direct": true
  },

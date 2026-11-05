@@ -5,10 +5,15 @@ extends ThrowTrial
 ## l'étagère (confirmer pour fixer la direction), puis une jauge de force oscille (confirmer dans
 ## la zone). La bouteille désignée vole en éclats si le tir est juste. Trois jetons, de plus en
 ## plus vite. Note = moyenne (direction pondérée, force).
+## 2.0 : quatre jetons, quatre règles (`modes`) : étagère fixe ; étagère qui DÉFILE (la
+## bouteille bouge pendant la visée et le vol : il faut anticiper) ; VENTILATEUR (le jeton dérive
+## d'autant que l'indique la flèche : viser à côté) ; puis les deux. Le tir est jugé à l'arrivée.
 
 enum Phase { AIM, POWER, FLIGHT, REST }
 
 const BOTTLES: int = 6
+## Ventilateur vu de trois quarts (rad).
+const FAN_YAW: float = 0.7
 const SHELF_Y: float = 520.0
 const BOTTLE_W: float = 46.0
 const BOTTLE_H: float = 150.0
@@ -36,6 +41,14 @@ var _bottles3: Array[Node3D] = []
 var _chip3: Node3D = null
 var _neon: Label3D = null
 var _neon_light: OmniLight3D = null
+## Règle du jeton en cours, vitesse de l'étagère (px/s, signée) et dérive du vent (px, signée).
+var _mode: String = "still"
+var _shelf_v: float = 0.0
+var _wind: float = 0.0
+var _pow_sc: float = 0.0
+var _prev_pred: float = 0.0
+var _fan3: Node3D = null
+var _blades3: Node3D = null
 
 
 func begin() -> void:
@@ -94,6 +107,20 @@ func _build_3d() -> void:
 	var lamp: OmniLight3D = Stage3D.omni(r, Color(1.0, 0.85, 0.6), 2.5, st.to3(Vector2(960, 300), 1.2), 6.0)
 	lamp.shadow_enabled = RenderQuality.shadows()
 	# Jeton lancé.
+	# Ventilateur de comptoir (à gauche) : socle, cage de laiton, pales qui tournent quand il souffle.
+	_fan3 = Node3D.new()
+	_fan3.position = st.to3(Vector2(300.0, 400.0), 0.3)
+	r.add_child(_fan3)
+	Stage3D.cylinder(_fan3, 12.0 * px, 120.0 * px, Vector3(0, -60.0 * px, 0), Stage3D.mat(Color(0.2, 0.2, 0.22), 0.6, 0.4))
+	Stage3D.cylinder(_fan3, 40.0 * px, 12.0 * px, Vector3(0, -120.0 * px, 0), Stage3D.mat(Color(0.2, 0.2, 0.22), 0.6, 0.4))
+	var cage: MeshInstance3D = Stage3D.cylinder(_fan3, 70.0 * px, 24.0 * px, Vector3.ZERO, Stage3D.mat(Palette.GOLD_DARK, 0.8, 0.3))
+	cage.rotation.z = PI * 0.5
+	_blades3 = Node3D.new()
+	_fan3.add_child(_blades3)
+	for k2: int in 3:
+		var blade: MeshInstance3D = Stage3D.box(_blades3, Vector3(0.02, 120.0 * px, 34.0 * px), Vector3(0.02, 0, 0),
+			Stage3D.mat(Color(0.7, 0.72, 0.75), 0.7, 0.3))
+		blade.rotation.x = PI * 2.0 / 3.0 * float(k2)
 	_chip3 = Node3D.new()
 	r.add_child(_chip3)
 	var chip_body: MeshInstance3D = Stage3D.cylinder(_chip3, 34.0 * px, 8.0 * px, Vector3.ZERO, Stage3D.mat(Palette.ROULETTE_RED, 0.1, 0.4))
@@ -121,6 +148,11 @@ func _next_target() -> void:
 		if _alive[k]:
 			standing.append(k)
 	_target = standing[rng.randi_range(0, standing.size() - 1)]
+	var modes: Array = Balance.arr("throw_trials.bottles.modes")
+	_mode = String(modes[mini(_throw, modes.size() - 1)])
+	var dir: float = 1.0 if rng.randf() < 0.5 else -1.0
+	_shelf_v = dir * p("shelf_speed") / slow if _mode.contains("move") else 0.0
+	_wind = (1.0 if rng.randf() < 0.5 else -1.0) * rng.randf_range(p("wind_min"), p("wind_max")) if _mode.contains("wind") else 0.0
 	_phase = Phase.AIM
 	_phase_t = 0.0
 
@@ -155,21 +187,26 @@ func _power_at(tt: float) -> float:
 
 func _throw_chip() -> void:
 	var zone: float = p("power_zone") * widen()
-	var err_x: float = absf(_aim_lock - _xs[_target]) / (BOTTLE_W * 0.5 * p("neck_tolerance") * widen())
-	var aim_sc: float = 1.0 if err_x <= 1.0 else clampf(1.0 - (err_x - 1.0) / p("miss_falloff"), 0.0, 1.0)
 	# Plein score dans la bande dorée (± power_zone), puis décroissance jusqu'à ± power_falloff.
 	var err_p: float = absf(_power - p("power_target"))
-	var pow_sc: float = 1.0 if err_p <= zone else clampf(1.0 - (err_p - zone) / maxf(p("power_falloff") - zone, 0.01), 0.0, 1.0)
-	var sc: float = aim_sc * p("weight_aim") + pow_sc * (1.0 - p("weight_aim"))
-	_hit = aim_sc >= 0.99 and pow_sc >= 0.5
-	_scores.append(sc)
+	_pow_sc = 1.0 if err_p <= zone else clampf(1.0 - (err_p - zone) / maxf(p("power_falloff") - zone, 0.01), 0.0, 1.0)
 	_phase = Phase.FLIGHT
 	_phase_t = 0.0
 	AudioBus.play("whoosh", 1.4, -6.0)
 
 
+## Point d'arrivée du jeton : la visée, déviée par le vent.
+func _landing_x() -> float:
+	return _aim_lock + _wind
+
+
 func _land() -> void:
-	var sc: float = _scores[-1]
+	# Jugé à l'arrivée : la bouteille a pu bouger pendant le vol.
+	var err_x: float = absf(_landing_x() - _xs[_target]) / (BOTTLE_W * 0.5 * p("neck_tolerance") * widen())
+	var aim_sc: float = 1.0 if err_x <= 1.0 else clampf(1.0 - (err_x - 1.0) / p("miss_falloff"), 0.0, 1.0)
+	var sc: float = aim_sc * p("weight_aim") + _pow_sc * (1.0 - p("weight_aim"))
+	_hit = aim_sc >= 0.99 and _pow_sc >= 0.5
+	_scores.append(sc)
 	if _hit:
 		_alive[_target] = false
 		AudioBus.play("shatter", 1.0 + rng.randf_range(-0.1, 0.1))
@@ -191,6 +228,15 @@ func tick(dt: float) -> void:
 		sh["p"] = (sh["p"] as Vector2) + (sh["v"] as Vector2) * dt
 		sh["t"] = float(sh["t"]) - dt
 	_shards = _shards.filter(func(q: Dictionary) -> bool: return float(q["t"]) > 0.0)
+	# Étagère qui défile : les bouteilles glissent et repassent derrière les montants.
+	if _shelf_v != 0.0 and _phase != Phase.REST:
+		var span: float = SHELF_X.y - SHELF_X.x + 120.0
+		for k: int in BOTTLES:
+			_xs[k] += _shelf_v * dt
+			if _xs[k] > SHELF_X.y + 60.0:
+				_xs[k] -= span
+			elif _xs[k] < SHELF_X.x - 60.0:
+				_xs[k] += span
 	match _phase:
 		Phase.AIM:
 			var u: float = sin(_phase_t * TAU / _sweep() - PI * 0.5) * 0.5 + 0.5
@@ -217,8 +263,13 @@ func bot_wants() -> Dictionary:
 	var want: Dictionary = {"do": ""}
 	match _phase:
 		Phase.AIM:
-			if _phase_t > 0.05 and (_prev_aim - _xs[_target]) * (_aim_x - _xs[_target]) <= 0.0:
+			# Où sera la bouteille à l'arrivée (force jouée à son premier passage dans l'or, puis vol) ?
+			var lead: float = p("power_target") * p("power_seconds") * slow + p("flight_seconds")
+			var pred: float = _xs[_target] + _shelf_v * lead
+			var land: float = _aim_x + _wind
+			if _phase_t > 0.05 and (_prev_aim + _wind - _prev_pred) * (land - pred) <= 0.0:
 				want = {"do": "confirm"}
+			_prev_pred = pred
 		Phase.POWER:
 			if _phase_t > 0.05 and (_prev_power - p("power_target")) * (_power - p("power_target")) <= 0.0:
 				want = {"do": "confirm"}
@@ -248,6 +299,16 @@ func paint() -> void:
 		var sp: Vector2 = sh["p"]
 		draw_colored_polygon(PackedVector2Array([sp, sp + Vector2(10, 4), sp + Vector2(3, 12)]), c.lightened(0.3))
 	pips(Vector2(960, 110), _scores, pi("throws"))
+	text(Vector2(960, 160), tr("TRIAL_BOTTLES_MODE_" + _mode.to_upper()), UiKit.SIZE_BODY, Palette.GOLD_LIGHT)
+	if _wind != 0.0 and _phase != Phase.REST:
+		# Flèche du vent : sa longueur est la dérive du jeton (à reporter sur la visée).
+		var y: float = SHELF_Y + 110.0
+		var a: Vector2 = Vector2(960.0 - _wind * 0.5, y)
+		var b: Vector2 = Vector2(960.0 + _wind * 0.5, y)
+		draw_line(a, b, Palette.CYAN, 6.0)
+		var d: float = signf(_wind)
+		draw_colored_polygon(PackedVector2Array([b + Vector2(d * 18, 0), b + Vector2(-d * 6, -14), b + Vector2(-d * 6, 14)]), Palette.CYAN)
+		text(Vector2(960.0, y - 30.0), tr("TRIAL_BOTTLES_WIND"), UiKit.SIZE_SMALL, Palette.CYAN)
 	match _phase:
 		Phase.AIM:
 			_draw_reticle(_aim_x, Palette.CYAN)
@@ -260,8 +321,13 @@ func _sync_3d() -> void:
 	if stage == null:
 		return
 	for k: int in _bottles3.size():
-		_bottles3[k].visible = _alive[k]
+		_bottles3[k].visible = _alive[k] and _xs[k] > SHELF_X.x - 50.0 and _xs[k] < SHELF_X.y + 50.0
+		_bottles3[k].position = stage.to3(Vector2(_xs[k], SHELF_Y))
 		_bottles3[k].rotation.z = sin(t * 2.0 + float(k)) * 0.01
+	if _blades3 != null:
+		_blades3.rotation.x += _wind * 0.004
+		_fan3.rotation.y = FAN_YAW if _wind >= 0.0 else PI - FAN_YAW
+		_fan3.visible = _wind != 0.0
 	var flick: float = 1.0 if fposmod(t * 7.3, 3.1) > 0.2 else 0.35
 	_neon.modulate = Color(Palette.MAGENTA, flick)
 	_neon_light.light_energy = 1.6 * flick
@@ -271,7 +337,7 @@ func _sync_3d() -> void:
 	if _phase == Phase.FLIGHT:
 		var u: float = clampf(_phase_t / p("flight_seconds"), 0.0, 1.0)
 		var dest: Vector2 = Vector2(_aim_lock, SHELF_Y - BOTTLE_H * (0.35 + 0.6 * (_power - 0.4)))
-		pos = HAND.lerp(dest, u) + Vector2(0, -260.0 * sin(u * PI))
+		pos = HAND.lerp(dest, u) + Vector2(0, -260.0 * sin(u * PI)) + Vector2(_wind * u * u, 0)
 		spin = _phase_t * 18.0
 		depth = lerpf(1.45, 0.12, u)
 	_chip3.position = stage.to3(pos, depth)
