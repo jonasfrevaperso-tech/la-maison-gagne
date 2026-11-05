@@ -344,6 +344,10 @@ _STAMP = {
     "A": ["0110", "1001", "1001", "1111", "1001", "1001", "1001"],
     "Y": ["10001", "10001", "01010", "00100", "00100", "00100", "00100"],
     "E": ["1111", "1000", "1000", "1110", "1000", "1000", "1111"],
+    "S": ["0111", "1000", "1000", "0110", "0001", "0001", "1110"],
+    "O": ["0110", "1001", "1001", "1001", "1001", "1001", "0110"],
+    "L": ["1000", "1000", "1000", "1000", "1000", "1000", "1111"],
+    "D": ["1110", "1001", "1001", "1001", "1001", "1001", "1110"],
 }
 
 
@@ -457,6 +461,62 @@ def shot_door(rng: random.Random) -> None:
     save(fg, "door_fg")
 
 
+# --------------------------------------------------------------------------- défaite (1.9)
+
+
+def shot_defeat(rng: random.Random) -> None:
+    """Défaite : la ligne du registre se remplit et se barre, tampon « SOLDÉ » ; la rue à l'aube."""
+    # La dernière ligne, griffonnée puis barrée de rouge (le nom du joueur rejoint les autres).
+    line = canvas()
+    d = ImageDraw.Draw(line)
+    sx = 170
+    while sx < 236:
+        h = rng.randint(1, 3)
+        d.line([(sx, 158 - h), (sx + 2, 158)], fill=(60, 40, 40, 255))
+        sx += 3
+    for j in range(4):
+        rect(d, 260 + j * 6, 155, 263 + j * 6, 158, (60, 40, 40, 255))
+    d.line([(168, 156), (240, 156)], fill=RED + (255,))
+    save(line, "defeat_line")
+    # Tampon « SOLDÉ » (s'abat sur la page).
+    st = canvas()
+    d = ImageDraw.Draw(st)
+    d.rectangle([106, 66, 214, 106], outline=RED + (255,), width=3)
+    d.rectangle([110, 70, 210, 102], outline=RED + (200,), width=1)
+    _stamp_word(d, "SOLDE", 124, 78)
+    rect(d, 171, 72, 174, 74, RED + (255,))  # accent de « SOLDÉ »
+    save(st, "defeat_stamp")
+    # Ciel d'aube : dégradé prune → abricot, soleil qui pointe, immeubles éteints.
+    bg = canvas()
+    dither_gradient(bg, (0, 0, W, 90), (40, 30, 64), (236, 150, 108), 7)
+    dither_gradient(bg, (0, 90, W, 150), (236, 150, 108), (250, 196, 140), 3)
+    glow_disc(bg, 300, 58, 46, (255, 210, 140), 0.8)
+    d = ImageDraw.Draw(bg)
+    d.ellipse([288, 46, 312, 70], fill=(255, 226, 170, 255))
+    x = 0
+    while x < W:
+        w = rng.randint(18, 34)
+        h = rng.randint(40, 96)
+        rect(d, x, 150 - h, x + w, 180, (44, 30, 50, 255))
+        for _ in range(rng.randint(0, 2)):
+            wx = x + rng.randint(3, max(4, w - 5))
+            wy = 150 - h + rng.randint(6, max(7, h - 10))
+            rect(d, wx, wy, wx + 2, wy + 2, (250, 190, 120, 255))
+        x += w + rng.randint(0, 4)
+    rect(d, 0, 150, W, 180, (60, 44, 60, 255))
+    save(bg, "dawn_bg")
+    # Premier plan : réverbère éteint, flaques qui renvoient l'aube.
+    fg = canvas()
+    d = ImageDraw.Draw(fg)
+    rect(d, 262, 36, 264, 168, (30, 22, 30, 255))
+    rect(d, 258, 34, 268, 38, (50, 40, 46, 255))
+    for _ in range(14):
+        px_ = rng.randint(30, 300)
+        py_ = rng.randint(160, 176)
+        d.line([(px_, py_), (px_ + rng.randint(6, 16), py_)], fill=(236, 160, 120, 200))
+    save(fg, "dawn_fg")
+
+
 def main() -> None:
     rng = random.Random(1987)
     shot_street(rng)
@@ -465,6 +525,7 @@ def main() -> None:
     shot_ledger(rng)
     shot_stairs(rng)
     shot_door(rng)
+    shot_defeat(random.Random(2026))  # tirage à part : les calques de l'intro ne changent pas
     print("Cinématique :", len(list(OUT.glob("*.png"))), "calques")
 
 

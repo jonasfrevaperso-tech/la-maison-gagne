@@ -812,3 +812,8 @@ TRIAL_SIMON_HINT_TOUCH,Rejoue la mélodie en touchant {@tap} les boutons du juke
 TRIAL_RHYTHM_HINT_TOUCH,"Touche {@tap} la piste quand la note passe la ligne, garde le doigt sur les notes longues","Tap {@tap} the lane as the note crosses the line, keep your finger on long notes"
 TRIAL_HIGHLOW_HINT_TOUCH,Touche {@tap} en haut : plus haut · en bas : plus bas,Tap {@tap} the top: higher · the bottom: lower
 TRIAL_SORT_HINT_TOUCH,Touche {@tap} le bac de la couleur du jeton qui passe dans le cadre,Tap {@tap} the bin matching the colour of the chip in the frame
+DEFEAT_THE_HOUSE,La Maison,The House
+OPT_DEFEAT_CUTSCENE,Cinématique de défaite,Defeat cutscene
+OPT_DC_ALWAYS,Toujours,Always
+OPT_DC_FIRST,La première fois,The first time
+OPT_DC_NEVER,Jamais,Never

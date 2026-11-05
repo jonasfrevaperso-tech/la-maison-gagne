@@ -142,7 +142,7 @@ func record_shop(action: String, data: Dictionary) -> void:
 
 
 ## Fin de run : statistiques de profil, déblocages, puis résumé.
-func end_run(victory: bool) -> void:
+func end_run(victory: bool, allow_cutscene: bool = true) -> void:
 	if not has_active_run():
 		return
 	var r: RunState = controller.run
@@ -180,7 +180,23 @@ func end_run(victory: bool) -> void:
 	SaveSystem.clear_run()
 	Telemetry.end(r, victory)
 	EventBus.run_ended.emit(r, victory)
+	if not victory and allow_cutscene and defeat_cutscene_wanted():
+		goto(SCREEN_INTRO, {
+			"cutscene": "defeat", "next": String(SCREEN_SUMMARY), "next_params": {"victory": false},
+			"act": r.act(), "creditor": r.creditor_id,
+		})
+		return
 	goto(SCREEN_SUMMARY, {"victory": victory})
+
+
+## Cinématique de défaite : toujours, la première fois seulement, ou jamais (Options → Jeu).
+func defeat_cutscene_wanted() -> bool:
+	match Settings.s("game", "defeat_cutscene"):
+		"never":
+			return false
+		"first":
+			return int((SaveSystem.profile.get("stats", {}) as Dictionary).get("defeat_seen", 0)) == 0
+	return true
 
 
 func abandon_run() -> void:

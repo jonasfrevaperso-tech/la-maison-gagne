@@ -125,6 +125,15 @@ func _drive() -> void:
 			await _shot("summary")
 			print("Autoplay : écran de résumé atteint (victoire=%s)" % str(GameState.last_run_victory))
 			break
+		# Défaite : la cinématique se regarde un instant (capture), puis on passe au bilan.
+		var defeat: Array = get_tree().root.find_children("*", "IntroCutscene", true, false).filter(
+			func(n: Node) -> bool: return (n as IntroCutscene).cutscene_id == "defeat")
+		if not defeat.is_empty():
+			await _wait(2.0)
+			await _shot("defeat_cutscene")
+			(defeat[0] as IntroCutscene)._finish()
+			await _wait(POLL)
+			continue
 		var rs: RunScreen = _screen()
 		if rs == null:
 			await _wait(POLL)

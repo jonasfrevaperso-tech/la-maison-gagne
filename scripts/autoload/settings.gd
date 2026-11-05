@@ -41,6 +41,7 @@ const DEFAULTS: Dictionary = {
 		"show_probabilities": false,
 		"tutorial_tips": true,
 		"trial_tutos": true,
+		"defeat_cutscene": "always",
 		"replay_story": false,
 		"input_mode": "auto",
 		"telemetry": false,

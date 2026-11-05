@@ -394,5 +394,172 @@
     "text_en": "TAKE A SEAT. THE WHEEL IS WARM. AND THE HOUSE… ALWAYS WINS."
    }
   ]
+ },
+ {
+  "id": "defeat_ledger",
+  "cutscene": "defeat",
+  "order": 1,
+  "layers": [
+   {
+    "img": "ledger_bg",
+    "depth": 0.4
+   },
+   {
+    "img": "defeat_line",
+    "depth": 0.4,
+    "anim": "rise"
+   },
+   {
+    "img": "defeat_stamp",
+    "depth": 0.4,
+    "anim": "slam",
+    "at": 1
+   }
+  ],
+  "camera": {
+   "from": [
+    0.02,
+    0.05,
+    1.12
+   ],
+   "to": [
+    -0.01,
+    0.09,
+    1.04
+   ]
+  },
+  "fx": [
+   "vignette"
+  ],
+  "ambience": "",
+  "music": "intro",
+  "sfx": [
+   {
+    "at": 1,
+    "id": "decor_topple",
+    "shake": true
+   }
+  ],
+  "captions": [
+   {
+    "who": "narrator",
+    "text_fr": "La plume grince. Une ligne de plus au registre du Grand Zéro.",
+    "text_en": "The pen scratches. One more line in the Grand Zero's ledger.",
+    "by_act": {
+     "2": {
+      "text_fr": "La plume grince. Tu étais allé loin, plus loin que la plupart.",
+      "text_en": "The pen scratches. You'd come far, further than most."
+     },
+     "3": {
+      "text_fr": "La plume grince. Si près du Patron… Le registre, lui, ne fait pas de différence.",
+      "text_en": "The pen scratches. So close to the Boss… The ledger makes no distinction."
+     }
+    }
+   },
+   {
+    "who": "narrator",
+    "text_fr": "{creditor} referme le livre d'un geste sec. SOLDÉ.",
+    "text_en": "{creditor} snaps the book shut. SETTLED."
+   }
+  ]
+ },
+ {
+  "id": "defeat_dawn",
+  "cutscene": "defeat",
+  "order": 2,
+  "layers": [
+   {
+    "img": "dawn_bg",
+    "depth": 0.15
+   },
+   {
+    "img": "street_mid",
+    "depth": 0.5
+   },
+   {
+    "img": "dawn_fg",
+    "depth": 1.0
+   }
+  ],
+  "camera": {
+   "from": [
+    0.0,
+    0.0,
+    1.02
+   ],
+   "to": [
+    0.03,
+    0.01,
+    1.1
+   ]
+  },
+  "fx": [],
+  "ambience": "ambience_rain",
+  "ambience_db": -26.0,
+  "captions": [
+   {
+    "who": "narrator",
+    "text_fr": "Dehors, le jour se lève. Le néon s'est tu.",
+    "text_en": "Outside, day is breaking. The neon has gone quiet."
+   },
+   {
+    "who": "hero",
+    "text_fr": "Grand-père avait tort. Ce n'est pas une banque où l'on rit. C'est une banque qui rit.",
+    "text_en": "Grandpa was wrong. It isn't a bank where you laugh. It's a bank that laughs.",
+    "by_act": {
+     "1": {
+      "text_fr": "Les poches vides, la tête pleine. La prochaine fois, je saurai.",
+      "text_en": "Empty pockets, full head. Next time, I'll know."
+     }
+    }
+   }
+  ]
+ },
+ {
+  "id": "defeat_door",
+  "cutscene": "defeat",
+  "order": 3,
+  "layers": [
+   {
+    "img": "door_bg",
+    "depth": 0.3,
+    "anim": "pulse"
+   },
+   {
+    "img": "door_left",
+    "depth": 0.6
+   },
+   {
+    "img": "door_right",
+    "depth": 0.6
+   },
+   {
+    "img": "door_fg",
+    "depth": 1.0
+   }
+  ],
+  "camera": {
+   "from": [
+    0.0,
+    0.0,
+    1.2
+   ],
+   "to": [
+    0.0,
+    0.0,
+    1.05
+   ]
+  },
+  "fx": [
+   "dust"
+  ],
+  "ambience": "",
+  "captions": [
+   {
+    "who": "narrator",
+    "text_fr": "Mais la porte reste entrouverte. La Maison gagne toujours… presque toujours.",
+    "text_en": "But the door stays ajar. The House always wins… almost always."
+   }
+  ]
  }
 ]

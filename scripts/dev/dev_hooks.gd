@@ -116,7 +116,7 @@ func start() -> bool:
 			r.slip.place("split:17-20", 1)
 			r.slip.place("corner:1", 1)
 	if String(args.get("dev-phase", "")) == "summary":
-		GameState.end_run(false)
+		GameState.end_run(false, args.has("dev-defeat-cutscene"))
 	else:
 		GameState.goto(&"run")
 	if String(args.get("dev-phase", "")) == "jackpot":

@@ -187,3 +187,30 @@ func test_catch_direct_bank() -> void:
 	c.feed(_mb(c._bank_button(), true))
 	eq(c._banked, 3.0, "VIDER met la pile à l'abri")
 	c.free()
+
+
+## Défaite : variante de réplique par acte, créancier nommé ; réglage toujours / 1re fois / jamais.
+func test_defeat_cutscene_variants() -> void:
+	_boot()
+	var lines: Array = [{"text_fr": "Acte normal", "by_act": {"3": {"text_fr": "Acte trois"}}}, {"text_fr": "{creditor} gagne."}]
+	var a1: Array = IntroCutscene.vary(lines, 1, "Le Notaire")
+	var a3: Array = IntroCutscene.vary(lines, 3, "Le Notaire")
+	eq(String(a1[0]["text_fr"]), "Acte normal", "texte de base à l'acte 1")
+	eq(String(a3[0]["text_fr"]), "Acte trois", "variante de l'acte 3")
+	eq(String(a1[1]["text_fr"]), "Le Notaire gagne.", "créancier nommé")
+	var shots: int = 0
+	for e: Dictionary in DataRegistry.db.list("cutscenes"):
+		if String(e.get("cutscene", "")) == "defeat":
+			shots += 1
+	check(shots >= 3, "trois plans de défaite")
+	var stats: Dictionary = SaveSystem.profile["stats"]
+	var before: String = Settings.s("game", "defeat_cutscene")
+	stats["defeat_seen"] = 1
+	Settings.set_value("game", "defeat_cutscene", "first")
+	check(not GameState.defeat_cutscene_wanted(), "« la première fois » : déjà vue")
+	Settings.set_value("game", "defeat_cutscene", "always")
+	check(GameState.defeat_cutscene_wanted(), "« toujours »")
+	Settings.set_value("game", "defeat_cutscene", "never")
+	check(not GameState.defeat_cutscene_wanted(), "« jamais »")
+	Settings.set_value("game", "defeat_cutscene", before)
+	stats.erase("defeat_seen")

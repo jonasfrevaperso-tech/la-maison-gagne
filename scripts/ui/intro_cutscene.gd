@@ -23,6 +23,10 @@ const CAPTION_MARGIN: float = 60.0
 
 var cutscene_id: String = "intro"
 var next_screen: StringName = &"title"
+## Paramètres transmis à l'écran suivant (défaite → bilan), acte atteint et créancier vainqueur.
+var next_params: Dictionary = {}
+var act: int = 1
+var creditor: String = ""
 var _shots: Array[Dictionary] = []
 var _shot: int = -1
 var _caption: int = -1
@@ -56,6 +60,30 @@ var _skip_label: Label = null
 func setup(params: Dictionary) -> void:
 	next_screen = StringName(String(params.get("next", "title")))
 	cutscene_id = String(params.get("cutscene", "intro"))
+	next_params = params.get("next_params", {}) as Dictionary
+	act = int(params.get("act", 1))
+	creditor = String(params.get("creditor", ""))
+
+
+## Variantes par acte (`by_act`, clés "1".."3") et marqueur {creditor} dans les répliques.
+static func vary(lines: Array, p_act: int, creditor_name: String) -> Array:
+	var out: Array = []
+	for ln: Variant in lines:
+		var line: Dictionary = (ln as Dictionary).duplicate()
+		var by: Dictionary = line.get("by_act", {})
+		if by.has(str(p_act)):
+			line.merge(by[str(p_act)] as Dictionary, true)
+		for k: String in ["text_fr", "text_en"]:
+			if line.has(k):
+				line[k] = String(line[k]).replace("{creditor}", creditor_name)
+		out.append(line)
+	return out
+
+
+## Nom du créancier vainqueur, ou « la Maison » s'il n'y en avait pas à ce moment-là.
+func _creditor_name() -> String:
+	var e: Dictionary = DataRegistry.db.get_entry("creditors", creditor) if creditor != "" else {}
+	return Localization.t(e, "name") if not e.is_empty() else tr("DEFEAT_THE_HOUSE")
 
 
 func _ready() -> void:
@@ -69,7 +97,8 @@ func _ready() -> void:
 	var hero: String = GameState.run().character_id if GameState.run() != null else ""
 	for i: int in _shots.size():
 		var shot: Dictionary = _shots[i].duplicate()
-		shot["captions"] = DialogueOverlay.personalize(shot.get("captions", []) as Array, hero)
+		var lines: Array = DialogueOverlay.personalize(shot.get("captions", []) as Array, hero)
+		shot["captions"] = vary(lines, act, _creditor_name())
 		_shots[i] = shot
 	_shots.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return int(a.get("order", 0)) < int(b.get("order", 0)))
 	var rng: RandomNumberGenerator = RngService.cosmetic()
@@ -78,7 +107,7 @@ func _ready() -> void:
 	for i: int in DUST_MOTES:
 		_dust.append(Vector3(rng.randf(), rng.randf(), rng.randf_range(0.3, 1.0)))
 	_build_ui()
-	AudioBus.play_music("intro")
+	AudioBus.play_music(String(_shots[0].get("music", "intro")) if not _shots.is_empty() else "intro")
 	_next_shot()
 
 
@@ -241,10 +270,10 @@ func _finish() -> void:
 	if _done:
 		return
 	_done = true
-	SaveSystem.max_stat("intro_seen", 1)
+	SaveSystem.max_stat("%s_seen" % cutscene_id, 1)
 	SaveSystem.save_profile()
 	AudioBus.stop_ambience()
-	GameState.goto(next_screen)
+	GameState.goto(next_screen, next_params)
 
 
 func _process(delta: float) -> void:

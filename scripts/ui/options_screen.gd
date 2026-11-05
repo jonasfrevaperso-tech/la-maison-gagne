@@ -289,6 +289,8 @@ func _game_tab() -> void:
 	_check(b, "OPT_TRIAL_TUTOS", "game", "trial_tutos")
 	_desc(b, "OPT_TRIAL_TUTOS_DESC")
 	_check(b, "OPT_REPLAY_STORY", "game", "replay_story")
+	_choice(b, "OPT_DEFEAT_CUTSCENE", "game", "defeat_cutscene", ["always", "first", "never"],
+		["OPT_DC_ALWAYS", "OPT_DC_FIRST", "OPT_DC_NEVER"])
 	_desc(b, "OPT_REPLAY_STORY_DESC")
 	if Platform.is_mobile():
 		_check(b, "OPT_HAPTICS", "game", "haptics")
