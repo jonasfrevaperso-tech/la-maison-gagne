@@ -504,25 +504,34 @@ def art_blackjack(rng) -> None:
 
 
 def art_scratch(rng) -> None:
-    """Le Grattage : ticket crème, 9 cases argentées, deux grattées (trèfles), reflet doré."""
+    """Le Grattage (1.9) : ticket argenté, trois zones cerclées de pointillés, une à moitié grattée."""
     img, d = canvas()
     rect(d, 0, 0, W, H, (26, 15, 20))
-    rect(d, 0, 78, W, H, WOOD_D)
-    rect(d, 38, 6, 122, 94, (244, 231, 200))
-    rect(d, 40, 8, 120, 92, GOLD)
-    rect(d, 42, 10, 118, 90, (244, 231, 200))
-    rect(d, 50, 13, 110, 19, VELVET)
-    for i in range(9):
-        x, y = 48 + (i % 3) * 22, 24 + (i // 3) * 22
-        rect(d, x, y, x + 18, y + 18, (184, 184, 196))
-        if i in (1, 5):
-            rect(d, x + 2, y + 2, x + 16, y + 16, IVORY)
-            disc(d, x + 7, y + 7, 3, EMERALD)
-            disc(d, x + 11, y + 7, 3, EMERALD)
-            disc(d, x + 9, y + 11, 3, EMERALD)
-    glow(img, 101, 40, 10, GOLD_L, 0.7)
-    disc(d, 101, 40, 2, IVORY)
-    disc(d, 128, 70, 6, GOLD)
+    rect(d, 0, 80, W, H, WOOD_D)
+    rect(d, 14, 10, 146, 88, GOLD_D)
+    rect(d, 16, 12, 144, 86, (244, 231, 200))
+    rect(d, 40, 15, 120, 21, VELVET)
+    rect(d, 22, 26, 138, 82, (184, 184, 196))
+    for y in range(26, 82, 4):
+        rect(d, 22, y, 138, y + 1, (168, 168, 182))
+    cols = [EMERALD, YELLOW, RED]
+    for k, cx in enumerate((42, 80, 118)):
+        cy = 52 if k != 1 else 58
+        if k == 0:
+            disc(d, cx, cy, 11, (255, 246, 220))
+            disc(d, cx - 3, cy - 2, 3, cols[k])
+            disc(d, cx + 3, cy - 2, 3, cols[k])
+            disc(d, cx, cy + 3, 3, cols[k])
+        elif k == 1:
+            d.pieslice((cx - 11, cy - 11, cx + 11, cy + 11), 180, 360, fill=(255, 246, 220))
+            d.polygon([(cx, cy - 8), (cx + 3, cy - 2), (cx - 3, cy - 2)], fill=cols[k])
+        for a in range(0, 360, 30):
+            rr = math.radians(a)
+            d.point((int(cx + math.cos(rr) * 13), int(cy + math.sin(rr) * 13)), fill=GOLD)
+    disc(d, 92, 54, 6, GOLD)
+    disc(d, 92, 54, 4, GOLD_L)
+    for k in range(6):
+        d.point((84 - k * 2, 60 + (k % 3)), fill=STEEL)
     save(img, "scratch")
 
 
@@ -547,23 +556,33 @@ def art_dice(rng) -> None:
 
 
 def art_derby(rng) -> None:
-    """Le Tiercé : stand forain à ampoules, quatre chevaux de bois sur leurs rails, damier."""
+    """Le Tiercé (1.9) : chevaux de bois sur leurs rails, piste de rythme gauche / droite en bas."""
     img, d = canvas()
     rect(d, 0, 0, W, H, (26, 12, 24))
-    rect(d, 0, 4, W, 16, VELVET)
+    rect(d, 0, 4, W, 14, VELVET)
     for k in range(20):
         disc(d, 4 + k * 8, 6, 1, GOLD_L if k % 2 else GOLD_D)
     cols = [YELLOW, CYAN, RED, EMERALD]
     for k in range(4):
-        y = 30 + k * 17
-        rect(d, 8, y + 6, 140, y + 7, (180, 120, 60))
-        x = 40 + (3 - k) * 14 + (20 if k == 0 else 0)
-        rect(d, x, y - 2, x + 16, y + 3, cols[k])
-        rect(d, x + 14, y - 6, x + 18, y, cols[k])
-        for l in (1, 6, 10, 14):
-            rect(d, x + l, y + 3, x + l + 1, y + 6, cols[k])
-    for y in range(24, 96, 4):
+        y = 24 + k * 13
+        rect(d, 8, y + 5, 140, y + 6, (180, 120, 60))
+        x = 34 + (3 - k) * 12 + (26 if k == 0 else 0)
+        rect(d, x, y - 2, x + 14, y + 2, cols[k])
+        rect(d, x + 12, y - 5, x + 16, y, cols[k])
+        for l in (1, 5, 9, 12):
+            rect(d, x + l, y + 2, x + l + 1, y + 5, cols[k])
+    for y in range(20, 76, 4):
         rect(d, 146, y, 150, y + 2, IVORY if (y // 4) % 2 else INK)
+    # Piste de rythme : ligne de frappe dorée, notes alternées qui arrivent.
+    rect(d, 16, 80, 144, 96, INK)
+    rect(d, 30, 79, 32, 97, GOLD_L)
+    for k, x in enumerate((31, 56, 81, 106, 131)):
+        col = CYAN if k % 2 == 0 else MAGENTA
+        d.ellipse((x - 5, 83, x + 5, 93), outline=col)
+        if k % 2 == 0:
+            d.polygon([(x - 3, 88), (x + 2, 85), (x + 2, 91)], fill=col)
+        else:
+            d.polygon([(x + 3, 88), (x - 2, 85), (x - 2, 91)], fill=col)
     save(img, "derby")
 
 
@@ -625,19 +644,25 @@ def art_juggle(rng) -> None:
 
 
 def art_billiards(rng) -> None:
-    """Le Billard : table vue de dessus, poches, bille blanche, bille fantôme, queue."""
+    """Le Billard (1.9) : table vue de dessus, trajectoire, bille fantôme, flèche vers la poche."""
     img, d = canvas()
     rect(d, 0, 0, W, H, (14, 10, 8))
-    rect(d, 10, 12, 150, 90, (90, 48, 24))
+    rect(d, 10, 12, 150, 90, (110, 58, 28))
     rect(d, 16, 18, 144, 84, (11, 90, 58))
-    rect(d, 20, 22, 140, 80, (14, 107, 69))
+    rect(d, 20, 22, 140, 80, (18, 120, 76))
     for (x, y) in ((20, 22), (80, 22), (140, 22), (20, 80), (80, 80), (140, 80)):
-        disc(d, x, y, 4, INK)
-    disc(d, 124, 32, 4, YELLOW)
-    d.ellipse((114, 37, 122, 45), outline=IVORY)
-    disc(d, 60, 64, 4, IVORY)
-    d.line((64, 61, 114, 43), fill=SMOKE)
-    d.line((14, 82, 54, 67), fill=(200, 154, 90), width=2)
+        disc(d, x, y, 5, INK)
+        d.ellipse((x - 6, y - 6, x + 6, y + 6), outline=GOLD_D)
+    d.ellipse((133, 15, 147, 29), outline=EMERALD)
+    disc(d, 50, 66, 4, IVORY)
+    for k in range(9):
+        x0 = 54 + k * 6
+        d.line((x0, 66 - k * 2.2, x0 + 3, 66 - k * 2.2 - 1.1), fill=IVORY)
+    d.ellipse((104, 42, 112, 50), outline=IVORY)
+    disc(d, 114, 41, 4, YELLOW)
+    d.line((117, 38, 133, 25), fill=YELLOW)
+    d.polygon([(136, 22), (130, 25), (133, 28)], fill=YELLOW)
+    d.line((14, 80, 44, 69), fill=(216, 176, 122), width=2)
     save(img, "billiards")
 
 

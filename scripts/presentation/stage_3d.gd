@@ -6,6 +6,15 @@ extends SubViewportContainer
 ## Le contenu se construit dans `root` ; la présentation reste purement cosmétique.
 
 const AMBIENT: Color = Color(0.32, 0.22, 0.3)
+## Reflets (1.9) : HDRI d'intérieur chaleureux (Poly Haven, CC0), lue seulement pour les reflets
+## des métaux ; le fond reste la couleur de la scène. Coupée en qualité allégée.
+const HDRI_PATH: String = "res://assets/hdri/lounge_1k.hdr"
+const HDRI_ENERGY: float = 0.55
+## Textures PBR (ambientCG, CC0, 512 px) : <jeu>_albedo / _normal / _rough.
+const TEX_PATH: String = "res://assets/textures/%s_%s.jpg"
+
+static var _sky: Sky = null
+static var _tex_cache: Dictionary[String, Texture2D] = {}
 
 var root: Node3D = null
 var cam: Camera3D = null
@@ -61,6 +70,21 @@ func _apply_quality() -> void:
 	key.shadow_enabled = RenderQuality.shadows()
 	env.glow_enabled = Settings.f("video", "bloom") > 0.0 and not _vp.transparent_bg
 	env.glow_intensity = 0.4 + 0.8 * Settings.f("video", "bloom")
+	var refl: bool = bool(RenderQuality.pick(true, false)) and ResourceLoader.exists(HDRI_PATH)
+	env.sky = shared_sky() if refl else null
+	env.reflected_light_source = Environment.REFLECTION_SOURCE_SKY if refl else Environment.REFLECTION_SOURCE_BG
+
+
+## Ciel partagé par toutes les scènes (une seule HDRI en mémoire vidéo).
+static func shared_sky() -> Sky:
+	if _sky == null:
+		var pano: PanoramaSkyMaterial = PanoramaSkyMaterial.new()
+		pano.panorama = load(HDRI_PATH) as Texture2D
+		pano.energy_multiplier = HDRI_ENERGY
+		_sky = Sky.new()
+		_sky.sky_material = pano
+		_sky.radiance_size = Sky.RADIANCE_SIZE_128
+	return _sky
 
 
 ## Fond transparent : seule la géométrie se dessine (décor 3D posé sur une interface 2D).
@@ -112,6 +136,32 @@ static func mat(col: Color, metallic: float = 0.0, rough: float = 0.6) -> Standa
 	m.metallic = metallic
 	m.roughness = rough
 	return m
+
+
+## Matériau texturé (bois, marbre, feutre) teinté par `col`, plaqué en triplanaire monde :
+## `tile` mètres par répétition, quelle que soit la forme (boîtes, cylindres).
+static func textured(set_name: String, col: Color, tile: float, metallic: float = 0.0, rough: float = 1.0) -> StandardMaterial3D:
+	var m: StandardMaterial3D = mat(col, metallic, rough)
+	var alb: Texture2D = _tex(set_name, "albedo")
+	if alb == null:
+		return m
+	m.albedo_texture = alb
+	m.normal_enabled = true
+	m.normal_texture = _tex(set_name, "normal")
+	m.roughness_texture = _tex(set_name, "rough")
+	m.roughness_texture_channel = BaseMaterial3D.TEXTURE_CHANNEL_RED
+	m.uv1_triplanar = true
+	m.uv1_world_triplanar = true
+	m.uv1_scale = Vector3.ONE / maxf(tile, 0.01)
+	return m
+
+
+static func _tex(set_name: String, kind: String) -> Texture2D:
+	var key: String = set_name + "_" + kind
+	if not _tex_cache.has(key):
+		var path: String = TEX_PATH % [set_name, kind]
+		_tex_cache[key] = load(path) as Texture2D if ResourceLoader.exists(path) else null
+	return _tex_cache[key]
 
 
 static func glow(col: Color, energy: float = 2.0) -> StandardMaterial3D:

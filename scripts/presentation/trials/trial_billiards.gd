@@ -82,9 +82,9 @@ func _build_3d() -> void:
 	# Tapis, bandes de feutre, cadre d'acajou verni et mouches de nacre.
 	Stage3D.box(r, Vector3((TABLE.size.x + CUSHION_PX * 2.0) * PX3, (TABLE.size.y + CUSHION_PX * 2.0) * PX3, 0.04),
 		st.to3(TABLE.get_center(), -0.02),
-		Stage3D.mat(Color("0a5034"), 0.0, 0.95))
-	var cushion: StandardMaterial3D = Stage3D.mat(Color("08422b"), 0.0, 0.9)
-	var wood: StandardMaterial3D = Stage3D.mat(Color("5a2a12"), 0.0, 0.3)
+		Stage3D.textured("felt", Color("1c9a62"), 0.35, 0.0, 1.0))
+	var cushion: StandardMaterial3D = Stage3D.textured("felt", Color("13784b"), 0.35, 0.0, 1.0)
+	var wood: StandardMaterial3D = Stage3D.textured("wood", Color("c07a50"), 0.8, 0.0, 0.7)
 	wood.clearcoat_enabled = true
 	wood.clearcoat = 0.8
 	var g: Rect2 = TABLE.grow(RAIL_PX)
@@ -105,7 +105,7 @@ func _build_3d() -> void:
 		for y: float in [TABLE.position.y - 34.0, TABLE.end.y + 34.0]:
 			Stage3D.sphere(r, 5.0 * PX3, st.to3(Vector2(TABLE.position.x + dx, y), 0.16), pearl)
 	# Poches : trou noir, rebord doré.
-	var gilt: StandardMaterial3D = Stage3D.mat(Palette.GOLD_DARK, 0.45, 0.3)
+	var gilt: StandardMaterial3D = Stage3D.mat(Palette.GOLD_DARK, 0.75, 0.3)
 	for pk: Vector2 in _pockets():
 		var ring: TorusMesh = TorusMesh.new()
 		ring.inner_radius = POCKET_R * PX3

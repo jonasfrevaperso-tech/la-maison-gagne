@@ -64,12 +64,12 @@ func _x_of(k: int) -> float:
 
 func _build_shell(w: float, cx: float, wall: Color, floor_c: Color, accent: Color) -> void:
 	var wm: StandardMaterial3D = Stage3D.mat(wall, 0.0, 0.85)
-	var panel: StandardMaterial3D = Stage3D.mat(wall.darkened(0.35), 0.0, 0.6)
-	var brass: StandardMaterial3D = Stage3D.mat(Palette.GOLD_DARK, 0.45, 0.3)
+	var panel: StandardMaterial3D = Stage3D.textured("wood", wall.darkened(0.1).lightened(0.25), 0.9, 0.0, 0.8)
+	var brass: StandardMaterial3D = Stage3D.mat(Palette.GOLD_DARK, 0.75, 0.3)
 	# Sol en damier, mur du fond, plinthe, cimaise et lambris.
 	var tiles: int = int(ceil(w / 0.8))
-	var fa: StandardMaterial3D = Stage3D.mat(floor_c, 0.0, 0.35)
-	var fb: StandardMaterial3D = Stage3D.mat(floor_c.lightened(0.12), 0.0, 0.35)
+	var fa: StandardMaterial3D = Stage3D.textured("marble", floor_c.lightened(0.5), 1.6, 0.0, 0.6)
+	var fb: StandardMaterial3D = Stage3D.textured("marble", floor_c.lightened(0.62), 1.6, 0.0, 0.6)
 	for i: int in tiles:
 		for j: int in 6:
 			Stage3D.box(_room, Vector3(0.8, 0.02, 0.8), Vector3(cx - w * 0.5 + 0.4 + 0.8 * float(i), -0.01, WALL_Z + 0.4 + 0.8 * float(j)),

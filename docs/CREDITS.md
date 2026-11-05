@@ -14,7 +14,7 @@ Conçu et développé avec Claude Code (Anthropic) pour jonasfreva.
 - Python 3, numpy, Pillow — outillage hors jeu
 
 ## Assets
-Tous les assets (icônes, sprites, sons, musiques) sont **générés par les scripts de `tools/`** et sont originaux. Aucune ressource tierce n'est incluse, sauf mention ci-dessous.
+Tous les assets (icônes, sprites, sons, musiques) sont **générés par les scripts de `tools/`** et sont originaux. Aucune ressource tierce n'est incluse, sauf mention ci-dessous (1.9 : une HDRI et trois textures CC0, obtenues via le serveur MCP 3d-asset-server).
 
 | Asset | Source | Licence |
 |---|---|---|
@@ -28,6 +28,10 @@ Tous les assets (icônes, sprites, sons, musiques) sont **générés par les scr
 | Props 3D rendus (`assets/sprites/` : roue, jetons, bille) | modélisés et rendus par `tools/blender/render_props.py` (Blender, Cycles) | originaux (projet) |
 | Shaders (`shaders/`) | écrits pour le projet | originaux (projet) |
 | Musiques (`audio/music/`) | composées et synthétisées par `tools/gen_audio.py` | originales (projet) |
+| HDRI de reflets « Lythwood Lounge » (`assets/hdri/lounge_1k.hdr`, 1K) | Greg Zaal, [Poly Haven](https://polyhaven.com/a/lythwood_lounge) | CC0 1.0 |
+| Bois « Wood 051 » (`assets/textures/wood_*.jpg`, réduit à 512 px) | [ambientCG](https://ambientcg.com/a/Wood051) | CC0 1.0 |
+| Marbre « Tiles 074 » (`assets/textures/marble_*.jpg`, réduit à 512 px) | [ambientCG](https://ambientcg.com/a/Tiles074) | CC0 1.0 |
+| Tissu « Fabric 061 » (`assets/textures/felt_*.jpg`, réduit à 512 px) | [ambientCG](https://ambientcg.com/a/Fabric061) | CC0 1.0 |
 
 ## Inspirations (mécaniques et ressenti uniquement)
 Balatro, Clover Pit, Raccoin. Aucun nom, personnage, visuel ou son n'en est repris.
