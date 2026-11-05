@@ -3,8 +3,8 @@
 > Reprise après coupure : lire ce fichier, `CLAUDE.md`, puis `docs/DECISIONS.md`. Lancer `tools/check.sh`.
 
 ## État courant
-- Phase en cours : **1.9.0 « Répétition générale »** — phases 33 à 39 faites, publication (phase 40) en attente du build 4.7.2
-- Dernier tag : `phase-39-recette`
+- Phase en cours : **Livré (1.9.0 « Répétition générale »)** — voir la section 1.9.0 en fin de fichier
+- Dernier tag : `v1.9.0` / `v1.9.0-android`
 
 ## Phase 0 — Reconnaissance ✅
 - Environnement : Godot 4.7.2 (MCP godot OK), Blender 5.2.2, Python 3.14 + numpy 2.4 + Pillow 12, uv, gdtoolkit 4 (installé via uv), git 2.53, 12 cœurs.
@@ -223,6 +223,6 @@ Plan : phases 33 à 40 (remarques de test sur les deux versions).
 - **Phase 37 — Défaite** ✅ (`phase-37-defaite`) : cinématique à variantes par acte et créancier (D-080).
 - **Phase 38 — Assets** ✅ (`phase-38-assets`) : HDRI de reflets, textures PBR CC0, trois cartons regénérés (D-081).
 - **Phase 39 — Recette** ✅ (`phase-39-recette`) : `docs/QA_1.9.md`.
-- **Phase 40 — Publication** : en attente (le Godot du système est en 4.7.1, les modèles d'export en 4.7.2).
+- **Phase 40 — Publication** ✅ (`phase-40-release`) : builds faits avec le Godot 4.7.2 officiel (`~/.local/opt/godot-4.7.2/bin` placé en tête du PATH, car le Godot de Fedora est en 4.7.1). Recette sur le Pixel 7 consignée dans `docs/QA_1.9.md`. APK de 42,6 Mo (39,5 Mo en 1.8.0).
 
 Banc 1.9.0 (épreuves modifiées, bot parfait / bot humain) : Bouteilles 1,00 / 0,78–0,80 · Shaker 1,00 / 0,87–0,96 · Cave 0,99–1,00 / 0,75–0,93 · Billard 1,00 / 0,92 · Grattage 1,00 / 0,94 · Tiercé 1,00 / 0,95 · Pluie 0,98–0,99. Partie automatique PC et mobile sans erreur de script ; 133 tests.
