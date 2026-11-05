@@ -25,18 +25,8 @@ const WALL_Z: float = -2.6
 const RACK_Z: float = -1.9
 const PILLAR_Z: float = -1.1
 const LAMP_RANGE: float = 12.0
-const GROOM: Array[String] = [
-	"  ####  ",
-	" ###### ",
-	"  #  #  ",
-	"  ####  ",
-	" ###### ",
-	"########",
-	"# #### #",
-	"  ####  ",
-	"  #  #  ",
-	" ##  ## ",
-]
+## Pieds → mains levées, en hauteurs de personnage (pose « suspendu » de Figure3D).
+const HANG_REACH: float = 1.06
 
 var _x: float = 120.0
 var _y: float = FLOOR_Y
@@ -65,6 +55,13 @@ var _ropes3: Dictionary[int, Array] = {}
 var _lamps: Array[OmniLight3D] = []
 var _flames: Array[MeshInstance3D] = []
 var _rat_last: Dictionary[int, float] = {}
+var _hero: Figure3D = null
+## Accrochage amorti : les mains glissent jusqu'au bout du câble en `grab_blend` secondes.
+var _grab_t: float = 1.0
+var _grab_from: Vector2 = Vector2.ZERO
+## Élan transmis aux câbles : oscillation amortie (angle, vitesse) ajoutée au balancement.
+var _kick: Dictionary[int, Vector2] = {}
+var _air_t: float = 0.0
 
 
 func begin() -> void:
@@ -130,6 +127,11 @@ func _build_3d() -> void:
 		if String(sg["kind"]) in ["treasure", "pit", "barrel"]:
 			_treasure3[i] = _build_treasure(st)
 	_build_door(st)
+	_hero = Figure3D.new()
+	st.root.add_child(_hero)
+	_hero.build(BODY.y * PX3 * p("hero_scale"))
+	_hero.rotation.y = PI * 0.5
+	_hero.position = st.to3(Vector2(_x, _y), 0.05)
 
 
 ## Mur de briques du fond (une seule MultiMesh), joints sombres derrière.
@@ -328,11 +330,12 @@ func _build_door(st: Stage3D) -> void:
 	Stage3D.omni(st.root, Palette.GOLD_LIGHT, 1.5, c + Vector3(0, 0.6, 0.8), 3.0)
 
 
-func _sync_3d() -> void:
+func _sync_3d(dt: float) -> void:
 	if stage == null:
 		return
 	var st: Stage3D = stage
 	st.cam.position.x = _cam * PX3
+	_sync_hero(dt)
 	for i: int in _barrels3.keys():
 		var b: Node3D = _barrels3[i]
 		b.position = st.to3(Vector2(float(_segs[i]["bx"]), FLOOR_Y - BARREL_R), 0.0)
@@ -368,6 +371,34 @@ func _sync_3d() -> void:
 		_flames[k].scale = Vector3.ONE * fl
 
 
+## Le groom : pose selon l'état (course, saut, chute, suspendu, étourdi).
+func _sync_hero(dt: float) -> void:
+	if _hero == null:
+		return
+	_hero.position = stage.to3(Vector2(_x, _y), 0.05)
+	_hero.rotation.z = 0.0
+	if _stun > 0.0:
+		_hero.animate(&"stun", t * 6.0, dt)
+	elif _rope >= 0:
+		# Mains au bout du câble, corps dans son prolongement.
+		var a: float = _rope_angle(_rope)
+		var reach: float = BODY.y * p("hero_scale") * HANG_REACH
+		var hands: Vector2 = _rope_end(_rope) if _grab_t >= 1.0 else Vector2(_x, _y - BODY.y)
+		_hero.position = stage.to3(hands + Vector2(sin(a), cos(a)) * reach, 0.05)
+		_hero.rotation.z = a
+		_hero.animate(&"hang", 0.0, dt, a / maxf(p("rope_swing"), 0.01) * 0.5)
+	elif not _ground:
+		if _vy < 0.0 or _air_t < 0.25:
+			_hero.animate(&"jump", clampf(_air_t / 0.6, 0.0, 1.0), dt)
+		else:
+			_hero.animate(&"fall", t * 8.0, dt)
+	elif absf(_vx) > 10.0:
+		_hero.animate(&"run", _run_anim * 2.6, dt)
+	else:
+		_hero.animate(&"idle", t * 2.0, dt)
+	_hero.rotation.y = PI * 0.5 if _vx >= -1.0 or _rope >= 0 else -PI * 0.5
+
+
 func _dur() -> float:
 	return p("duration") * slow
 
@@ -382,7 +413,25 @@ func _pit_at(x: float) -> int:
 
 
 func _rope_angle(k: int) -> float:
-	return p("rope_swing") * sin(t * TAU / p("rope_period") + float(_segs[k]["phase"]))
+	var kick: float = (_kick[k] as Vector2).x if _kick.has(k) else 0.0
+	return p("rope_swing") * sin(t * TAU / p("rope_period") + float(_segs[k]["phase"])) + kick
+
+
+## Vitesse angulaire du câble (balancement + élan reçu).
+func _rope_omega(k: int) -> float:
+	var kick: float = (_kick[k] as Vector2).y if _kick.has(k) else 0.0
+	return p("rope_swing") * TAU / p("rope_period") * cos(t * TAU / p("rope_period") + float(_segs[k]["phase"])) + kick
+
+
+## Élans des câbles : ressort amorti vers zéro.
+func _tick_kicks(dt: float) -> void:
+	var w0: float = TAU / p("rope_period")
+	for k: int in _kick.keys():
+		var st: Vector2 = _kick[k]
+		var acc: float = -w0 * w0 * st.x - 2.0 * p("kick_damping") * w0 * st.y
+		st.y += acc * dt
+		st.x += st.y * dt
+		_kick[k] = st
 
 
 func _rope_end(k: int) -> Vector2:
@@ -415,7 +464,7 @@ func _jump() -> void:
 	if _rope >= 0:
 		# Se lâcher du câble : on garde l'élan du balancement.
 		var a: float = _rope_angle(_rope)
-		var w: float = p("rope_swing") * TAU / p("rope_period") * cos(t * TAU / p("rope_period") + float(_segs[_rope]["phase"]))
+		var w: float = _rope_omega(_rope)
 		_vx = maxf(w * ROPE_LEN * cos(a), 0.0) + p("run_speed") * 0.6
 		_vy = -p("jump_speed") * 0.6
 		_rope = -1
@@ -440,10 +489,17 @@ func tick(dt: float) -> void:
 		axis = clampf((_mouse_x - (_x - _cam)) / 120.0, -1.0, 1.0)
 	if _stun > 0.0:
 		axis = 0.0
+	_tick_kicks(dt)
 	if _rope >= 0:
 		var e: Vector2 = _rope_end(_rope)
-		_x = e.x
-		_y = e.y + BODY.y
+		var target: Vector2 = Vector2(e.x, e.y + BODY.y)
+		if _grab_t < 1.0:
+			# Les mains glissent le long du câble jusqu'au bout (lissé), au lieu d'un saut instantané.
+			_grab_t = minf(1.0, _grab_t + dt / maxf(p("grab_blend"), 0.01))
+			var k: float = _grab_t * _grab_t * (3.0 - 2.0 * _grab_t)
+			target = _grab_from.lerp(target, k)
+		_x = target.x
+		_y = target.y
 	else:
 		if _ground:
 			_vx = axis * p("run_speed")
@@ -455,11 +511,12 @@ func tick(dt: float) -> void:
 		_x = maxf(_x, 60.0)
 		_land()
 		_grab_rope()
+	_air_t = 0.0 if _ground or _rope >= 0 else _air_t + dt
 	_run_anim += absf(_vx) * dt * 0.02
 	_obstacles(dt)
 	_collect()
 	_cam = clampf(_x - SCREEN_X, 0.0, _goal_x - size.x + 200.0)
-	_sync_3d()
+	_sync_3d(dt)
 	if _x >= _goal_x or t >= _dur():
 		_end()
 
@@ -501,6 +558,12 @@ func _grab_rope() -> void:
 		var near: Vector2 = Geometry2D.get_closest_point_to_segment(hands, pivot.lerp(e, p("rope_grab_from")), e)
 		if near.distance_to(hands) < GRAB_R * p("grab_scale") and _x < float(_segs[k]["x"]) + 60.0:
 			_rope = k
+			# L'élan de la course passe au câble ; le corps glisse jusqu'à sa prise.
+			var st: Vector2 = _kick.get(k, Vector2.ZERO)
+			st.y += _vx / ROPE_LEN * p("kick_gain")
+			_kick[k] = st
+			_grab_t = 0.0
+			_grab_from = Vector2(_x, _y)
 			_vx = 0.0
 			_vy = 0.0
 			AudioBus.play("cloth", 1.0, -6.0)
@@ -617,12 +680,6 @@ func paint() -> void:
 	var c: float = _cam
 	if stage == null:
 		return
-	# Le groom.
-	var col: Color = Palette.MULT_RED if _stun > 0.0 and fmod(t * 10.0, 1.0) < 0.5 else Palette.ROULETTE_RED
-	var cell: float = BODY.x / 8.0 * 1.4
-	var at: Vector2 = Vector2(_x - c - 4.0 * cell, _y - 10.0 * cell + (sin(_run_anim) * 3.0 if _ground else 0.0))
-	ArcadeKit.sprite(self, at, GROOM, cell, col)
-	draw_rect(Rect2(at + Vector2(2.0 * cell, 0), Vector2(4.0 * cell, cell)), Palette.GOLD)
 	# Bandeau : progression et trésors.
 	var prog: float = clampf(_x / _goal_x, 0.0, 1.0)
 	draw_rect(Rect2(size.x * 0.5 - 400, 80, 800, 14), Color(Palette.INK, 0.8))

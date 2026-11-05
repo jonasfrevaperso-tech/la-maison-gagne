@@ -210,6 +210,8 @@ func _open_trial() -> void:
 		trial.rehearsal = _rehearsal
 		for line: Variant in e.get("tuto_" + Localization.locale(), e.get("tuto_fr", [])):
 			trial.tuto_lines.append(String(line))
+		if _rehearsal == "demo":
+			trial.pace = Balance.f("throw_game.tuto_demo_speed") * float(e.get("tuto_pace", 1.0))
 		trial.skip_intro(_rehearsal == "essai")
 		trial.skip_requested.connect(_next_rehearsal)
 		trial.done.connect(_on_rehearsal_done)
@@ -495,12 +497,21 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 
+## Durée de la démo (au moins `tuto_step_seconds` par étape, bornée) ou de l'essai.
+func _rehearsal_limit() -> float:
+	if _rehearsal != "demo":
+		return Balance.f("throw_game.rehearsal_seconds")
+	var steps_n: int = maxi(trial.tuto_lines.size(), 1) if trial != null else 1
+	return clampf(Balance.f("throw_game.tuto_step_seconds") * float(steps_n), Balance.f("throw_game.tuto_demo_seconds"),
+		Balance.f("throw_game.tuto_demo_max"))
+
+
 ## Démo : le bot de l'épreuve joue seul ; démo et essai sont bornés dans le temps.
 func _tick_rehearsal(dt: float) -> void:
 	if _rehearsal == "" or trial == null:
 		return
 	_rehearse_t += dt
-	var limit: float = Balance.f("throw_game.tuto_demo_seconds" if _rehearsal == "demo" else "throw_game.rehearsal_seconds")
+	var limit: float = _rehearsal_limit()
 	trial.rehearsal_u = clampf(_rehearse_t / maxf(limit, 0.01), 0.0, 1.0)
 	if _rehearsal == "demo" and not trial.finished:
 		trial.act(trial.want())

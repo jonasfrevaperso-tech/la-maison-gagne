@@ -238,8 +238,11 @@
     "pace": {
       "ready_seconds": 0.6
     },
-    "tuto_demo_seconds": 7.0,
-    "rehearsal_seconds": 8.0
+    "tuto_demo_seconds": 9.0,
+    "tuto_demo_max": 14.0,
+    "tuto_step_seconds": 4.0,
+    "tuto_demo_speed": 0.6,
+    "rehearsal_seconds": 10.0
   },
   "throw_trials": {
     "_doc": "Réglages des épreuves du lancer (une entrée par épreuve de data/throw/throw_trials.json).",
@@ -388,7 +391,11 @@
       "plaque_value": 3.0,
       "plaque_speed": 1.2,
       "bad_penalty": 0.05,
-      "topple_penalty": 0.08,
+      "topple_penalty": 0.03,
+      "topple_keep": 0.5,
+      "secure_share": 0.3,
+      "end_stack_share": 0.5,
+      "warn_share": 0.5,
       "stun_seconds": 0.55,
       "stun_wobble": 0.35,
       "stack_max": 12,
@@ -469,7 +476,11 @@
       "fall_penalty": 0.05,
       "hit_penalty": 0.03,
       "rope_grab_from": 0.25,
-      "grab_scale": 2.5
+      "grab_scale": 2.5,
+      "grab_blend": 0.16,
+      "kick_gain": 0.35,
+      "kick_damping": 0.35,
+      "hero_scale": 1.4
     },
     "pachinko": {
       "balls": 6,
@@ -480,11 +491,13 @@
       "peg_kick": 40.0,
       "funnel_pull": 6.0,
       "max_vx": 800.0,
-      "max_vy": 520.0,
-      "kick_window": 60,
+      "max_vy": 440.0,
+      "kick_window": 90,
+      "gold_half": 80.0,
+      "silver_half": 150.0,
       "kick_cooldown": 0.35,
       "kick_flight": 0.5,
-      "silver_value": 0.4
+      "silver_value": 0.5
     },
     "blackjack": {
       "hands": 3,

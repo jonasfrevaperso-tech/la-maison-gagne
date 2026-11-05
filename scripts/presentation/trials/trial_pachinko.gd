@@ -18,8 +18,6 @@ const KICK_Y: float = 850.0
 const KICK_HALF_W: float = 150.0
 const KICK_GAP: float = 200.0
 const CUP_Y: float = 930.0
-const GOLD_HALF: float = 60.0
-const SILVER_HALF: float = 140.0
 const SUBSTEPS: int = 4
 ## Décor 3D : mètres par pixel, ampoules du caisson, machines voisines de la salle.
 const PX3: float = 0.005
@@ -127,9 +125,9 @@ func _build_3d() -> void:
 		blade.name = "blade"
 		Stage3D.cylinder(fl, 10.0 * PX3, 0.09, Vector3.ZERO, gilt).rotation.x = PI * 0.5
 		_flippers.append(fl)
-	Stage3D.box(r, Vector3(SILVER_HALF * 2.0 * PX3, 50.0 * PX3, 0.1), st.to3(Vector2(c, CUP_Y + 15.0), 0.0), Stage3D.mat(Color("b0b0bc"),
+	Stage3D.box(r, Vector3(_silver_half() * 2.0 * PX3, 50.0 * PX3, 0.1), st.to3(Vector2(c, CUP_Y + 15.0), 0.0), Stage3D.mat(Color("b0b0bc"),
 		0.45, 0.2))
-	Stage3D.box(r, Vector3(GOLD_HALF * 2.0 * PX3, 52.0 * PX3, 0.12), st.to3(Vector2(c, CUP_Y + 15.0), 0.01), Stage3D.glow(Palette.GOLD,
+	Stage3D.box(r, Vector3(_gold_half() * 2.0 * PX3, 52.0 * PX3, 0.12), st.to3(Vector2(c, CUP_Y + 15.0), 0.01), Stage3D.glow(Palette.GOLD,
 		0.6))
 	_cup_light = Stage3D.omni(r, Palette.GOLD_LIGHT, 0.6, st.to3(Vector2(c, CUP_Y - 40.0), 0.4), 2.0)
 	# Ampoules du caisson (haut et bas) qui chassent.
@@ -233,7 +231,7 @@ func kick(side: int) -> void:
 		var err: float = clampf(absf(pos.y - KICK_Y) / (p("kick_window") * widen()), 0.0, 1.0)
 		var dir: float = 1.0 if side == 0 else -1.0
 		# Trajectoire balistique visée sur le godet, ratée d'autant plus que la frappe est tardive.
-		var target: float = _center() + dir * err * (SILVER_HALF + 40.0)
+		var target: float = _center() + dir * err * (_silver_half() + 40.0)
 		var flight: float = p("kick_flight")
 		var v: Vector2 = Vector2((target - pos.x) / flight, (CUP_Y - pos.y - 0.5 * p("gravity") * flight * flight) / flight)
 		b["v"] = v
@@ -310,15 +308,24 @@ func _step(b: Dictionary, h: float) -> void:
 	b["p"] = pos
 
 
+## Demi-largeurs des godets or et argent (réglages de l'épreuve).
+func _gold_half() -> float:
+	return p("gold_half")
+
+
+func _silver_half() -> float:
+	return p("silver_half")
+
+
 func _score_ball(x: float) -> void:
 	var dx: float = absf(x - _center())
 	var sc: float = 0.0
 	var key: String = "TRIAL_PACHINKO_GUTTER"
-	if dx <= GOLD_HALF:
+	if dx <= _gold_half():
 		sc = 1.0
 		key = "TRIAL_PACHINKO_GOLD"
 		AudioBus.play("slot_win", 1.2, -4.0)
-	elif dx <= SILVER_HALF:
+	elif dx <= _silver_half():
 		sc = p("silver_value")
 		key = "TRIAL_PACHINKO_SILVER"
 		AudioBus.play("coin", 1.1, -6.0)

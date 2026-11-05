@@ -410,8 +410,10 @@ func _topple() -> void:
 	pop(Vector2(_x, TRAY_Y - 140.0), 0.0, "TRIAL_CATCH_TOPPLE")
 	AudioBus.play("decor_topple", 1.0, -2.0)
 	_penalty += p("topple_penalty")
-	_stack_val = 0.0
-	_stack_n = 0
+	# Seul le haut de la pile tombe : le bas reste sur le plateau (une pile oubliée n'efface plus tout).
+	var keep: float = clampf(p("topple_keep"), 0.0, 1.0)
+	_stack_n = int(floor(float(_stack_n) * keep))
+	_stack_val *= keep if _stack_n > 0 else 0.0
 	_wobble = 0.0
 	_combo = 0
 
@@ -470,7 +472,7 @@ func tick(dt: float) -> void:
 	_move_items(dt)
 	if t >= _dur() and _items.is_empty():
 		_ended = true
-		_banked += _stack_val
+		_banked += _stack_val * p("end_stack_share")  # pile restée sur le plateau : à moitié perdue
 		# 90 % des pièces dorées suffisent pour la note pleine (une pièce perdue n'est pas fatale).
 		var sc: float = _banked / maxf(_good_total * p("full_share"), 1.0) - _penalty
 		finish(clampf(sc, 0.0, 1.0))
@@ -524,7 +526,9 @@ func _catch(it: Dictionary, pos: Vector2) -> void:
 		_:
 			_combo += 1
 			var gain: float = _value(kind) * _mult() * (2.0 if _bonus.has("double") else 1.0)
-			_stack_val += gain
+			# Une part est acquise d'office ; le reste attend sur la pile qu'on la mette à l'abri.
+			_banked += gain * p("secure_share")
+			_stack_val += gain * (1.0 - p("secure_share"))
 			_stack_n += 1 if kind == "chip" else 2
 			AudioBus.play("chip_place", 0.9 + 0.02 * float(_combo % 12))
 			if _combo > 0 and _combo % int(p("combo_step")) == 0:
@@ -603,6 +607,10 @@ func paint() -> void:
 		var a: float = clampf(_wave_flash, 0.0, 1.0)
 		var wave_s: String = tr(WAVE_KEYS[mini(_wave, WAVE_KEYS.size() - 1)])
 		text(Vector2(size.x * 0.5, HUD_Y + 90.0), wave_s, UiKit.SIZE_BODY, Color(Palette.GOLD_LIGHT, 0.55 + 0.45 * a))
+	# Pile haute : rappel de la mettre à l'abri (le bouton VIDER pulse aussi).
+	if _warn():
+		var wa: float = 0.6 + 0.4 * sin(t * 8.0)
+		text(Vector2(_x, TRAY_Y - 190.0), tr("TRIAL_CATCH_WARN"), UiKit.SIZE_H2, Color(Palette.MULT_RED, wa), "display")
 	# Jauge de pile sous le plateau (orange puis rouge quand elle vacille).
 	if _stack_n > 0:
 		var cap: float = p("stack_max")
@@ -632,6 +640,10 @@ func direct_input(event: InputEvent) -> bool:
 	return true
 
 
+func _warn() -> bool:
+	return _stack_n >= int(ceil(p("stack_max") * p("warn_share"))) or (_stack_n > 0 and _wobble > 0.55)
+
+
 func _bank_button() -> Vector2:
 	var pr: Rect2 = play_rect()
 	return Vector2(pr.end.x - p("bank_button_r") - 40.0, pr.end.y - p("bank_button_r") - 40.0)
@@ -639,7 +651,7 @@ func _bank_button() -> Vector2:
 
 func _draw_bank_button() -> void:
 	var c: Vector2 = _bank_button()
-	var r: float = p("bank_button_r")
+	var r: float = p("bank_button_r") * (1.0 + (0.08 * sin(t * 8.0) if _warn() else 0.0))
 	draw_circle(c, r, Color(Palette.INK, 0.85))
 	draw_arc(c, r, 0, TAU, 48, Palette.GOLD if _stack_n > 0 else Palette.SMOKE, 4.0)
 	text(c, tr("TOUCH_EMPTY"), UiKit.SIZE_H2, Palette.GOLD_LIGHT if _stack_n > 0 else Palette.SMOKE)

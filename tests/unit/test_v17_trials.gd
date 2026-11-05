@@ -27,7 +27,7 @@ func test_catch_bank_topple_stun() -> void:
 	c._stack_val = 9.0
 	c._stack_n = c.pi("stack_max") + 1
 	c.tick(0.01)
-	eq(c._stack_n, 0, "pile trop haute : renversée")
+	eq(c._stack_n, (c.pi("stack_max") + 1) / 2, "pile trop haute : renversée (la moitié basse reste)")
 	check(c._penalty > 0.0 and is_equal_approx(c._banked, 5.0), "valeur perdue et pénalité")
 	c._catch({"kind": "bottle"}, Vector2(960, 900))
 	check(c._stun > 0.0, "bouteille : plateau étourdi")

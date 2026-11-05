@@ -23,6 +23,13 @@ const HINT_H: float = 40.0
 const STICK_DEAD: float = 0.25
 const HAPTIC_PERFECT_MS: int = 40
 
+## Démo du tuto : durée d'affichage d'un geste du bot, et libellé par type de geste.
+const CUE_SECONDS: float = 0.9
+const CUE_KEYS: Dictionary[String, String] = {
+	"confirm": "TUTO_CUE_CONFIRM", "hold": "TUTO_CUE_HOLD", "release": "TUTO_CUE_RELEASE",
+	"sym": "TUTO_CUE_SYM", "dir": "TUTO_CUE_DIR", "axis": "TUTO_CUE_STICK",
+}
+
 var entry: Dictionary = {}
 var assist: bool = false
 var precision: int = 1
@@ -55,6 +62,8 @@ var direct: bool = false
 var tuto_lines: Array[String] = []
 ## Part du temps de démo / d'essai écoulée (0..1), dessinée en jauge.
 var rehearsal_u: float = 0.0
+## Vitesse du temps de l'épreuve (démo du tuto : ralentie pour qu'on suive les gestes).
+var pace: float = 1.0
 ## Carton d'annonce (nom, règle, commandes) avant que l'épreuve ne commence.
 var intro_left: float = 0.0
 var _intro_total: float = 1.0
@@ -73,6 +82,9 @@ var _keys_label: RichTextLabel = null
 var _keys_label_rect: Rect2 = Rect2()
 ## Tuto : carton sauté (1 : sans « Prêt ? », 2 : avec), appliqué une fois dans l'arbre.
 var _skip_intro: int = 0
+## Démo : dernier geste du bot, affiché quelques instants sur le carton (« Appuie ! »…).
+var _demo_cue: String = ""
+var _demo_cue_t: float = 0.0
 
 
 func setup(p_entry: Dictionary, p_precision: int, p_assist: bool, p_mouse: bool) -> ThrowTrial:
@@ -273,7 +285,22 @@ func act(w: Dictionary) -> void:
 		return
 	if _ready_left > 0.0:
 		return
+	if rehearsal == "demo":
+		_note_cue(w)
 	bot_apply(w)
+
+
+## Démo : retient le geste franc du bot pour l'afficher (le stick seulement s'il est poussé).
+func _note_cue(w: Dictionary) -> void:
+	var kind: String = String(w.get("do", ""))
+	var key: String = String(CUE_KEYS.get(kind, ""))
+	if kind == "axis" and (w.get("v", Vector2.ZERO) as Vector2).length() < 0.5:
+		key = ""
+	if key == "":
+		return
+	if key != _demo_cue or _demo_cue_t < CUE_SECONDS * 0.5:
+		_demo_cue = key
+		_demo_cue_t = CUE_SECONDS
 
 
 ## Crée la scène 3D de l'épreuve (appelée par begin()) : elle remplit la zone de jeu et passe
@@ -331,7 +358,8 @@ func blocked() -> bool:
 func _process(delta: float) -> void:
 	if finished or blocked():
 		return
-	var dt: float = delta / maxf(Engine.time_scale, 0.0001)
+	var dt: float = delta / maxf(Engine.time_scale, 0.0001) * pace
+	_demo_cue_t = maxf(0.0, _demo_cue_t - dt)
 	if not _begun:
 		intro_left -= dt
 		if intro_left <= 0.0:
@@ -421,6 +449,11 @@ func _draw_rehearsal() -> void:
 			text(Vector2(box.get_center().x, box.position.y + (66.0 if full() else 54.0)), tuto_lines[k],
 				UiKit.SIZE_H2 if full() else UiKit.SIZE_BODY, Palette.IVORY, "body")
 		text(Vector2(box.get_center().x, box.end.y - 18.0), tr("TUTO_SKIP"), UiKit.SIZE_SMALL, Palette.SMOKE, "body")
+		if _demo_cue_t > 0.0:  # geste en cours du bot, en vignette à droite du carton
+			var ca: float = clampf(_demo_cue_t / CUE_SECONDS * 2.0, 0.0, 1.0)
+			var cue_at: Vector2 = Vector2(box.end.x - 120.0, box.position.y + 24.0)
+			draw_rect(Rect2(cue_at - Vector2(104, 16), Vector2(208, 32)), Color(Palette.GOLD, 0.25 * ca))
+			text(cue_at, tr(_demo_cue), UiKit.SIZE_SMALL, Color(Palette.GOLD_LIGHT, ca), "display")
 		draw_rect(Rect2(box.position.x, box.end.y - 4.0, box.size.x * rehearsal_u, 4.0), Palette.GOLD)
 	else:
 		var band: Rect2 = Rect2(pr.get_center().x - w * 0.3, top - 22.0, w * 0.6, 44.0)
