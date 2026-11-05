@@ -7,6 +7,7 @@ sont écrites à part (docs/balance_proposal.json) pour relecture.
 Usage :
   python3 tools/telemetry_report.py                      # télémétrie du joueur (dossier par défaut)
   python3 tools/telemetry_report.py --human DIR [DIR…]   # un ou plusieurs dossiers (plusieurs testeurs)
+  python3 tools/telemetry_report.py --human LaMaisonGagne-donnees-….zip   # archive « Exporter mes données »
   python3 tools/telemetry_report.py --bot DIR            # référence bot (sim_main --telemetry=…)
   python3 tools/telemetry_report.py --out docs/PLAYTEST_REPORT.md --proposal docs/balance_proposal.json
 
@@ -21,11 +22,12 @@ import os
 import pathlib
 import statistics
 import sys
+import zipfile
 from collections import Counter, defaultdict
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 USER_DIR = pathlib.Path(os.environ.get("XDG_DATA_HOME", pathlib.Path.home() / ".local" / "share")) / "godot" / "app_userdata" / "La Maison Gagne"
-DEFAULT_HUMAN = USER_DIR / "telemetry"
+DEFAULT_HUMAN = USER_DIR / "journal"
 DEFAULT_BOT = USER_DIR / "dev" / "bot_ref"
 
 # Seuils (rapport, pas jeu : ils ne vont pas dans balance.json).
@@ -49,9 +51,10 @@ def load_runs(dirs: list[pathlib.Path]) -> tuple[list[list[dict]], list[dict]]:
     for d in dirs:
         if not d.exists():
             continue
-        for f in sorted(d.glob("*.jsonl")):
+        for name, text in _jsonl_sources(d):
+            f = pathlib.Path(name)
             recs = []
-            for line in f.read_text(encoding="utf-8").splitlines():
+            for line in text.splitlines():
                 line = line.strip()
                 if not line:
                     continue
@@ -61,12 +64,41 @@ def load_runs(dirs: list[pathlib.Path]) -> tuple[list[list[dict]], list[dict]]:
                     continue
             if f.name == "notes.jsonl":
                 notes.extend(recs)
+            elif f.name == "museum.jsonl":
+                for r in recs:
+                    r["_file"] = f.name
+                MUSEUM_TRIALS.extend(recs)
             elif recs and recs[0].get("t") == "run_start":
                 for r in recs:
                     r["_file"] = f.name
                     r["_dir"] = str(d)
                 runs.append(recs)
     return runs, notes
+
+
+MUSEUM_TRIALS: list[dict] = []
+
+
+def _jsonl_sources(path: pathlib.Path) -> list[tuple[str, str]]:
+    """Fichiers .jsonl d'un dossier, ou du dossier journal/ d'une archive exportée (.zip)."""
+    if path.suffix == ".zip":
+        with zipfile.ZipFile(path) as z:
+            return [(n, z.read(n).decode("utf-8")) for n in sorted(z.namelist())
+                    if n.startswith("journal/") and n.endswith(".jsonl")]
+    return [(f.name, f.read_text(encoding="utf-8")) for f in sorted(path.glob("*.jsonl"))]
+
+
+def trial_table(runs: list[list[dict]]) -> dict[str, dict]:
+    """Par épreuve : nombre, note moyenne (en partie / Musée / tuto), durée et gestes médians."""
+    out: dict[str, dict] = defaultdict(lambda: {"n": 0, "ctx": defaultdict(list), "secs": [], "gps": []})
+    recs = [r for run in runs for r in of(run, "trial")] + [r for r in MUSEUM_TRIALS if r.get("t") == "trial"]
+    for r in recs:
+        row = out[r.get("id", "?")]
+        row["n"] += 1
+        row["ctx"][r.get("context", "?")].append(float(r.get("score", 0.0)))
+        row["secs"].append(float(r.get("seconds", 0.0)))
+        row["gps"].append(float(r.get("gestures_per_s", 0.0)))
+    return out
 
 
 def of(run: list[dict], kind: str) -> list[dict]:
@@ -217,7 +249,7 @@ def write_report(human_dirs: list[pathlib.Path], bot_dir: pathlib.Path | None, o
         notes.extend(of(r, "note"))
     if not human:
         print("Aucune télémétrie joueur trouvée dans :", ", ".join(map(str, human_dirs)))
-        print("Active « Statistiques de jeu locales » dans les options, joue, puis relance ce script.")
+        print("Joue une partie (le journal est tenu d'office), ou passe l'archive d'« Exporter mes données » avec --human.")
         return 1
     hs, bs = summary(human), summary(bot) if bot else None
     L: list[str] = ["# Rapport de playtest", ""]
@@ -292,6 +324,19 @@ def write_report(human_dirs: list[pathlib.Path], bot_dir: pathlib.Path | None, o
         L.append(f"| {g}{tag} | {v['offered']} | {v['bought']} | {rate} | {wr} |")
     L.append("")
 
+    trials = trial_table(human)
+    if trials:
+        L.append("## Épreuves")
+        L.append("| Épreuve | Parties | Note en partie | Musée | Tuto (essai) | Durée méd. (s) | Gestes/s méd. |")
+        L.append("|---|---|---|---|---|---|---|")
+
+        def avg(xs: list[float]) -> str:
+            return f"{statistics.mean(xs):.2f} ({len(xs)})" if xs else "—"
+        for tid in sorted(trials, key=lambda k: -trials[k]["n"]):
+            t = trials[tid]
+            L.append(f"| {tid} | {t['n']} | {avg(t['ctx']['run'])} | {avg(t['ctx']['museum'])} | {avg(t['ctx']['tuto'])} "
+                     f"| {med(t['secs']):.1f} | {med(t['gps']):.2f} |")
+        L.append("")
     L.append("## Notes de test")
     if not notes:
         L.append("Aucune note (F8 en jeu ou « Noter ce moment » dans le menu pause).")

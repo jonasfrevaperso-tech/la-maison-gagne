@@ -398,6 +398,12 @@ CONFIRM_TELEMETRY,"Enregistrer des statistiques de jeu sur cet ordinateur (tours
 OPT_TELEMETRY,Statistiques de jeu locales,Local gameplay statistics
 OPT_TELEMETRY_DESC,"Fichiers dans le dossier des données (télémétrie), jamais envoyés. La note de test se prend à tout moment (voir Commandes).","Files in the data folder (telemetry), never sent. Playtest notes can be taken at any time (see Controls)."
 OPT_OPEN_DATA,Ouvrir le dossier des données,Open the data folder
+OPT_EXPORT_DATA,Exporter mes données,Export my data
+OPT_EXPORT_DATA_DESC,"Une archive .zip avec tes sauvegardes, le journal détaillé de chaque partie et de chaque épreuve, et des tableaux CSV prêts à étudier.","A .zip archive with your saves, the detailed log of every run and every trial, and CSV tables ready to study."
+TOAST_EXPORT_RUNNING,Préparation de l'archive…,Preparing the archive…
+TOAST_EXPORT_DONE,Données exportées : %s,Data exported: %s
+TOAST_EXPORT_FAILED,L'export a échoué.,The export failed.
+TOAST_EXPORT_CANCELLED,Export annulé.,Export cancelled.
 PAUSE_NOTE,Noter ce moment,Note this moment
 NOTE_TITLE,Note de test,Playtest note
 NOTE_INTRO,"Qu'as-tu ressenti ? Une incompréhension, un ennui, un bug, un grand moment : tout aide. La capture montre l'écran au moment de la note.","How did that feel? Confusion, boredom, a bug, a great moment: everything helps. The screenshot shows the screen when you opened this note."

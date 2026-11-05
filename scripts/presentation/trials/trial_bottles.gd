@@ -143,16 +143,28 @@ static func _brick_texture() -> ImageTexture:
 
 
 func _next_target() -> void:
-	var standing: Array[int] = []
-	for k: int in BOTTLES:
-		if _alive[k]:
-			standing.append(k)
-	_target = standing[rng.randi_range(0, standing.size() - 1)]
 	var modes: Array = Balance.arr("throw_trials.bottles.modes")
 	_mode = String(modes[mini(_throw, modes.size() - 1)])
 	var dir: float = 1.0 if rng.randf() < 0.5 else -1.0
 	_shelf_v = dir * p("shelf_speed") / slow if _mode.contains("move") else 0.0
 	_wind = (1.0 if rng.randf() < 0.5 else -1.0) * rng.randf_range(p("wind_min"), p("wind_max")) if _mode.contains("wind") else 0.0
+	# Cible équitable : elle ne sort pas de l'étagère avant l'arrivée du jeton (visée lente
+	# comprise) et la visée qu'elle demande, vent compris, reste dans la course du viseur.
+	var standing: Array[int] = []
+	var fair: Array[int] = []
+	var horizon: float = _sweep() * 1.5 + p("power_seconds") * slow + p("flight_seconds")
+	for k: int in BOTTLES:
+		if not _alive[k]:
+			continue
+		standing.append(k)
+		var x_end: float = _xs[k] + _shelf_v * horizon
+		var inside: bool = x_end > SHELF_X.x + BOTTLE_W and x_end < SHELF_X.y - BOTTLE_W
+		var aim_ok: bool = _xs[k] - _wind > SHELF_X.x - 40.0 and _xs[k] - _wind < SHELF_X.y + 40.0 \
+			and x_end - _wind > SHELF_X.x - 40.0 and x_end - _wind < SHELF_X.y + 40.0
+		if inside and aim_ok:
+			fair.append(k)
+	var pool: Array[int] = fair if not fair.is_empty() else standing
+	_target = pool[rng.randi_range(0, pool.size() - 1)]
 	_phase = Phase.AIM
 	_phase_t = 0.0
 

@@ -231,3 +231,4 @@ Banc 1.9.0 (épreuves modifiées, bot parfait / bot humain) : Bouteilles 1,00 / 
 Plan : phases 41 à 53 (50 épreuves, 28 builds de 7 grigris, difficulté resserrée, export des données).
 - **Phase 41 — Correctifs** ✅ (`phase-41-correctifs`) : Pluie, Pachinko, Cave (personnage animé, accrochage amorti), tutos ralentis (D-082).
 - **Phase 42 — Dix épreuves approfondies** ✅ (`phase-42a`, `phase-42b`) : D-083. Banc (bot / humain) : Verre 1,00 / 0,76–0,91 · Bonneteau 0,99 / 0,99 · Grattage 0,92 / 0,96 · Tiercé 0,94 / 0,62 · Effet 1,00 / 0,97 · Billard 1,00 / 0,71–0,92 · Lasers 0,94–1,00 · Tri 1,00 / 1,00 · Bouteilles 0,84–1,00 / 0,76–0,79 · Tour 1,00 / 0,62–0,76.
+- **Phase 43 — Journal et export** ✅ (`phase-43-export`) : journal local toujours tenu, épreuves journalisées (chronologie des gestes et verdicts), Options → « Exporter mes données » (.zip : sauvegardes, JSONL, 5 CSV, README), rapport qui lit l'archive (D-084).

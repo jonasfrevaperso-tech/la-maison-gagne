@@ -25,6 +25,8 @@ const HAPTIC_PERFECT_MS: int = 40
 
 ## Démo du tuto : durée d'affichage d'un geste du bot, et libellé par type de geste.
 const CUE_SECONDS: float = 0.9
+## Entrées gardées au plus dans chaque chronologie du journal (gestes, verdicts).
+const LOG_MAX: int = 400
 const CUE_KEYS: Dictionary[String, String] = {
 	"confirm": "TUTO_CUE_CONFIRM", "hold": "TUTO_CUE_HOLD", "release": "TUTO_CUE_RELEASE",
 	"sym": "TUTO_CUE_SYM", "dir": "TUTO_CUE_DIR", "axis": "TUTO_CUE_STICK",
@@ -64,6 +66,8 @@ var tuto_lines: Array[String] = []
 var rehearsal_u: float = 0.0
 ## Vitesse du temps de l'épreuve (démo du tuto : ralentie pour qu'on suive les gestes).
 var pace: float = 1.0
+## Gestes francs du joueur (appuis, clics, touchers ; gestes du bot), pour le journal de jeu.
+var gestures: int = 0
 ## Carton d'annonce (nom, règle, commandes) avant que l'épreuve ne commence.
 var intro_left: float = 0.0
 var _intro_total: float = 1.0
@@ -85,6 +89,9 @@ var _skip_intro: int = 0
 ## Démo : dernier geste du bot, affiché quelques instants sur le carton (« Appuie ! »…).
 var _demo_cue: String = ""
 var _demo_cue_t: float = 0.0
+## Chronologie pour le journal : instants des gestes et des verdicts (« pop ») de l'épreuve.
+var _log_gestures: Array[float] = []
+var _log_beats: Array[Dictionary] = []
 
 
 func setup(p_entry: Dictionary, p_precision: int, p_assist: bool, p_mouse: bool) -> ThrowTrial:
@@ -187,6 +194,24 @@ func bot_wants() -> Dictionary:
 	return {"do": ""}
 
 
+func _count_gesture() -> void:
+	gestures += 1
+	if _log_gestures.size() < LOG_MAX:
+		_log_gestures.append(snappedf(t, 0.01))
+
+
+## Détail propre à l'épreuve pour le journal de jeu (objet JSON ; vide par défaut).
+func journal() -> Dictionary:
+	return {}
+
+
+## Détail complet : chronologie commune (gestes, verdicts) + détail propre à l'épreuve.
+func journal_detail() -> Dictionary:
+	var d: Dictionary = {"gesture_t": _log_gestures, "beats": _log_beats}
+	d.merge(journal(), true)
+	return d
+
+
 func bot_apply(_want: Dictionary) -> void:
 	pass
 
@@ -216,6 +241,8 @@ func feed(event: InputEvent) -> bool:
 		return confirm_pressed(event) or sym_pressed(event) >= 0
 	if _ready_left > 0.0:
 		return confirm_pressed(event) or sym_pressed(event) >= 0 or (direct and event is InputEventMouse)
+	if _any_press(event):
+		_count_gesture()
 	if direct and event is InputEventMouse:
 		return direct_input(event)
 	return handle(event)
@@ -287,6 +314,8 @@ func act(w: Dictionary) -> void:
 		return
 	if rehearsal == "demo":
 		_note_cue(w)
+	elif String(w.get("do", "")) not in ["", "axis"]:
+		_count_gesture()
 	bot_apply(w)
 
 
@@ -591,6 +620,8 @@ static func held_vector() -> Vector2:
 ## Verdict flottant (« Parfait », « Raté »…) au point donné.
 func pop(at: Vector2, sc: float, key: String = "") -> void:
 	var g: ThrowSkill.Grade = ThrowSkill.beat_grade(sc)
+	if _log_beats.size() < LOG_MAX:
+		_log_beats.append({"t": snappedf(t, 0.01), "sc": snappedf(sc, 0.01), "key": key})
 	_pops.append({"at": at, "t": POP_TIME, "key": key if key != "" else ThrowSkill.pop_key(g), "g": int(g)})
 
 

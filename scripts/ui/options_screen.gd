@@ -304,6 +304,8 @@ func _game_tab() -> void:
 	_desc(b, "OPT_TELEMETRY_DESC")
 	b.add_child(UiKit.button(tr("OPT_RESET_TUTORIAL"), _reset_tutorial))
 	b.add_child(UiKit.button(tr("OPT_RESET_TRIAL_TUTOS"), _reset_trial_tutos))
+	b.add_child(UiKit.button(tr("OPT_EXPORT_DATA"), _export_data))
+	_desc(b, "OPT_EXPORT_DATA_DESC")
 	if not Platform.is_mobile():
 		b.add_child(UiKit.button(tr("OPT_OPEN_DATA"), _open_data_dir))
 
@@ -423,6 +425,18 @@ func _reset_trial_tutos() -> void:
 	SaveSystem.profile["trials_tutored"] = []
 	SaveSystem.save_profile()
 	EventBus.toast.emit(tr("TOAST_TRIAL_TUTOS_RESET"), &"success")
+
+
+## Archive .zip de toutes les données (sauvegardes, journal, CSV) : voir DataExport.
+func _export_data() -> void:
+	EventBus.toast.emit(tr("TOAST_EXPORT_RUNNING"), &"info")
+	DataExport.run(func(path: String) -> void:
+		if path == DataExport.CANCELLED:
+			EventBus.toast.emit(tr("TOAST_EXPORT_CANCELLED"), &"info")
+		elif path == "":
+			EventBus.toast.emit(tr("TOAST_EXPORT_FAILED"), &"error")
+		else:
+			EventBus.toast.emit(tr("TOAST_EXPORT_DONE") % path, &"success"))
 
 
 func go_back() -> void:

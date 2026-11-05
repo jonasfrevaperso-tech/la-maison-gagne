@@ -57,6 +57,7 @@ var quality: float = 0.0
 var trial: ThrowTrial = null
 var _index: int = 0
 var _practice_diff: Dictionary = {}
+var _practice_name: String = ""
 var _precision: int = 1
 var _assist: bool = false
 var _mouse: bool = false
@@ -106,6 +107,7 @@ func start(precision: int, assist: bool, count: int = -1) -> void:
 ## sans lâcher ni lien avec une partie ; `practice_done` rend sa note.
 func start_practice(id: String, difficulty: String, tuto: bool = false) -> void:
 	_practice_diff = Balance.data().get("museum", {}).get("difficulty", {}).get(difficulty, {}) as Dictionary
+	_practice_name = difficulty
 	var assist: bool = bool(_practice_diff.get("assist", false))
 	_close_trial()
 	practice = true
@@ -306,6 +308,7 @@ func _fit(r: Rect2) -> float:
 
 
 func _on_trial_done(sc: float) -> void:
+	_journal(sc, "museum" if practice else "run")
 	trial_scores.append(sc)
 	_pause_grade = ThrowSkill.beat_grade(sc)
 	if trial != null:
@@ -319,6 +322,15 @@ func _on_trial_done(sc: float) -> void:
 			AudioBus.play("chime", 0.9 + sc * 0.3, -4.0)
 		_:
 			AudioBus.play("lose_soft", 1.0, -4.0)
+
+
+## Journal de jeu : une ligne par épreuve terminée (démonstrations exclues).
+func _journal(sc: float, context: String) -> void:
+	if trial == null:
+		return
+	var input: String = "pad" if InputGlyphs.using_pad else ("touch" if InputGlyphs.using_touch else ("mouse" if trial.mouse else "keys"))
+	var diff: String = _practice_name if practice else ("assist" if _assist else "run")
+	Telemetry.trial(RunTelemetry.trial(trial_ids[_index], context, diff, sc, trial.t, trial.gestures, input, trial.journal_detail()))
 
 
 ## Tuto : démo → essai → épreuve réelle (même épreuve, nouvelle instance).
@@ -341,6 +353,7 @@ func _on_rehearsal_done(sc: float) -> void:
 	if _rehearsal == "demo":
 		_next_rehearsal.call_deferred()
 		return
+	_journal(sc, "tuto")
 	if trial != null:
 		trial.show_verdict(ThrowSkill.beat_grade(sc))
 	beat = Beat.PAUSE

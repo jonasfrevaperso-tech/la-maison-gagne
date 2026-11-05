@@ -71,6 +71,9 @@ static func spin(pre: Dictionary, run: RunState, ctx: ScoreContext, think_second
 		"control": snappedf(t.control, 0.001) if t != null else 0.0,
 		"won_bets": ctx.bets_won.size(),
 		"score": ctx.total,
+		"base_chips": snappedf(ctx.chips, 0.01),
+		"mult": snappedf(ctx.base_mult + ctx.mult_add, 0.01),
+		"xmult": snappedf(ctx.mult_mul, 0.001),
 		"money_delta": ctx.money_delta,
 		"grigris": grigri_ids(run),
 		"think_s": snappedf(minf(think_seconds, MAX_THINK_SECONDS), 0.1),
@@ -137,6 +140,24 @@ static func run_end(run: RunState, victory: bool, seconds: float) -> Dictionary:
 		"grigris": grigri_ids(run),
 		"pacts": run.pacts_used.size(),
 		"seconds": snappedf(seconds, 0.1),
+	}
+
+
+## Une épreuve jouée : contexte (run, museum, tuto), note, durée, gestes, commande, détail.
+static func trial(id: String, context: String, difficulty: String, score: float, seconds: float, gestures: int,
+		input: String, detail: Dictionary) -> Dictionary:
+	return {
+		"t": "trial",
+		"date": Time.get_datetime_string_from_system(true),
+		"context": context,
+		"id": id,
+		"difficulty": difficulty,
+		"score": snappedf(score, 0.001),
+		"seconds": snappedf(seconds, 0.01),
+		"gestures": gestures,
+		"gestures_per_s": snappedf(float(gestures) / maxf(seconds, 0.01), 0.01),
+		"input": input,
+		"detail": detail,
 	}
 
 

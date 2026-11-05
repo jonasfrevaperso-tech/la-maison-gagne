@@ -3,13 +3,21 @@ extends Node
 ## dans les options). Rien ne quitte l'ordinateur : un fichier JSONL par run dans
 ## `user://telemetry/`, lu par `tools/telemetry_report.py` pour l'équilibrage.
 ## Le temps compté est le temps actif (fenêtre au premier plan, pause exclue).
+## 2.0 : en plus, un JOURNAL de jeu toujours tenu, lui aussi local (`user://journal/`) : mêmes
+## enregistrements + chaque épreuve jouée ; c'est lui que « Exporter mes données » emporte
+## (`DataExport`). Les vieux runs tournent au-delà de JOURNAL_KEEP fichiers.
 
 const DIR_NAME: String = "telemetry/"
 const SHOTS_DIR: String = "shots/"
 const FLAG_FILE: String = "telemetry_file"
 const FLAG_SECONDS: String = "telemetry_seconds"
+const FLAG_JOURNAL: String = "journal_file"
+const JOURNAL_DIR: String = "journal/"
+const MUSEUM_FILE: String = "museum.jsonl"
+const JOURNAL_KEEP: int = 200
 
 var _file: String = ""
+var _journal: String = ""
 var _run_seconds: float = 0.0
 var _deadline_seconds: float = 0.0
 var _think_seconds: float = 0.0
@@ -53,6 +61,10 @@ func directory() -> String:
 	return DevMode.save_dir() + DIR_NAME
 
 
+func journal_dir() -> String:
+	return DevMode.save_dir() + JOURNAL_DIR
+
+
 # --------------------------------------------------------------------------- cycle de run
 
 
@@ -60,18 +72,23 @@ func begin(run: RunState) -> void:
 	_file = ""
 	_run_seconds = 0.0
 	_deadline_seconds = 0.0
-	if not enabled():
-		return
-	DirAccess.make_dir_recursive_absolute(directory())
 	var stamp: String = Time.get_datetime_string_from_system().replace(":", "-")
-	_file = directory() + "run_%s_%s.jsonl" % [stamp, run.character_id]
-	run.flags[FLAG_FILE] = _file
+	var name: String = "run_%s_%s.jsonl" % [stamp, run.character_id]
+	DirAccess.make_dir_recursive_absolute(journal_dir())
+	_rotate()
+	_journal = journal_dir() + name
+	run.flags[FLAG_JOURNAL] = _journal
+	if enabled():
+		DirAccess.make_dir_recursive_absolute(directory())
+		_file = directory() + name
+		run.flags[FLAG_FILE] = _file
 	_write(RunTelemetry.run_start(run, "human", String(ProjectSettings.get_setting("application/config/version"))))
 
 
 ## Reprise d'un run sauvegardé : on continue le même fichier et le même chronomètre.
 func resume(run: RunState) -> void:
 	_file = String(run.flags.get(FLAG_FILE, "")) if enabled() else ""
+	_journal = String(run.flags.get(FLAG_JOURNAL, ""))
 	_run_seconds = float(run.flags.get(FLAG_SECONDS, 0.0))
 	_deadline_seconds = 0.0
 	_write({"t": "resume", "n": run.total_spins})
@@ -93,7 +110,9 @@ func before_spin(run: RunState) -> void:
 func after_spin(run: RunState, outcome: RunController.SpinOutcome) -> void:
 	if _pre.is_empty():
 		_pre = RunTelemetry.snapshot(run)
-	_write(RunTelemetry.spin(_pre, run, outcome.ctx, _think_seconds))
+	var rec: Dictionary = RunTelemetry.spin(_pre, run, outcome.ctx, _think_seconds)
+	rec["slot"] = outcome.slot
+	_write(rec)
 	if outcome.deadline_won or outcome.deadline_failed:
 		_write(RunTelemetry.deadline(_pre, run, outcome.ctx, outcome.deadline_won, _deadline_seconds))
 		_deadline_seconds = 0.0
@@ -138,6 +157,27 @@ func shop_closed(run: RunState) -> void:
 func end(run: RunState, victory: bool) -> void:
 	_write(RunTelemetry.run_end(run, victory, _run_seconds))
 	_file = ""
+	_journal = ""
+
+
+## Une épreuve jouée (`PlayJournal.trial`) : dans le journal du run, sinon dans celui du Musée.
+func trial(rec: Dictionary) -> void:
+	if _journal != "" and String(rec.get("context", "")) == "run":
+		_write(rec)
+		return
+	DirAccess.make_dir_recursive_absolute(journal_dir())
+	_append(journal_dir() + MUSEUM_FILE, rec)
+
+
+## Garde les JOURNAL_KEEP runs les plus récents (noms horodatés : l'ordre alphabétique suffit).
+func _rotate() -> void:
+	var runs: Array[String] = []
+	for f: String in DirAccess.get_files_at(journal_dir()):
+		if f.begins_with("run_") and f.ends_with(".jsonl"):
+			runs.append(f)
+	runs.sort()
+	while runs.size() >= JOURNAL_KEEP:
+		DirAccess.remove_absolute(journal_dir() + runs.pop_front())
 
 
 ## Note de test (humeur + texte + capture éventuelle). Hors run : fichier de notes générales.
@@ -159,10 +199,11 @@ func note(run: RunState, mood: String, text: String, screen: String, shot: Image
 
 
 func _write(rec: Dictionary) -> void:
-	if _file == "" or not enabled():
-		return
 	rec["at"] = snappedf(_run_seconds, 0.1)
-	_append(_file, rec)
+	if _journal != "":
+		_append(_journal, rec)
+	if _file != "" and enabled():
+		_append(_file, rec)
 
 
 static func _append(path: String, rec: Dictionary) -> void:

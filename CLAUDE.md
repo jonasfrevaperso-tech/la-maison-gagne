@@ -17,6 +17,7 @@ Roguelite de roulette européenne (Godot 4.7, GDScript typé). Jeu de hasard **s
 - Banc des épreuves : `godot --headless --path . -- --dev-trial-bench=3 [--dev-trials-only=catch,dice]` (25 épreuves ; bot ≥ 0,8, inactif ≤ 0,4). Bots : un geste de manette par image (`axis`, `confirm`, `sym`+`symbol`, `dir`, `hold`, `release`), cf. D-069.
 - À-coups : `--dev-hitch` (journal des images > 50 ms) ; réglages forcés : `--dev-set=video/preset=ultra;video/scaling=fsr2`.
 - Musée : `godot --path . -- --dev-screen=museum --dev-tab=<salle 0-4> [--dev-trials=<épreuve> --dev-autoplay=1]` (D-074); `--dev-focus=N` (objet), `--dev-tutos=1` (tuto forcé, aussi en partie automatique), cf. D-077.
+- Données du joueur : journal `user://journal/*.jsonl` ; export Options → « Exporter mes données » (`DataExport`, D-084) ; analyse `python3 tools/telemetry_report.py --human <archive.zip>`.
 - Défaite : `--dev-defeat-cutscene` (le bilan de dev passe par la cinématique, D-080).
 - Lancer le jeu : `godot --path .`
 - Android : `tools/build_android.sh [--debug] [--install]` (APK dans `build/`, cf. `docs/ANDROID.md`) ; émulation sur PC : `godot --path . -- --dev-mobile` ; interface mobile : `godot --headless --path . -- --dev-ui-check --dev-mobile` ; mémoire vidéo : `--dev-mem=200`.

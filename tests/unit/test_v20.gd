@@ -210,3 +210,46 @@ func test_tower_sway_and_kinds() -> void:
 	tw.drop()
 	eq(tw._perfects, 1, "sommet décalé par l'oscillation, visé où il est : pile !")
 	tw.free()
+
+
+## Journal → CSV : guillemets, listes, fusion début / fin de run, une ligne par achat.
+func test_journal_csv_tables() -> void:
+	var text: String = "\n".join(PackedStringArray([
+		JSON.stringify({"t": "run_start", "character": "joueur", "seed": 7}),
+		JSON.stringify({"t": "spin", "n": 1, "score": 120, "grigris": ["a", "b"], "slot": [{"reels": ["x"], "prize": ""}]}),
+		JSON.stringify({"t": "shop", "bought": ["g1", "g2"], "money_before": 30, "money_after": 5}),
+		JSON.stringify({"t": "run_end", "victory": true, "tier": 4}),
+		"pas du json",
+	]))
+	var recs: Array[Dictionary] = JournalCsv.parse_jsonl(text, "run_a")
+	eq(recs.size(), 4, "la ligne illisible est ignorée (sans bruit)")
+	var runs: PackedStringArray = JournalCsv.runs(recs).strip_edges().split("\n")
+	eq(runs.size(), 2, "un run = une ligne (plus l'en-tête)")
+	check(runs[1].begins_with("run_a,") and runs[1].contains(",joueur,") and runs[1].contains(",1,4,"), "début et fin réunis")
+	var spins: String = JournalCsv.table(JournalCsv.of_kind(recs, "spin"), JournalCsv.SPIN_COLS)
+	check(spins.contains(",a|b,"), "les grigris sont joints par |")
+	check(spins.contains("\"[{\"\"prize\"\""), "la machine à sous est un JSON entre guillemets")
+	eq(JournalCsv.purchases(recs).strip_edges().split("\n").size(), 3, "une ligne par grigri acheté")
+	eq(JournalCsv.cell("a,b"), "\"a,b\"", "virgule échappée")
+
+
+## Export : l'archive contient sauvegardes, journal, CSV et README ; une épreuve est journalisée.
+func test_data_export_zip() -> void:
+	_boot()
+	var rec: Dictionary = RunTelemetry.trial("darts", "museum", "normal", 0.8, 12.5, 25, "pad", {"beats": []})
+	eq(rec["gestures_per_s"], 2.0, "gestes par seconde")
+	Telemetry.trial(rec)
+	var museum: String = FileAccess.get_file_as_string(Telemetry.journal_dir() + Telemetry.MUSEUM_FILE)
+	check(museum.contains("\"id\":\"darts\""), "l'épreuve du Musée est dans museum.jsonl")
+	var path: String = DevMode.save_dir() + "test_export.zip"
+	eq(DataExport.build(path), OK, "archive construite")
+	var zip: ZIPReader = ZIPReader.new()
+	eq(zip.open(path), OK, "archive lisible")
+	var files: PackedStringArray = zip.get_files()
+	for f: String in ["README.txt", "csv/runs.csv", "csv/spins.csv", "csv/deadlines.csv", "csv/trials.csv", "csv/purchases.csv",
+			"journal/" + Telemetry.MUSEUM_FILE]:
+		check(files.has(f), "contient " + f)
+	var trials: String = zip.read_file("csv/trials.csv").get_string_from_utf8()
+	check(trials.contains(",museum,darts,normal,0.8,"), "la ligne de l'épreuve est dans trials.csv")
+	zip.close()
+	DirAccess.remove_absolute(path)
