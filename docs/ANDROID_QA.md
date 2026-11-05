@@ -44,14 +44,14 @@ une main sur un vrai téléphone peut juger. Cocher, noter le modèle et la vers
 - [x] Record conservé après fermeture de l'application et réinstallation par-dessus (Pixel 7, 1.8.0).
 
 ## 1.9.0 — Jeu direct, tutos et défaite
-- [ ] Première rencontre d'une épreuve : démonstration (carton en haut), essai bandeau cyan, puis épreuve ; toucher passe chaque étape.
-- [ ] Juke-box, Effet, Plus haut / plus bas, Tri, Jonglage, Pachinko : on touche l'objet, aucun pavé affiché.
+- [x] Première rencontre d'une épreuve : démonstration (carton en haut), essai bandeau cyan, puis épreuve ; toucher passe chaque étape.
+- [x] Juke-box, Effet, Plus haut / plus bas, Tri, Jonglage, Pachinko : on touche l'objet, aucun pavé affiché.
 - [ ] Pluie : le plateau suit le doigt, bouton VIDER met la pile à l'abri.
-- [ ] Billard : glisser depuis la blanche vise et dose, relâcher sous le seuil ne tire pas, revenir sur la bille annule.
+- [x] Billard : glisser depuis la blanche vise et dose, relâcher sous le seuil ne tire pas, revenir sur la bille annule.
 - [ ] Grattage : gratter au doigt dans les pointillés, le débordement est signalé.
 - [ ] Défaite : cinématique (registre, aube, porte), passage au doigt maintenu, puis bilan.
 - [ ] Musée : la maquette de la Mémoire ne scintille pas ; geste Retour en épreuve ouvre la pause.
-- [ ] Mémoire après une partie avec Billard et Musée (`dumpsys meminfo`), à comparer à la 1.8.0.
+- [x] Mémoire après une partie avec Billard et Musée (`dumpsys meminfo`) : PSS 1,06 Go (Pixel 7, 1.9.0).
 
 ## Système
 - [x] Bouton/geste Retour : ferme la surcouche, sinon ouvre la pause ; sur le titre, demande avant de quitter.

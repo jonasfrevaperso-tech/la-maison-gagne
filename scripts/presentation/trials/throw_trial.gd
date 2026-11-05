@@ -558,7 +558,7 @@ static func held_vector() -> Vector2:
 ## Verdict flottant (« Parfait », « Raté »…) au point donné.
 func pop(at: Vector2, sc: float, key: String = "") -> void:
 	var g: ThrowSkill.Grade = ThrowSkill.beat_grade(sc)
-	_pops.append({"at": at, "t": POP_TIME, "key": key if key != "" else ThrowSkill.grade_key(g), "g": int(g)})
+	_pops.append({"at": at, "t": POP_TIME, "key": key if key != "" else ThrowSkill.pop_key(g), "g": int(g)})
 
 
 func _draw_pops() -> void:

@@ -139,6 +139,11 @@ static func grade_key(g: Grade) -> String:
 	return ["THROW_Q_PERFECT", "THROW_Q_GREAT", "THROW_Q_GOOD", "THROW_Q_MISS"][int(g)]
 
 
+## Verdict court d'un geste dans une épreuve (« Parfait ! », « Raté ») : pas de « lancer ».
+static func pop_key(g: Grade) -> String:
+	return ["POP_Q_PERFECT", "POP_Q_GREAT", "POP_Q_GOOD", "POP_Q_MISS"][int(g)]
+
+
 ## Note d'un temps isolé → verdict (mêmes seuils que la qualité globale).
 static func beat_grade(score: float) -> Grade:
 	return grade(score)

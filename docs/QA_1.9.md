@@ -23,10 +23,17 @@ Chaque ligne donne le constat, sa cause, le correctif et la vérification.
 | 11 | Billard sur mobile : tir accidentel en visant | Le bouton de tir servait aussi à doser | Lance-pierre : on ne tire qu'au-delà d'un seuil, revenir sur la bille annule | `test_billiards_slingshot` |
 | 12 | Défaite sans mise en scène | — | Cinématique « registre soldé, aube, porte », avec des variantes par acte et par créancier | `test_defeat_cutscene_variants`, partie automatique |
 | 14 | Banc : Cave et Pêche sous le seuil humain sur un passage (0,39 et 0,54) | Forte variance selon le tirage (fosse à câble large, fenêtre de ferrage courte) | Cave : `rope_pit_width` 440, `grab_scale` 2,5, `fall_stun` 0,3 ; Pêche : `cast_tolerance` 0,18, `react_window` 0,7 | 5 passages Cave à 0,73–0,93 ; 4 passages Pêche à 0,76–0,87 |
+| 15 | Pendant une épreuve, une mauvaise note du Juke-box affichait « LANCER RATÉ » (vu sur le Pixel 7) | Les verdicts de geste reprenaient l'étiquette de qualité du lancer | Étiquettes courtes `POP_Q_*` (Parfait !, Très bien, Bien, Raté) ; le verdict de fin d'épreuve est inchangé | Pixel 7 |
+| 16 | Musée sur téléphone : « La Pluie du Grand Lustr » coupé dans la rangée | Texte rogné sans points de suspension | `OVERRUN_TRIM_ELLIPSIS` | Capture `--dev-mobile` |
+| 17 | Banc : le bot parfait de la Pluie passe parfois sous 0,8 (0,78–0,79) | La note exigeait 100 % des pièces dorées, et le tirage dépend de l'ordre des épreuves | `catch.full_share` 0,9 : 90 % des pièces suffisent pour la note pleine | 3 passages : bot 0,95–1,00, humain 0,89–0,94, inactif ≤ 0,29 |
 | 13 | L'import de l'HDRI émettait deux avertissements | En-tête `GAMMA` / `PRIMARIES` ignoré par Godot | Lignes d'en-tête retirées (image inchangée) | Import sans avertissement |
 
 ## Écrans relus (captures)
 Chargement, partie (tapis, roue, surcouches, machine à sous), les 25 épreuves au carton, en démonstration, en jeu et au verdict, le Musée (5 salles), la cinématique de défaite et le bilan. Tout a été relu sur PC (1920×1080) et en émulation mobile.
 
-## Restant à faire sur l'appareil
-- Sur le Pixel 7 (détecté par adb) : installation par-dessus la 1.8.0, tuto, jeu au doigt, Billard au lance-pierre, défaite, `dumpsys meminfo`. Ces vérifications se feront avec l'APK 1.9.0, après le build de la phase 40.
+## Pixel 7 (adb, APK release 1.9.0)
+- Installé par-dessus la 1.8.0 : la partie en cours est conservée ; Vulkan / Forward Mobile sur Mali-G710.
+- Musée : sol en marbre, maquettes ; Juke-box avec démonstration, essai, puis épreuve, joué en touchant directement les boutons, sans pavé.
+- Billard au lance-pierre : un petit glissement depuis la blanche ne tire pas, une traction tire, et un toucher hors de la bille ne fait rien.
+- Mémoire : PSS de 1,06 Go, dont 0,68 Go « Graphics » (1,28 Go en 1.6.0). Aucune erreur au logcat.
+- Non refait sur l'appareil : la cinématique de défaite, vérifiée sur PC et en émulation mobile.

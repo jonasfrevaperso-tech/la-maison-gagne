@@ -209,6 +209,7 @@ func _show_room(k: int, focus: int) -> void:
 	for i: int in _view.exhibits.size():
 		var b: Button = UiKit.button(_strip_label(_view.exhibits[i]), _on_strip.bind(i), Vector2(0, 56))
 		b.clip_text = true
+		b.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.focus_entered.connect(select.bind(i))
 		b.mouse_entered.connect(select.bind(i))

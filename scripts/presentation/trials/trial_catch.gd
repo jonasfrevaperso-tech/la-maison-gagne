@@ -471,7 +471,8 @@ func tick(dt: float) -> void:
 	if t >= _dur() and _items.is_empty():
 		_ended = true
 		_banked += _stack_val
-		var sc: float = _banked / maxf(_good_total, 1.0) - _penalty
+		# 90 % des pièces dorées suffisent pour la note pleine (une pièce perdue n'est pas fatale).
+		var sc: float = _banked / maxf(_good_total * p("full_share"), 1.0) - _penalty
 		finish(clampf(sc, 0.0, 1.0))
 
 

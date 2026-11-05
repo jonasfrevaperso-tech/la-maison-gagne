@@ -373,6 +373,7 @@
     },
     "catch": {
       "duration": 16.0,
+      "full_share": 0.9,
       "tray_speed": 1250.0,
       "tray_accel": 9.0,
       "mouse_gain": 8.0,
