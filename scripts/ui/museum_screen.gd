@@ -76,7 +76,7 @@ func _dev_start() -> void:
 		var k: int = (rooms[r].get("exhibits", []) as Array).find(_dev_play)
 		if k >= 0:
 			_show_room(r, k)
-			play_current()
+			play_current(DevMode.args().get("dev-tutos", "0") == "1")  # outil : tuto forcé
 			return
 
 

@@ -406,14 +406,20 @@ func _draw_rehearsal() -> void:
 	if rehearsal == "demo":
 		draw_rect(pr, Color(Palette.INK, 0.28))
 		var k: int = clampi(floori(rehearsal_u * float(tuto_lines.size())), 0, maxi(tuto_lines.size() - 1, 0))
+		# Plein écran : carton en haut. Sur le tapis (PC) : au-dessus du cadre, pour ne rien cacher
+		# du jeu ; sur téléphone, compact en haut du cadre.
 		var box: Rect2 = Rect2(pr.get_center().x - w * 0.5, top - 30.0, w, 132.0)
+		if not full():
+			box = Rect2(pr.get_center().x - w * 0.5, 4.0, w, 104.0)
+			if not Platform.is_mobile():
+				box.position.y = -18.0 - 16.0 - box.size.y - 8.0
 		draw_rect(box, Color(Palette.INK, 0.92))
 		draw_rect(box, Palette.GOLD, false, 2.0)
 		text(Vector2(box.get_center().x, box.position.y + 24.0), "%s · %d/%d" % [tr("TUTO_DEMO"), k + 1, tuto_lines.size()],
 			UiKit.SIZE_SMALL, Palette.GOLD_LIGHT)
 		if not tuto_lines.is_empty():
-			text(Vector2(box.get_center().x, box.position.y + 66.0), tuto_lines[k], UiKit.SIZE_H2 if full() else UiKit.SIZE_BODY, Palette.IVORY,
-				"body")
+			text(Vector2(box.get_center().x, box.position.y + (66.0 if full() else 54.0)), tuto_lines[k],
+				UiKit.SIZE_H2 if full() else UiKit.SIZE_BODY, Palette.IVORY, "body")
 		text(Vector2(box.get_center().x, box.end.y - 18.0), tr("TUTO_SKIP"), UiKit.SIZE_SMALL, Palette.SMOKE, "body")
 		draw_rect(Rect2(box.position.x, box.end.y - 4.0, box.size.x * rehearsal_u, 4.0), Palette.GOLD)
 	else:

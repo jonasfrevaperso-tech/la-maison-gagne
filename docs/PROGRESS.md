@@ -3,8 +3,8 @@
 > Reprise après coupure : lire ce fichier, `CLAUDE.md`, puis `docs/DECISIONS.md`. Lancer `tools/check.sh`.
 
 ## État courant
-- Phase en cours : **Livré (1.8.0 « Le Musée »)** — voir la section 1.8.0 en fin de fichier
-- Dernier tag : `v1.8.0` / `v1.8.0-android`
+- Phase en cours : **1.9.0 « Répétition générale »** — phases 33 à 39 faites, publication (phase 40) en attente du build 4.7.2
+- Dernier tag : `phase-39-recette`
 
 ## Phase 0 — Reconnaissance ✅
 - Environnement : Godot 4.7.2 (MCP godot OK), Blender 5.2.2, Python 3.14 + numpy 2.4 + Pillow 12, uv, gdtoolkit 4 (installé via uv), git 2.53, 12 cœurs.
@@ -213,3 +213,16 @@ Plan : phases 28 à 32 (remarques de test sur les deux versions).
 - **Phase 30 — Rework des épreuves** ✅ (`phase-30a` arcade, `phase-30b` table, `phase-30c` adresse, `phase-30d` Élan / Effet / Tri, `phase-30e` harmonisation) : les 14 épreuves à plat passent en 3D (D-073).
 - **Phase 31 — Le Musée** ✅ (`phase-31a-musee-salles`, `phase-31b-musee-jeu`) : cinq salles, 25 maquettes, entraînement à trois difficultés, records et médailles, deux succès (D-074).
 - **Phase 32 — Publication** ✅ (`phase-32-release`).
+
+## Version 1.9.0 — « Répétition générale » (PC + Android)
+Plan : phases 33 à 40 (remarques de test sur les deux versions).
+- **Phase 33 — Correctifs** ✅ (`phase-33-correctifs`) : B dans les épreuves du Musée et pause, Mémoire qui ne scintille plus, jauge des Bouteilles, Shaker et Cave adoucis (D-076).
+- **Phase 34 — Tutos** ✅ (`phase-34-tutos`) : démonstration, essai, épreuve ; bouton Tuto au Musée ; options (D-077).
+- **Phase 35 — Épreuves** ✅ (`phase-35-epreuves`) : Billard (trajectoire, lance-pierre), Grattage refait, Tiercé à piste de rythme (D-078).
+- **Phase 36 — Android direct** ✅ (`phase-36-android-direct`) : sept épreuves jouées sur les objets (D-079).
+- **Phase 37 — Défaite** ✅ (`phase-37-defaite`) : cinématique à variantes par acte et créancier (D-080).
+- **Phase 38 — Assets** ✅ (`phase-38-assets`) : HDRI de reflets, textures PBR CC0, trois cartons regénérés (D-081).
+- **Phase 39 — Recette** ✅ (`phase-39-recette`) : `docs/QA_1.9.md`.
+- **Phase 40 — Publication** : en attente (le Godot du système est en 4.7.1, les modèles d'export en 4.7.2).
+
+Banc 1.9.0 (épreuves modifiées, bot parfait / bot humain) : Bouteilles 1,00 / 0,78–0,80 · Shaker 1,00 / 0,87–0,96 · Cave 0,99–1,00 / 0,75–0,93 · Billard 1,00 / 0,92 · Grattage 1,00 / 0,94 · Tiercé 1,00 / 0,95 · Pluie 0,98–0,99. Partie automatique PC et mobile sans erreur de script ; 133 tests.

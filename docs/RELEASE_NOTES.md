@@ -1,3 +1,36 @@
+# Notes de version — 1.9.0 « Répétition générale »
+
+Une mise à jour pour les deux versions du jeu. Chaque point précise la version concernée : **[PC]**, **[Android]** ou **[PC + Android]**.
+
+## Apprendre chaque épreuve [PC + Android]
+- La première fois qu'on rencontre une épreuve, elle se présente d'abord en **démonstration** : elle se joue seule et un carton explique les gestes en deux ou trois étapes. Vient ensuite un **essai qui ne compte pas**, puis la vraie épreuve. Une touche passe chaque étape.
+- Au Musée, le bouton **Tuto** du cartel rejoue cette initiation. Dans les options (Jeu), on peut couper les tutos ou les remettre à zéro.
+
+## Épreuves refaites [PC + Android]
+- **Billard** : la trajectoire complète est tracée jusqu'au point de contact ou à la bande, puis un rebond, avec la direction de la bille visée, la déviation de la blanche et la poche conseillée. Les billes tombent dans les poches, les bandes ont leur son, et chaque coup reçoit son verdict. À la souris et au doigt, on tire **au lance-pierre** depuis la blanche ; revenir sur la bille annule.
+- **Grattage**, repensé de zéro : il faut gratter les trois cases cerclées de pointillés **sans déborder**. Le grattage se fait vraiment, à la souris ou au doigt, avec des copeaux.
+- **Tiercé** : une **piste de rythme** fait défiler les notes gauche / droite vers la ligne de frappe, avec un tic sur chaque temps et un verdict à chaque appui (Parfait, Bien, Contretemps). Le rythme est plus lent, la fenêtre plus large.
+- **Bouteilles** : la zone de force ne déborde plus de la jauge, elle est plus étroite, et viser les bouteilles devient plus facile. **Shaker** et **Cave** sont plus tolérants.
+
+## Défaite [PC + Android]
+- Une **cinématique de défaite** dans le style du prologue montre le registre soldé, la rue au petit matin, puis la porte du Grand Zéro. Le texte change selon l'acte atteint et nomme le créancier qui vous a fait tomber. Option : toujours, la première fois ou jamais.
+
+## Plus beau [PC + Android]
+- Reflets d'un vrai intérieur (HDRI) sur les laitons et les billes, feutre et bois texturés au Billard, marbre et lambris au Musée. Assets CC0, crédités. La qualité Économie s'en passe.
+- Nouveaux cartons illustrés pour le Billard, le Grattage et le Tiercé.
+
+## Le Musée [PC + Android]
+- **Corrigé** : la maquette de la Mémoire ne scintille plus.
+
+## Jouer avec les doigts [Android]
+- Juke-box, Effet, Plus haut / plus bas, Tri, Jonglage, Pachinko et Pluie du Grand Lustre se jouent **en touchant les objets eux-mêmes** et non plus des boutons émulés : le plateau de la Pluie suit le doigt, un bouton VIDER met la pile à l'abri, on touche directement les boutons du juke-box.
+- Billard : on ne tire plus par accident en voulant viser.
+
+## Manette [PC]
+- **Corrigé** : au Musée, B servait à quitter l'épreuve au lieu de jouer. Il joue désormais, et Start ouvre une pause (Reprendre, Recommencer, Quitter l'épreuve).
+
+---
+
 # Notes de version — 1.8.0 « Le Musée »
 
 Une mise à jour pour les deux versions du jeu. Chaque point précise la version concernée : **[PC]**, **[Android]** ou **[PC + Android]**.

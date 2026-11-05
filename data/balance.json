@@ -458,9 +458,9 @@
       "rope_swing": 0.75,
       "rope_period": 2.8,
       "pit_width": 140,
-      "rope_pit_width": 520,
+      "rope_pit_width": 440,
       "fall_depth": 120.0,
-      "fall_stun": 0.45,
+      "fall_stun": 0.3,
       "hit_stun": 0.5,
       "barrel_speed": 140,
       "rat_speed": 1.1,
@@ -468,7 +468,7 @@
       "fall_penalty": 0.05,
       "hit_penalty": 0.03,
       "rope_grab_from": 0.25,
-      "grab_scale": 2.1
+      "grab_scale": 2.5
     },
     "pachinko": {
       "balls": 6,
@@ -547,12 +547,12 @@
     "fishing": {
       "fish": 2,
       "cast_seconds": 0.9,
-      "cast_tolerance": 0.15,
+      "cast_tolerance": 0.18,
       "cast_timeout": 4.0,
       "bite_min": 0.5,
       "bite_max": 1.1,
       "early_penalty": 0.4,
-      "react_window": 0.6,
+      "react_window": 0.7,
       "bot_react": 0.12,
       "tension_start": 0.3,
       "reel_tension": 0.55,
