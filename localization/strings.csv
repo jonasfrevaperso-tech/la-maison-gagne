@@ -867,3 +867,48 @@ OPT_DEFEAT_CUTSCENE,Cinématique de défaite,Defeat cutscene
 OPT_DC_ALWAYS,Toujours,Always
 OPT_DC_FIRST,La première fois,The first time
 OPT_DC_NEVER,Jamais,Never
+TRIAL_TAPDANCE_HINT,{qte_left} {qte_up} {qte_right} {qte_down} : rejoue les pas de la danseuse en mesure,{qte_left} {qte_up} {qte_right} {qte_down}: play the dancer's steps back in time
+TRIAL_TAPDANCE_HINT_MOUSE,"{@click} les pavés de pas, en mesure","{@click} the step pads, in time"
+TRIAL_TAPDANCE_HINT_TOUCH,"Touche {@tap} les pavés de pas, en mesure","Tap {@tap} the step pads, in time"
+TRIAL_TAPDANCE_COUNT,%d…,%d…
+TRIAL_TAPDANCE_LISTEN,Écoute…,Listen…
+TRIAL_TAPDANCE_YOUR_TURN,À toi !,Your turn!
+TRIAL_TAPDANCE_BRAVO,Bravo !,Bravo!
+TRIAL_TAPDANCE_PHRASE,Phrase %d / %d,Phrase %d / %d
+TRIAL_TAPDANCE_EXTRA,En trop,Extra
+TRIAL_TAPDANCE_WRONG,Mauvais pas,Wrong step
+TRIAL_TAPDANCE_MISSED,Pas oubliés !,Missed steps!
+TRIAL_TAPDANCE_STEP_0,Pointe G,Left toe
+TRIAL_TAPDANCE_STEP_1,Talon,Heel
+TRIAL_TAPDANCE_STEP_2,Pointe D,Right toe
+TRIAL_TAPDANCE_STEP_3,Frappe,Stamp
+TRIAL_SPOTLIGHT_HINT,{move} : garde la meneuse (en or) dans la lumière,{move}: keep the star (in gold) in the light
+TRIAL_SPOTLIGHT_HINT_MOUSE,"{@mouse} : la poursuite suit le pointeur, avec retard","{@mouse}: the spot follows the pointer, with a lag"
+TRIAL_SPOTLIGHT_HINT_TOUCH,Joystick : garde la meneuse (en or) dans la lumière,Joystick: keep the star (in gold) in the light
+TRIAL_SPOTLIGHT_STATUS,Dans la lumière : %d %%,In the light: %d %%
+TRIAL_SPOTLIGHT_DOUBLE,Une doublure ! Suis celle en or.,An understudy! Follow the gold one.
+TRIAL_TIGHTROPE_HINT,Maintiens {confirm} pour avancer · {move} déplacer la perche,Hold {confirm} to walk · {move} shift the pole
+TRIAL_TIGHTROPE_HINT_MOUSE,Maintiens {@click} pour avancer · {@mouse} à gauche ou à droite du funambule pour la perche,Hold {@click} to walk · {@mouse} left or right of the walker for the pole
+TRIAL_TIGHTROPE_HINT_TOUCH,Joystick à gauche : la perche · maintiens à droite pour avancer,Joystick on the left: the pole · hold on the right to walk
+TRIAL_TIGHTROPE_GUST,Rafale !,Gust!
+TRIAL_TIGHTROPE_CAUGHT,Rattrapé !,Caught!
+TRIAL_TIGHTROPE_ARRIVED,Arrivé !,Made it!
+TRIAL_TIGHTROPE_FALLS,Rattrapages : %d,Slips: %d
+TRIAL_HATTOSS_HINT,"{confirm} lâcher au bon élan · {move} haut : lifté, bas : coupé","{confirm} release at the right swing · {move} up: backspin, down: topspin"
+TRIAL_HATTOSS_HINT_MOUSE,"{@click} lâcher · {@mouse} au-dessus du groom : lifté, en dessous : coupé","{@click} release · {@mouse} above the groom: backspin, below: topspin"
+TRIAL_HATTOSS_HINT_TOUCH,Joystick : l'effet · touche à droite pour lâcher,Joystick: the spin · tap on the right to release
+TRIAL_HATTOSS_HOOKED,Accroché !,Hooked!
+TRIAL_HATTOSS_CLOUD,Dans le décor !,Into the scenery!
+TRIAL_HATTOSS_TOO_LATE,Trop tard !,Too late!
+TRIAL_HATTOSS_FLAT,Effet : à plat,Spin: flat
+TRIAL_HATTOSS_LIFT,Effet : lifté (plane),Spin: backspin (floats)
+TRIAL_HATTOSS_DIVE,Effet : coupé (plonge),Spin: topspin (dives)
+TRIAL_MENTALIST_HINT,{move} choisir le jeton et sa couleur · {confirm} proposer,{move} pick the chip and its colour · {confirm} submit
+TRIAL_MENTALIST_HINT_MOUSE,{@click} un jeton pour changer sa couleur · « Proposer » pour valider,{@click} a chip to change its colour · “Submit” to confirm
+TRIAL_MENTALIST_HINT_TOUCH,"Touche {@tap} un jeton pour changer sa couleur, puis « Proposer »","Tap {@tap} a chip to change its colour, then “Submit”"
+TRIAL_MENTALIST_SUBMIT,Proposer,Submit
+TRIAL_MENTALIST_FOUND,Trouvé !,Found it!
+TRIAL_MENTALIST_OUT,Plus d'essais !,Out of tries!
+TRIAL_MENTALIST_TIME,Temps écoulé !,Time's up!
+TRIAL_MENTALIST_SECRET,La combinaison :,The combination:
+TRIAL_MENTALIST_TRIES,Essais : %d / %d,Tries: %d / %d

@@ -31,7 +31,7 @@ func test_blackjack_grace_period() -> void:
 	bj.free()
 
 
-## Musée : les 25 épreuves sont exposées, chacune dans une seule salle.
+## Musée : toutes les épreuves sont exposées, chacune dans une seule salle.
 func test_museum_exhibits_every_trial_once() -> void:
 	var db: ContentDB = ContentDB.shared()
 	var seen: Dictionary[String, int] = {}

@@ -186,6 +186,80 @@ func _pose(p_anim: StringName, ph: float, amount: float) -> Dictionary[StringNam
 			o[&"el_l"] = Vector3(-0.2, 0, 0)
 			o[&"el_r"] = Vector3(-0.2, 0, 0)
 			o[&"_bob"] = Vector3(0, absf(s) * 0.06, 0)
+		&"tap":
+			# Claquette : `amount` = pas (0 pointe gauche, 1 talon, 2 pointe droite, 3 frappe à plat) ;
+			# `ph` 0 → 1 : le pied monte puis frappe ; bras en jazz, buste qui accompagne.
+			var step: int = clampi(int(amount), 0, 3)
+			var lift: float = sin(clampf(ph, 0.0, 1.0) * PI)
+			var left: bool = step == 0 or (step == 1 and fmod(ph, 2.0) < 1.0) or step == 3
+			var hk: StringName = &"hip_l" if left else &"hip_r"
+			var kk: StringName = &"kn_l" if left else &"kn_r"
+			var heel: bool = step == 1
+			o[hk] = Vector3(-0.5 * lift if not heel else -0.25 * lift, 0, 0)
+			o[kk] = Vector3((0.9 if not heel else 0.2) * lift + 0.15, 0, 0)
+			o[&"kn_l" if hk == &"hip_r" else &"kn_r"] = Vector3(0.25, 0, 0)
+			o[&"sh_l"] = Vector3(-0.6 - 0.4 * lift, 0, -0.9)
+			o[&"sh_r"] = Vector3(-0.6 - 0.4 * lift, 0, 0.9)
+			o[&"el_l"] = Vector3(-0.6, 0, 0)
+			o[&"el_r"] = Vector3(-0.6, 0, 0)
+			o[&"torso"] = Vector3(0.05, 0.25 * (1.0 if left else -1.0) * lift, 0)
+			o[&"_bob"] = Vector3(0, -0.03 + 0.025 * lift, 0)
+		&"balance":
+			# Funambule : `amount` = inclinaison (-1..1), bras écartés qui compensent.
+			o[&"torso"] = Vector3(0, 0, amount * 0.45)
+			o[&"sh_l"] = Vector3(-0.1, 0, -1.45 + amount * 0.5)
+			o[&"sh_r"] = Vector3(-0.1, 0, 1.45 + amount * 0.5)
+			o[&"el_l"] = Vector3(-0.1, 0, 0)
+			o[&"el_r"] = Vector3(-0.1, 0, 0)
+			o[&"hip_l"] = Vector3(-0.25 * s, 0, -0.05)
+			o[&"hip_r"] = Vector3(0.25 * s, 0, 0.05)
+			o[&"kn_l"] = Vector3(0.2 + maxf(0.0, -c) * 0.3, 0, 0)
+			o[&"kn_r"] = Vector3(0.2 + maxf(0.0, c) * 0.3, 0, 0)
+			o[&"head"] = Vector3(0.15, 0, -amount * 0.3)
+		&"carry":
+			# Serveur : plateau tenu à droite, bras plié ; `amount` = inclinaison du plateau ; `ph` = marche.
+			var w: float = 0.3
+			o[&"hip_l"] = Vector3(-w * s, 0, 0)
+			o[&"hip_r"] = Vector3(w * s, 0, 0)
+			o[&"kn_l"] = Vector3(maxf(0.0, -c) * w * 1.6 + 0.1, 0, 0)
+			o[&"kn_r"] = Vector3(maxf(0.0, c) * w * 1.6 + 0.1, 0, 0)
+			o[&"sh_r"] = Vector3(-1.4, 0, 0.35 + amount * 0.3)
+			o[&"el_r"] = Vector3(-1.5, 0, 0)
+			o[&"sh_l"] = Vector3(0.2 * s, 0, -0.25 - amount * 0.3)
+			o[&"el_l"] = Vector3(-0.3, 0, 0)
+			o[&"torso"] = Vector3(0, 0, -amount * 0.2)
+			o[&"_bob"] = Vector3(0, absf(s) * 0.012, 0)
+		&"throw":
+			# Lancer à bras roulé : `ph` 0 (armé, bras en arrière) → 1 (bras projeté devant).
+			var u: float = clampf(ph, 0.0, 1.0)
+			o[&"sh_r"] = Vector3(lerpf(1.2, -2.2, u), 0, 0.25)
+			o[&"el_r"] = Vector3(lerpf(-0.8, -0.1, u), 0, 0)
+			o[&"sh_l"] = Vector3(lerpf(-0.9, 0.4, u), 0, -0.3)
+			o[&"torso"] = Vector3(lerpf(0.15, -0.2, u), lerpf(0.5, -0.4, u), 0)
+			o[&"hip_l"] = Vector3(-0.35, 0, 0)
+			o[&"kn_l"] = Vector3(0.25, 0, 0)
+			o[&"hip_r"] = Vector3(0.25, 0, 0)
+			o[&"kn_r"] = Vector3(0.2, 0, 0)
+		&"sit":
+			# Assis (chaise, banquette) : `amount` = penché vers la table (0..1), `ph` = respiration.
+			o[&"hip_l"] = Vector3(-1.5, 0, -0.08)
+			o[&"hip_r"] = Vector3(-1.5, 0, 0.08)
+			o[&"kn_l"] = Vector3(1.5, 0, 0)
+			o[&"kn_r"] = Vector3(1.5, 0, 0)
+			o[&"torso"] = Vector3(-0.15 * amount + 0.02 * s, 0, 0)
+			o[&"sh_l"] = Vector3(-0.7 * amount - 0.1, 0, -0.15)
+			o[&"sh_r"] = Vector3(-0.7 * amount - 0.1, 0, 0.15)
+			o[&"el_l"] = Vector3(-0.9 * amount - 0.2, 0, 0)
+			o[&"el_r"] = Vector3(-0.9 * amount - 0.2, 0, 0)
+			o[&"_bob"] = Vector3(0, -0.2, 0)
+		&"point":
+			# Désigne devant soi ; `amount` = direction (-1 gauche … 1 droite).
+			o[&"sh_r"] = Vector3(-1.5, -amount * 0.8, 0.1)
+			o[&"el_r"] = Vector3(-0.05, 0, 0)
+			o[&"sh_l"] = Vector3(0.05, 0, -0.12)
+			o[&"el_l"] = Vector3(-0.2, 0, 0)
+			o[&"torso"] = Vector3(0, -amount * 0.3, 0)
+			o[&"head"] = Vector3(0.05, -amount * 0.4, 0)
 		_:  # idle : respiration, bras le long du corps.
 			o[&"torso"] = Vector3(0.02 * s, 0, 0)
 			o[&"sh_l"] = Vector3(0.05, 0, -0.1 - 0.03 * s)

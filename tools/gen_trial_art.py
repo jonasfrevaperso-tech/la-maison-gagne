@@ -666,12 +666,157 @@ def art_billiards(rng) -> None:
     save(img, "billiards")
 
 
+# --------------------------------------------------------------------------- 2.0 : le Cabaret
+
+
+def cabaret(img, d, floor_y=78) -> None:
+    """Fond commun du Cabaret : rideaux, lambrequin à franges, éventail doré, plancher, rampe."""
+    rect(d, 0, 0, W, H, (18, 6, 12))
+    for k in range(9):
+        a = math.pi * (0.1 + 0.8 * k / 8)
+        d.line((80, floor_y - 4, 80 + math.cos(a) * 60, floor_y - 4 - math.sin(a) * 60), fill=GOLD_D)
+    for x in range(0, 30, 6):
+        rect(d, x, 0, x + 4, H, (110, 10, 24))
+        rect(d, W - x - 4, 0, W - x, H, (110, 10, 24))
+    rect(d, 0, 0, W, 7, (110, 10, 24))
+    rect(d, 0, 7, W, 8, GOLD)
+    for x in range(2, W, 5):
+        d.point((x, 9), fill=GOLD_D)
+    gradient(img, (0, floor_y, W, H), WOOD, WOOD_D, 3)
+    rect(d, 0, floor_y, W, floor_y, GOLD)
+    for x in range(8, W, 14):
+        glow(img, x, floor_y + 2, 5, GOLD_L, 0.9)
+        d.point((x, floor_y + 2), fill=FOAM)
+
+
+def figure(d, x, y, coat, skirt=False, arms="down", skin=(232, 184, 150), hat=None) -> None:
+    """Petit personnage (pieds en x, y) : jambes, buste, tête, bras selon la pose."""
+    legs = (28, 20, 24) if not skirt else skin
+    rect(d, x - 3, y - 10, x - 1, y, legs)
+    rect(d, x + 1, y - 10, x + 3, y, legs)
+    rect(d, x - 4, y - 21, x + 4, y - 10, coat)
+    if skirt:
+        d.polygon([(x - 4, y - 12), (x + 4, y - 12), (x + 7, y - 6), (x - 7, y - 6)], fill=coat)
+    disc(d, x, y - 25, 3, skin)
+    if arms == "up":
+        d.line((x - 4, y - 20, x - 8, y - 29), fill=coat, width=2)
+        d.line((x + 4, y - 20, x + 8, y - 29), fill=coat, width=2)
+    elif arms == "out":
+        d.line((x - 4, y - 19, x - 12, y - 20), fill=coat, width=2)
+        d.line((x + 4, y - 19, x + 12, y - 20), fill=coat, width=2)
+    else:
+        d.line((x - 4, y - 20, x - 6, y - 12), fill=coat, width=2)
+        d.line((x + 4, y - 20, x + 6, y - 12), fill=coat, width=2)
+    if hat:
+        rect(d, x - 3, y - 31, x + 3, y - 28, hat)
+
+
+def art_tapdance(rng) -> None:
+    """Les Claquettes : danseuse et groom face à face, pas qui claquent, piste des croches."""
+    img, d = canvas()
+    cabaret(img, d)
+    glow(img, 58, 50, 22, GOLD_L, 0.5)
+    glow(img, 102, 50, 22, GOLD_L, 0.5)
+    figure(d, 58, 77, (90, 26, 138), skirt=True, arms="out")
+    figure(d, 102, 77, RED, arms="out", hat=RED)
+    for x, col in ((50, RED), (66, YELLOW), (94, CYAN), (110, EMERALD)):
+        d.line((x - 2, 72, x - 5, 68), fill=col)
+        d.line((x + 2, 72, x + 5, 68), fill=col)
+    rect(d, 30, 88, 130, 95, INK)
+    for k in range(9):
+        d.line((30 + k * 12.5, 89, 30 + k * 12.5, 94), fill=SMOKE if k % 2 == 0 else STEEL_D)
+    for k, col in ((0, RED), (3, YELLOW), (5, CYAN), (6, EMERALD)):
+        disc(d, 36 + k * 12.5, 91, 2, col)
+    save(img, "tapdance")
+
+
+def art_spotlight(rng) -> None:
+    """Le Projecteur : faisceau de poursuite sur la meneuse en or, doublure argent dans l'ombre."""
+    img, d = canvas()
+    cabaret(img, d)
+    for side in (0, 1):
+        x0 = 28 if side == 0 else 112
+        for k in range(6):
+            rect(d, x0 + (k * 3 if side == 0 else -k * 3), 78 - k * 4, x0 + 20 + (k * 3 if side == 0 else -k * 3), 78 - k * 4, GOLD_D)
+    d.polygon([(70, 0), (78, 0), (100, 78), (64, 78)], fill=(60, 52, 40))
+    glow(img, 82, 70, 20, FOAM, 0.8)
+    figure(d, 82, 77, GOLD, skirt=True, arms="up")
+    figure(d, 40, 77, (110, 116, 130), skirt=True)
+    d.ellipse((64, 40, 100, 78), outline=GOLD_L)
+    save(img, "spotlight")
+
+
+def art_tightrope(rng) -> None:
+    """Le Funambule : fil entre deux mâts, funambule et sa perche, filet, fanions dans le vent."""
+    img, d = canvas()
+    cabaret(img, d, floor_y=90)
+    for x in (22, 138):
+        rect(d, x - 1, 30, x + 1, 90, GOLD)
+        d.polygon([(x, 22), (x + (9 if x < 80 else -9), 25), (x, 28)], fill=MAGENTA)
+    d.line((22, 40, 138, 40), fill=STEEL)
+    for x in range(26, 136, 6):
+        d.line((x, 72, x + 3, 76), fill=SMOKE)
+    d.line((24, 74, 136, 74), fill=SMOKE)
+    figure(d, 74, 40, IVORY, arms="out")
+    d.line((54, 26, 96, 18), fill=(150, 100, 50), width=2)
+    for y in (12, 20):
+        d.line((110, y, 124, y), fill=CYAN)
+        d.polygon([(124, y - 2), (128, y), (124, y + 2)], fill=CYAN)
+    save(img, "tightrope")
+
+
+def art_hattoss(rng) -> None:
+    """Le Lancer de chapeau : groom au bras levé, haut-de-forme en cloche vers la patère."""
+    img, d = canvas()
+    cabaret(img, d)
+    figure(d, 26, 77, RED, arms="up", hat=RED)
+    for k in range(10):
+        u = k / 9
+        x = 34 + u * 92
+        y = 46 - math.sin(u * math.pi) * 30 + u * 2
+        d.point((int(x), int(y)), fill=GOLD_L)
+    rect(d, 124, 36, 126, 78, WOOD)
+    rect(d, 120, 77, 130, 78, WOOD)
+    d.line((125, 38, 120, 34), fill=GOLD)
+    d.line((125, 38, 130, 34), fill=GOLD)
+    rect(d, 92, 18, 100, 26, INK)
+    rect(d, 89, 26, 103, 27, INK)
+    rect(d, 92, 24, 100, 25, RED)
+    for k in range(4):
+        disc(d, 50 + k * 10, 14 + (k % 2) * 3, 5, (200, 212, 232))
+    save(img, "hattoss")
+
+
+def art_mentalist(rng) -> None:
+    """Le Mentaliste : turban, boule de cristal, rangées de jetons et leurs points d'indice."""
+    img, d = canvas()
+    cabaret(img, d)
+    figure(d, 44, 64, (26, 14, 46), arms="out", hat=IVORY)
+    d.polygon([(30, 77), (58, 77), (54, 60), (34, 60)], fill=(58, 10, 74))
+    rect(d, 33, 59, 55, 60, GOLD)
+    glow(img, 44, 54, 9, (160, 100, 255), 1.0)
+    disc(d, 44, 54, 4, (150, 90, 255))
+    rect(d, 80, 16, 146, 74, INK)
+    d.rectangle((80, 16, 146, 74), outline=GOLD_D)
+    rows = ((RED, YELLOW, CYAN, 1, 0), (YELLOW, EMERALD, (176, 58, 255), 1, 2), (YELLOW, EMERALD, (176, 58, 255), 3, 0))
+    for r, (a, b, c, blk, wht) in enumerate(rows):
+        y = 26 + r * 16
+        for k, col in enumerate((a, b, c)):
+            chip(d, 90 + k * 12, y, 4, col)
+        for k in range(blk):
+            disc(d, 126 + k * 6, y, 2, GOLD_L)
+        for k in range(wht):
+            disc(d, 126 + (blk + k) * 6, y, 2, IVORY)
+    save(img, "mentalist")
+
+
 def main() -> None:
     rng = random.Random(1520)
     for fn in [art_charge, art_rhythm, art_bottles, art_memory, art_shells, art_darts, art_safe,
                art_tower, art_shaker, art_pour, art_simon, art_catch, art_highlow, art_sort,
                art_invaders, art_cave, art_pachinko, art_blackjack, art_scratch, art_dice, art_derby,
-               art_fishing, art_lasers, art_juggle, art_billiards]:
+               art_fishing, art_lasers, art_juggle, art_billiards,
+               art_tapdance, art_spotlight, art_tightrope, art_hattoss, art_mentalist]:
         fn(rng)
     print(f"{len(list(OUT.glob('trial_*.png')))} illustrations d'épreuves écrites dans {OUT.relative_to(ROOT)}")
 

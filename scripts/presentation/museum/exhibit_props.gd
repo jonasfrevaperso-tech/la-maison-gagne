@@ -61,6 +61,16 @@ static func build(trial_id: String) -> Node3D:
 			_tower(n)
 		"sort":
 			_sort(n)
+		"tapdance":
+			_tapdance(n)
+		"spotlight":
+			_spotlight(n)
+		"tightrope":
+			_tightrope(n)
+		"hattoss":
+			_hattoss(n)
+		"mentalist":
+			_mentalist(n)
 		_:
 			var c: Node3D = CasinoChip3D.build(n, Palette.GOLD, 0.3)
 			c.position.y = 0.3
@@ -400,3 +410,106 @@ static func _sort(n: Node3D) -> void:
 		var chip: Node3D = CasinoChip3D.build(n, CHIP_COLORS[k], 0.06)
 		chip.position = Vector3(-0.25 + 0.25 * float(k), 0.16, -0.1)
 		chip.rotation.x = PI * 0.5
+
+
+# --------------------------------------------------------------------------- le Cabaret
+
+
+## Plancher de scène miniature : planches, nez doré (socle commun du Cabaret).
+static func _boards(n: Node3D, w: float = 0.6) -> void:
+	for k: int in 4:
+		var col: Color = Color("4a2a16") if k % 2 == 0 else Color("3e2412")
+		Stage3D.box(n, Vector3(w, 0.03, 0.12), Vector3(0, 0.015, -0.18 + 0.12 * float(k)), _m(col, 0.0, 0.45))
+	Stage3D.box(n, Vector3(w, 0.012, 0.02), Vector3(0, 0.03, 0.25), _m(Palette.GOLD, 0.7, 0.3))
+
+
+static func _tapdance(n: Node3D) -> void:
+	_boards(n)
+	# Paire de souliers à claquettes vernis, plaques de métal à la pointe et au talon.
+	var patent: StandardMaterial3D = _m(Color("0c0a0e"), 0.3, 0.12)
+	var steel: StandardMaterial3D = _m(Color("c8ccd8"), 0.9, 0.2)
+	for sx: float in [-0.09, 0.09]:
+		var shoe: Node3D = Node3D.new()
+		shoe.position = Vector3(sx, 0.03, 0.0)
+		shoe.rotation.y = sx * 2.0
+		n.add_child(shoe)
+		Stage3D.box(shoe, Vector3(0.09, 0.06, 0.24), Vector3(0, 0.04, 0), patent)
+		Stage3D.box(shoe, Vector3(0.085, 0.05, 0.08), Vector3(0, 0.09, -0.07), patent)
+		Stage3D.box(shoe, Vector3(0.08, 0.01, 0.07), Vector3(0, 0.005, 0.08), steel)
+		Stage3D.box(shoe, Vector3(0.07, 0.01, 0.05), Vector3(0, 0.005, -0.09), steel)
+		Stage3D.sphere(shoe, 0.018, Vector3(0, 0.08, 0.04), _m(Palette.ROULETTE_RED, 0.0, 0.4))
+	Stage3D.cylinder(n, 0.03, 0.02, Vector3(0.2, 0.04, 0.12), _m(Palette.GOLD, 0.8, 0.25))
+
+
+static func _spotlight(n: Node3D) -> void:
+	_boards(n)
+	# Projecteur de poursuite sur pied : fût laqué, lentille allumée, poignée.
+	Stage3D.cylinder(n, 0.12, 0.02, Vector3(0, 0.04, -0.05), _m(Color("15151a"), 0.5, 0.4))
+	Stage3D.cylinder(n, 0.015, 0.36, Vector3(0, 0.22, -0.05), _m(Palette.GOLD, 0.8, 0.3))
+	var head: Node3D = Node3D.new()
+	head.position = Vector3(0, 0.44, -0.05)
+	head.rotation.x = -0.45
+	n.add_child(head)
+	var barrel: MeshInstance3D = Stage3D.cylinder(head, 0.09, 0.34, Vector3.ZERO, _m(Color("1a1a22"), 0.6, 0.3), 0.07)
+	barrel.rotation.x = PI * 0.5
+	var lens: MeshInstance3D = Stage3D.cylinder(head, 0.07, 0.01, Vector3(0, 0, 0.17), Stage3D.glow(Color(1.0, 0.92, 0.7), 3.0))
+	lens.rotation.x = PI * 0.5
+	Stage3D.box(head, Vector3(0.02, 0.02, 0.14), Vector3(0.0, 0.1, -0.08), _m(Palette.GOLD, 0.8, 0.3))
+	Stage3D.omni(n, Color(1.0, 0.9, 0.7), 0.6, Vector3(0, 0.3, 0.3), 1.0)
+
+
+static func _tightrope(n: Node3D) -> void:
+	# Deux mâts de laiton, le fil, et le funambule de fer-blanc avec sa perche.
+	var brass: StandardMaterial3D = _m(Palette.GOLD, 0.8, 0.28)
+	for sx: float in [-0.3, 0.3]:
+		Stage3D.cylinder(n, 0.012, 0.5, Vector3(sx, 0.25, 0), brass)
+		Stage3D.sphere(n, 0.02, Vector3(sx, 0.51, 0), brass)
+	var wire: MeshInstance3D = Stage3D.cylinder(n, 0.003, 0.6, Vector3(0, 0.45, 0), _m(Color("c8ccd8"), 0.9, 0.2))
+	wire.rotation.z = PI * 0.5
+	var fig: Figure3D = Figure3D.new().build(0.22, {"coat": Color("f0ece0"), "trousers": Color("f0ece0"), "trim": Color("ff2e88"), "hat": ""})
+	fig.position = Vector3(0.05, 0.45, 0)
+	fig.rotation.z = -0.12
+	n.add_child(fig)
+	fig.animate(&"balance", 0.0, 1.0, 0.3)
+	var pole: MeshInstance3D = Stage3D.cylinder(n, 0.004, 0.36, Vector3(0.05, 0.6, 0.03), _m(Color("8a5a2a"), 0.0, 0.5))
+	pole.rotation.z = PI * 0.5 + 0.2
+	Stage3D.cylinder(n, 0.2, 0.02, Vector3(0, 0.01, 0), _m(Palette.VELVET, 0.0, 0.8))
+
+
+static func _hattoss(n: Node3D) -> void:
+	_boards(n)
+	# Portemanteau de bois tourné, un haut-de-forme accroché, un autre en vol.
+	var wood: StandardMaterial3D = _m(Color("3a2010"), 0.0, 0.45)
+	Stage3D.cylinder(n, 0.1, 0.02, Vector3(0.1, 0.04, 0), wood, 0.07)
+	Stage3D.cylinder(n, 0.014, 0.5, Vector3(0.1, 0.29, 0), wood)
+	Stage3D.sphere(n, 0.025, Vector3(0.1, 0.55, 0), _m(Palette.GOLD, 0.8, 0.25))
+	_hat(n, Vector3(0.12, 0.49, 0.02), Vector3(0, 0, 0.3))
+	_hat(n, Vector3(-0.18, 0.42, 0.05), Vector3(0.4, 0.6, -0.5))
+
+
+static func _hat(n: Node3D, at: Vector3, rot: Vector3) -> void:
+	var h: Node3D = Node3D.new()
+	h.position = at
+	h.rotation = rot
+	n.add_child(h)
+	var felt: StandardMaterial3D = _m(Color("101014"), 0.1, 0.35)
+	Stage3D.cylinder(h, 0.075, 0.008, Vector3.ZERO, felt)
+	Stage3D.cylinder(h, 0.045, 0.09, Vector3(0, 0.045, 0), felt)
+	Stage3D.cylinder(h, 0.046, 0.016, Vector3(0, 0.014, 0), _m(Palette.ROULETTE_RED, 0.0, 0.5))
+
+
+static func _mentalist(n: Node3D) -> void:
+	# Guéridon drapé, boule de cristal qui luit, trois jetons alignés devant.
+	Stage3D.cylinder(n, 0.2, 0.26, Vector3(0, 0.13, 0), _m(Color("3a0a4a"), 0.0, 0.8), 0.16)
+	Stage3D.cylinder(n, 0.21, 0.012, Vector3(0, 0.265, 0), _m(Palette.GOLD, 0.7, 0.3))
+	Stage3D.cylinder(n, 0.04, 0.04, Vector3(0, 0.29, 0), _m(Palette.GOLD, 0.8, 0.25), 0.06)
+	var ball: StandardMaterial3D = Stage3D.glow(Color(0.55, 0.3, 1.0), 1.5)
+	ball.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	ball.albedo_color.a = 0.7
+	Stage3D.sphere(n, 0.09, Vector3(0, 0.39, 0), ball)
+	Stage3D.omni(n, Color(0.6, 0.35, 1.0), 0.8, Vector3(0, 0.45, 0.15), 1.0)
+	var cols: Array[Color] = [Color("ffd23f"), Color("2ee6a8"), Color("b03aff")]
+	for k: int in 3:
+		var c: Node3D = CasinoChip3D.build(n, cols[k], 0.04)
+		c.position = Vector3(-0.09 + 0.09 * float(k), 0.31, 0.15)
+

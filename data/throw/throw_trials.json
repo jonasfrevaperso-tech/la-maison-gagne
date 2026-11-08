@@ -540,5 +540,111 @@
    "Don't touch the black ball, ringed in red!",
    "Up / down: follow or draw spin, then set the power."
   ]
+ },
+ {
+  "id": "tapdance",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Les Claquettes",
+  "name_en": "Tap Dance",
+  "desc_fr": "La danseuse frappe une phrase de pas sur la mesure ; à la suivante, rejoue-la : bon pas, bon moment. Les phrases s'allongent, se décalent sur les contretemps, puis se jouent de mémoire.",
+  "desc_en": "The dancer taps a phrase of steps on the bar; on the next one, play it back: right step, right moment. Phrases grow longer, slip onto the off-beats, then must be played from memory.",
+  "tuto_fr": [
+   "Écoute et regarde : la danseuse frappe une phrase de pas.",
+   "À toi : rejoue les mêmes pas, aux mêmes instants de la mesure.",
+   "Plus tard, la piste ne montre plus que les instants : retiens les pas !"
+  ],
+  "tuto_en": [
+   "Listen and watch: the dancer taps a phrase of steps.",
+   "Your turn: play the same steps at the same moments of the bar.",
+   "Later the track only shows the moments: remember the steps!"
+  ],
+  "touch_direct": true
+ },
+ {
+  "id": "spotlight",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Le Projecteur",
+  "name_en": "The Follow Spot",
+  "desc_fr": "Tiens la poursuite sur la meneuse de revue : elle arpente la scène et les escaliers, s'arrête, repart. Le projecteur est lourd, le cercle se resserre, et une doublure en argent tente de te tromper.",
+  "desc_en": "Keep the follow spot on the revue star: she roams the stage and the stairs, stops, sets off again. The spot is heavy, the circle tightens, and a silver understudy tries to fool you.",
+  "tuto_fr": [
+   "Garde la meneuse dans le cercle de lumière.",
+   "Le projecteur est lourd : anticipe ses départs et ses arrêts.",
+   "Une doublure en argent entre ? Reste sur la vraie, en or !"
+  ],
+  "tuto_en": [
+   "Keep the star inside the circle of light.",
+   "The spot is heavy: anticipate when she starts and stops.",
+   "A silver understudy comes on? Stay on the real one, in gold!"
+  ],
+  "touch_stick": true
+ },
+ {
+  "id": "tightrope",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Le Funambule",
+  "name_en": "The Tightrope",
+  "desc_fr": "Traverse le fil tendu au-dessus de la scène. Maintiens pour avancer, déplace la perche pour rattraper le corps qui penche : plus il penche, plus il tombe vite. Les fanions annoncent les rafales.",
+  "desc_en": "Cross the wire stretched above the stage. Hold to walk, shift the pole to catch the leaning body: the more it leans, the faster it falls. The pennants warn of gusts.",
+  "tuto_fr": [
+   "Maintiens pour avancer sur le fil : chaque pas déséquilibre un peu.",
+   "Pousse la perche du côté opposé à la chute pour te redresser.",
+   "Rafale annoncée ? Arrête-toi et compense du côté du vent."
+  ],
+  "tuto_en": [
+   "Hold to walk along the wire: every step unbalances you a little.",
+   "Push the pole against the fall to straighten up.",
+   "Gust coming? Stop and lean into the wind."
+  ],
+  "touch_stick": true,
+  "touch_pad": [
+   "ui_spin"
+  ]
+ },
+ {
+  "id": "hattoss",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Le Lancer de chapeau",
+  "name_en": "The Hat Toss",
+  "desc_fr": "Lance le haut-de-forme sur la patère du portemanteau. Le balancier du bras donne la force, le stick l'effet : lifté, il plane ; coupé, il plonge. Le ventilateur souffle, et un nuage de décor barre les lancers trop hauts.",
+  "desc_en": "Toss the top hat onto the coat stand's peg. The swinging arm sets the power, the stick the spin: backspin floats, topspin dives. The fan blows, and a painted cloud blocks throws that go too high.",
+  "tuto_fr": [
+   "Le bras balance : lâche quand l'aiguille est à la bonne force.",
+   "Au lâcher, stick vers le haut : le chapeau plane ; vers le bas : il plonge.",
+   "Regarde les rubans du ventilateur, et passe sous le nuage !"
+  ],
+  "tuto_en": [
+   "The arm swings: release when the needle shows the right power.",
+   "On release, stick up: the hat floats; down: it dives.",
+   "Watch the fan's ribbons, and stay under the cloud!"
+  ],
+  "touch_stick": true,
+  "touch_pad": [
+   "ui_spin"
+  ]
+ },
+ {
+  "id": "mentalist",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Le Mentaliste",
+  "name_en": "The Mentalist",
+  "desc_fr": "Le mentaliste cache une combinaison de jetons. À chaque proposition, il répond : un point doré par jeton bien placé, un blanc par bonne couleur mal placée. Trouve-la en peu d'essais, avant la fin du temps.",
+  "desc_en": "The mentalist hides a combination of chips. For each guess he answers: a gold dot per chip in the right place, a white one per right colour in the wrong place. Find it in few tries, before time runs out.",
+  "tuto_fr": [
+   "Choisis la couleur de chaque jeton, puis propose ta combinaison.",
+   "Point doré : bonne couleur, bonne place. Point blanc : bonne couleur, mauvaise place.",
+   "Moins tu fais d'essais, meilleure est la note."
+  ],
+  "tuto_en": [
+   "Pick each chip's colour, then submit your combination.",
+   "Gold dot: right colour, right place. White dot: right colour, wrong place.",
+   "The fewer tries you need, the better the score."
+  ],
+  "touch_direct": true
  }
 ]

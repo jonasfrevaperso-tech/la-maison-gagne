@@ -83,5 +83,22 @@
       "tower",
       "sort"
     ]
+  },
+  {
+    "id": "cabaret",
+    "name_fr": "Le Cabaret",
+    "name_en": "The Cabaret",
+    "desc_fr": "Rideaux de velours, rampe d'ampoules et public attablé : les numéros de la revue.",
+    "desc_en": "Velvet curtains, footlights and a seated audience: the revue's acts.",
+    "wall": "2a0a14",
+    "floor": "2a160c",
+    "accent": "ff2e88",
+    "exhibits": [
+      "tapdance",
+      "spotlight",
+      "tightrope",
+      "hattoss",
+      "mentalist"
+    ]
   }
 ]

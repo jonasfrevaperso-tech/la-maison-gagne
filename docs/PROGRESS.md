@@ -234,3 +234,5 @@ Plan : phases 41 à 53 (50 épreuves, 28 builds de 7 grigris, difficulté resser
 - **Phase 43 — Journal et export** ✅ (`phase-43-export`) : journal local toujours tenu, épreuves journalisées (chronologie des gestes et verdicts), Options → « Exporter mes données » (.zip : sauvegardes, JSONL, 5 CSV, README), rapport qui lit l'archive (D-084).
 - **Phase 44 — Difficulté** ✅ (`phase-44-difficulte`) : 5 tours par échéance, dettes ×3–4 dès le palier 3, économie resserrée ; glouton 24 %, hasard 1,5 %, sans achat éliminé au palier 2,5, 3 tours par échéance (D-085).
 - **Phase 45 — Builds** ✅ (`phase-45-builds`) : 28 familles de 7, paliers 2 / 4 / 7, 28 emblèmes, biais de boutique 1,0, dettes recalées (glouton 15 %, hasard 0,7 %) (D-086).
+- **Phase 46 — Cabaret** ✅ (`phase-46-cabaret`) : salle 6 du Musée. Claquettes, Projecteur, Funambule, Lancer de chapeau, Mentaliste ; décor `CabaretSet`, six nouvelles poses de `Figure3D` (D-087).
+
