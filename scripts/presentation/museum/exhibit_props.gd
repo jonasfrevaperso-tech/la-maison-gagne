@@ -71,6 +71,16 @@ static func build(trial_id: String) -> Node3D:
 			_hattoss(n)
 		"mentalist":
 			_mentalist(n)
+		"crepe":
+			_crepe(n)
+		"cutting":
+			_cutting(n)
+		"service":
+			_service(n)
+		"orders":
+			_orders(n)
+		"souffle":
+			_souffle(n)
 		_:
 			var c: Node3D = CasinoChip3D.build(n, Palette.GOLD, 0.3)
 			c.position.y = 0.3
@@ -513,3 +523,97 @@ static func _mentalist(n: Node3D) -> void:
 		var c: Node3D = CasinoChip3D.build(n, cols[k], 0.04)
 		c.position = Vector3(-0.09 + 0.09 * float(k), 0.31, 0.15)
 
+
+
+# --------------------------------------------------------------------------- les Cuisines
+
+
+## Plan de travail miniature : inox brossé, carreaux crème au dos (socle commun des Cuisines).
+static func _worktop(n: Node3D, w: float = 0.6) -> void:
+	Stage3D.box(n, Vector3(w, 0.03, 0.4), Vector3(0, 0.015, 0), _m(Color("b8bcc6"), 0.85, 0.28))
+	for k: int in 6:
+		var tx: float = -w * 0.5 + w / 12.0 + w / 6.0 * float(k)
+		Stage3D.box(n, Vector3(w / 6.0 - 0.006, 0.05, 0.01), Vector3(tx, 0.06, -0.2), _m(Color("e8e0cc"), 0.0, 0.3))
+
+
+static func _crepe(n: Node3D) -> void:
+	_worktop(n)
+	# Poêle de fonte et sa queue, crêpe dorée en l'air, flammèches bleues dessous.
+	var iron: StandardMaterial3D = _m(Color("1a1a1e"), 0.6, 0.45)
+	Stage3D.cylinder(n, 0.14, 0.03, Vector3(0, 0.05, 0), iron, 0.12)
+	var handle: MeshInstance3D = Stage3D.cylinder(n, 0.012, 0.22, Vector3(0.22, 0.06, 0.04), _m(Color("3a2010"), 0.0, 0.5))
+	handle.rotation.z = PI * 0.5
+	handle.rotation.y = -0.2
+	var crepe: MeshInstance3D = Stage3D.cylinder(n, 0.12, 0.008, Vector3(-0.02, 0.28, 0), _m(Color("e8b060"), 0.0, 0.7))
+	crepe.rotation = Vector3(0.6, 0.0, 0.4)
+	for k: int in 6:
+		var a: float = TAU * float(k) / 6.0
+		Stage3D.cylinder(n, 0.008, 0.03, Vector3(cos(a) * 0.1, 0.025, sin(a) * 0.1), Stage3D.glow(Color(0.3, 0.55, 1.0), 2.5), 0.0)
+
+
+static func _cutting(n: Node3D) -> void:
+	# Planche de bois, carotte entamée suivant son pointillé, couteau du chef.
+	Stage3D.box(n, Vector3(0.5, 0.03, 0.3), Vector3(0, 0.015, 0), _m(Color("a8743a"), 0.0, 0.5))
+	var carrot: MeshInstance3D = Stage3D.cylinder(n, 0.035, 0.32, Vector3(-0.04, 0.065, 0), _m(Color("e8782a"), 0.0, 0.5), 0.02)
+	carrot.rotation.z = PI * 0.5
+	for k: int in 3:
+		var leaf_at: Vector3 = Vector3(-0.24, 0.07, -0.02 + 0.02 * float(k))
+		var leaf: MeshInstance3D = Stage3D.box(n, Vector3(0.1, 0.008, 0.015), leaf_at, _m(Color("4a8a2a"), 0.0, 0.6))
+		leaf.rotation.y = -0.3 + 0.3 * float(k)
+	var knife: Node3D = Node3D.new()
+	knife.position = Vector3(0.16, 0.06, 0.08)
+	knife.rotation = Vector3(0.0, 0.5, 0.0)
+	n.add_child(knife)
+	Stage3D.box(knife, Vector3(0.2, 0.004, 0.04), Vector3(0, 0, 0), _m(Color("d8dce4"), 0.95, 0.15))
+	Stage3D.box(knife, Vector3(0.11, 0.02, 0.025), Vector3(0.15, 0, 0), _m(Color("15110e"), 0.0, 0.4))
+
+
+static func _service(n: Node3D) -> void:
+	# Serveur de fer-blanc, plateau à bout de bras chargé de verres de vin.
+	Stage3D.cylinder(n, 0.2, 0.02, Vector3(0, 0.01, 0), _m(Color("6e4422"), 0.0, 0.5))
+	var fig: Figure3D = Figure3D.new().build(0.42, {"coat": Color("16161e"), "trim": Palette.IVORY, "hat": ""})
+	fig.position = Vector3(0, 0.02, 0)
+	n.add_child(fig)
+	fig.animate(&"carry", 0.0, 1.0, 0.0)
+	var tray: Vector3 = Vector3(0.1, 0.4, 0.0)  # au-dessus de la main droite, bras plié
+	Stage3D.cylinder(n, 0.09, 0.006, tray, _m(Color("c8ccd4"), 0.9, 0.25))
+	var glass: StandardMaterial3D = _m(Color(0.85, 0.95, 1.0, 0.5), 0.0, 0.05)
+	glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	for k: int in 4:
+		var at: Vector3 = tray + Vector3(-0.04 + 0.08 * float(k % 2), 0.03, -0.03 + 0.06 * float(k / 2))
+		Stage3D.cylinder(n, 0.016, 0.05, at, glass, 0.02)
+		Stage3D.cylinder(n, 0.014, 0.02, at + Vector3(0, -0.005, 0), _m(Color("8a1020"), 0.0, 0.2))
+
+
+static func _orders(n: Node3D) -> void:
+	_worktop(n)
+	# Rail du passe et ses bons, verre à cocktail, citron et bouteille de gin.
+	Stage3D.box(n, Vector3(0.5, 0.01, 0.02), Vector3(0, 0.42, -0.18), _m(Color("c8ccd4"), 0.9, 0.25))
+	for k: int in 3:
+		var tk_at: Vector3 = Vector3(-0.16 + 0.16 * float(k), 0.35, -0.175)
+		var tk: MeshInstance3D = Stage3D.box(n, Vector3(0.1, 0.13, 0.004), tk_at, _m(Color("f4ecd8"), 0.0, 0.8))
+		tk.rotation.z = (float(k) - 1.0) * 0.08
+		Stage3D.box(n, Vector3(0.1, 0.02, 0.005), Vector3(-0.16 + 0.16 * float(k), 0.405, -0.172), _m(Color("2a2a34"), 0.0, 0.6))
+	var glass: StandardMaterial3D = _m(Color(0.85, 0.95, 1.0, 0.5), 0.0, 0.05)
+	glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	Stage3D.cylinder(n, 0.004, 0.08, Vector3(0, 0.07, 0.05), glass)
+	Stage3D.cylinder(n, 0.07, 0.07, Vector3(0, 0.145, 0.05), glass, 0.005)
+	Stage3D.cylinder(n, 0.05, 0.03, Vector3(0, 0.15, 0.05), _m(Color("ffe04a"), 0.0, 0.3), 0.02)
+	Stage3D.cylinder(n, 0.035, 0.18, Vector3(-0.18, 0.12, 0.05), glass)
+	Stage3D.sphere(n, 0.03, Vector3(0.16, 0.06, 0.06), _m(Color("ffe04a"), 0.0, 0.5))
+
+
+static func _souffle(n: Node3D) -> void:
+	# Ramequin blanc plissé, soufflé bien monté et doré, petit thermomètre à cadran.
+	Stage3D.cylinder(n, 0.2, 0.02, Vector3(0, 0.01, 0), _m(Color("15110e"), 0.3, 0.4))
+	var ramekin: StandardMaterial3D = _m(Color("f8f6f0"), 0.0, 0.25)
+	Stage3D.cylinder(n, 0.1, 0.1, Vector3(0, 0.07, 0), ramekin)
+	for k: int in 14:
+		var a: float = TAU * float(k) / 14.0
+		Stage3D.box(n, Vector3(0.01, 0.09, 0.01), Vector3(cos(a) * 0.102, 0.07, sin(a) * 0.102), ramekin)
+	var dome: MeshInstance3D = Stage3D.sphere(n, 0.098, Vector3(0, 0.13, 0), _m(Color("e8b860"), 0.0, 0.7))
+	dome.scale = Vector3(1.0, 1.25, 1.0)
+	var dial: MeshInstance3D = Stage3D.cylinder(n, 0.05, 0.01, Vector3(0.18, 0.1, 0.06), _m(Color("1a1a1e"), 0.4, 0.4))
+	dial.rotation.x = PI * 0.5
+	Stage3D.box(n, Vector3(0.004, 0.04, 0.004), Vector3(0.18, 0.11, 0.067), _m(Palette.GOLD, 0.8, 0.3))
+	Stage3D.cylinder(n, 0.005, 0.1, Vector3(0.18, 0.05, 0.06), _m(Palette.GOLD, 0.8, 0.3))

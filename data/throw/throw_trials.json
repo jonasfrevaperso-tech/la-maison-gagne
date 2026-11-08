@@ -646,5 +646,111 @@
    "The fewer tries you need, the better the score."
   ],
   "touch_direct": true
+ },
+ {
+  "id": "crepe",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "La Crêpe Suzette",
+  "name_en": "Crêpe Suzette",
+  "desc_fr": "Fais sauter la crêpe : maintiens pour armer le coup de poêle, relâche pour la lancer. Plus l'élan est fort, plus elle tourne : un demi-tour, puis un tour et demi. Rattrape-la dans la poêle, puis flambe !",
+  "desc_en": "Flip the crêpe: hold to wind up the pan, release to toss it. The stronger the toss, the more it spins: half a turn, then one and a half. Catch it in the pan, then flambé!",
+  "tuto_fr": [
+   "Maintiens pour armer, relâche pour faire sauter la crêpe.",
+   "La jauge indique les tours : vise ½ tour, puis 1½ tour.",
+   "En l'air, elle dérive : déplace la poêle sous son ombre."
+  ],
+  "tuto_en": [
+   "Hold to wind up, release to toss the crêpe.",
+   "The gauge shows the turns: aim for ½ a turn, then 1½.",
+   "In the air it drifts: move the pan under its shadow."
+  ],
+  "touch_stick": true,
+  "touch_pad": [
+   "ui_spin"
+  ]
+ },
+ {
+  "id": "cutting",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Le Découpage",
+  "name_en": "The Carving",
+  "desc_fr": "Le couteau avance tout seul : guide-le sur le pointillé de la carotte, du filet de poisson, puis du gâteau. Sur les arêtes et les cerises, soulève la lame — mais une lame levée ailleurs ne coupe rien.",
+  "desc_en": "The knife moves on its own: guide it along the dotted line on the carrot, the fish fillet, then the cake. Over bones and cherries, lift the blade — but a lifted blade cuts nothing elsewhere.",
+  "tuto_fr": [
+   "Le couteau avance seul : garde-le sur le pointillé.",
+   "Zone rouge (arête, cerise) : maintiens pour soulever la lame.",
+   "Relâche juste après : lame levée, rien n'est coupé !"
+  ],
+  "tuto_en": [
+   "The knife moves on its own: keep it on the dotted line.",
+   "Red zone (bone, cherry): hold to lift the blade.",
+   "Release right after: a lifted blade cuts nothing!"
+  ],
+  "touch_stick": true,
+  "touch_pad": [
+   "ui_spin"
+  ]
+ },
+ {
+  "id": "service",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Le Service",
+  "name_en": "The Service",
+  "desc_fr": "Traverse la salle avec un plateau de six verres. Évite les chaises tirées, les dessertes et les collègues qui traversent — mais en douceur : un écart brusque fait glisser les verres vers le bord.",
+  "desc_en": "Cross the dining room with a tray of six glasses. Dodge pulled-out chairs, dessert trolleys and colleagues crossing your path — but gently: a sudden swerve sends the glasses sliding to the edge.",
+  "tuto_fr": [
+   "Le serveur avance seul : déporte-le vers le passage libre.",
+   "Écart brusque : les verres glissent (regarde le plateau en bas à droite).",
+   "Anticipe : un collègue qui traverse ne t'attendra pas !"
+  ],
+  "tuto_en": [
+   "The waiter walks on his own: steer him to the open gap.",
+   "Sudden swerve: the glasses slide (watch the tray, bottom right).",
+   "Plan ahead: a colleague crossing won't wait for you!"
+  ],
+  "touch_stick": true
+ },
+ {
+  "id": "orders",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Les Commandes",
+  "name_en": "The Orders",
+  "desc_fr": "Les bons arrivent sur le rail : chaque recette s'affiche un instant puis se cache. Retiens-la, choisis le bon le plus pressé et verse les ingrédients dans l'ordre. Une erreur, et le verre part à l'évier.",
+  "desc_en": "Tickets arrive on the rail: each recipe shows for a moment, then hides. Remember it, pick the most urgent ticket and pour the ingredients in order. One mistake and the glass goes down the sink.",
+  "tuto_fr": [
+   "Retiens la recette : elle se cache vite !",
+   "Choisis le bon (gauche / droite), puis verse les ingrédients dans l'ordre.",
+   "Sers vite : un bon qui attend trop est perdu."
+  ],
+  "tuto_en": [
+   "Remember the recipe: it hides quickly!",
+   "Pick the ticket (left / right), then pour the ingredients in order.",
+   "Serve fast: a ticket that waits too long is lost."
+  ],
+  "touch_direct": true
+ },
+ {
+  "id": "souffle",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Le Soufflé",
+  "name_en": "The Soufflé",
+  "desc_fr": "Tiens le four dans la zone verte pendant toute la cuisson. Mais le four a de l'inertie : la chaleur continue de monter après qu'on a baissé le gaz. Anticipe les paliers de la recette et la porte que le commis va ouvrir.",
+  "desc_en": "Keep the oven in the green zone for the whole bake. But the oven has inertia: the heat keeps rising after you turn the gas down. Anticipate the recipe's steps and the door the apprentice is about to open.",
+  "tuto_fr": [
+   "Tourne le bouton du gaz : la flamme (point rouge) règle où le four va aller.",
+   "Le four suit avec retard : baisse avant d'arriver, monte avant le palier suivant.",
+   "La porte va s'ouvrir (repère sur la frise) : prépare un peu plus de chaleur."
+  ],
+  "tuto_en": [
+   "Turn the gas knob: the flame (red dot) sets where the oven will go.",
+   "The oven lags behind: turn down before you arrive, up before the next step.",
+   "The door will open (mark on the strip): build up a little extra heat."
+  ],
+  "touch_stick": true
  }
 ]

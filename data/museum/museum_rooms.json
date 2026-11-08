@@ -100,5 +100,22 @@
       "hattoss",
       "mentalist"
     ]
+  },
+  {
+    "id": "kitchens",
+    "name_fr": "Les Cuisines",
+    "name_en": "The Kitchens",
+    "desc_fr": "Carreaux de métro, feux bleus et casseroles de cuivre : les épreuves de la brigade.",
+    "desc_en": "Subway tiles, blue flames and copper pans: the kitchen brigade's trials.",
+    "wall": "e8e0cc",
+    "floor": "16120f",
+    "accent": "ff9a3a",
+    "exhibits": [
+      "crepe",
+      "cutting",
+      "service",
+      "orders",
+      "souffle"
+    ]
   }
 ]

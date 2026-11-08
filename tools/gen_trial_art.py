@@ -810,13 +810,146 @@ def art_mentalist(rng) -> None:
     save(img, "mentalist")
 
 
+# --------------------------------------------------------------------------- 2.0 : les Cuisines
+
+CREAM = (232, 224, 204)
+COPPER = (200, 120, 64)
+
+
+def kitchen(img, d, counter_y=74) -> None:
+    """Fond commun des Cuisines : carreaux de métro crème, frise noire, casseroles de cuivre, comptoir inox."""
+    rect(d, 0, 0, W, H, (106, 100, 88))
+    for row in range(0, counter_y // 5 + 1):
+        off = 0 if row % 2 == 0 else 5
+        for x in range(-off, W, 10):
+            rect(d, x + 1, row * 5 + 1, x + 9, row * 5 + 4, CREAM)
+    rect(d, 0, 20, W, 23, INK)
+    rect(d, 0, 24, W, 24, GOLD)
+    rect(d, 0, 30, W, 30, GOLD_D)
+    for x in range(14, W, 30):
+        d.line((x, 30, x, 33), fill=GOLD_D)
+        disc(d, x, 38, 5, COPPER)
+        disc(d, x - 1, 37, 2, (232, 170, 110))
+    gradient(img, (0, counter_y, W, H), STEEL, STEEL_D, 3)
+    rect(d, 0, counter_y, W, counter_y + 1, IVORY)
+
+
+def art_crepe(rng) -> None:
+    """La Crêpe Suzette : la poêle lance la crêpe qui tourne, flamme bleue, puis l'éclat du flambé."""
+    img, d = canvas()
+    kitchen(img, d)
+    for k in range(5):
+        glow(img, 70 + k * 5, 74, 3, (80, 140, 255), 1.0)
+    rect(d, 58, 70, 96, 73, INK)
+    rect(d, 96, 71, 124, 72, WOOD)
+    for k, (x, y) in enumerate(((78, 60), (82, 44), (78, 30))):
+        w = (16, 6, 14)[k]
+        d.ellipse((x - w, y - 2, x + w, y + 2), fill=(232, 176, 96))
+    d.arc((60, 22, 100, 70), 200, 340, fill=GOLD_L)
+    glow(img, 136, 40, 12, AMBER, 0.9)
+    for k in range(5):
+        d.polygon([(130 + k * 3, 54), (133 + k * 3, 40 - (k % 2) * 6), (136 + k * 3, 54)], fill=(255, 150 - k * 15, 40))
+    save(img, "crepe")
+
+
+def art_cutting(rng) -> None:
+    """Le Découpage : planche, carotte et son pointillé ondulé, couteau, deux pépins rouges à enjamber."""
+    img, d = canvas()
+    rect(d, 0, 0, W, H, (40, 30, 24))
+    gradient(img, (10, 14, 150, 92), (196, 140, 80), (150, 100, 52), 4)
+    for y in range(18, 92, 9):
+        d.line((10, y, 150, y), fill=(170, 116, 62))
+    d.rounded_rectangle((30, 40, 134, 64), radius=10, fill=(232, 120, 40))
+    for k in range(4):
+        d.line((24, 50, 14, 40 + k * 6), fill=(80, 150, 50), width=2)
+    pts = [(34 + x, 52 + 8 * math.sin(x / 14.0)) for x in range(0, 98, 2)]
+    for k in range(0, len(pts) - 1, 2):
+        d.line((pts[k], pts[k + 1]), fill=INK)
+    for x in (70, 104):
+        disc(d, x, int(52 + 8 * math.sin((x - 34) / 14.0)), 3, RED)
+    rect(d, 112, 50, 114, 78, STEEL)
+    rect(d, 111, 78, 115, 90, INK)
+    save(img, "cutting")
+
+
+def art_service(rng) -> None:
+    """Le Service : le serveur de dos, plateau de verres de vin levé, l'allée entre les nappes blanches."""
+    img, d = canvas()
+    gradient(img, (0, 0, W, 50), (30, 14, 10), (70, 30, 20), 3)
+    gradient(img, (0, 50, W, H), (140, 90, 46), (100, 60, 30), 4)
+    d.polygon([(70, 50), (90, 50), (130, H), (30, H)], fill=(124, 80, 40))
+    for k, (x, y, r) in enumerate(((22, 60, 10), (138, 60, 10), (44, 52, 6), (116, 52, 6), (60, 48, 4), (100, 48, 4))):
+        d.ellipse((x - r, y - r // 2, x + r, y + r // 2), fill=IVORY)
+        rect(d, x - r, y, x + r, y + r, (220, 214, 200))
+        glow(img, x, y - 2, 3, AMBER, 0.8)
+    glow(img, 80, 12, 10, GOLD_L, 0.7)
+    rect(d, 72, 66, 88, 90, (22, 22, 30))
+    disc(d, 80, 61, 5, (58, 36, 22))
+    d.line((88, 70, 98, 60), fill=(22, 22, 30), width=3)
+    d.line((98, 60, 98, 52), fill=(22, 22, 30), width=3)
+    d.ellipse((84, 48, 114, 54), fill=STEEL)
+    for k in range(4):
+        x = 89 + k * 6
+        d.polygon([(x - 2, 40), (x + 2, 40), (x + 1, 46), (x - 1, 46)], fill=(200, 220, 240))
+        rect(d, x - 1, 42, x + 1, 44, (138, 16, 32))
+        d.line((x, 46, x, 50), fill=(200, 220, 240))
+    save(img, "service")
+
+
+def art_orders(rng) -> None:
+    """Les Commandes : trois bons au rail du passe (l'un montre sa recette), verre à cocktail."""
+    img, d = canvas()
+    kitchen(img, d, counter_y=80)
+    rect(d, 14, 8, 146, 9, STEEL)
+    cols = ((216, 232, 240), YELLOW, IVORY, (138, 216, 255))
+    for k in range(3):
+        x = 22 + k * 44
+        rect(d, x, 10, x + 34, 50, (244, 236, 216))
+        rect(d, x, 10, x + 34, 15, INK if k != 2 else RED)
+        for j in range(3):
+            if k == 0:
+                disc(d, x + 7 + j * 10, 30, 4, cols[(j * 3 + 1) % 4], outline=INK)
+            else:
+                disc(d, x + 7 + j * 10, 30, 4, (216, 204, 176))
+        rect(d, x + 3, 44, x + 3 + (28 if k == 0 else 12), 46, GOLD if k == 0 else EMERALD)
+    d.polygon([(66, 58), (94, 58), (80, 72)], fill=(200, 220, 240))
+    d.polygon([(70, 60), (90, 60), (80, 69)], fill=YELLOW)
+    rect(d, 79, 72, 81, 80, (200, 220, 240))
+    rect(d, 72, 79, 88, 80, (200, 220, 240))
+    disc(d, 110, 76, 4, YELLOW)
+    rect(d, 40, 58, 46, 80, (200, 220, 240))
+    save(img, "orders")
+
+
+def art_souffle(rng) -> None:
+    """Le Soufflé : four vitré, soufflé qui monte dans son ramequin, thermomètre à zone verte."""
+    img, d = canvas()
+    kitchen(img, d, counter_y=86)
+    rect(d, 14, 30, 100, 86, (28, 26, 30))
+    rect(d, 14, 30, 100, 31, GOLD)
+    gradient(img, (22, 38, 92, 80), (110, 60, 30), (60, 30, 16), 3)
+    glow(img, 57, 60, 20, AMBER, 0.6)
+    d.line((26, 42, 88, 42), fill=(255, 90, 20), width=2)
+    rect(d, 46, 64, 68, 76, IVORY)
+    d.ellipse((44, 50, 70, 70), fill=(232, 184, 96))
+    rect(d, 46, 64, 68, 76, IVORY)
+    for x in range(47, 68, 3):
+        d.line((x, 64, x, 76), fill=(210, 206, 196))
+    disc(d, 128, 52, 22, INK, outline=GOLD)
+    d.arc((110, 34, 146, 70), 250, 300, fill=EMERALD, width=4)
+    d.line((128, 52, 138, 36), fill=GOLD_L, width=2)
+    disc(d, 128, 52, 2, GOLD)
+    save(img, "souffle")
+
+
 def main() -> None:
     rng = random.Random(1520)
     for fn in [art_charge, art_rhythm, art_bottles, art_memory, art_shells, art_darts, art_safe,
                art_tower, art_shaker, art_pour, art_simon, art_catch, art_highlow, art_sort,
                art_invaders, art_cave, art_pachinko, art_blackjack, art_scratch, art_dice, art_derby,
                art_fishing, art_lasers, art_juggle, art_billiards,
-               art_tapdance, art_spotlight, art_tightrope, art_hattoss, art_mentalist]:
+               art_tapdance, art_spotlight, art_tightrope, art_hattoss, art_mentalist,
+               art_crepe, art_cutting, art_service, art_orders, art_souffle]:
         fn(rng)
     print(f"{len(list(OUT.glob('trial_*.png')))} illustrations d'épreuves écrites dans {OUT.relative_to(ROOT)}")
 

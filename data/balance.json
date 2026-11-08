@@ -845,6 +845,140 @@
       "fail_black": 0.12,
       "fail_white": 0.04,
       "reveal_seconds": 1.4
+    },
+    "crepe": {
+      "duration": 16.0,
+      "flips": 4,
+      "target_turns": [
+        0.5,
+        0.5,
+        1.5,
+        1.5
+      ],
+      "turns_min": 0.2,
+      "turns_max": 1.8,
+      "charge_seconds": 1.2,
+      "flight_min": 0.7,
+      "flight_max": 1.25,
+      "gravity": 2200.0,
+      "drift": [
+        100,
+        180,
+        260,
+        330
+      ],
+      "pan_speed": 560,
+      "turn_ok": 0.05,
+      "turn_miss": 0.3,
+      "catch_miss": 180,
+      "rest_seconds": 0.7,
+      "idle_seconds": 5.0,
+      "flambe_seconds": 1.4
+    },
+    "cutting": {
+      "duration": 14.0,
+      "items": 3,
+      "speed": [
+        230,
+        260,
+        300
+      ],
+      "amplitude": [
+        100,
+        140,
+        160
+      ],
+      "bones": [
+        0,
+        3,
+        3
+      ],
+      "bone_min": 50.0,
+      "bone_max": 80.0,
+      "guide_speed": 640,
+      "tolerance_px": 14,
+      "miss_px": 55,
+      "bot_lead": 0.1,
+      "bot_lift_margin": 0.12,
+      "freq_min": 0.8,
+      "freq_max": 1.4,
+      "bot_gain": 5.0
+    },
+    "service": {
+      "duration": 15.0,
+      "speed": 2.2,
+      "walk_seconds": 14.0,
+      "first_obstacle": 5.0,
+      "spacing_min": 3.6,
+      "spacing_max": 4.6,
+      "gap_width": 1.6,
+      "crosser_ahead": 1.6,
+      "crosser_speed": 1.2,
+      "crosser_lead": 1.9,
+      "lateral_speed": 2.6,
+      "response": 4.0,
+      "static_accel": 7.0,
+      "stick_rel": 0.15,
+      "friction": 7.0,
+      "body_half": 0.28,
+      "bump_seconds": 0.6,
+      "bump_slow": 0.5,
+      "bump_glasses": 2,
+      "bow_seconds": 0.8,
+      "bot_horizon": 4.5,
+      "bot_gain": 2.4,
+      "bot_cross_window": 0.45,
+      "bot_cross_horizon": 1.6
+    },
+    "orders": {
+      "duration": 20.0,
+      "tickets": 6,
+      "recipe_len": [
+        2,
+        3,
+        3,
+        4,
+        4,
+        5
+      ],
+      "first_ticket": 0.6,
+      "ticket_every": 2.4,
+      "peek_seconds": 2.0,
+      "patience": 11.0,
+      "wait_weight": 0.6,
+      "grace": 0.35,
+      "ruin_penalty": 0.25
+    },
+    "souffle": {
+      "duration": 15.0,
+      "step_seconds": [
+        4.0,
+        5.0,
+        5.0
+      ],
+      "step_target": [
+        175,
+        210,
+        165
+      ],
+      "start_temp": 150.0,
+      "heat_max": 280.0,
+      "k_heater": 0.9,
+      "k_oven": 0.7,
+      "knob_seconds": 1.2,
+      "band": 8.0,
+      "soft": 1.5,
+      "grace": 1.2,
+      "rise_seconds": 3.0,
+      "door_at": 9.5,
+      "door_drop": 30.0,
+      "door_seconds": 1.0,
+      "door_warn": 2.5,
+      "bot_lead": 1.4,
+      "bot_kp": 0.8,
+      "bot_kd": 0.9,
+      "bot_gain": 6.0,
+      "bot_door_boost": 0.6
     }
   },
   "slot": {

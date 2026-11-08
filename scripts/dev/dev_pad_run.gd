@@ -9,7 +9,7 @@ extends Node
 
 const STEP: float = 0.12
 const STALL_SECONDS: float = 25.0
-const MAX_SECONDS: float = 900.0
+const MAX_SECONDS: float = 1800.0  # campagne 2.0 : plus de tours, deux épreuves par lancer
 
 var spins_wanted: int = 10
 ## Multiplicateur de dette (0 = normal) : traverser toute la campagne rapidement.
@@ -100,6 +100,7 @@ func _play_throw(g: ThrowMinigame) -> void:
 	if stick:
 		await _axis_set(JOY_AXIS_LEFT_X, 0.0)
 		await _axis_set(JOY_AXIS_LEFT_Y, 0.0)
+	print("Épreuve à la manette : %s, %.1f s, notes %s" % [str(g.trial_ids), (Time.get_ticks_msec() - t0) / 1000.0, str(g.trial_scores)])
 
 
 func _press(name: String) -> void:
@@ -227,7 +228,7 @@ func _act() -> void:
 		if GameState.last_run_victory:
 			_finish(true, "campagne gagnée à la manette (%d tours)" % _spins_seen())
 		else:
-			_finish(false, "run terminé avant l'objectif (résumé atteint)")
+			_finish(false, "run terminé avant l'objectif (résumé atteint) — %s" % _defeat_info())
 	elif root is ConfirmBox or root is VirtualKeyboard:
 		await _press("A")
 	else:
@@ -409,3 +410,13 @@ func _finish(ok: bool, why: String) -> void:
 func _spins_seen() -> int:
 	var ctl: RunController = GameState.controller
 	return ctl.run.total_spins if ctl != null and ctl.run != null else -1
+
+
+## Diagnostic d'une défaite : cause, palier, échéance, dette et score au moment de la fin.
+func _defeat_info() -> String:
+	var ctl: RunController = GameState.controller
+	if ctl == null or ctl.run == null:
+		return "aucune run"
+	var r: RunState = ctl.run
+	return "cause « %s », palier %d, échéance %d, dette %d, score %d, tours %d" % [
+		r.defeat_reason, r.tier, r.deadline_idx, r.debt, r.deadline_score, r.total_spins]

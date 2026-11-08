@@ -912,3 +912,51 @@ TRIAL_MENTALIST_OUT,Plus d'essais !,Out of tries!
 TRIAL_MENTALIST_TIME,Temps écoulé !,Time's up!
 TRIAL_MENTALIST_SECRET,La combinaison :,The combination:
 TRIAL_MENTALIST_TRIES,Essais : %d / %d,Tries: %d / %d
+TRIAL_CREPE_HINT,Maintiens {confirm} puis relâche pour faire sauter · {move} déplacer la poêle,Hold {confirm} then release to flip · {move} move the pan
+TRIAL_CREPE_HINT_MOUSE,Maintiens {@click} puis relâche · {@mouse} déplace la poêle,Hold {@click} then release · {@mouse} moves the pan
+TRIAL_CREPE_HINT_TOUCH,Joystick : la poêle · maintiens puis relâche à droite pour faire sauter,Joystick: the pan · hold then release on the right to flip
+TRIAL_CREPE_HALF,Un demi-tour !,Half a turn!
+TRIAL_CREPE_ONE_HALF,Un tour et demi !,One and a half turns!
+TRIAL_CREPE_FLAMBE,On flambe !,Flambé!
+TRIAL_CREPE_FLOOR,Par terre !,On the floor!
+TRIAL_CREPE_WRONG_SIDE,Mauvaise face !,Wrong side!
+TRIAL_CREPE_TOO_LATE,Elle brûle !,It's burning!
+TRIAL_CUTTING_HINT,{move} guider le couteau · maintiens {confirm} pour soulever la lame,{move} guide the knife · hold {confirm} to lift the blade
+TRIAL_CUTTING_HINT_MOUSE,{@mouse} guide le couteau · maintiens {@click} pour soulever la lame,{@mouse} guides the knife · hold {@click} to lift the blade
+TRIAL_CUTTING_HINT_TOUCH,Joystick : le couteau · maintiens à droite pour soulever la lame,Joystick: the knife · hold on the right to lift the blade
+TRIAL_CUTTING_ITEM_0,La carotte,The carrot
+TRIAL_CUTTING_ITEM_1,Le filet de poisson,The fish fillet
+TRIAL_CUTTING_ITEM_2,Le gâteau,The cake
+TRIAL_CUTTING_LIFTED,Lame levée,Blade up
+TRIAL_SERVICE_HINT,"{move} : déporte le serveur, en douceur","{move}: steer the waiter, gently"
+TRIAL_SERVICE_HINT_MOUSE,"{@mouse} : le serveur suit le pointeur, en douceur","{@mouse}: the waiter follows the pointer, gently"
+TRIAL_SERVICE_HINT_TOUCH,"Joystick : déporte le serveur, en douceur","Joystick: steer the waiter, gently"
+TRIAL_SERVICE_STATUS,Verres : %d / %d,Glasses: %d / %d
+TRIAL_SERVICE_DROP,Verre cassé !,Glass broken!
+TRIAL_SERVICE_SERVED,Servi !,Served!
+TRIAL_ORDERS_HINT,{@qte} : verser un ingrédient · {@dpad} : changer de bon,{@qte}: pour an ingredient · {@dpad}: switch ticket
+TRIAL_ORDERS_HINT_MOUSE,"Clique un bon, puis les ingrédients dans l'ordre","Click a ticket, then the ingredients in order"
+TRIAL_ORDERS_HINT_TOUCH,"Touche un bon, puis les ingrédients dans l'ordre","Tap a ticket, then the ingredients in order"
+TRIAL_ORDERS_STATUS,Bons servis : %d / %d,Tickets done: %d / %d
+TRIAL_ORDERS_EXPIRED,Trop tard !,Too late!
+TRIAL_ORDERS_WRONG,À l'évier !,Down the sink!
+TRIAL_ORDERS_SERVED,Servi !,Served!
+TRIAL_ORDERS_REMEMBER,retiens…,remember…
+TRIAL_ORDERS_ING_0,Gin,Gin
+TRIAL_ORDERS_ING_1,Citron,Lemon
+TRIAL_ORDERS_ING_2,Sucre,Sugar
+TRIAL_ORDERS_ING_3,Glace,Ice
+TRIAL_ORDERS_NAME_0,Table 4,Table 4
+TRIAL_ORDERS_NAME_1,Table 7,Table 7
+TRIAL_ORDERS_NAME_2,Bar,Bar
+TRIAL_ORDERS_NAME_3,Salon,Lounge
+TRIAL_ORDERS_NAME_4,Terrasse,Terrace
+TRIAL_ORDERS_NAME_5,Table 12,Table 12
+TRIAL_SOUFFLE_HINT,{move} : tourne le bouton du gaz (haut / bas),{move}: turn the gas knob (up / down)
+TRIAL_SOUFFLE_HINT_MOUSE,{@drag} : règle le gaz (haut = fort),{@drag}: set the gas (up = high)
+TRIAL_SOUFFLE_HINT_TOUCH,Joystick haut / bas : tourne le bouton du gaz,Joystick up / down: turn the gas knob
+TRIAL_SOUFFLE_FLAME,Flamme : %d %%,Flame: %d %%
+TRIAL_SOUFFLE_RISE,Soufflé : %d %%,Soufflé: %d %%
+TRIAL_SOUFFLE_DOOR,La porte !,The door!
+TRIAL_SOUFFLE_DOOR_MARK,porte,door
+TRIAL_SOUFFLE_DONE,Sorti du four !,Out of the oven!
