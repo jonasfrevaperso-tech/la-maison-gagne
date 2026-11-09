@@ -1,3 +1,60 @@
+# Notes de version — 2.0.0 « La Grande Saison »
+
+La plus grosse mise à jour du jeu, pour les deux versions : **50 épreuves** au lieu de 25, une campagne qui résiste, des builds à construire pour de bon et l'export de toutes vos données. Chaque point précise la version concernée : **[PC]**, **[Android]** ou **[PC + Android]**.
+
+## 25 nouvelles épreuves, 5 nouvelles salles [PC + Android]
+Chacune a son décor en 3D, ses sons, son carton illustré, sa maquette au Musée et son tuto en trois étapes.
+- **Le Cabaret** : Claquettes (répondre à la danseuse), Projecteur (suivre l'artiste), Funambule (tenir le fil dans le vent), Lancer de chapeau (viser le portemanteau malgré le ventilateur), Mentaliste (deviner la combinaison).
+- **Les Cuisines** : Crêpe Suzette (faire sauter, rattraper, flamber), Découpage (suivre le pointillé au couteau), Service (traverser la salle avec un plateau de verres), Commandes (cocktails de mémoire), Soufflé (tenir la température du four).
+- **Les Toits** : Pigeon voyageur (voler entre les cheminées), Gouttières (mener la pluie au tonneau), Antenne (chercher la station), Tyrolienne (s'arrêter pile), Télescope (aligner une constellation).
+- **Le Fumoir** : Ronds de fumée, Palet (curling de salon), Dominos, Bluff (repérer le joueur qui bluffe), Échecs éclair (mat en un coup).
+- **Le Garage** : Voiturier (créneau en marche arrière), Rallye (dérapage au frein à main entre les plots), Clé dynamométrique (serrer en étoile, au bon couple), Coffre (ranger tous les bagages), Fuite (semer la police dans la circulation, de nuit).
+
+## Une campagne qui résiste [PC + Android]
+- Les deux premiers paliers restent accessibles ; **à partir du palier 3, les dettes montent nettement**. Il faut en général trois tours pour solder une échéance, et une échéance compte désormais **5 tours**.
+- **Économie resserrée** : récompenses d'échéance, intérêts et prix revus. On ne peut plus tout acheter.
+- Au simulateur, jouer au hasard ne gagne presque jamais (moins de 1 %), et sans rien acheter on tombe au palier 2 ou 3.
+
+## 28 builds de 7 grigris [PC + Android]
+- Les 196 grigris sont répartis en **28 familles thématiques de 7**, chacune avec son emblème. Les bonus se déclenchent à **2, 4 et 7** grigris d'une même famille : le palier 7 est un build complet, rare et puissant.
+- La boutique favorise un peu les familles déjà commencées, mais compléter un build demande des choix.
+- Une partie en cours reprend sans problème avec les nouvelles familles.
+
+## Les épreuves de la 1.x revues [PC + Android]
+- **Plus riches** : chacune de ces dix épreuves gagne une seconde règle.
+  - Verre parfait : l'inclinaison dose la mousse.
+  - Bonneteau : feintes et croupier tricheur.
+  - Grattage : zone piège et double pellicule.
+  - Tiercé : des haies à sauter.
+  - Effet : glissés et disque qui s'emballe.
+  - Billard : bille noire interdite, effet rétro ou coulé.
+  - Lasers : rideau, miroir et interrupteur.
+  - Tri des jetons : jetons piégés, doubles ou à retourner, et des bacs qui tournent.
+  - Bouteilles : quatre règles, dont le ventilateur.
+  - Tour de jetons : oscillation, rafales, jetons lourds et légers.
+- **Plus justes** :
+  - **Pluie du Grand Lustre corrigée** : une pile renversée ne fait plus tout perdre, et la pile restée sur le plateau compte à la fin.
+  - **Pachinko** plus facile.
+- **La Cave** : l'accrochage aux câbles est amorti, en gardant l'élan, et le groom est enfin animé (course, saut, suspension, chute).
+- **Tutos plus lents** : la démonstration tourne au ralenti, chaque étape reste affichée assez longtemps, et le geste joué s'affiche à l'écran.
+
+## Exporter mes données [PC + Android]
+- Options → **« Exporter mes données »** : une archive .zip avec vos sauvegardes, vos statistiques, le journal de chaque partie (chaque tour, chaque achat, chaque épreuve avec ses gestes et verdicts), des tableaux CSV prêts pour un tableur, et un README qui décrit les champs.
+- Le journal est tenu sur l'appareil, rien n'est envoyé nulle part.
+
+## Plus beau [PC + Android]
+- **Musée** : chaque épreuve est exposée sous son carton illustré encadré, sur un socle de marbre veiné. Pilastres et appliques entre les vitrines.
+- Décors refaits pour le Tri des jetons (salle de comptage), le Bonneteau (coin de rue) et la Tour de jetons ; feutre texturé sur les tables de jeu.
+
+## Sur PC [PC]
+- L'archive des données est enregistrée dans Documents, et le dossier s'ouvre tout seul.
+
+## Sur Android [Android]
+- Les nouvelles épreuves se jouent au doigt, en touchant directement les objets quand c'est naturel : écrous de la Clé, bagages du Coffre, files de la Fuite, pièces des Échecs, dominos.
+- L'archive des données passe par le sélecteur de fichiers du système (Téléchargements en secours).
+
+---
+
 # Notes de version — 1.9.0 « Répétition générale »
 
 Une mise à jour pour les deux versions du jeu. Chaque point précise la version concernée : **[PC]**, **[Android]** ou **[PC + Android]**.

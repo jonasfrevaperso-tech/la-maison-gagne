@@ -465,9 +465,9 @@ func _draw_rehearsal() -> void:
 		var k: int = clampi(floori(rehearsal_u * float(tuto_lines.size())), 0, maxi(tuto_lines.size() - 1, 0))
 		# Plein écran : carton en haut. Sur le tapis (PC) : au-dessus du cadre, pour ne rien cacher
 		# du jeu ; sur téléphone, compact en haut du cadre.
-		var box: Rect2 = Rect2(pr.get_center().x - w * 0.5, top - 30.0, w, 132.0)
+		var box: Rect2 = Rect2(pr.get_center().x - w * 0.5, top - 30.0, w, 150.0)
 		if not full():
-			box = Rect2(pr.get_center().x - w * 0.5, 4.0, w, 104.0)
+			box = Rect2(pr.get_center().x - w * 0.5, 4.0, w, 124.0)
 			if not Platform.is_mobile():
 				box.position.y = -18.0 - 16.0 - box.size.y - 8.0
 		draw_rect(box, Color(Palette.INK, 0.92))
@@ -475,8 +475,8 @@ func _draw_rehearsal() -> void:
 		text(Vector2(box.get_center().x, box.position.y + 24.0), "%s · %d/%d" % [tr("TUTO_DEMO"), k + 1, tuto_lines.size()],
 			UiKit.SIZE_SMALL, Palette.GOLD_LIGHT)
 		if not tuto_lines.is_empty():
-			text(Vector2(box.get_center().x, box.position.y + (66.0 if full() else 54.0)), tuto_lines[k],
-				UiKit.SIZE_H2 if full() else UiKit.SIZE_BODY, Palette.IVORY, "body")
+			text_fit(Vector2(box.get_center().x, box.position.y + (74.0 if full() else 62.0)), tuto_lines[k],
+				UiKit.SIZE_H2 if full() else UiKit.SIZE_BODY, Palette.IVORY, box.size.x - 40.0)
 		text(Vector2(box.get_center().x, box.end.y - 18.0), tr("TUTO_SKIP"), UiKit.SIZE_SMALL, Palette.SMOKE, "body")
 		if _demo_cue_t > 0.0:  # geste en cours du bot, en vignette à droite du carton
 			var ca: float = clampf(_demo_cue_t / CUE_SECONDS * 2.0, 0.0, 1.0)
@@ -639,6 +639,37 @@ func text(at: Vector2, s: String, sz: int, col: Color, font: String = "display",
 	var pos: Vector2 = Vector2(at.x - w * 0.5, at.y + fs * 0.35)
 	draw_string_outline(f, pos, s, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, outline, Color(Palette.INK, col.a))
 	draw_string(f, pos, s, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, col)
+
+
+## Texte centré tenu dans `max_w` : la taille baisse jusqu'à `UiKit.SIZE_SMALL`, puis le texte
+## passe sur deux lignes (le grand texte du téléphone faisait déborder les cartons).
+func text_fit(at: Vector2, s: String, sz: int, col: Color, max_w: float, font: String = "body") -> void:
+	var f: Font = UiKit.font(font)
+	var fs: int = UiKit.fs(sz)
+	var floor_fs: int = UiKit.fs(UiKit.SIZE_SMALL)
+	while fs > floor_fs and f.get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > max_w:
+		fs -= 1
+	var lines: PackedStringArray = PackedStringArray([s])
+	if f.get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > max_w:
+		lines = split_two(s)
+	for i: int in lines.size():
+		var w: float = f.get_string_size(lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+		var dy: float = (float(i) - float(lines.size() - 1) * 0.5) * float(fs) * 1.1
+		var pos: Vector2 = Vector2(at.x - w * 0.5, at.y + dy + fs * 0.35)
+		draw_string_outline(f, pos, lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1, fs, 7, Color(Palette.INK, col.a))
+		draw_string(f, pos, lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1, fs, col)
+
+
+## Coupe `s` en deux lignes à l'espace le plus proche du milieu.
+static func split_two(s: String) -> PackedStringArray:
+	var mid: int = s.length() / 2
+	var best: int = -1
+	for i: int in s.length():
+		if s[i] == " " and (best < 0 or absi(i - mid) < absi(best - mid)):
+			best = i
+	if best < 0:
+		return PackedStringArray([s])
+	return PackedStringArray([s.substr(0, best), s.substr(best + 1)])
 
 
 ## Cadre d'épreuve : fond encre, double filet doré.

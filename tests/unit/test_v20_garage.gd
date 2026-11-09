@@ -107,3 +107,12 @@ func test_escape_crash_and_caught() -> void:
 	e._caught = true
 	eq(e.quality(), 0.0, "rattrapé")
 	e.free()
+
+
+## Cartons de tuto (constat de recette 2.0 sur Pixel 7) : une étape trop longue se coupe en deux
+## lignes à l'espace le plus proche du milieu.
+func test_tuto_line_splits_in_two() -> void:
+	var parts: PackedStringArray = ThrowTrial.split_two("Avant de déboîter, vérifie la file d'à côté.")
+	eq(parts.size(), 2, "deux lignes")
+	eq(parts[0] + " " + parts[1], "Avant de déboîter, vérifie la file d'à côté.", "rien de perdu")
+	eq(ThrowTrial.split_two("Indivisible").size(), 1, "sans espace, une ligne")
