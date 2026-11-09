@@ -1003,3 +1003,50 @@ TRIAL_TELESCOPE_CHART,la carte,the chart
 TRIAL_TELESCOPE_STATUS,Ciel %d / %d,Sky %d / %d
 TRIAL_TELESCOPE_FOUND,La voilà !,There it is!
 TRIAL_TELESCOPE_DAWN,L'aube…,Dawn…
+TRIAL_SMOKERINGS_HINT,{move} : incliner · {@hold} : inspirer · relâcher : souffler,{move}: tilt · {@hold}: breathe in · release: blow
+TRIAL_SMOKERINGS_HINT_MOUSE,{@mouse} : viser · {@hold} : inspirer · relâcher : souffler,{@mouse}: aim · {@hold}: breathe in · release: blow
+TRIAL_SMOKERINGS_HINT_TOUCH,"Joystick : incliner · bouton maintenu : inspirer, relâché : souffler","Joystick: tilt · hold the button: breathe in, release: blow"
+TRIAL_SMOKERINGS_BREATH,souffle,breath
+TRIAL_SMOKERINGS_STATUS,Cerceau %d / %d,Hoop %d / %d
+TRIAL_SMOKERINGS_CLEAN,En plein cœur !,Dead centre!
+TRIAL_SMOKERINGS_THROUGH,Passé !,Through!
+TRIAL_SMOKERINGS_BROKE,Brisé sur le cerceau,Broke on the hoop
+TRIAL_SMOKERINGS_SHORT,Dissipé…,Faded…
+TRIAL_SMOKERINGS_COUGH,Kof kof !,Cough cough!
+TRIAL_PALET_HINT,"{move} : viser · {@hold} : force, puis brosser","{move}: aim · {@hold}: power, then sweep"
+TRIAL_PALET_HINT_MOUSE,"{@mouse} : viser · {@hold} : force, puis brosser","{@mouse}: aim · {@hold}: power, then sweep"
+TRIAL_PALET_HINT_TOUCH,"Joystick : viser · bouton maintenu : force, puis brosser","Joystick: aim · hold the button: power, then sweep"
+TRIAL_PALET_FORCE,force,power
+TRIAL_PALET_BRUSHING,On brosse !,Sweep!
+TRIAL_PALET_STATUS,Palet %d / %d,Puck %d / %d
+TRIAL_PALET_BUTTON,Au bouton !,On the button!
+TRIAL_PALET_HOUSE,Dans la maison,In the house
+TRIAL_PALET_SHORT,Trop court,Too short
+TRIAL_PALET_LONG,Trop long,Too long
+TRIAL_PALET_OUT,Dans la gouttière,In the gutter
+TRIAL_PALET_LATE,Trop tard,Too late
+TRIAL_DOMINOES_HINT,{@dpad} gauche / droite : choisir · {confirm} : poser · bas : piocher,{@dpad} left / right: pick · {confirm}: play · down: draw
+TRIAL_DOMINOES_HINT_MOUSE,{@click} sur un domino : le poser · sur la pioche : piocher,{@click} a domino: play it · the stock: draw
+TRIAL_DOMINOES_HINT_TOUCH,"Touche un domino pour le poser, la pioche pour piocher","Tap a domino to play it, the stock to draw"
+TRIAL_DOMINOES_PILE,pioche,stock
+TRIAL_DOMINOES_STATUS,Points %d / %d,Points %d / %d
+TRIAL_DOMINOES_DOUBLE,Double !,Double!
+TRIAL_DOMINOES_WRONG,Ça ne va pas !,Doesn't fit!
+TRIAL_DOMINOES_BLOCKED,Main bloquée…,Hand blocked…
+TRIAL_BLUFF_HINT,{@dpad} gauche / droite : désigner · {confirm} : accuser,{@dpad} left / right: point · {confirm}: call the bluff
+TRIAL_BLUFF_HINT_MOUSE,{@click} sur le menteur,{@click} the liar
+TRIAL_BLUFF_HINT_TOUCH,Touche le menteur,Tap the liar
+TRIAL_BLUFF_WATCH,Main %d / %d — observe…,Hand %d / %d — watch…
+TRIAL_BLUFF_STATUS,Main %d / %d — qui bluffe ?,Hand %d / %d — who's bluffing?
+TRIAL_BLUFF_BET,Je mise %d,I bet %d
+TRIAL_BLUFF_CAUGHT,Démasqué !,Caught!
+TRIAL_BLUFF_WRONG,Il disait vrai…,He was honest…
+TRIAL_BLUFF_ESCAPED,Il s'en tire…,He got away…
+TRIAL_CHESS_HINT,"{@dpad} : curseur · {confirm} : prendre, puis poser","{@dpad}: cursor · {confirm}: pick up, then place"
+TRIAL_CHESS_HINT_MOUSE,"{@click} sur une pièce blanche, puis sur sa case d'arrivée","{@click} a white piece, then its destination"
+TRIAL_CHESS_HINT_TOUCH,"Touche une pièce blanche, puis sa case d'arrivée","Tap a white piece, then its destination"
+TRIAL_CHESS_STATUS,Position %d / %d,Position %d / %d
+TRIAL_CHESS_TASK,Les Blancs matent en un coup,White mates in one
+TRIAL_CHESS_MATE,Échec et mat !,Checkmate!
+TRIAL_CHESS_NOT_MATE,Pas mat…,Not mate…
+TRIAL_CHESS_FLAG,Le drapeau tombe !,Flag fell!

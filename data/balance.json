@@ -1130,6 +1130,168 @@
       "late_weight": 0.9,
       "late_floor": 0.35,
       "rest_seconds": 1.0
+    },
+    "smokerings": {
+      "duration": 25.0,
+      "hoops": 5,
+      "dist": [
+        650,
+        800,
+        950,
+        1100,
+        1200
+      ],
+      "hoop_y": [
+        640,
+        600,
+        660,
+        560,
+        620
+      ],
+      "amp": [
+        0,
+        50,
+        80,
+        100,
+        120
+      ],
+      "period": [
+        3.0,
+        2.8,
+        2.5,
+        2.3,
+        2.1
+      ],
+      "hoop_r": [
+        100,
+        92,
+        86,
+        80,
+        76
+      ],
+      "v_min": 450,
+      "v_max": 1350,
+      "drag": 0.6,
+      "lift": 60,
+      "r0": 28,
+      "grow": 22,
+      "fit_share": 0.6,
+      "perfect_ratio": 0.3,
+      "edge_q": 0.45,
+      "die_vx": 70,
+      "aim_max": 0.5,
+      "aim_speed": 0.9,
+      "charge_seconds": 1.2,
+      "cough_seconds": 0.7,
+      "rest_seconds": 0.6,
+      "hoop_seconds": 7.0,
+      "fade_seconds": 3.0,
+      "bot_settle": 0.05,
+      "bot_aim_tol": 0.01,
+      "y_jitter": 40,
+      "bot_wait_slack": 0.05,
+      "bot_deadline": 3.0,
+      "bot_margin": 0.06
+    },
+    "palet": {
+      "duration": 28.0,
+      "throws": 3,
+      "length": 4.2,
+      "start_u": 0.15,
+      "house_u": 3.6,
+      "house_r": 0.3,
+      "width": 0.9,
+      "radius": 0.055,
+      "friction": 0.9,
+      "brush_friction": 0.55,
+      "bowl": 1.26,
+      "v_min": 1.6,
+      "v_max": 3.2,
+      "restitution": 0.9,
+      "guards": [
+        0,
+        1,
+        2
+      ],
+      "guard_min": 0.5,
+      "guard_max": 0.9,
+      "guard_side": 0.12,
+      "aim_max": 0.18,
+      "aim_speed": 0.25,
+      "gauge_seconds": 1.3,
+      "throw_seconds": 9.0,
+      "rest_seconds": 0.8,
+      "perfect_ratio": 0.25,
+      "edge_q": 0.35,
+      "click_dv": 0.3,
+      "cam_h": 1.7,
+      "cam_back": 3.4,
+      "bot_short": 0.12,
+      "bot_brush_margin": 0.01,
+      "bot_aim_step": 0.02,
+      "bot_power_step": 0.04,
+      "bot_aim_tol": 0.004
+    },
+    "dominoes": {
+      "duration": 20.0,
+      "hand": 5,
+      "target": 22,
+      "place_seconds": 0.45,
+      "wrong_seconds": 1.0,
+      "draw_seconds": 0.7,
+      "opp_first": 2.5,
+      "opp_period": 3.0,
+      "cam_h": 2.5,
+      "cam_back": 2.4
+    },
+    "bluff": {
+      "duration": 24.0,
+      "hands": 3,
+      "calm_seconds": 2.0,
+      "window_seconds": 8.0,
+      "period_min": 2.4,
+      "period_max": 3.4,
+      "jitter": 0.12,
+      "nervous_ratio": [
+        2.6,
+        2.3,
+        2.0
+      ],
+      "herring_chance": [
+        0.0,
+        0.6,
+        1.0
+      ],
+      "herring_seconds": 1.0,
+      "tic_seconds": 0.7,
+      "quick_seconds": 4.0,
+      "late_floor": 0.4,
+      "rest_seconds": 0.7,
+      "bot_min_short": 2,
+      "short_cut": 0.75
+    },
+    "chess": {
+      "duration": 45.0,
+      "rounds": 3,
+      "tier": [
+        0,
+        1,
+        2
+      ],
+      "limit": [
+        16,
+        20,
+        24
+      ],
+      "grace": 0.3,
+      "late_weight": 0.8,
+      "late_floor": 0.35,
+      "wrong_mult": 0.6,
+      "wrong_seconds": 2.0,
+      "undo_seconds": 0.9,
+      "rest_seconds": 1.3,
+      "cam_h": 2.9,
+      "cam_back": 2.8
     }
   },
   "slot": {

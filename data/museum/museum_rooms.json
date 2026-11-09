@@ -134,5 +134,22 @@
       "zipline",
       "telescope"
     ]
+  },
+  {
+    "id": "smoking",
+    "name_fr": "Le Fumoir",
+    "name_en": "The Smoking Room",
+    "desc_fr": "Boiseries de noyer, fauteuils club et feu de bois : les épreuves du cercle, entre gentlemen.",
+    "desc_en": "Walnut panelling, club chairs and a log fire: the club's trials, among gentlemen.",
+    "wall": "143a2a",
+    "floor": "4a2a16",
+    "accent": "c8a040",
+    "exhibits": [
+      "smokerings",
+      "palet",
+      "dominoes",
+      "bluff",
+      "chess"
+    ]
   }
 ]

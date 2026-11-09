@@ -127,6 +127,21 @@ func project(p: Vector3) -> Vector2:
 	return cam.unproject_position(p) * (size / vp_size) + position
 
 
+## Inverse de `project` : point du plan horizontal `plane_y` sous le pixel `p2` (repère du parent) ;
+## Vector3.INF si la vue n'est pas encore dimensionnée ou si le rayon ne coupe pas le plan.
+func unproject_to_plane(p2: Vector2, plane_y: float) -> Vector3:
+	var vp_size: Vector2 = Vector2(_vp.size)
+	if vp_size.x <= 0.0 or size.x <= 0.0:
+		return Vector3.INF
+	var vp_pos: Vector2 = (p2 - position) * (vp_size / size)
+	var from: Vector3 = cam.project_ray_origin(vp_pos)
+	var dir: Vector3 = cam.project_ray_normal(vp_pos)
+	if absf(dir.y) < 0.0001:
+		return Vector3.INF
+	var k: float = (plane_y - from.y) / dir.y
+	return Vector3.INF if k < 0.0 else from + dir * k
+
+
 # --------------------------------------------------------------------------- fabrique
 
 

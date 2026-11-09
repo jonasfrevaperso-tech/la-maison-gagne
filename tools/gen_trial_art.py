@@ -1084,6 +1084,138 @@ def art_telescope(rng) -> None:
     save(img, "telescope")
 
 
+# --------------------------------------------------------------------------- 2.0 : le Fumoir
+
+SKIN = (232, 184, 150)
+DRAPE_C = (20, 58, 42)
+WALNUT_C = (74, 42, 22)
+LEATHER_C = (106, 26, 20)
+FELT_C = (30, 90, 52)
+
+
+def smoking(img, d, floor_y=80) -> None:
+    """Fond commun du Fumoir : tenture rayée vert bouteille, lambris de noyer, cimaise dorée."""
+    for x in range(0, W, 8):
+        rect(d, x, 0, x + 3, floor_y - 30, DRAPE_C)
+        rect(d, x + 4, 0, x + 7, floor_y - 30, (14, 44, 32))
+    rect(d, 0, floor_y - 30, W, floor_y, WALNUT_C)
+    for x in range(4, W, 24):
+        d.rectangle((x, floor_y - 26, x + 18, floor_y - 4), outline=(50, 28, 14))
+    rect(d, 0, floor_y - 31, W, floor_y - 30, GOLD)
+    rect(d, 0, floor_y, W, H, (70, 42, 22))
+
+
+def art_smokerings(rng) -> None:
+    """Les Ronds de fumée : fumeur dans son fauteuil club, ronds qui filent vers le cerceau."""
+    img, d = canvas()
+    smoking(img, d, 84)
+    rect(d, 10, 56, 44, 84, LEATHER_C)
+    rect(d, 10, 48, 18, 84, (80, 18, 14))
+    disc(d, 32, 44, 7, SKIN)
+    rect(d, 26, 51, 40, 66, INK)
+    d.line((36, 52, 42, 46), fill=SKIN, width=3)
+    disc(d, 43, 45, 1, (255, 120, 40))
+    for k, (x, y, r) in enumerate(((60, 42, 4), (82, 38, 6), (104, 34, 8))):
+        d.ellipse((x - r * 0.4, y - r, x + r * 0.4, y + r), outline=(236, 230, 220), width=2)
+    d.line((128, 0, 128, 18), fill=(138, 106, 58))
+    d.ellipse((122, 18, 134, 50), outline=GOLD_L, width=2)
+    save(img, "smokerings")
+
+
+def art_palet(rng) -> None:
+    """Le Palet : longue table vernie en perspective, maison peinte, palet doré qui revient."""
+    img, d = canvas()
+    smoking(img, d, 40)
+    d.polygon([(10, 92), (150, 92), (124, 40), (36, 40)], fill=(192, 136, 80))
+    d.polygon([(10, 92), (150, 92), (150, 96), (10, 96)], fill=(42, 22, 10))
+    for r, c in ((14, (42, 74, 138)), (10, (240, 232, 216)), (6, (168, 42, 36))):
+        d.ellipse((80 - r * 1.4, 50 - r * 0.45, 80 + r * 1.4, 50 + r * 0.45), fill=c)
+    pts = [(80 + 22 * math.sin(k / 10 * math.pi), 88 - k * 3.6) for k in range(11)]
+    for (x, y) in pts[::2]:
+        d.point((x, y), fill=GOLD_L)
+    d.ellipse((74, 47, 86, 53), fill=GOLD)
+    d.ellipse((92, 58, 102, 63), fill=(138, 26, 20))
+    save(img, "palet")
+
+
+def art_dominoes(rng) -> None:
+    """Les Dominos : chaîne en serpentin sur le tapis vert, main du joueur au premier plan."""
+    img, d = canvas()
+    rect(d, 0, 0, W, H, FELT_C)
+    for _ in range(120):
+        d.point((rng.randrange(W), rng.randrange(H)), fill=(24, 78, 44))
+    def tile(x, y, a, b, vertical=False):
+        w, h = (8, 16) if vertical else (16, 8)
+        rect(d, x + 1, y + 1, x + w + 1, y + h + 1, (10, 30, 18))
+        rect(d, x, y, x + w, y + h, (244, 236, 216))
+        if vertical:
+            d.line((x + 1, y + h // 2, x + w - 1, y + h // 2), fill=(106, 90, 64))
+        else:
+            d.line((x + w // 2, y + 1, x + w // 2, y + h - 1), fill=(106, 90, 64))
+        for half, n in enumerate((a, b)):
+            cx = x + (w // 4 if not vertical else w // 2) + (w // 2 * half if not vertical else 0)
+            cy = y + (h // 2 if not vertical else h // 4) + (h // 2 * half if vertical else 0)
+            for i in range(n):
+                d.point((cx - 1 + (i % 2) * 2, cy - 1 + (i // 2)), fill=INK)
+    x = 20
+    for a, b in ((1, 3), (3, 5), (5, 5), (5, 2), (2, 6), (6, 4)):
+        tile(x, 34, a, b, vertical=(a == b))
+        x += 10 if a == b else 18
+    for k, (a, b) in enumerate(((4, 1), (6, 6), (0, 3), (2, 2))):
+        tile(44 + k * 20, 70, a, b, vertical=True)
+    d.rectangle((62, 68, 73, 89), outline=GOLD_L)
+    save(img, "dominoes")
+
+
+def art_bluff(rng) -> None:
+    """Le Bluff : quatre joueurs attablés, l'un trahi par son tic (traits de nervosité)."""
+    img, d = canvas()
+    smoking(img, d, 70)
+    for k, coat in enumerate(((26, 26, 34), (42, 26, 20), (20, 34, 42), (42, 42, 42))):
+        x = 24 + k * 37
+        rect(d, x - 9, 48, x + 9, 70, coat)
+        disc(d, x, 40, 7, SKIN)
+        rect(d, x - 7, 33, x + 7, 36, ((58, 36, 22), (138, 138, 138), (200, 154, 80), (26, 16, 16))[k])
+    d.line((66, 42, 70, 34), fill=SKIN, width=3)
+    for a in (-0.6, 0.0, 0.6):
+        d.line((61 + 12 * math.sin(a), 28 - 4 * math.cos(a), 61 + 16 * math.sin(a), 24 - 6 * math.cos(a)), fill=GOLD_L)
+    rect(d, 0, 70, W, H, FELT_C)
+    rect(d, 0, 70, W, 72, LEATHER_C)
+    for k in range(4):
+        rect(d, 18 + k * 37, 78, 24 + k * 37, 86, (138, 26, 36))
+        for h in range(3):
+            rect(d, 28 + k * 37, 84 - 2 * h, 33 + k * 37, 85 - 2 * h, (RED, FOAM, (61, 139, 255))[h])
+    save(img, "bluff")
+
+
+def art_chess(rng) -> None:
+    """Les Échecs éclair : échiquier en perspective, roi noir renversé, pendule."""
+    img, d = canvas()
+    smoking(img, d, 34)
+    top, bot = 38, 96
+    for j in range(8):
+        y0 = top + (bot - top) * j / 8
+        y1 = top + (bot - top) * (j + 1) / 8
+        for i in range(8):
+            def xl(y, i):
+                f = (y - top) / (bot - top)
+                half = 40 + 34 * f
+                return 80 - half + 2 * half * i / 8
+            poly = [(xl(y0, i), y0), (xl(y0, i + 1), y0), (xl(y1, i + 1), y1), (xl(y1, i), y1)]
+            d.polygon(poly, fill=(232, 204, 152) if (i + j) % 2 else (90, 46, 20))
+    rect(d, 76, 54, 84, 72, (239, 224, 188))
+    disc(d, 80, 52, 5, (239, 224, 188))
+    for k in range(5):
+        d.point((77 + k * 1.5, 47), fill=(239, 224, 188))
+    rect(d, 98, 66, 116, 72, (42, 26, 20))
+    disc(d, 118, 69, 4, (42, 26, 20))
+    d.line((121, 69, 125, 69), fill=(42, 26, 20), width=2)
+    rect(d, 132, 22, 152, 32, WOOD)
+    disc(d, 137, 27, 3, FOAM)
+    disc(d, 147, 27, 3, FOAM)
+    save(img, "chess")
+
+
 def main() -> None:
     rng = random.Random(1520)
     for fn in [art_charge, art_rhythm, art_bottles, art_memory, art_shells, art_darts, art_safe,
@@ -1092,7 +1224,8 @@ def main() -> None:
                art_fishing, art_lasers, art_juggle, art_billiards,
                art_tapdance, art_spotlight, art_tightrope, art_hattoss, art_mentalist,
                art_crepe, art_cutting, art_service, art_orders, art_souffle,
-               art_pigeon, art_gutters, art_antenna, art_zipline, art_telescope]:
+               art_pigeon, art_gutters, art_antenna, art_zipline, art_telescope,
+               art_smokerings, art_palet, art_dominoes, art_bluff, art_chess]:
         fn(rng)
     print(f"{len(list(OUT.glob('trial_*.png')))} illustrations d'épreuves écrites dans {OUT.relative_to(ROOT)}")
 

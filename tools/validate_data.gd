@@ -188,6 +188,12 @@ func _validate_entry(db: ContentDB, cat: String, e: Dictionary) -> void:
 				errors.append("%s : touch_direct sans tap_action ni direct_input" % eid)
 			if e.has("touch_pad") or e.has("touch_stick"):
 				errors.append("%s : touch_direct et pavé émulé à la fois" % eid)
+		# 2.0 : positions des Échecs éclair — chacune a exactement un mat, celui des données.
+		for pz: Variant in e.get("puzzles", []):
+			var pd: Dictionary = pz as Dictionary
+			var mates: Array[Vector2i] = ChessMini.from_fen(String(pd.get("fen", ""))).mating_moves()
+			if mates.size() != 1 or mates[0] != ChessMini.parse_uci(String(pd.get("solution", ""))):
+				errors.append("%s : position « %s » sans mat unique conforme" % [eid, String(pd.get("fen", ""))])
 		# 1.9 : tuto de première rencontre, 2 à 4 étapes par langue.
 		for lang: String in ["fr", "en"]:
 			var steps: Array = e.get("tuto_" + lang, []) as Array

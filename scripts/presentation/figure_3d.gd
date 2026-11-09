@@ -252,6 +252,52 @@ func _pose(p_anim: StringName, ph: float, amount: float) -> Dictionary[StringNam
 			o[&"el_l"] = Vector3(-0.9 * amount - 0.2, 0, 0)
 			o[&"el_r"] = Vector3(-0.9 * amount - 0.2, 0, 0)
 			o[&"_bob"] = Vector3(0, -0.2, 0)
+		&"smoke":
+			# Fumeur assis : `amount` 0..1 = inspiration (main à la bouche, buste qui se gonfle et
+			# s'incline en arrière) ; négatif = il souffle (tête projetée, main écartée).
+			var inh: float = clampf(amount, 0.0, 1.0)
+			var blow: float = clampf(-amount, 0.0, 1.0)
+			o[&"hip_l"] = Vector3(-1.5, 0, -0.08)
+			o[&"hip_r"] = Vector3(-1.5, 0, 0.08)
+			o[&"kn_l"] = Vector3(1.5, 0, 0)
+			o[&"kn_r"] = Vector3(1.4, 0, 0)
+			o[&"torso"] = Vector3(0.12 * inh - 0.12 * blow + 0.02 * s, 0, 0)
+			o[&"head"] = Vector3(0.15 * inh - 0.25 * blow, 0, 0)
+			o[&"sh_r"] = Vector3(-1.3 + 0.6 * blow, 0, 0.35 + 0.3 * blow)
+			o[&"el_r"] = Vector3(-2.0 + 0.9 * blow, 0, 0)
+			o[&"sh_l"] = Vector3(-0.3, 0, -0.2)
+			o[&"el_l"] = Vector3(-0.8, 0, 0)
+			o[&"_bob"] = Vector3(0, -0.2 + 0.015 * inh, 0)
+		&"tic":
+			# Joueur attablé et ses tics (Bluff) : `amount` = tic (0 se gratte le nez, 1 tire l'oreille,
+			# 2 lisse la moustache, 3 tapote la table), `ph` 0..1 = déroulé du geste (0 = repos).
+			var g: float = sin(clampf(ph, 0.0, 1.0) * PI)
+			o[&"hip_l"] = Vector3(-1.5, 0, -0.08)
+			o[&"hip_r"] = Vector3(-1.5, 0, 0.08)
+			o[&"kn_l"] = Vector3(1.5, 0, 0)
+			o[&"kn_r"] = Vector3(1.5, 0, 0)
+			o[&"torso"] = Vector3(-0.12 + 0.015 * s, 0, 0)
+			o[&"sh_l"] = Vector3(-0.8, 0, -0.15)
+			o[&"el_l"] = Vector3(-1.0, 0, 0)
+			o[&"sh_r"] = Vector3(-0.8, 0, 0.15)
+			o[&"el_r"] = Vector3(-1.0, 0, 0)
+			o[&"_bob"] = Vector3(0, -0.2, 0)
+			match clampi(int(amount), 0, 3):
+				0:
+					o[&"sh_r"] = Vector3(-0.8 - 1.0 * g, 0, 0.15 - 0.25 * g)
+					o[&"el_r"] = Vector3(-1.0 - 1.1 * g, 0, 0)
+					o[&"head"] = Vector3(0.12 * g, 0, 0)
+				1:
+					o[&"sh_l"] = Vector3(-0.8 - 1.4 * g, 0, -0.15 - 0.5 * g)
+					o[&"el_l"] = Vector3(-1.0 - 1.0 * g, 0, 0)
+					o[&"head"] = Vector3(0, 0, 0.25 * g)
+				2:
+					o[&"sh_r"] = Vector3(-0.8 - 1.0 * g, 0.3 * sin(ph * TAU * 2.0) * g, 0.1)
+					o[&"el_r"] = Vector3(-1.0 - 1.0 * g, 0, 0)
+					o[&"head"] = Vector3(-0.1 * g, 0.2 * g, 0)
+				_:
+					o[&"sh_r"] = Vector3(-0.8 + 0.25 * absf(sin(ph * TAU * 3.0)) * g, 0, 0.15)
+					o[&"head"] = Vector3(0.1 * g, -0.3 * g, 0)
 		&"point":
 			# Désigne devant soi ; `amount` = direction (-1 gauche … 1 droite).
 			o[&"sh_r"] = Vector3(-1.5, -amount * 0.8, 0.1)

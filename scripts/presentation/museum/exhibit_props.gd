@@ -91,6 +91,16 @@ static func build(trial_id: String) -> Node3D:
 			_zipline(n)
 		"telescope":
 			_telescope(n)
+		"smokerings":
+			_smokerings(n)
+		"palet":
+			_palet(n)
+		"dominoes":
+			_dominoes(n)
+		"bluff":
+			_bluff(n)
+		"chess":
+			_chess(n)
 		_:
 			var c: Node3D = CasinoChip3D.build(n, Palette.GOLD, 0.3)
 			c.position.y = 0.3
@@ -713,3 +723,105 @@ static func _telescope(n: Node3D) -> void:
 	var tube: MeshInstance3D = Stage3D.cylinder(n, 0.03, 0.38, Vector3(0.02, 0.4, 0), _m(Palette.GOLD, 0.85, 0.25), 0.022)
 	tube.rotation.z = -0.9
 	Stage3D.sphere(n, 0.03, Vector3(0.18, 0.62, 0), Stage3D.glow(Color(1.0, 0.95, 0.8), 1.5))
+
+
+# --------------------------------------------------------------------------- le Fumoir
+
+
+static func _smokerings(n: Node3D) -> void:
+	# Fauteuil club miniature, cerceau de laiton suspendu et deux ronds de fumée.
+	var chair: Node3D = SmokingSet.club_chair(n, Vector3(-0.16, 0.0, 0.0), PI * 0.5)
+	chair.scale = Vector3.ONE * 0.3
+	var hoop: MeshInstance3D = MeshInstance3D.new()
+	var torus: TorusMesh = TorusMesh.new()
+	torus.inner_radius = 0.085
+	torus.outer_radius = 0.095
+	hoop.mesh = torus
+	hoop.material_override = _m(SmokingSet.BRASS, 0.85, 0.25)
+	hoop.position = Vector3(0.18, 0.28, 0)
+	hoop.rotation = Vector3(0, 0.35, PI * 0.5)
+	n.add_child(hoop)
+	Stage3D.cylinder(n, 0.003, 0.2, Vector3(0.18, 0.47, 0), _m(Color("8a6a3a"), 0.0, 0.8))
+	var smoke: StandardMaterial3D = _m(Color(0.92, 0.9, 0.86, 0.6), 0.0, 1.0)
+	smoke.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	for k: int in 2:
+		var ring: MeshInstance3D = MeshInstance3D.new()
+		var tr: TorusMesh = TorusMesh.new()
+		tr.inner_radius = 0.02 + 0.01 * float(k)
+		tr.outer_radius = 0.035 + 0.012 * float(k)
+		ring.mesh = tr
+		ring.material_override = smoke
+		ring.position = Vector3(-0.02 + 0.09 * float(k), 0.24 + 0.02 * float(k), 0)
+		ring.rotation = Vector3(0, 0.35, PI * 0.5)
+		n.add_child(ring)
+
+
+static func _palet(n: Node3D) -> void:
+	# Table de palet miniature : plateau vernis, maison peinte, palets doré et rouges.
+	Stage3D.box(n, Vector3(0.62, 0.03, 0.16), Vector3(0, 0.12, 0), _m(Color("c08850"), 0.0, 0.2))
+	for sz: float in [-1.0, 1.0]:
+		Stage3D.box(n, Vector3(0.64, 0.03, 0.02), Vector3(0, 0.12, sz * 0.09), _m(SmokingSet.WALNUT_D, 0.0, 0.4))
+	for k: int in 2:
+		Stage3D.cylinder(n, 0.02, 0.1, Vector3(-0.25 + 0.5 * float(k), 0.05, 0), _m(SmokingSet.WALNUT_D, 0.0, 0.4))
+	var house: Array[Color] = [Color("2a4a8a"), Color("f0e8d8"), Color("a82a24")]
+	for k2: int in house.size():
+		Stage3D.cylinder(n, 0.055 - 0.017 * float(k2), 0.002, Vector3(0.22, 0.1365 + 0.0005 * float(k2), 0), _m(house[k2], 0.0, 0.4))
+	Stage3D.cylinder(n, 0.014, 0.01, Vector3(0.21, 0.142, 0.01), _m(Palette.GOLD, 0.85, 0.3))
+	for k3: int in 2:
+		Stage3D.cylinder(n, 0.014, 0.01, Vector3(0.05 + 0.06 * float(k3), 0.142, -0.02 + 0.04 * float(k3)), _m(Color("8a1a14"), 0.2, 0.4))
+
+
+static func _dominoes(n: Node3D) -> void:
+	# Dominos debout en serpentin, le premier qui bascule ; tapis vert.
+	Stage3D.box(n, Vector3(0.6, 0.01, 0.36), Vector3(0, 0.005, 0), _m(Color("1e5a34"), 0.0, 1.0))
+	var ivory: StandardMaterial3D = _m(Color("f4ecd8"), 0.0, 0.35)
+	var pip: StandardMaterial3D = _m(Color("141014"), 0.0, 0.4)
+	for k: int in 8:
+		var a: float = float(k) * 0.42
+		var at: Vector3 = Vector3(-0.22 + 0.06 * float(k), 0.045, 0.08 * sin(a))
+		var d: MeshInstance3D = Stage3D.box(n, Vector3(0.012, 0.07, 0.035), at, ivory)
+		d.rotation = Vector3(0, -0.42 * cos(a) * 0.8, -0.9 if k == 0 else 0.0)
+		Stage3D.sphere(d, 0.004, Vector3(0.007, 0.015, 0), pip)
+		Stage3D.sphere(d, 0.004, Vector3(0.007, -0.015, 0), pip)
+
+
+static func _bluff(n: Node3D) -> void:
+	# Éventail de cartes, piles de jetons, cigare dans son cendrier.
+	Stage3D.box(n, Vector3(0.5, 0.01, 0.34), Vector3(0, 0.005, 0), _m(Color("1e5a34"), 0.0, 1.0))
+	for k: int in 5:
+		var card_at: Vector3 = Vector3(-0.1 + 0.015 * float(k), 0.012 + 0.002 * float(k), 0.02)
+		var card_col: Color = Color("f4ecd8") if k < 4 else Color("8a1a24")
+		var card: MeshInstance3D = Stage3D.box(n, Vector3(0.06, 0.003, 0.09), card_at, _m(card_col, 0.0, 0.5))
+		card.rotation.y = -0.5 + 0.25 * float(k)
+	var cols: Array[Color] = [Palette.ROULETTE_RED, Palette.IVORY, Palette.CHIPS_BLUE]
+	for c: int in 3:
+		for h: int in 3 + c:
+			Stage3D.cylinder(n, 0.022, 0.008, Vector3(0.08 + 0.05 * float(c), 0.014 + 0.0085 * float(h), -0.06), _m(cols[c], 0.2, 0.4))
+	Stage3D.cylinder(n, 0.04, 0.012, Vector3(0.12, 0.016, 0.08), _m(Color("8a8a90"), 0.8, 0.3), 0.032)
+	var cigar: MeshInstance3D = Stage3D.cylinder(n, 0.007, 0.09, Vector3(0.1, 0.03, 0.08), _m(Color("6a3a1a"), 0.0, 0.8))
+	cigar.rotation.z = PI * 0.5 - 0.2
+	Stage3D.sphere(n, 0.007, Vector3(0.055, 0.04, 0.08), Stage3D.glow(Color(1.0, 0.45, 0.15), 2.5))
+
+
+static func _chess(n: Node3D) -> void:
+	# Échiquier miniature, roi noir renversé devant la dame blanche.
+	var light: StandardMaterial3D = _m(Color("e8cc98"), 0.0, 0.35)
+	var dark: StandardMaterial3D = _m(Color("5a2e14"), 0.0, 0.35)
+	Stage3D.box(n, Vector3(0.36, 0.02, 0.36), Vector3(0, 0.01, 0), _m(Color("3a1a0c"), 0.0, 0.3))
+	for i: int in 8:
+		for j: int in 8:
+			var sq_at: Vector3 = Vector3(-0.14 + 0.04 * float(i), 0.022, -0.14 + 0.04 * float(j))
+			Stage3D.box(n, Vector3(0.04, 0.004, 0.04), sq_at, light if (i + j) % 2 == 1 else dark)
+	var queen: Node3D = TrialChess.piece_model("Q")
+	queen.scale = Vector3.ONE * 0.35
+	queen.position = Vector3(0.02, 0.024, 0.02)
+	n.add_child(queen)
+	var king: Node3D = TrialChess.piece_model("k")
+	king.scale = Vector3.ONE * 0.35
+	king.position = Vector3(-0.06, 0.03, -0.06)
+	king.rotation.z = -PI * 0.5
+	n.add_child(king)
+	var rook: Node3D = TrialChess.piece_model("R")
+	rook.scale = Vector3.ONE * 0.35
+	rook.position = Vector3(0.1, 0.024, -0.1)
+	n.add_child(rook)

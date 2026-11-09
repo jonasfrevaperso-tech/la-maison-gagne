@@ -851,5 +851,315 @@
    "Match the chart's pattern before dawn."
   ],
   "touch_direct": true
+ },
+ {
+  "id": "smokerings",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Les Ronds de fumée",
+  "name_en": "Smoke Rings",
+  "desc_fr": "Calé dans ton fauteuil, souffle des ronds de fumée à travers les cerceaux qui montent et descendent. Un rond ralentit, grossit et monte : souffle fort pour qu'il arrive petit et droit, doucement pour qu'il s'élève — mais n'inspire pas trop, tu tousserais.",
+  "desc_en": "Settled in your armchair, blow smoke rings through the hoops bobbing up and down. A ring slows, grows and rises: blow hard for a small, straight ring, gently to let it climb — but don't breathe in too much, or you'll cough.",
+  "tuto_fr": [
+   "Incline le souffle vers le haut ou le bas.",
+   "Maintiens pour inspirer, relâche pour souffler : plus tu inspires, plus le rond file.",
+   "Le rond monte et grossit en route, et le cerceau bouge : anticipe !"
+  ],
+  "tuto_en": [
+   "Tilt your breath up or down.",
+   "Hold to breathe in, release to blow: the deeper the breath, the faster the ring.",
+   "The ring rises and grows on its way, and the hoop moves: anticipate!"
+  ]
+ },
+ {
+  "id": "palet",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Le Palet",
+  "name_en": "Table Curling",
+  "desc_fr": "Curling de salon sur une longue table de noyer. La table est creusée : lancé de biais, le palet s'écarte puis revient vers l'axe — de quoi contourner les palets de garde. Pendant la glissade, brosse pour qu'il aille plus loin.",
+  "desc_en": "Parlour curling on a long walnut table. The table is hollowed: thrown at an angle, the puck drifts out then curls back to the centre line — perfect to get round the guards. While it slides, sweep to carry it further.",
+  "tuto_fr": [
+   "Haut / bas : vise. Maintiens puis relâche au bon moment de la jauge.",
+   "La table est creusée : un palet lancé de biais revient vers l'axe. Contourne les gardes rouges.",
+   "Pendant la glissade, maintiens pour brosser : il ira plus loin. Vise le bouton !"
+  ],
+  "tuto_en": [
+   "Up / down: aim. Hold, then release at the right point of the gauge.",
+   "The table is hollowed: a puck thrown at an angle curls back to the centre. Get round the red guards.",
+   "While it slides, hold to sweep: it goes further. Aim for the button!"
+  ]
+ },
+ {
+  "id": "dominoes",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Les Dominos",
+  "name_en": "Dominoes",
+  "desc_fr": "Sur le tapis vert, prolonge la chaîne au plus vite : un domino se pose au bout dont il porte le nombre, un double rapporte double. Ton partenaire d'en face pose aussi et change les bouts — suis le mouvement, et pioche si rien ne va.",
+  "desc_en": "On the green baize, extend the chain as fast as you can: a domino goes on the end showing its number, a double scores double. Your partner across the table plays too and changes the ends — keep up, and draw if nothing fits.",
+  "tuto_fr": [
+   "Gauche / droite : choisis un domino. Confirme pour le poser au bout qui porte son nombre.",
+   "Un double rapporte deux points. Poser à faux bloque ta main un instant.",
+   "Rien ne va ? Bas : pioche. Ton partenaire change les bouts : surveille-les !"
+  ],
+  "tuto_en": [
+   "Left / right: pick a domino. Confirm to play it on the end showing its number.",
+   "A double scores two points. A wrong play blocks your hand for a moment.",
+   "Nothing fits? Down: draw. Your partner changes the ends: watch them!"
+  ],
+  "touch_direct": true
+ },
+ {
+  "id": "bluff",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Le Bluff",
+  "name_en": "The Bluff",
+  "desc_fr": "Quatre joueurs, chacun son tic : se gratter le nez, tirer l'oreille, lisser la moustache, tapoter la table. Observe leur rythme habituel… puis, quand les mises tombent, démasque celui qui refait son tic bien plus souvent : il bluffe.",
+  "desc_en": "Four players, each with a tic: scratching the nose, tugging the ear, smoothing the moustache, drumming the table. Watch their usual rhythm… then, when the bets come in, unmask the one doing it far more often: he's bluffing.",
+  "tuto_fr": [
+   "Au début de chaque main, observe : chacun a son tic et son rythme.",
+   "Quand les mises tombent, le menteur refait son tic bien plus souvent.",
+   "Gauche / droite pour le désigner, confirme pour l'accuser — vite, mais sans te tromper !"
+  ],
+  "tuto_en": [
+   "At the start of each hand, watch: everyone has a tic and a rhythm.",
+   "When the bets come in, the liar repeats his tic far more often.",
+   "Left / right to point him out, confirm to call him — quickly, but don't get it wrong!"
+  ],
+  "touch_direct": true
+ },
+ {
+  "id": "chess",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Les Échecs éclair",
+  "name_en": "Lightning Chess",
+  "desc_fr": "Les Blancs jouent et matent en un coup : trouve lequel avant que la pendule ne tombe. Trois positions de plus en plus chargées ; un coup qui ne mate pas te coûte cher.",
+  "desc_en": "White to play and mate in one: find the move before the flag falls. Three increasingly crowded positions; a move that doesn't mate costs you dearly.",
+  "tuto_fr": [
+   "Déplace le curseur, confirme pour prendre une pièce blanche, puis confirme sur la case d'arrivée.",
+   "Un seul coup mate : le roi noir ne doit plus pouvoir s'échapper.",
+   "Un faux coup est repris, mais la pendule tourne et la note baisse."
+  ],
+  "tuto_en": [
+   "Move the cursor, confirm to pick up a white piece, then confirm on its destination.",
+   "Only one move mates: the black king must have no escape.",
+   "A wrong move is taken back, but the clock runs and your mark drops."
+  ],
+  "touch_direct": true,
+  "puzzles": [
+   {
+    "fen": "2Q5/k7/3R4/8/8/8/1K6/8",
+    "tier": 0,
+    "solution": "d6a6"
+   },
+   {
+    "fen": "k1K5/8/8/6R1/8/5P2/8/8",
+    "tier": 0,
+    "solution": "g5a5"
+   },
+   {
+    "fen": "7k/8/8/3p1R2/8/6Q1/8/2K5",
+    "tier": 0,
+    "solution": "f5h5"
+   },
+   {
+    "fen": "7k/5K2/3p4/8/8/3N4/8/3R4",
+    "tier": 0,
+    "solution": "d1h1"
+   },
+   {
+    "fen": "5K1k/8/8/6N1/4R3/8/8/8",
+    "tier": 0,
+    "solution": "e4h4"
+   },
+   {
+    "fen": "k7/4R3/8/4p3/7R/8/K7/8",
+    "tier": 0,
+    "solution": "h4h8"
+   },
+   {
+    "fen": "2k5/8/2K5/1Q6/8/8/7B/8",
+    "tier": 0,
+    "solution": "b5b8"
+   },
+   {
+    "fen": "5K2/7k/8/8/8/5N2/6Q1/8",
+    "tier": 0,
+    "solution": "g2g7"
+   },
+   {
+    "fen": "8/8/k7/3K4/8/8/2R5/1R6",
+    "tier": 0,
+    "solution": "c2a2"
+   },
+   {
+    "fen": "8/8/5K1k/8/3Q4/8/7P/8",
+    "tier": 0,
+    "solution": "d4h4"
+   },
+   {
+    "fen": "k7/8/K3p3/8/4R3/8/8/3R4",
+    "tier": 0,
+    "solution": "d1d8"
+   },
+   {
+    "fen": "8/8/5K1k/8/5R2/4P3/5p2/8",
+    "tier": 0,
+    "solution": "f4h4"
+   },
+   {
+    "fen": "2k5/7R/8/6R1/8/8/6K1/8",
+    "tier": 0,
+    "solution": "g5g8"
+   },
+   {
+    "fen": "8/7k/8/8/6R1/4R3/7K/8",
+    "tier": 0,
+    "solution": "e3h3"
+   },
+   {
+    "fen": "8/k7/n2N4/p7/p4R2/6K1/6Q1/8",
+    "tier": 1,
+    "solution": "g2b7"
+   },
+   {
+    "fen": "3K4/8/4p2k/7P/6n1/4p3/2Q5/8",
+    "tier": 1,
+    "solution": "c2g6"
+   },
+   {
+    "fen": "8/k7/p7/2NQK3/2P5/8/8/8",
+    "tier": 1,
+    "solution": "d5b7"
+   },
+   {
+    "fen": "1k1K4/8/1N6/2r5/4Q3/P7/8/8",
+    "tier": 1,
+    "solution": "e4a8"
+   },
+   {
+    "fen": "1K3Bk1/Q7/8/8/1P4p1/8/8/8",
+    "tier": 1,
+    "solution": "a7g7"
+   },
+   {
+    "fen": "5B1k/5Q2/8/8/4b3/8/8/5K2",
+    "tier": 1,
+    "solution": "f7g7"
+   },
+   {
+    "fen": "k7/8/1K6/7R/1p6/6N1/3P4/8",
+    "tier": 1,
+    "solution": "h5h8"
+   },
+   {
+    "fen": "6R1/7k/6p1/3K4/8/8/8/B7",
+    "tier": 1,
+    "solution": "g8h8"
+   },
+   {
+    "fen": "1Q6/2B1k3/4p1K1/1R6/8/5p2/8/8",
+    "tier": 1,
+    "solution": "b8d8"
+   },
+   {
+    "fen": "7k/4R2p/1K6/8/8/8/3N4/5Q2",
+    "tier": 1,
+    "solution": "f1f8"
+   },
+   {
+    "fen": "7K/k1r5/8/6R1/1Q1p4/1pP5/8/8",
+    "tier": 1,
+    "solution": "g5a5"
+   },
+   {
+    "fen": "8/8/kp6/1p6/4Q3/8/5P2/1K6",
+    "tier": 1,
+    "solution": "e4a8"
+   },
+   {
+    "fen": "2k3K1/8/3Q2p1/8/1R6/7P/8/8",
+    "tier": 1,
+    "solution": "b4b8"
+   },
+   {
+    "fen": "1K1k4/R4p2/8/q7/8/7R/7Q/8",
+    "tier": 1,
+    "solution": "h3h8"
+   },
+   {
+    "fen": "5rk1/5p1R/8/2p2p2/8/4K3/1B6/Q7",
+    "tier": 2,
+    "solution": "h7h8"
+   },
+   {
+    "fen": "2k5/2pq4/2Q3p1/8/5B2/1B2K2P/8/8",
+    "tier": 2,
+    "solution": "c6a8"
+   },
+   {
+    "fen": "8/k1np4/B7/8/1Q6/bp2K3/4B3/8",
+    "tier": 2,
+    "solution": "b4b7"
+   },
+   {
+    "fen": "7k/7p/6p1/1NKRr3/5Q1n/8/5P2/8",
+    "tier": 2,
+    "solution": "f4f8"
+   },
+   {
+    "fen": "k7/4b3/3p2P1/3p3N/3R2K1/8/1Q6/8",
+    "tier": 2,
+    "solution": "d4a4"
+   },
+   {
+    "fen": "k1N5/B3p3/1R6/2p5/2b1p3/K7/4Q3/8",
+    "tier": 2,
+    "solution": "b6b8"
+   },
+   {
+    "fen": "5k2/Q6p/4P3/1q1p3K/2R5/8/8/8",
+    "tier": 2,
+    "solution": "a7f7"
+   },
+   {
+    "fen": "2qkN1Q1/5K2/pbp5/8/5B2/8/8/8",
+    "tier": 2,
+    "solution": "e8f6"
+   },
+   {
+    "fen": "k7/ppn5/8/1pK5/8/3R2N1/8/4N1B1",
+    "tier": 2,
+    "solution": "d3d8"
+   },
+   {
+    "fen": "k7/3N4/p1pK4/8/p1QR4/8/8/8",
+    "tier": 2,
+    "solution": "c4a6"
+   },
+   {
+    "fen": "1Q3n2/4p1k1/8/8/3PB3/5Rpb/8/6K1",
+    "tier": 2,
+    "solution": "b8f8"
+   },
+   {
+    "fen": "8/7k/4N3/P2rp1R1/4b3/4Kp2/8/1Q6",
+    "tier": 2,
+    "solution": "b1h1"
+   },
+   {
+    "fen": "4k3/7n/5Q1p/1PB2Nr1/8/8/1K6/8",
+    "tier": 2,
+    "solution": "f6e7"
+   },
+   {
+    "fen": "1R1r4/4q3/k2p1P2/4b3/8/1n6/K5N1/6Q1",
+    "tier": 2,
+    "solution": "g1b6"
+   }
+  ]
  }
 ]

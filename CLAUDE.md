@@ -14,9 +14,9 @@ Roguelite de roulette européenne (Godot 4.7, GDScript typé). Jeu de hasard **s
 - Tests : `godot --headless --path . -s res://tests/run_tests.gd`
 - Simulation : `godot --headless --path . -s res://scripts/sim/sim_main.gd -- --runs=500 --bot=greedy`
 - Validation des données : `godot --headless --path . -s res://tools/validate_data.gd`
-- Banc des épreuves : `godot --headless --path . -- --dev-trial-bench=3 [--dev-trials-only=catch,dice]` (40 épreuves ; bot ≥ 0,8, humain ≥ 0,55, inactif ≤ 0,4). Bots : un geste de manette par image (`axis`, `confirm`, `sym`+`symbol`, `dir`, `hold`, `release`), cf. D-069.
+- Banc des épreuves : `godot --headless --path . -- --dev-trial-bench=3 [--dev-trials-only=catch,dice]` (45 épreuves ; bot ≥ 0,8, humain ≥ 0,55, inactif ≤ 0,4). Bots : un geste de manette par image (`axis`, `confirm`, `sym`+`symbol`, `dir`, `hold`, `release`), cf. D-069.
 - À-coups : `--dev-hitch` (journal des images > 50 ms) ; réglages forcés : `--dev-set=video/preset=ultra;video/scaling=fsr2`.
-- Musée : `godot --path . -- --dev-screen=museum --dev-tab=<salle 0-7> [--dev-trials=<épreuve> --dev-autoplay=1]` (D-074); `--dev-focus=N` (objet), `--dev-tutos=1` (tuto forcé, aussi en partie automatique), cf. D-077.
+- Musée : `godot --path . -- --dev-screen=museum --dev-tab=<salle 0-8> [--dev-trials=<épreuve> --dev-autoplay=1]` (D-074); `--dev-focus=N` (objet), `--dev-tutos=1` (tuto forcé, aussi en partie automatique), cf. D-077.
 - Données du joueur : journal `user://journal/*.jsonl` ; export Options → « Exporter mes données » (`DataExport`, D-084) ; analyse `python3 tools/telemetry_report.py --human <archive.zip>`.
 - Défaite : `--dev-defeat-cutscene` (le bilan de dev passe par la cinématique, D-080).
 - Lancer le jeu : `godot --path .`
