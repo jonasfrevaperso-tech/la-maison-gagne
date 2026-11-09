@@ -942,6 +942,148 @@ def art_souffle(rng) -> None:
     save(img, "souffle")
 
 
+# --------------------------------------------------------------------------- 2.0 : les Toits
+
+ZINC = (90, 100, 120)
+ZINC_D = (58, 66, 82)
+BRICK = (138, 58, 38)
+SKY_N = (10, 16, 36)
+LAMP = (255, 200, 102)
+
+
+def rooftop(img, d, roof_y=78, rng=None, moon=True) -> None:
+    """Fond commun des Toits : nuit étoilée, lune, ville aux fenêtres allumées, toits de zinc."""
+    gradient(img, (0, 0, W, roof_y), SKY_N, (42, 58, 106), 4)
+    r = rng or random.Random(5)
+    for _ in range(40):
+        d.point((r.randrange(W), r.randrange(roof_y - 20)), fill=FOAM)
+    if moon:
+        glow(img, 136, 16, 10, (220, 230, 255), 0.6)
+        disc(d, 136, 16, 6, FOAM)
+    x = 0
+    while x < W:
+        w = r.randrange(10, 22)
+        h = r.randrange(14, 34)
+        rect(d, x, roof_y - h, x + w - 1, roof_y, (22, 28, 50))
+        for wy in range(roof_y - h + 3, roof_y - 2, 5):
+            for wx in range(x + 2, x + w - 3, 4):
+                if r.random() < 0.35:
+                    d.point((wx, wy), fill=LAMP)
+        x += w
+    rect(d, 0, roof_y, W, H, ZINC)
+    for xs in range(0, W, 8):
+        d.line((xs, roof_y, xs, H), fill=ZINC_D)
+    rect(d, 0, roof_y, W, roof_y + 1, ZINC_D)
+
+
+def art_pigeon(rng) -> None:
+    """Le Pigeon voyageur : plané entre deux souches fumantes vers l'anneau doré d'une fenêtre."""
+    img, d = canvas()
+    rooftop(img, d, 84, rng)
+    for x, top in ((30, 56), (96, 62)):
+        rect(d, x, top, x + 10, 84, BRICK)
+        for k in range(3):
+            disc(d, x + 4 + k * 3, top - 10 - k * 9, 4 + k * 2, (150, 156, 172))
+    rect(d, 118, 34, 138, 54, LAMP)
+    d.ellipse((112, 30, 144, 58), outline=GOLD_L, width=2)
+    d.polygon([(62, 40), (78, 36), (86, 40), (78, 44)], fill=(122, 128, 144))
+    d.polygon([(70, 39), (64, 28), (78, 37)], fill=(90, 96, 112))
+    d.polygon([(70, 41), (64, 52), (78, 43)], fill=(90, 96, 112))
+    disc(d, 84, 38, 2, (90, 106, 122))
+    d.point((86, 37), fill=(255, 106, 26))
+    save(img, "pigeon")
+
+
+def art_gutters(rng) -> None:
+    """Les Gouttières : mur de zinc, tuyaux de cuivre en chicane, eau bleue, tonneau sous l'orage."""
+    img, d = canvas()
+    rect(d, 0, 0, W, H, SKY_N)
+    for k in range(40):
+        x = rng.randrange(W)
+        y = rng.randrange(H)
+        d.line((x, y, x - 2, y + 6), fill=(110, 130, 180))
+    rect(d, 24, 10, 136, 82, ZINC)
+    for xs in range(24, 137, 10):
+        d.line((xs, 10, xs, 82), fill=ZINC_D)
+    rect(d, 20, 8, 140, 12, (70, 78, 96))
+    copper = (200, 120, 64)
+    water = (90, 150, 255)
+    path = [(50, 14), (50, 30), (90, 30), (90, 50), (60, 50), (60, 70), (110, 70), (110, 84)]
+    for (a, b), (c, e) in zip(path, path[1:]):
+        d.line((a, b, c, e), fill=water, width=4)
+        d.line((a, b, c, e), fill=(170, 200, 255), width=1)
+    for (x, y) in path[1:-1]:
+        disc(d, x, y, 3, copper)
+    d.line((112, 18, 130, 18), fill=copper, width=4)
+    d.line((30, 40, 30, 60), fill=copper, width=4)
+    rect(d, 100, 84, 120, 95, WOOD)
+    rect(d, 100, 87, 120, 88, INK)
+    save(img, "gutters")
+
+
+def art_antenna(rng) -> None:
+    """L'Antenne : poste en noyer sur le toit, image qui perce la neige, antenne arête de poisson."""
+    img, d = canvas()
+    rooftop(img, d, 82, rng)
+    rect(d, 20, 30, 92, 80, (138, 74, 34))
+    rect(d, 26, 36, 76, 72, GOLD)
+    rect(d, 28, 38, 74, 70, INK)
+    for k in range(9):
+        a0 = k * 40
+        d.pieslice((36, 40, 66, 68), a0, a0 + 20, fill=RED if k % 2 else INK)
+    disc(d, 51, 54, 4, GOLD)
+    for _ in range(70):
+        g = rng.randrange(90, 230)
+        d.point((rng.randrange(28, 74), rng.randrange(38, 70)), fill=(g, g, g))
+    disc(d, 84, 46, 3, INK)
+    disc(d, 84, 60, 3, INK)
+    rect(d, 126, 20, 127, 82, STEEL)
+    rect(d, 108, 22, 146, 23, STEEL)
+    for k in range(6):
+        d.line((110 + k * 6, 17, 110 + k * 6, 28), fill=STEEL)
+    save(img, "antenna")
+
+
+def art_zipline(rng) -> None:
+    """La Tyrolienne : câble entre deux toits, voyageur à la poulie, repère doré sur la plateforme."""
+    img, d = canvas()
+    rooftop(img, d, 86, rng, moon=False)
+    glow(img, 24, 14, 9, (220, 230, 255), 0.5)
+    disc(d, 24, 14, 5, FOAM)
+    pts = [(14 + k * 7, 24 + int(k * 2.3 + 18 * math.sin(k / 19 * math.pi))) for k in range(20)]
+    d.line(pts, fill=STEEL)
+    rect(d, 10, 24, 12, 86, STEEL_D)
+    rect(d, 146, 40, 148, 86, STEEL_D)
+    rect(d, 112, 72, 150, 74, WOOD)
+    rect(d, 126, 66, 127, 72, GOLD_L)
+    glow(img, 126, 70, 4, GOLD_L, 0.8)
+    x, y = pts[11]
+    disc(d, x, y + 1, 2, STEEL)
+    d.line((x, y + 2, x, y + 8), fill=STEEL_D)
+    figure(d, x, y + 36, RED, arms="up")
+    rect(d, 140, 50, 144, 62, RED)
+    save(img, "zipline")
+
+
+def art_telescope(rng) -> None:
+    """Le Télescope : oculaire à trois anneaux, constellation tracée en or, lunette de laiton."""
+    img, d = canvas()
+    rooftop(img, d, 84, rng, moon=False)
+    disc(d, 104, 44, 38, GOLD_D)
+    disc(d, 104, 44, 35, (5, 8, 26))
+    for r in (24, 12):
+        d.ellipse((104 - r, 44 - r, 104 + r, 44 + r), outline=(60, 70, 110))
+    stars = [(80, 34), (94, 22), (112, 30), (118, 52), (100, 60), (92, 46)]
+    d.line(stars, fill=GOLD_L)
+    for (x, y) in stars:
+        disc(d, x, y, 2, FOAM)
+    d.line((14, 76, 50, 52), fill=GOLD, width=5)
+    d.line((48, 54, 52, 51), fill=GOLD_L, width=6)
+    for dx in (-6, 0, 6):
+        d.line((30, 66, 30 + dx * 2, 86), fill=WOOD)
+    save(img, "telescope")
+
+
 def main() -> None:
     rng = random.Random(1520)
     for fn in [art_charge, art_rhythm, art_bottles, art_memory, art_shells, art_darts, art_safe,
@@ -949,7 +1091,8 @@ def main() -> None:
                art_invaders, art_cave, art_pachinko, art_blackjack, art_scratch, art_dice, art_derby,
                art_fishing, art_lasers, art_juggle, art_billiards,
                art_tapdance, art_spotlight, art_tightrope, art_hattoss, art_mentalist,
-               art_crepe, art_cutting, art_service, art_orders, art_souffle]:
+               art_crepe, art_cutting, art_service, art_orders, art_souffle,
+               art_pigeon, art_gutters, art_antenna, art_zipline, art_telescope]:
         fn(rng)
     print(f"{len(list(OUT.glob('trial_*.png')))} illustrations d'épreuves écrites dans {OUT.relative_to(ROOT)}")
 

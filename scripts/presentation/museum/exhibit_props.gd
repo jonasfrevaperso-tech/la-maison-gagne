@@ -81,6 +81,16 @@ static func build(trial_id: String) -> Node3D:
 			_orders(n)
 		"souffle":
 			_souffle(n)
+		"pigeon":
+			_pigeon(n)
+		"gutters":
+			_gutters(n)
+		"antenna":
+			_antenna(n)
+		"zipline":
+			_zipline(n)
+		"telescope":
+			_telescope(n)
 		_:
 			var c: Node3D = CasinoChip3D.build(n, Palette.GOLD, 0.3)
 			c.position.y = 0.3
@@ -617,3 +627,89 @@ static func _souffle(n: Node3D) -> void:
 	dial.rotation.x = PI * 0.5
 	Stage3D.box(n, Vector3(0.004, 0.04, 0.004), Vector3(0.18, 0.11, 0.067), _m(Palette.GOLD, 0.8, 0.3))
 	Stage3D.cylinder(n, 0.005, 0.1, Vector3(0.18, 0.05, 0.06), _m(Palette.GOLD, 0.8, 0.3))
+
+
+# --------------------------------------------------------------------------- les Toits
+
+
+## Pan de toit de zinc miniature et sa souche de brique (socle commun des Toits).
+static func _roof(n: Node3D, chimney: bool = true) -> void:
+	var slope: MeshInstance3D = Stage3D.box(n, Vector3(0.6, 0.03, 0.4), Vector3(0, 0.06, 0), _m(Color("5a6478"), 0.7, 0.45))
+	slope.rotation.x = -0.2
+	for k: int in 5:
+		Stage3D.box(n, Vector3(0.01, 0.035, 0.4), Vector3(-0.24 + 0.12 * float(k), 0.07, 0), _m(Color("3a4252"), 0.7, 0.4)).rotation.x = -0.2
+	if chimney:
+		Stage3D.box(n, Vector3(0.1, 0.18, 0.1), Vector3(0.22, 0.15, -0.1), _m(Color("8a3a26"), 0.0, 0.9))
+		for k2: int in 2:
+			Stage3D.cylinder(n, 0.015, 0.05, Vector3(0.2 + 0.04 * float(k2), 0.26, -0.1), _m(Color("c8603a"), 0.0, 0.7), 0.012)
+
+
+static func _pigeon(n: Node3D) -> void:
+	_roof(n)
+	# Pigeon gris ardoise posé, ailes entrouvertes, message roulé à la patte.
+	var slate: StandardMaterial3D = _m(Color("7a8090"), 0.0, 0.7)
+	var bird: Node3D = Node3D.new()
+	bird.position = Vector3(-0.05, 0.135, 0.02)
+	n.add_child(bird)
+	Stage3D.sphere(bird, 0.06, Vector3.ZERO, slate).scale = Vector3(1.5, 1.0, 1.0)
+	Stage3D.sphere(bird, 0.035, Vector3(0.08, 0.04, 0), _m(Color("5a6a7a"), 0.3, 0.3))
+	Stage3D.sphere(bird, 0.028, Vector3(0.07, 0.0, 0), _m(Color("3a8a6a"), 0.5, 0.25))
+	for side: float in [-1.0, 1.0]:
+		var wing: MeshInstance3D = Stage3D.box(bird, Vector3(0.1, 0.008, 0.12), Vector3(-0.01, 0.03, side * 0.07), slate)
+		wing.rotation.x = side * 0.5
+	Stage3D.cylinder(bird, 0.012, 0.03, Vector3(0.0, -0.06, 0.02), _m(Color("f4ecd8"), 0.0, 0.8)).rotation.x = PI * 0.5
+
+
+static func _gutters(n: Node3D) -> void:
+	_roof(n, false)
+	# Coudes de cuivre raccordés, gargouille, petit tonneau cerclé.
+	var copper: StandardMaterial3D = _m(Color("c87840"), 0.85, 0.3)
+	Stage3D.cylinder(n, 0.02, 0.2, Vector3(-0.1, 0.22, 0.05), copper)
+	var h: MeshInstance3D = Stage3D.cylinder(n, 0.02, 0.2, Vector3(0.0, 0.12, 0.05), copper)
+	h.rotation.z = PI * 0.5
+	Stage3D.sphere(n, 0.026, Vector3(-0.1, 0.12, 0.05), copper)
+	Stage3D.cylinder(n, 0.02, 0.12, Vector3(0.1, 0.07, 0.05), copper)
+	Stage3D.sphere(n, 0.026, Vector3(0.1, 0.12, 0.05), copper)
+	Stage3D.cylinder(n, 0.06, 0.1, Vector3(0.1, 0.05, 0.05), _m(Color("6a4422"), 0.0, 0.6), 0.055)
+	Stage3D.sphere(n, 0.04, Vector3(-0.1, 0.34, 0.05), _m(Color("8a8478"), 0.0, 0.9))
+
+
+static func _antenna(n: Node3D) -> void:
+	_roof(n, false)
+	# Antenne en arête de poisson sur son mât, et un poste de télévision miniature.
+	var alu: StandardMaterial3D = _m(Color("c8ccd4"), 0.9, 0.3)
+	Stage3D.cylinder(n, 0.008, 0.45, Vector3(0.15, 0.28, -0.05), alu)
+	var boom: MeshInstance3D = Stage3D.cylinder(n, 0.006, 0.26, Vector3(0.15, 0.48, -0.05), alu)
+	boom.rotation.z = PI * 0.5
+	for k: int in 5:
+		Stage3D.cylinder(n, 0.004, 0.16 - 0.02 * float(k), Vector3(0.04 + 0.055 * float(k), 0.48, -0.05), alu).rotation.x = PI * 0.5
+	Stage3D.box(n, Vector3(0.2, 0.15, 0.12), Vector3(-0.12, 0.16, 0.05), _m(Color("8a4a22"), 0.0, 0.3))
+	Stage3D.box(n, Vector3(0.14, 0.1, 0.01), Vector3(-0.14, 0.16, 0.112), Stage3D.glow(Color(0.6, 0.65, 0.7), 0.8))
+
+
+static func _zipline(n: Node3D) -> void:
+	# Deux poteaux, le câble en pente, la poulie et son voyageur suspendu.
+	var steel: StandardMaterial3D = _m(Color("3a3e48"), 0.7, 0.4)
+	Stage3D.cylinder(n, 0.012, 0.55, Vector3(-0.25, 0.275, 0), steel)
+	Stage3D.cylinder(n, 0.012, 0.35, Vector3(0.25, 0.175, 0), steel)
+	var cable: MeshInstance3D = Stage3D.cylinder(n, 0.003, 0.54, Vector3(0, 0.45, 0), _m(Color("8a8c94"), 0.8, 0.3))
+	cable.rotation.z = PI * 0.5 + 0.38
+	Stage3D.sphere(n, 0.018, Vector3(-0.02, 0.455, 0), _m(Color("c8ccd4"), 0.9, 0.25))
+	var fig: Figure3D = Figure3D.new().build(0.22, {"coat": Color("c83a2a"), "hat": ""})
+	fig.position = Vector3(-0.02, 0.2, 0)
+	n.add_child(fig)
+	fig.animate(&"hang", 0.0, 1.0, 0.0)
+	Stage3D.box(n, Vector3(0.6, 0.02, 0.3), Vector3(0, 0.01, 0), _m(Color("5a6478"), 0.7, 0.45))
+
+
+static func _telescope(n: Node3D) -> void:
+	_roof(n, false)
+	# Lunette de laiton sur trépied de bois, pointée vers le ciel.
+	var wood: StandardMaterial3D = _m(Color("5a3418"), 0.0, 0.5)
+	for k: int in 3:
+		var a: float = TAU * float(k) / 3.0
+		var leg: MeshInstance3D = Stage3D.cylinder(n, 0.007, 0.3, Vector3(cos(a) * 0.05, 0.2, sin(a) * 0.05), wood)
+		leg.rotation = Vector3(sin(a) * 0.3, 0.0, -cos(a) * 0.3)
+	var tube: MeshInstance3D = Stage3D.cylinder(n, 0.03, 0.38, Vector3(0.02, 0.4, 0), _m(Palette.GOLD, 0.85, 0.25), 0.022)
+	tube.rotation.z = -0.9
+	Stage3D.sphere(n, 0.03, Vector3(0.18, 0.62, 0), Stage3D.glow(Color(1.0, 0.95, 0.8), 1.5))

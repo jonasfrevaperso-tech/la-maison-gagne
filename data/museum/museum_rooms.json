@@ -117,5 +117,22 @@
       "orders",
       "souffle"
     ]
+  },
+  {
+    "id": "rooftops",
+    "name_fr": "Les Toits",
+    "name_en": "The Rooftops",
+    "desc_fr": "Zinc, cheminées et ciel étoilé : les épreuves qu'on joue la nuit, au-dessus de Paris.",
+    "desc_en": "Zinc, chimneys and a starry sky: the trials played at night, above the city.",
+    "wall": "1a2440",
+    "floor": "2a2e38",
+    "accent": "8ab8ff",
+    "exhibits": [
+      "pigeon",
+      "gutters",
+      "antenna",
+      "zipline",
+      "telescope"
+    ]
   }
 ]

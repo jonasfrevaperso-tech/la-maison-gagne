@@ -236,4 +236,5 @@ Plan : phases 41 à 53 (50 épreuves, 28 builds de 7 grigris, difficulté resser
 - **Phase 45 — Builds** ✅ (`phase-45-builds`) : 28 familles de 7, paliers 2 / 4 / 7, 28 emblèmes, biais de boutique 1,0, dettes recalées (glouton 15 %, hasard 0,7 %) (D-086).
 - **Phase 46 — Cabaret** ✅ (`phase-46-cabaret`) : salle 6 du Musée. Claquettes, Projecteur, Funambule, Lancer de chapeau, Mentaliste ; décor `CabaretSet`, six nouvelles poses de `Figure3D` (D-087).
 - **Phase 47 — Cuisines** ✅ (`phase-47-cuisines`) : salle 7 du Musée. Crêpe Suzette, Découpage, Service, Commandes, Soufflé ; décor `KitchenSet` (D-088). Banc (bot / humain / inactif) : Crêpe 1,00 / 0,89 / 0 · Découpage 0,88 / 0,80 / 0,27 · Service 0,83 / 0,67 / 0 · Commandes 1,00 / 1,00 / 0 · Soufflé 0,86 / 0,86 / 0,05.
+- **Phase 48 — Toits** ✅ (`phase-48-toits`) : salle 8 du Musée. Pigeon voyageur, Gouttières, Antenne, Tyrolienne, Télescope ; décor `RooftopSet` (D-089). Banc (bot / humain / inactif) : Pigeon 0,94 / 0,88 / 0,06 · Gouttières 1,00 / 1,00 / 0 · Antenne 1,00 / 1,00 / 0,03 · Tyrolienne 1,00 / 0,95 / 0,03 · Télescope 1,00 / 1,00 / 0. Pilote manette : plafond porté à 1 800 s, diagnostic de défaite.
 

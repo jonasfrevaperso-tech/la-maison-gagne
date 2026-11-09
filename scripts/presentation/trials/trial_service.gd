@@ -51,25 +51,36 @@ func _place_obstacles() -> void:
 	var at: float = p("first_obstacle")
 	var last_gap: float = 0.0
 	var k: int = 0
+	var rows: Array[Vector2] = []  # (abscisse du rang, centre du passage)
 	while at < _len - 2.0:
 		var gap: float = rng.randf_range(-LANE + 0.5, LANE - 0.5)
 		if absf(gap - last_gap) < 0.9:
 			gap = clampf(-signf(last_gap + 0.01) * rng.randf_range(0.6, LANE - 0.5), -LANE + 0.5, LANE - 0.5)
 		var half: float = p("gap_width") * 0.5
 		var kind: int = k % 3
-		var moving: bool = kind == 2 and k >= 2
 		if gap - half > -LANE:
 			_obstacles.append({"s": at, "x0": -LANE - 0.3, "x1": gap - half, "vx": 0.0, "kind": kind, "hit": false})
 		if gap + half < LANE:
 			_obstacles.append({"s": at, "x0": gap + half, "x1": LANE + 0.3, "vx": 0.0, "kind": (kind + 1) % 3, "hit": false})
-		if moving:
-			# Un collègue traverse devant le passage : il faut attendre qu'il soit passé.
-			var dir: float = -1.0 if rng.randf() < 0.5 else 1.0
-			_obstacles.append({"s": at + p("crosser_ahead"), "x0": -dir * 2.6 - 0.25, "x1": -dir * 2.6 + 0.25,
-				"vx": dir * p("crosser_speed"), "kind": 3, "hit": false, "t0": at / p("speed") - p("crosser_lead")})
+		rows.append(Vector2(at, gap))
 		last_gap = gap
 		at += rng.randf_range(p("spacing_min"), p("spacing_max"))
 		k += 1
+	# Collègues qui traversent juste après certains rangs : au moment où le serveur arrive, ils
+	# passent devant l'ancien passage, venus du côté opposé au suivant. Qui file tôt vers le passage
+	# suivant les évite ; qui traîne dans l'ancien les percute.
+	for r: int in rows.size() - 1:
+		if r % 3 != 2:
+			continue
+		var gap_now: float = rows[r].y
+		var gap_next: float = rows[r + 1].y
+		var dir: float = signf(gap_next - gap_now)  # il vient du côté opposé au passage suivant
+		var row_s: float = rows[r].x + p("crosser_ahead")
+		var arrive: float = row_s / p("speed")
+		var start_x: float = -dir * 2.6
+		var t0: float = arrive - (gap_now - start_x) / (dir * p("crosser_speed"))
+		_obstacles.append({"s": row_s, "x0": start_x - 0.25, "x1": start_x + 0.25, "vx": dir * p("crosser_speed"),
+			"kind": 3, "hit": false, "t0": t0})
 
 
 ## Étendue latérale d'un obstacle à l'instant `when` (maintenant si négatif).
@@ -194,14 +205,21 @@ func bot_wants() -> Dictionary:
 		var cx: Vector2 = _obs_x(o2, t + maxf(ds2, 0.0) / (p("speed") / slow))
 		var mid: float = (cx.x + cx.y) * 0.5
 		var clear: float = p("body_half") + (cx.y - cx.x) * 0.5 + absf(float(o2["vx"])) * p("bot_cross_window")
-		var side: float = signf(_x - mid) if absf(_x - mid) > 0.01 else -signf(float(o2["vx"]))
+		# Esquiver du côté où l'on va (le passage suivant), sauf si l'on est déjà nettement de l'autre.
+		var side: float = signf(target - mid) if absf(target - mid) > 0.01 else signf(_x - mid)
+		if absf(_x - mid) > clear * 0.8 and signf(_x - mid) != side:
+			side = signf(_x - mid)
 		var keep: float = mid + side * clear
 		if keep < -LANE or keep > LANE:
 			keep = mid - side * clear
 		if (target - mid) * side < clear:
 			target = clampf(keep, -LANE, LANE)
 	var err: float = target - _x
-	var v: float = clampf(err * p("bot_gain") / p("lateral_speed"), -1.0, 1.0)
+	# Écart en douceur : la vitesse voulue ne s'éloigne jamais trop de la vitesse actuelle,
+	# sinon l'accélération dépasse l'adhérence des verres.
+	var dv: float = p("static_accel") / p("response") * p("bot_smooth")
+	var v_des: float = clampf(err * p("bot_gain"), _vx - dv, _vx + dv)
+	var v: float = clampf(v_des / p("lateral_speed"), -1.0, 1.0)
 	return {"do": "axis", "v": Vector2(v, 0.0)}
 
 

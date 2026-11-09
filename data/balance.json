@@ -603,7 +603,7 @@
       "speed_max": 2200,
       "friction": 900.0,
       "restitution": 0.6,
-      "charge_seconds": 2.0,
+      "charge_seconds": 2.4,
       "aim_speed": 1.6,
       "no_wall_factor": 0.3,
       "rest_seconds": 1.0,
@@ -911,9 +911,9 @@
       "first_obstacle": 5.0,
       "spacing_min": 3.6,
       "spacing_max": 4.6,
-      "gap_width": 1.6,
+      "gap_width": 1.8,
       "crosser_ahead": 1.6,
-      "crosser_speed": 1.2,
+      "crosser_speed": 1.0,
       "crosser_lead": 1.9,
       "lateral_speed": 2.6,
       "response": 4.0,
@@ -928,7 +928,8 @@
       "bot_horizon": 4.5,
       "bot_gain": 2.4,
       "bot_cross_window": 0.45,
-      "bot_cross_horizon": 1.6
+      "bot_cross_horizon": 1.6,
+      "bot_smooth": 0.8
     },
     "orders": {
       "duration": 20.0,
@@ -979,6 +980,156 @@
       "bot_kd": 0.9,
       "bot_gain": 6.0,
       "bot_door_boost": 0.6
+    },
+    "pigeon": {
+      "duration": 18.0,
+      "cruise": 300.0,
+      "fly_seconds": 15.0,
+      "first_stack": 1000.0,
+      "spacing": 560,
+      "stack_min": 180.0,
+      "stack_max": 360.0,
+      "ring_high_min": 260.0,
+      "ring_high_max": 420.0,
+      "ring_low_min": 30,
+      "ring_low_max": 70,
+      "max_pitch": 0.7,
+      "pitch_rate": 2.2,
+      "gravity": 500.0,
+      "drag": 0.8,
+      "stall": 190.0,
+      "max_speed": 520.0,
+      "lift": 240.0,
+      "plume_height": 300,
+      "plume_rise": 1.0,
+      "wind": 0.25,
+      "recharge_rate": 1.5,
+      "flap_rise": 70.0,
+      "boost_decay": 4.0,
+      "flap_speed": 60.0,
+      "hit_penalty": 0.2,
+      "hit_cool": 1.0,
+      "parallax": 0.9,
+      "bot_look": 420.0,
+      "bot_clear": 45,
+      "bot_flap_gap": 140.0,
+      "bot_kp": 0.01,
+      "bot_kd": 0.002,
+      "sink": 30,
+      "low_exit": 70,
+      "ring_at": 0.62
+    },
+    "gutters": {
+      "duration": 30.0,
+      "rounds": 3,
+      "cols": [
+        5,
+        6,
+        6
+      ],
+      "rows": [
+        4,
+        4,
+        5
+      ],
+      "min_path": [
+        7,
+        9,
+        11
+      ],
+      "limit": [
+        12,
+        14,
+        16
+      ],
+      "grace": 0.35,
+      "late_weight": 0.9,
+      "late_floor": 0.35,
+      "drain_seconds": 1.2
+    },
+    "antenna": {
+      "duration": 22.0,
+      "stations": 3,
+      "limit": 8.0,
+      "grace": 0.45,
+      "late_weight": 0.9,
+      "late_floor": 0.35,
+      "miss_share": 0.4,
+      "width_broad": 0.18,
+      "width_peak": 0.025,
+      "width_gain": 0.22,
+      "broad_share": 0.35,
+      "lock_q": 0.8,
+      "lock_seconds": 1.2,
+      "freq_sweep": 2.6,
+      "gain_sweep": 1.6,
+      "drift": 0.035,
+      "drift_rate": 0.5,
+      "pigeon_at": 4.5,
+      "pigeon_gain": 0.2,
+      "bot_gain": 8.0
+    },
+    "zipline": {
+      "duration": 24.0,
+      "lines": 3,
+      "length": [
+        1500,
+        1800,
+        2100
+      ],
+      "drop": [
+        260,
+        340,
+        300
+      ],
+      "sag": [
+        200,
+        240,
+        280
+      ],
+      "end_rise": 80,
+      "gravity": 1400.0,
+      "drag": 0.0004,
+      "brake": 1000,
+      "heat_rate": 0.35,
+      "cool_rate": 0.5,
+      "push": 60.0,
+      "wind_min": 20.0,
+      "wind_max": 70.0,
+      "target_back": 170.0,
+      "tolerance": 15,
+      "miss": 180,
+      "buffer_share": 0.25,
+      "crash_speed": 400.0,
+      "stop_speed": 6.0,
+      "stop_seconds": 0.35,
+      "line_limit": 6.5,
+      "rest_seconds": 1.0,
+      "bot_margin": 0.0,
+      "fair_margin": 80
+    },
+    "telescope": {
+      "duration": 30.0,
+      "skies": 3,
+      "stars": [
+        6,
+        7,
+        8
+      ],
+      "scramble": [
+        4,
+        6,
+        8
+      ],
+      "limit": [
+        10,
+        12,
+        14
+      ],
+      "grace": 0.35,
+      "late_weight": 0.9,
+      "late_floor": 0.35,
+      "rest_seconds": 1.0
     }
   },
   "slot": {

@@ -960,3 +960,46 @@ TRIAL_SOUFFLE_RISE,Soufflé : %d %%,Soufflé: %d %%
 TRIAL_SOUFFLE_DOOR,La porte !,The door!
 TRIAL_SOUFFLE_DOOR_MARK,porte,door
 TRIAL_SOUFFLE_DONE,Sorti du four !,Out of the oven!
+TRIAL_PIGEON_HINT,{move} : piquer / cabrer · {@hold} : battre des ailes,{move}: dive / climb · {@hold}: flap
+TRIAL_PIGEON_HINT_MOUSE,{@mouse} : l'altitude visée · {@click} : battre des ailes,{@mouse}: target height · {@click}: flap
+TRIAL_PIGEON_HINT_TOUCH,Joystick : piquer / cabrer · bouton : battre des ailes,Joystick: dive / climb · button: flap
+TRIAL_PIGEON_FLAPS,battements,wingbeats
+TRIAL_PIGEON_SPEED,vitesse,speed
+TRIAL_PIGEON_STALL,décrochage !,stall!
+TRIAL_PIGEON_HIT,Aïe !,Ouch!
+TRIAL_PIGEON_DELIVERED,Remis !,Delivered!
+TRIAL_PIGEON_MISSED,Manqué,Missed
+TRIAL_GUTTERS_HINT,{@dpad} : choisir une pièce · {confirm} : la tourner,{@dpad}: pick a piece · {confirm}: turn it
+TRIAL_GUTTERS_HINT_MOUSE,{@click} sur une pièce : la tourner,{@click} a piece: turn it
+TRIAL_GUTTERS_HINT_TOUCH,Touche une pièce pour la tourner,Tap a piece to turn it
+TRIAL_GUTTERS_LEVEL,chéneau,gutter
+TRIAL_GUTTERS_STATUS,Réseau %d / %d,Network %d / %d
+TRIAL_GUTTERS_FLOWING,Ça coule !,It flows!
+TRIAL_GUTTERS_OVERFLOW,Débordement !,Overflow!
+TRIAL_ANTENNA_HINT,{move} : fréquence (gauche / droite) et gain (haut / bas),{move}: frequency (left / right) and gain (up / down)
+TRIAL_ANTENNA_HINT_MOUSE,"{@drag} : gauche / droite la fréquence, haut / bas le gain","{@drag}: left / right frequency, up / down gain"
+TRIAL_ANTENNA_HINT_TOUCH,Joystick : fréquence (gauche / droite) et gain (haut / bas),Joystick: frequency (left / right) and gain (up / down)
+TRIAL_ANTENNA_SIGNAL,signal,signal
+TRIAL_ANTENNA_GAIN,gain,gain
+TRIAL_ANTENNA_STATUS,Station %d / %d,Station %d / %d
+TRIAL_ANTENNA_LOCKED,Image nette !,Clear picture!
+TRIAL_ANTENNA_LOST,Station perdue,Station lost
+TRIAL_ANTENNA_PIGEON,Un pigeon sur l'antenne !,A pigeon on the antenna!
+TRIAL_ZIPLINE_HINT,{@hold} : freiner · relâcher : filer,{@hold}: brake · release: glide
+TRIAL_ZIPLINE_HINT_MOUSE,{@hold} : freiner · relâcher : filer,{@hold}: brake · release: glide
+TRIAL_ZIPLINE_HINT_TOUCH,Maintiens le doigt pour freiner,Hold your finger to brake
+TRIAL_ZIPLINE_HEAT,frein,brake
+TRIAL_ZIPLINE_BRAKE,on freine !,braking!
+TRIAL_ZIPLINE_WIND,vent,wind
+TRIAL_ZIPLINE_STATUS,Ligne %d / %d,Line %d / %d
+TRIAL_ZIPLINE_PILE,Pile !,Spot on!
+TRIAL_ZIPLINE_SHORT,Trop court,Too short
+TRIAL_ZIPLINE_LONG,Trop loin,Too far
+TRIAL_ZIPLINE_BUFFER,Le butoir !,The buffer!
+TRIAL_TELESCOPE_HINT,"{@dpad} : haut / bas l'anneau, gauche / droite le tourner","{@dpad}: up / down the ring, left / right to turn it"
+TRIAL_TELESCOPE_HINT_MOUSE,"{@click} sur un anneau : moitié droite, sens horaire ; gauche, l'inverse","{@click} a ring: right half clockwise, left half the other way"
+TRIAL_TELESCOPE_HINT_TOUCH,"Touche un anneau : moitié droite, sens horaire ; gauche, l'inverse","Tap a ring: right half clockwise, left half the other way"
+TRIAL_TELESCOPE_CHART,la carte,the chart
+TRIAL_TELESCOPE_STATUS,Ciel %d / %d,Sky %d / %d
+TRIAL_TELESCOPE_FOUND,La voilà !,There it is!
+TRIAL_TELESCOPE_DAWN,L'aube…,Dawn…

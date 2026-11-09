@@ -752,5 +752,104 @@
    "The door will open (mark on the strip): build up a little extra heat."
   ],
   "touch_stick": true
+ },
+ {
+  "id": "pigeon",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Le Pigeon voyageur",
+  "name_en": "The Carrier Pigeon",
+  "desc_fr": "Plane au-dessus des toits pour remettre les messages aux fenêtres. Piquer donne de la vitesse, cabrer en coûte ; les fumées chaudes des cheminées te portent, et trois battements d'ailes t'attendent en réserve.",
+  "desc_en": "Glide over the rooftops to deliver messages to the windows. Diving gains speed, climbing costs it; warm chimney smoke lifts you, and three wingbeats are held in reserve.",
+  "tuto_fr": [
+   "Bas : piquer (plus vite). Haut : cabrer (plus haut, mais plus lent).",
+   "Traverse l'anneau doré devant chaque fenêtre qui attend un message.",
+   "Trop lent ? Bats des ailes, ou laisse la fumée chaude te porter."
+  ],
+  "tuto_en": [
+   "Down: dive (faster). Up: climb (higher, but slower).",
+   "Fly through the golden ring in front of each waiting window.",
+   "Too slow? Flap your wings, or let the warm smoke lift you."
+  ],
+  "touch_stick": true
+ },
+ {
+  "id": "gutters",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Les Gouttières",
+  "name_en": "The Gutters",
+  "desc_fr": "L'orage monte : tourne les coudes et les tés de la tuyauterie pour mener la pluie de la gargouille jusqu'au tonneau, avant que le chéneau ne déborde. Attention aux pièces qui ne mènent nulle part.",
+  "desc_en": "The storm is building: turn the elbows and tees of the pipework to lead the rain from the gargoyle to the barrel before the gutter overflows. Beware of pieces that lead nowhere.",
+  "tuto_fr": [
+   "Choisis une pièce, puis tourne-la d'un quart de tour.",
+   "Relie la gargouille (en haut) au tonneau (flèche verte, en bas).",
+   "Fais vite : le chéneau monte, et déborde à la fin de la jauge."
+  ],
+  "tuto_en": [
+   "Pick a piece, then turn it a quarter turn.",
+   "Connect the gargoyle (top) to the barrel (green arrow, bottom).",
+   "Be quick: the gutter fills and overflows when the gauge is full."
+  ],
+  "touch_direct": true
+ },
+ {
+  "id": "antenna",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "L'Antenne",
+  "name_en": "The Antenna",
+  "desc_fr": "Le poste sur le toit ne capte que de la neige. Tourne la molette des fréquences et celle du gain : l'image perce, le grésillement faiblit. Tiens l'image nette pour accrocher la station — mais le vent la fait dériver.",
+  "desc_en": "The rooftop TV picks up nothing but snow. Turn the frequency and gain knobs: the picture breaks through, the crackle fades. Hold the picture steady to lock the station — but the wind makes it drift.",
+  "tuto_fr": [
+   "Gauche / droite : la fréquence. Haut / bas : le gain.",
+   "Le vumètre et le grésillement te guident : plus l'image est nette, mieux c'est.",
+   "Tiens le signal dans le vert pour accrocher la station."
+  ],
+  "tuto_en": [
+   "Left / right: frequency. Up / down: gain.",
+   "The meter and the crackle guide you: the clearer the picture, the better.",
+   "Hold the signal in the green to lock the station."
+  ],
+  "touch_stick": true
+ },
+ {
+  "id": "zipline",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "La Tyrolienne",
+  "name_en": "The Zip Line",
+  "desc_fr": "File d'un toit à l'autre, suspendu à une poulie. Freine pour t'arrêter pile sur le repère doré — mais le frein chauffe et mord de moins en moins : freine par à-coups. Trop court, tu redescends ; trop vite, c'est le butoir.",
+  "desc_en": "Fly from one roof to the next, hanging from a pulley. Brake to stop right on the golden mark — but the brake heats up and bites less and less: brake in bursts. Too short and you slide back; too fast and you hit the buffer.",
+  "tuto_fr": [
+   "Maintiens pour freiner, relâche pour filer.",
+   "Le frein chauffe (jauge à gauche) : freine par à-coups.",
+   "Arrête-toi pile sur le repère doré. Regarde les fanions : le vent pousse ou retient."
+  ],
+  "tuto_en": [
+   "Hold to brake, release to glide.",
+   "The brake heats up (gauge on the left): brake in bursts.",
+   "Stop right on the golden mark. Watch the flags: the wind pushes or holds you back."
+  ]
+ },
+ {
+  "id": "telescope",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Le Télescope",
+  "name_en": "The Telescope",
+  "desc_fr": "Dans l'oculaire, le ciel est découpé en trois anneaux qui tournent par crans. Remets-les en place pour retrouver la constellation de la carte — mais les anneaux sont engrenés : l'extérieur entraîne celui du milieu, qui entraîne l'intérieur à l'envers.",
+  "desc_en": "In the eyepiece, the sky is cut into three rings that turn notch by notch. Set them right to find the constellation on the chart — but the rings are geared: the outer one drags the middle one, which drags the inner one the other way.",
+  "tuto_fr": [
+   "Haut / bas : choisis un anneau. Gauche / droite : tourne-le d'un cran.",
+   "Les anneaux sont engrenés : commence par l'extérieur !",
+   "Retrouve le tracé de la carte avant l'aube."
+  ],
+  "tuto_en": [
+   "Up / down: pick a ring. Left / right: turn it a notch.",
+   "The rings are geared: start with the outer one!",
+   "Match the chart's pattern before dawn."
+  ],
+  "touch_direct": true
  }
 ]
