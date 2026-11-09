@@ -12,6 +12,8 @@ const DT: float = 1.0 / 60.0
 const LANE_W: float = 3.5
 const CAR_HALF: Vector2 = Vector2(0.9, 2.2)
 const TRUCK_LEN: float = 9.0
+## Tolérance latérale des contacts (m) : un frôlement de rétroviseur en changeant de file passe.
+const SIDE_SLACK: float = 0.45
 
 var _lanes: int = 4
 var _lane: int = 1
@@ -22,6 +24,8 @@ var _gap: float = 0.0
 var _dist: float = 0.0
 var _traffic: Array[Dictionary] = []  # lane, x, z, v, truck, sig (−1/0/1), sig_t, to, node, model
 var _spawn_z: float = 0.0
+var _free: int = -1
+var _rows: int = 0
 var _crashes: int = 0
 var _invuln: float = 0.0
 var _t0: float = 0.0
@@ -47,6 +51,8 @@ func begin() -> void:
 	_gap = p("gap_start")
 	_t0 = t
 	_build_3d()
+	# Première rangée : la file du départ est occupée (il faut doubler tout de suite).
+	_free = _lane + (1 if _lane + 1 < _lanes else -1)
 	_spawn_z = -p("spawn_near")
 	while _spawn_z > -p("spawn_far"):
 		_spawn_row()
@@ -59,25 +65,49 @@ func lane_x(k: int) -> float:
 # --------------------------------------------------------------------------- circulation
 
 
-## Une rangée de circulation à `_spawn_z` : une ou deux voitures (jamais toutes les files
-## bouchées), parfois un camion ; la rangée suivante plus loin.
+## Une rangée de circulation à `_spawn_z` : deux puis trois véhicules, jamais toutes les files
+## bouchées ; la file laissée libre est la voisine de celle de la rangée précédente (un passage
+## existe toujours, mais il faut zigzaguer : rester dans sa file ne paie pas). Chaque file a sa
+## vitesse (lente à droite, rapide à gauche) : deux voitures
+## d'une même file ne se rattrapent pas, les barrages ne se forment pas au hasard des tirages.
+## Les camions ne roulent que dans la file de droite.
 func _spawn_row() -> void:
 	var free: int = rng.randi_range(0, _lanes - 1)
-	var count: int = 1 if rng.randf() < p("single_p") else 2
-	var used: Array[int] = []
-	for _k: int in count:
-		var lane: int = rng.randi_range(0, _lanes - 1)
-		if lane == free or lane in used:
-			continue
-		used.append(lane)
-		var truck: bool = rng.randf() < p("truck_p")
-		var v: float = rng.randf_range(p("truck_v_min"), p("truck_v_max")) if truck else rng.randf_range(p("car_v_min"), p("car_v_max"))
-		_add_vehicle(lane, _spawn_z - rng.randf_range(0.0, 6.0), v, truck)
+	if _free >= 0:
+		var step: int = -1 if rng.randf() < 0.5 else 1
+		free = _free + (step if _free + step >= 0 and _free + step < _lanes else -step)
+	_free = free
+	# Véhicules sur les files autres que le passage, dans un ordre tiré au sort.
+	var lanes: Array[int] = []
+	for k: int in _lanes:
+		if k != free:
+			lanes.append(k)
+	for i: int in range(lanes.size() - 1, 0, -1):
+		var j: int = rng.randi_range(0, i)
+		var tmp: int = lanes[i]
+		lanes[i] = lanes[j]
+		lanes[j] = tmp
+	_rows += 1
+	var count: int = 3 if _rows % 2 == 0 else 2  # rangées régulières : deux, puis trois véhicules
+	if _traffic.is_empty() and lanes.has(_lane):
+		lanes.erase(_lane)
+		lanes.push_front(_lane)
+	for lane: int in lanes.slice(0, mini(count, lanes.size())):
+		var truck: bool = lane == _lanes - 1 and rng.randf() < p("truck_p")
+		_add_vehicle(lane, _spawn_z - rng.randf_range(0.0, 6.0), _cruise(lane, truck), truck)
 	_spawn_z -= rng.randf_range(p("row_min"), p("row_max"))
 
 
+## Vitesse de croisière d'un véhicule dans la file `lane` (de `car_v_max` à gauche à
+## `car_v_min` à droite ; camions plus lents), à `lane_jitter` près.
+func _cruise(lane: int, truck: bool) -> float:
+	var u: float = float(lane) / float(maxi(_lanes - 1, 1))
+	var base: float = lerpf(p("truck_v_max"), p("truck_v_min"), u) if truck else lerpf(p("car_v_max"), p("car_v_min"), u)
+	return base + rng.randf_range(-p("lane_jitter"), p("lane_jitter"))
+
+
 func _add_vehicle(lane: int, z: float, v: float, truck: bool) -> void:
-	var d: Dictionary = {"lane": lane, "x": lane_x(lane), "z": z, "v": v, "truck": truck, "sig": 0, "sig_t": 0.0, "to": lane,
+	var d: Dictionary = {"lane": lane, "x": lane_x(lane), "z": z, "v": v, "cruise": v, "truck": truck, "sig": 0, "sig_t": 0.0, "to": lane,
 		"node": null, "model": {}}
 	if stage != null:
 		d["model"] = _truck_model() if truck else GarageSet.car(GarageSet.CAR_COLORS[rng.randi_range(0, GarageSet.CAR_COLORS.size() - 1)])
@@ -123,13 +153,14 @@ func _traffic_step() -> void:
 				var z: float = float(d["z"])
 				if lane_free(tgt2, z - 8.0, z + 8.0, d) and not _player_in(tgt2, z - 7.0, z + 7.0):
 					d["to"] = tgt2
+					d["cruise"] = _cruise(tgt2, false)
 				d["sig"] = 0
 		var tx: float = lane_x(int(d["to"]))
 		d["x"] = move_toward(float(d["x"]), tx, p("traffic_lateral") * DT)
 		if absf(float(d["x"]) - tx) < 0.01:
 			d["lane"] = d["to"]
 		# Les véhicules ralentissent derrière un plus lent de leur file.
-		var ahead_v: float = float(d["v"])
+		var ahead_v: float = float(d["cruise"])
 		for o: Dictionary in _traffic:
 			if o != d and int(o["lane"]) == int(d["lane"]) and float(o["z"]) < float(d["z"]) and float(d["z"]) - float(o["z"]) < 14.0:
 				ahead_v = minf(ahead_v, float(o["v"]))
@@ -152,9 +183,9 @@ func _player_in(lane: int, z0: float, z1: float) -> bool:
 	return absf(_x - lane_x(lane)) < LANE_W * 0.8 and CAR_HALF.y > z0 and -CAR_HALF.y < z1
 
 
-## Vrai si la voiture du joueur touche le véhicule `d`.
+## Vrai si la voiture du joueur touche le véhicule `d` (avec `SIDE_SLACK` sur les côtés).
 func touches(d: Dictionary, px: float) -> bool:
-	return absf(float(d["x"]) - px) < CAR_HALF.x * 2.0 - 0.1 and absf(float(d["z"])) < _half_len(d) + CAR_HALF.y - 0.1
+	return absf(float(d["x"]) - px) < CAR_HALF.x * 2.0 - SIDE_SLACK and absf(float(d["z"])) < _half_len(d) + CAR_HALF.y - 0.1
 
 
 # --------------------------------------------------------------------------- jeu
@@ -294,7 +325,7 @@ func bot_wants() -> Dictionary:
 		var tgt: int = _lane + dir
 		if tgt < 0 or tgt >= _lanes or absf(_x - lane_x(_lane)) > 0.3:
 			continue
-		if not lane_free(tgt, -p("bot_front_clear"), p("bot_back_clear")):
+		if not _can_merge(tgt):
 			continue
 		var f: float = _free_ahead(tgt)
 		var beyond: int = tgt + dir  # une file plus loin, si l'on peut y passer ensuite
@@ -305,14 +336,14 @@ func bot_wants() -> Dictionary:
 			best = tgt
 	if best != _lane and here < p("bot_look"):
 		return {"do": "dir", "dir": Vector2i(best - _lane, 0)}
-	var stop_d: float = (_v * _v - p("v_min") * p("v_min")) / (2.0 * p("brake")) + p("bot_brake_margin")
-	var want_brake: bool = here < stop_d * p("bot_brake_k") and best == _lane
+	var want_brake: bool = _must_brake(_lane) and best == _lane
 	if want_brake != _braking:
 		return {"do": "hold" if want_brake else "release"}
 	return {"do": ""}
 
 
-## Distance libre devant la voiture dans la file `lane` (en tenant compte de la vitesse relative).
+## Valeur d'une file pour le pilote : distance libre devant, allongée selon la vitesse de la
+## voiture devant par rapport à la vitesse de pointe (une file rapide vaut mieux).
 func _free_ahead(lane: int) -> float:
 	var x: float = lane_x(lane)
 	var best: float = p("bot_look") * 2.0
@@ -322,9 +353,47 @@ func _free_ahead(lane: int) -> float:
 		var gap: float = -float(d["z"]) - _half_len(d) - CAR_HALF.y
 		if gap < -CAR_HALF.y * 2.0:
 			continue
-		var closing: float = maxf(_v - float(d["v"]), 0.1)
+		var closing: float = maxf(p("v_max") - float(d["v"]), 0.1)
 		best = minf(best, maxf(gap, 0.0) * (1.0 + p("bot_rel_k") * float(d["v"]) / closing))
 	return best
+
+
+## Vrai si le pilote peut se rabattre dans la file `lane` : personne à hauteur, assez de place
+## pour freiner derrière celui de devant, et celui de derrière met au moins `bot_rear_t` s à
+## rattraper (plus une marge `bot_rear_m`).
+func _can_merge(lane: int) -> bool:
+	if _must_brake(lane):
+		return false
+	var x: float = lane_x(lane)
+	for d: Dictionary in _traffic:
+		if absf(float(d["x"]) - x) > LANE_W * 0.8 and int(d["to"]) != lane:
+			continue
+		var z: float = float(d["z"])
+		var hl: float = _half_len(d)
+		if absf(z) < hl + CAR_HALF.y + 0.5:
+			return false
+		if z > 0.0:
+			var room: float = z - hl - CAR_HALF.y
+			if room < p("bot_rear_m") + maxf(float(d["v"]) - _v, 0.0) * p("bot_rear_t"):
+				return false
+	return true
+
+
+## Vrai si, dans la file `lane`, un véhicule devant est plus près que la distance qu'il faut
+## pour retomber à sa vitesse (freinage `brake`), marge `bot_brake_margin` comprise.
+func _must_brake(lane: int) -> bool:
+	var x: float = lane_x(lane)
+	for d: Dictionary in _traffic:
+		if absf(float(d["x"]) - x) > LANE_W * 0.7 and int(d["to"]) != lane:
+			continue
+		var gap: float = -float(d["z"]) - _half_len(d) - CAR_HALF.y
+		if gap < -CAR_HALF.y * 2.0:
+			continue
+		var va: float = float(d["v"])
+		var need: float = maxf(_v * _v - va * va, 0.0) / (2.0 * p("brake")) * p("bot_brake_k") + p("bot_brake_margin")
+		if gap < need:
+			return true
+	return false
 
 
 func bot_apply(w: Dictionary) -> void:

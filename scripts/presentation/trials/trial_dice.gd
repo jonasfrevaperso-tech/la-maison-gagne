@@ -71,8 +71,8 @@ func _build_3d() -> void:
 	Stage3D.box(r, Vector3(30, 20, 0.05), st.to3(Vector2(960, 540), -0.4), Stage3D.mat(Color("140a10"), 0.0, 0.9))
 	# Feutre, bande de bois vernie et liseré doré.
 	Stage3D.box(r, Vector3(TABLE.size.x * PX3, TABLE.size.y * PX3, 0.04), st.to3(TABLE.get_center(), -0.02),
-		Stage3D.mat(Palette.FELT, 0.0, 0.95))
-	var wood: StandardMaterial3D = Stage3D.mat(Color("4a2a14"), 0.0, 0.3)
+		Stage3D.textured("felt", Color(0.1, 0.36, 0.22), 0.6))
+	var wood: StandardMaterial3D = Stage3D.textured("wood", Color("8a5a34"), 1.0, 0.0, 0.3)
 	wood.clearcoat_enabled = true
 	wood.clearcoat = 0.6
 	var gilt: StandardMaterial3D = Stage3D.mat(Palette.GOLD_DARK, 0.45, 0.35)

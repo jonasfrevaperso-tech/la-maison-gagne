@@ -64,7 +64,7 @@ func _build_3d() -> void:
 	st.cam.size = r.size.y * PX3
 	st.cam.look_at_from_position(Vector3(0, yc + sin(a) * 20.0, cos(a) * 20.0), Vector3(0, yc, 0), Vector3.UP)
 	_root3 = st.root
-	Stage3D.box(_root3, Vector3(r.size.x * PX3, 0.3, 4.0), Vector3(0, -0.15, 0), Stage3D.mat(Color(0.07, 0.26, 0.15), 0.0, 0.95))
+	Stage3D.box(_root3, Vector3(r.size.x * PX3, 0.3, 4.0), Vector3(0, -0.15, 0), Stage3D.textured("felt", Color(0.12, 0.4, 0.24), 0.5))
 	Stage3D.box(_root3, Vector3(r.size.x * PX3, 0.06, 0.08), Vector3(0, 0.0, 2.0), Stage3D.mat(Palette.GOLD_DARK, 0.7, 0.35))
 	Stage3D.box(_root3, Vector3(r.size.x * PX3 * 1.2, 12.0, 0.2), Vector3(0, 5.0, -3.0), Stage3D.mat(Color(0.1, 0.05, 0.08), 0.0, 1.0))
 	_build_cashier(r)
@@ -90,8 +90,8 @@ func _build_3d() -> void:
 ## Fond de la caisse : boiseries, guichet à barreaux de laiton, présentoirs de jetons, appliques.
 func _build_cashier(r: Rect2) -> void:
 	var w: float = r.size.x * PX3 * 1.2
-	var wood: StandardMaterial3D = Stage3D.mat(Color(0.2, 0.09, 0.05), 0.0, 0.5)
-	var brass: StandardMaterial3D = Stage3D.mat(Palette.GOLD_DARK, 0.45, 0.3)
+	var wood: StandardMaterial3D = Stage3D.textured("wood", Color(0.42, 0.22, 0.13), 1.5, 0.0, 0.5)
+	var brass: StandardMaterial3D = Stage3D.mat(Palette.GOLD_DARK, 0.85, 0.3)
 	for k: int in 9:
 		var x: float = -w * 0.5 + w * (float(k) + 0.5) / 9.0
 		Stage3D.box(_root3, Vector3(w / 9.0 - 0.08, 7.0, 0.06), Vector3(x, 3.6, -2.88), wood)

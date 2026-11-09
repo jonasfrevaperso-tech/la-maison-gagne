@@ -19,6 +19,11 @@ const SPOT_IDLE: float = 1.2
 const SPOT_FOCUS: float = 3.6
 const SPIN_SPEED: float = 0.35
 const FOLLOW: float = 5.0
+## Tableau au-dessus de chaque piédestal (carton illustré 160 × 100 de l'épreuve).
+const ART_W: float = 0.96
+const ART_H: float = 0.6
+const ART_Y: float = 1.92
+const ART_PATH: String = "res://assets/trials/trial_%s.png"
 
 var exhibits: Array[String] = []
 var focus: int = 0
@@ -79,13 +84,27 @@ func _build_shell(w: float, cx: float, wall: Color, floor_c: Color, accent: Colo
 	Stage3D.box(_room, Vector3(w, 0.05, 0.06), Vector3(cx, 1.02, WALL_Z + 0.03), brass)
 	Stage3D.box(_room, Vector3(w, 0.12, 0.05), Vector3(cx, 0.06, WALL_Z + 0.04), Stage3D.mat(wall.darkened(0.6), 0.0, 0.6))
 	Stage3D.box(_room, Vector3(w, 0.1, 0.08), Vector3(cx, 3.4, WALL_Z + 0.04), brass)
-	# Tableaux : cadres dorés entre les piédestaux, toiles à la couleur d'accent.
-	for k: int in exhibits.size() + 1:
-		var x: float = SPACING * (float(k) - 0.5)
-		var frame: MeshInstance3D = Stage3D.box(_room, Vector3(0.62, 0.8, 0.04), Vector3(x, 2.2, WALL_Z + 0.03), brass)
-		var canvas_c: Color = accent.darkened(0.55 + 0.1 * float(k % 3)).lerp(wall, 0.3)
-		Stage3D.box(frame, Vector3(0.52, 0.7, 0.02), Vector3(0, 0, 0.02), Stage3D.mat(canvas_c, 0.0, 0.9))
-		Stage3D.sphere(_room, 0.05, Vector3(x, 2.75, WALL_Z + 0.12), Stage3D.glow(Palette.GOLD_LIGHT, 1.5))
+	# Au-dessus de chaque piédestal, le carton illustré de l'épreuve dans un cadre doré à gorge ;
+	# entre deux piédestaux, un pilastre de bois et une applique à globe.
+	for k: int in exhibits.size():
+		var x: float = SPACING * float(k)
+		var frame: MeshInstance3D = Stage3D.box(_room, Vector3(ART_W + 0.16, ART_H + 0.16, 0.05), Vector3(x, ART_Y, WALL_Z + 0.03), brass)
+		Stage3D.box(frame, Vector3(ART_W + 0.06, ART_H + 0.06, 0.02), Vector3(0, 0, 0.02), Stage3D.mat(wall.darkened(0.7), 0.0, 0.8))
+		var canvas: MeshInstance3D = Stage3D.box(frame, Vector3(ART_W, ART_H, 0.01), Vector3(0, 0, 0.035), _art_mat(exhibits[k], accent))
+		canvas.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		Stage3D.box(_room, Vector3(0.22, 0.03, 0.12), Vector3(x, ART_Y + ART_H * 0.5 + 0.16, WALL_Z + 0.08), brass)
+		Stage3D.box(_room, Vector3(0.3, 0.02, 0.02), Vector3(x, ART_Y + ART_H * 0.5 + 0.15, WALL_Z + 0.15), Stage3D.glow(Palette.GOLD_LIGHT, 1.2))
+	for k4: int in exhibits.size() + 1:
+		var px2: float = SPACING * (float(k4) - 0.5)
+		Stage3D.box(_room, Vector3(0.22, 2.3, 0.08), Vector3(px2, 2.2, WALL_Z + 0.04), panel)
+		Stage3D.box(_room, Vector3(0.28, 0.08, 0.1), Vector3(px2, 3.3, WALL_Z + 0.05), brass)
+		Stage3D.box(_room, Vector3(0.28, 0.08, 0.1), Vector3(px2, 1.08, WALL_Z + 0.05), brass)
+		Stage3D.box(_room, Vector3(0.04, 0.18, 0.12), Vector3(px2, 2.45, WALL_Z + 0.1), brass)
+		Stage3D.sphere(_room, 0.07, Vector3(px2, 2.62, WALL_Z + 0.16), Stage3D.glow(Color(1.0, 0.86, 0.62), 2.0))
+	# Tapis de couloir à la couleur de la salle, bordé d'or, devant les cordons.
+	Stage3D.box(_room, Vector3(w, 0.012, 0.9), Vector3(cx, 0.006, 1.45), Stage3D.textured("felt", accent.darkened(0.6).lerp(wall, 0.4), 2.0))
+	for sz: float in [1.0, 1.9]:
+		Stage3D.box(_room, Vector3(w, 0.014, 0.04), Vector3(cx, 0.007, sz), Stage3D.mat(Palette.GOLD_DARK, 0.5, 0.4))
 	# Néon d'accent sous la corniche et cordons de velours devant les piédestaux.
 	Stage3D.box(_room, Vector3(w, 0.025, 0.025), Vector3(cx, 3.3, WALL_Z + 0.1), Stage3D.glow(accent, 1.4))
 	var velvet: StandardMaterial3D = Stage3D.mat(Palette.VELVET.lightened(0.1), 0.0, 0.8)
@@ -103,11 +122,16 @@ func _build_shell(w: float, cx: float, wall: Color, floor_c: Color, accent: Colo
 
 
 func _build_exhibit(k: int, at: Vector3) -> void:
-	var stone: StandardMaterial3D = Stage3D.mat(Color(0.34, 0.31, 0.3), 0.0, 0.4)
+	# Socle de marbre veiné : plinthe sombre, fût, bagues de laiton, plateau débordant.
+	var stone: StandardMaterial3D = Stage3D.textured("stone", Color(0.92, 0.9, 0.86), 0.9, 0.0, 0.3)
+	var base: StandardMaterial3D = Stage3D.textured("stone", Color(0.3, 0.27, 0.27), 0.9, 0.0, 0.25)
 	var brass: StandardMaterial3D = Stage3D.mat(Palette.GOLD_DARK, 0.45, 0.3)
-	Stage3D.box(_room, Vector3(PEDESTAL_W + 0.1, 0.08, PEDESTAL_W + 0.1), at + Vector3(0, 0.04, 0), stone)
-	Stage3D.box(_room, Vector3(PEDESTAL_W, PEDESTAL_H - 0.14, PEDESTAL_W), at + Vector3(0, PEDESTAL_H * 0.5, 0), stone)
-	Stage3D.box(_room, Vector3(PEDESTAL_W + 0.08, 0.06, PEDESTAL_W + 0.08), at + Vector3(0, PEDESTAL_H - 0.03, 0), stone)
+	var ring: StandardMaterial3D = Stage3D.mat(Palette.GOLD, 0.85, 0.25)
+	Stage3D.box(_room, Vector3(PEDESTAL_W + 0.14, 0.12, PEDESTAL_W + 0.14), at + Vector3(0, 0.06, 0), base)
+	Stage3D.box(_room, Vector3(PEDESTAL_W, PEDESTAL_H - 0.2, PEDESTAL_W), at + Vector3(0, PEDESTAL_H * 0.5 + 0.02, 0), stone)
+	for ry: float in [0.15, PEDESTAL_H - 0.1]:
+		Stage3D.box(_room, Vector3(PEDESTAL_W + 0.03, 0.025, PEDESTAL_W + 0.03), at + Vector3(0, ry, 0), ring)
+	Stage3D.box(_room, Vector3(PEDESTAL_W + 0.1, 0.06, PEDESTAL_W + 0.1), at + Vector3(0, PEDESTAL_H - 0.03, 0), base)
 	var plaque: MeshInstance3D = Stage3D.box(_room, Vector3(0.44, 0.12, 0.01),
 		at + Vector3(0, PEDESTAL_H * 0.62, PEDESTAL_W * 0.5 + 0.005), brass)
 	var name_l: Label3D = Stage3D.text3d(plaque, Localization.name_of("throw_trials", exhibits[k]), Vector3(0, 0, 0.008), 26, Palette.INK,
@@ -131,6 +155,22 @@ func _build_exhibit(k: int, at: Vector3) -> void:
 	_room.add_child(spot)
 	spot.look_at_from_position(spot.position, at + Vector3(0, PEDESTAL_H + 0.3, 0), Vector3.UP)
 	_spots.append(spot)
+
+
+## Matériau du tableau : le carton de l'épreuve en pixels nets, légèrement lumineux pour rester
+## lisible dans la pénombre ; à défaut, une toile à la couleur d'accent.
+static func _art_mat(id: String, accent: Color) -> StandardMaterial3D:
+	var path: String = ART_PATH % id
+	if not ResourceLoader.exists(path):
+		return Stage3D.mat(accent.darkened(0.6), 0.0, 0.9)
+	var m: StandardMaterial3D = StandardMaterial3D.new()
+	m.albedo_texture = load(path) as Texture2D
+	m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	m.roughness = 0.7
+	m.emission_enabled = true
+	m.emission_texture = m.albedo_texture
+	m.emission_energy_multiplier = 0.35
+	return m
 
 
 ## Choisit l'objet `k` : la caméra s'en approche, son projecteur s'allume.

@@ -31,6 +31,7 @@ Tous les assets (icônes, sprites, sons, musiques) sont **générés par les scr
 | HDRI de reflets « Lythwood Lounge » (`assets/hdri/lounge_1k.hdr`, 1K) | Greg Zaal, [Poly Haven](https://polyhaven.com/a/lythwood_lounge) | CC0 1.0 |
 | Bois « Wood 051 » (`assets/textures/wood_*.jpg`, réduit à 512 px) | [ambientCG](https://ambientcg.com/a/Wood051) | CC0 1.0 |
 | Marbre « Tiles 074 » (`assets/textures/marble_*.jpg`, réduit à 512 px) | [ambientCG](https://ambientcg.com/a/Tiles074) | CC0 1.0 |
+| Marbre veiné « Marble 012 » (`assets/textures/stone_*.jpg`, réduit à 512 px) | [ambientCG](https://ambientcg.com/a/Marble012) | CC0 1.0 |
 | Tissu « Fabric 061 » (`assets/textures/felt_*.jpg`, réduit à 512 px) | [ambientCG](https://ambientcg.com/a/Fabric061) | CC0 1.0 |
 
 ## Inspirations (mécaniques et ressenti uniquement)

@@ -40,7 +40,7 @@ func _build_3d() -> void:
 	st.look(Vector3(0, 1.55, 1.05), Vector3(0, 0, 0.08), 40.0)
 	var r: Node3D = st.root
 	Stage3D.cylinder(r, 2.4, 0.08, Vector3(0, -0.05, 0), Stage3D.mat(Color(0.2, 0.08, 0.04), 0.1, 0.4))
-	Stage3D.cylinder(r, 2.2, 0.08, Vector3(0, -0.04, 0), Stage3D.mat(Color(0.04, 0.24, 0.14), 0.0, 0.95))
+	Stage3D.cylinder(r, 2.2, 0.08, Vector3(0, -0.04, 0), Stage3D.textured("felt", Color(0.1, 0.36, 0.22), 0.6))
 	Stage3D.box(r, Vector3(12, 0.02, 8), Vector3(0, -0.12, 0), Stage3D.mat(Color(0.08, 0.04, 0.05), 0.0, 0.8))
 	# Talon de cartes (dos bordeaux).
 	for k: int in 8:

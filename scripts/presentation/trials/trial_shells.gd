@@ -48,12 +48,33 @@ func _build_3d() -> void:
 	st.key.light_energy = 0.25
 	st.look(Vector3(0, 2.3, 3.5), Vector3(0, 0.35, 0), 38.0)
 	var r: Node3D = st.root
-	Stage3D.box(r, Vector3(5.2, 0.06, 2.4), Vector3(0, -0.03, 0), Stage3D.mat(Color(0.07, 0.24, 0.13), 0.0, 0.95))
+	Stage3D.box(r, Vector3(5.2, 0.06, 2.4), Vector3(0, -0.03, 0), Stage3D.textured("felt", Color(0.1, 0.36, 0.22), 0.6))
 	Stage3D.box(r, Vector3(5.3, 0.08, 0.1), Vector3(0, -0.02, 1.22), Stage3D.mat(Color(0.3, 0.18, 0.08), 0.0, 0.7))
 	Stage3D.box(r, Vector3(5.0, 1.2, 2.2), Vector3(0, -0.66, 0), Stage3D.mat(Color(0.24, 0.14, 0.06), 0.0, 0.85))
 	for k: int in 6:
 		Stage3D.box(r, Vector3(5.02, 0.03, 2.22), Vector3(0, -0.2 - 0.18 * float(k), 0), Stage3D.mat(Color(0.16, 0.09, 0.04)))
-	Stage3D.box(r, Vector3(12, 6, 0.2), Vector3(0, 1.5, -3.0), Stage3D.mat(Color(0.09, 0.05, 0.07), 0.0, 1.0))
+	# Coin de rue derrière la table : mur de briques, affiche de music-hall éclairée, caisses
+	# de bois empilées et un réverbère au loin.
+	var wall: StandardMaterial3D = Stage3D.mat(Color(0.75, 0.68, 0.68), 0.0, 0.95)
+	wall.albedo_texture = TrialBottles._brick_texture()
+	wall.uv1_scale = Vector3(36, 18, 1)
+	wall.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	Stage3D.box(r, Vector3(12, 6, 0.2), Vector3(0, 1.5, -3.0), wall)
+	var poster: MeshInstance3D = Stage3D.box(r, Vector3(1.0, 1.3, 0.02), Vector3(-2.0, 0.75, -2.88), Stage3D.mat(Color("e8d8b0"), 0.0, 0.8))
+	Stage3D.box(poster, Vector3(0.9, 0.5, 0.01), Vector3(0, 0.3, 0.012), Stage3D.mat(Palette.ROULETTE_RED, 0.0, 0.7))
+	var bill: Label3D = Stage3D.text3d(poster, "GRAND ZÉRO", Vector3(0, 0.3, 0.02), 64, Palette.IVORY, Palette.INK)
+	bill.outline_size = 0
+	var bill2: Label3D = Stage3D.text3d(poster, "CE SOIR", Vector3(0, -0.3, 0.02), 48, Palette.INK, Palette.IVORY)
+	bill2.outline_size = 0
+	Stage3D.omni(r, Color(1.0, 0.8, 0.5), 0.9, Vector3(-2.0, 1.7, -2.3), 2.5)
+	var crate: StandardMaterial3D = Stage3D.textured("wood", Color(0.62, 0.44, 0.28), 0.8, 0.0, 0.85)
+	for c2: Vector3 in [Vector3(2.4, 0.3, -2.5), Vector3(3.1, 0.3, -2.4), Vector3(2.7, 0.9, -2.5)]:
+		var cb: MeshInstance3D = Stage3D.box(r, Vector3(0.6, 0.6, 0.6), c2 + Vector3(0, -1.26, 0), crate)
+		cb.rotation.y = 0.15 * c2.x
+	var post: StandardMaterial3D = Stage3D.mat(Color("2a2a2a"), 0.6, 0.4)
+	Stage3D.cylinder(r, 0.05, 4.2, Vector3(4.2, 0.6, -2.6), post)
+	Stage3D.sphere(r, 0.16, Vector3(4.2, 2.8, -2.6), Stage3D.glow(Color(1.0, 0.75, 0.4), 3.0))
+	Stage3D.omni(r, Color(1.0, 0.7, 0.4), 1.2, Vector3(4.0, 2.6, -2.2), 4.0)
 	_lamp = Node3D.new()
 	_lamp.position = Vector3(0, 3.1, 0.2)
 	r.add_child(_lamp)

@@ -60,7 +60,7 @@ func _build_3d() -> void:
 	st.look(Vector3(0, 4.4, 3.3), Vector3(0, 0, 0.15), 42.0)
 	var r: Node3D = st.root
 	# Feutre en demi-lune, liseré doré, rail matelassé de cuir.
-	var felt: MeshInstance3D = Stage3D.cylinder(r, 4.2, 0.06, Vector3(0, -0.03, -2.2), Stage3D.mat(Color(0.04, 0.24, 0.14), 0.0, 0.95))
+	var felt: MeshInstance3D = Stage3D.cylinder(r, 4.2, 0.06, Vector3(0, -0.03, -2.2), Stage3D.textured("felt", Color(0.1, 0.36, 0.22), 0.6))
 	felt.name = "felt"
 	Stage3D.box(r, Vector3(14, 0.04, 9), Vector3(0, -0.08, 0), Stage3D.mat(Color(0.12, 0.05, 0.04), 0.0, 0.7))
 	var gilt: StandardMaterial3D = Stage3D.mat(Palette.GOLD_DARK, 0.45, 0.35)

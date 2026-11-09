@@ -189,7 +189,24 @@ Format : D-NNN · date · décision · raison · alternatives écartées.
     - **Ordre imposé :** le chariot montre les deux bagages suivants. Un bagage rangé peut être repris.
     - **Bot :** il connaît la découpe d'origine. C'est une épreuve de réflexion : le bot humain obtient 1,00.
   - **Fuite :** voiture fixe et route qui défile.
-    - **Circulation :** des rangées laissent toujours une file libre. Les voitures mettent leur clignotant 1 s avant de changer de file (si la place est libre), les camions sont longs et lents.
-    - **Police :** elle roule à vitesse constante. Un accrochage coûte presque toute la vitesse et 6 m d'écart, sinon le joueur inactif gagnait souvent.
-    - **Bot :** il compare l'espace libre devant dans chaque file, y compris la file d'après si on peut y passer.
+    - **Circulation régulière, pour noter l'adresse et pas la chance (D-046) :**
+      - **Rangées :** deux puis trois véhicules en alternance, espacées de 52 à 60 m.
+      - **Passage :** la file laissée libre change à chaque rangée, toujours vers une voisine. Un passage existe toujours, mais il faut zigzaguer.
+      - **Vitesses :** chaque file a la sienne, lente à droite et rapide à gauche. Deux voitures d'une même file ne se rattrapent donc pas, et aucun barrage mobile ne se forme au hasard.
+      - **Camions :** ils roulent seulement dans la file de droite. Deux camions de front enfermaient le joueur.
+      - **Départ :** la première voiture est dans la file du départ.
+    - **Clignotants :** les voitures mettent leur clignotant 1 s avant de changer de file, si la place est libre.
+    - **Police :** elle roule à 26 m/s. Un accrochage coûte 80 % de la vitesse et 24 m d'écart. Un frôlement latéral de 0,45 m passe, pour pardonner un changement de file un peu juste.
+    - **Barème :** la note va de 65 à 130 m d'écart.
+    - **Bot :**
+      - **Choix de file :** il classe les files par espace libre et vitesse de la circulation, et regarde aussi la file d'après.
+      - **Rabattement :** il se rabat s'il pourrait freiner derrière la voiture de devant, et si celle de derrière met au moins 1,5 s à le rattraper.
+      - **Freinage :** il freine selon la vraie distance d'arrêt.
+    - **Mesure (60 graines) :** bot 0,96 de moyenne, inactif 0,14.
+- **D-092 · Décors : le Musée et les épreuves les plus nues (phase 51).**
+  - **Musée :** au-dessus de chaque piédestal, le carton illustré de l'épreuve dans un cadre doré (pixels nets, légère émission pour rester lisible dans la pénombre). Entre les vitrines : pilastres de noyer et appliques à globe. Socles en marbre veiné (« Marble 012 », ambientCG, CC0, 512 px) cerclés de laiton. Tapis de couloir à la couleur de la salle.
+  - **Pourquoi pas de modèles importés :** les 50 épreuves et les 10 salles sont construites en primitives cohérentes entre elles. Des modèles réalistes importés jureraient avec ce style et pèseraient sur l'APK. On ajoute donc des matériaux PBR (marbre, bois, feutre) et des décors de fond, pas des modèles.
+  - **Épreuves « panel » :** elles restent en fenêtre, par-dessus la table, avec la roue visible (choix d'origine). Le Tri des jetons a maintenant une salle de comptage (lambris de noyer, feutre, bacs cerclés de laiton) ; la Tour de jetons a une caisse en bois et du feutre texturés.
+  - **Tapis :** les tapis plats du Bonneteau, du Blackjack, de la Mémoire, du Plus ou moins et des Dés passent au feutre texturé.
+  - **Bonneteau :** un coin de rue derrière la table (briques, affiche du Grand Zéro, caisses).
 

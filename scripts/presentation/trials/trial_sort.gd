@@ -61,13 +61,26 @@ func _build_3d() -> void:
 	st.env.background_color = Color(0.05, 0.05, 0.07)
 	st.env.ambient_light_energy = 0.4
 	var root: Node3D = st.root
-	var plate: StandardMaterial3D = Stage3D.mat(Color(0.14, 0.14, 0.17), 0.45, 0.45)
+	# Salle de comptage de la caisse : lambris de noyer à panneaux moulurés, filets de laiton,
+	# bande de feutre vert derrière le tapis, deux lampes de bureau hors champ.
+	var plate: StandardMaterial3D = Stage3D.textured("wood", Color(0.55, 0.36, 0.24), 1.2, 0.0, 0.55)
 	Stage3D.box(root, Vector3(r.size.x * 2.0 * PX3, r.size.y * 2.0 * PX3, 0.04), st.to3(r.get_center(), -0.3), plate)
-	var rivet: StandardMaterial3D = Stage3D.mat(Color(0.35, 0.35, 0.4), 0.45, 0.3)
-	for k: int in 14:
-		var x: float = r.position.x + 30.0 + float(k) * (r.size.x - 60.0) / 13.0
-		for y: float in [r.position.y + 16.0, r.end.y - 14.0]:
-			Stage3D.sphere(root, 4.0 * PX3, st.to3(Vector2(x, y), -0.28), rivet)
+	var mould: StandardMaterial3D = Stage3D.textured("wood", Color(0.36, 0.22, 0.14), 1.2, 0.0, 0.5)
+	var brass: StandardMaterial3D = Stage3D.mat(Palette.GOLD_DARK, 0.85, 0.3)
+	var panels: int = 6
+	for k: int in panels:
+		var pw: float = (r.size.x - 40.0) / float(panels)
+		var px: float = r.position.x + 20.0 + pw * (float(k) + 0.5)
+		for y: float in [r.position.y + r.size.y * 0.2, r.end.y - r.size.y * 0.2]:
+			Stage3D.box(root, Vector3((pw - 24.0) * PX3, r.size.y * 0.26 * PX3, 0.03), st.to3(Vector2(px, y), -0.27), mould)
+	for y3: float in [r.position.y + 6.0, r.end.y - 6.0]:
+		Stage3D.box(root, Vector3(r.size.x * PX3, 6.0 * PX3, 0.03), st.to3(Vector2(r.get_center().x, y3), -0.25), brass)
+	var felt_band: Rect2 = _belt().grow_individual(0.0, 26.0, 0.0, 26.0)
+	Stage3D.box(root, Vector3(r.size.x * PX3, felt_band.size.y * PX3, 0.02), st.to3(felt_band.get_center(), -0.2),
+		Stage3D.textured("felt", Color(0.1, 0.36, 0.22), 0.6))
+	for lx: float in [r.position.x + r.size.x * 0.12, r.end.x - r.size.x * 0.12]:
+		var lamp: Vector3 = st.to3(Vector2(lx, r.position.y + 40.0), 0.2)
+		Stage3D.omni(root, Color(1.0, 0.82, 0.55), 0.6, lamp + Vector3(0, -0.3, 0.4), 3.0)
 	var belt: Rect2 = _belt()
 	Stage3D.box(root, Vector3(belt.size.x * PX3, belt.size.y * PX3, 0.04), st.to3(belt.get_center(), -0.04),
 		Stage3D.mat(Color(0.08, 0.08, 0.1), 0.0, 0.8))
@@ -108,6 +121,15 @@ func _build_3d() -> void:
 		rim.rotation.x = PI * 0.5
 		rim.position = at + Vector3(0, 0, 0.022)
 		root.add_child(rim)
+		var collar: TorusMesh = TorusMesh.new()
+		collar.inner_radius = (BIN_R + 2.0) * PX3
+		collar.outer_radius = (BIN_R + 7.0) * PX3
+		var brim: MeshInstance3D = MeshInstance3D.new()
+		brim.mesh = collar
+		brim.material_override = brass
+		brim.rotation.x = PI * 0.5
+		brim.position = at + Vector3(0, 0, 0.018)
+		root.add_child(brim)
 		_bins3.append(rim)
 		_bin_mats.append(inner_m)
 	Stage3D.omni(root, Color(1.0, 0.92, 0.8), 0.8, st.to3(c0, 2.0), 5.0)

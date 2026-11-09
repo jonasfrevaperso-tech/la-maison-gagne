@@ -56,7 +56,7 @@ func _build_3d() -> void:
 	st.key.light_energy = 0.35
 	st.look(Vector3(0, 4.3, 2.9), Vector3(0, 0, 0.25), 40.0)
 	var r: Node3D = st.root
-	Stage3D.box(r, Vector3(9, 0.05, 6), Vector3(0, -0.04, 0), Stage3D.mat(Color(0.05, 0.22, 0.13), 0.0, 0.95))
+	Stage3D.box(r, Vector3(9, 0.05, 6), Vector3(0, -0.04, 0), Stage3D.textured("felt", Color(0.1, 0.36, 0.22), 0.6))
 	# Arc de la donne et rebord matelassé.
 	for k: int in 40:
 		var a: float = lerpf(-0.9, 0.9, float(k) / 39.0)

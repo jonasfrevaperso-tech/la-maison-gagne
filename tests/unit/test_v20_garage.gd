@@ -101,7 +101,7 @@ func test_escape_crash_and_caught() -> void:
 	var e: TrialEscape = _trial("escape") as TrialEscape
 	e._v = 30.0
 	var gap0: float = e._gap
-	e._crash({"v": 20.0, "z": -2.0})
+	e._crash({"v": 20.0, "cruise": 20.0, "z": -2.0})
 	check(e._v < 15.0, "vitesse perdue")
 	check(e._gap < gap0, "la police se rapproche")
 	e._caught = true
