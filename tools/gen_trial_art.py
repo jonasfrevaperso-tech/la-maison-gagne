@@ -1216,6 +1216,159 @@ def art_chess(rng) -> None:
     save(img, "chess")
 
 
+CONCRETE_C = (78, 76, 72)
+HAZARD_C = (232, 184, 32)
+CAR_RED = (138, 26, 36)
+
+
+def garage(img, d, floor_y=40) -> None:
+    """Fond commun du Garage : mur de béton, bande verte peinte, piliers zébrés, dalles du sol."""
+    rect(d, 0, 0, W, floor_y, (106, 104, 98))
+    rect(d, 0, floor_y - 16, W, floor_y - 12, (30, 106, 74))
+    for x in (14, 120):
+        rect(d, x, 0, x + 10, floor_y, (138, 136, 128))
+        for k in range(3):
+            rect(d, x, floor_y - 6 + 2 * k, x + 10, floor_y - 5 + 2 * k, HAZARD_C if k % 2 == 0 else INK)
+    rect(d, 0, floor_y, W, H, CONCRETE_C)
+    for y in range(floor_y + 12, H, 14):
+        d.line((0, y, W, y), fill=(58, 56, 50))
+    for x in range(0, W, 30):
+        d.line((x, floor_y, x - 12, H), fill=(58, 56, 50))
+
+
+def car_side(d, x, y, col, length=46) -> None:
+    """Berline des années 50 de profil (vue de côté, tournée vers la droite)."""
+    rect(d, x, y - 10, x + length, y, col)
+    rect(d, x + length * 0.25, y - 18, x + length * 0.72, y - 10, (232, 220, 192))
+    rect(d, x + length * 0.29, y - 16, x + length * 0.68, y - 11, (32, 46, 60))
+    rect(d, x - 1, y - 3, x + length + 1, y - 1, STEEL)
+    for wx in (x + length * 0.2, x + length * 0.8):
+        disc(d, wx, y, 5, INK)
+        disc(d, wx, y, 2, IVORY)
+    disc(d, x + length, y - 7, 1, YELLOW)
+
+
+def art_valet(rng) -> None:
+    """Le Voiturier : vue du dessus, la rouge recule en biais dans la place entre deux voitures."""
+    img, d = canvas()
+    garage(img, d, 24)
+    rect(d, 0, 24, W, 30, (138, 132, 120))
+    rect(d, 0, 30, W, 31, HAZARD_C)
+    for x, col in ((4, (26, 58, 106)), (112, (232, 220, 192))):
+        rect(d, x, 34, x + 44, 50, col)
+        rect(d, x + 12, 36, x + 30, 48, (60, 60, 60) if col[0] > 200 else (232, 220, 192))
+    car = [(56, 62), (98, 44), (104, 56), (62, 74)]
+    d.polygon(car, fill=CAR_RED)
+    d.polygon([(70, 60), (88, 51), (92, 58), (74, 67)], fill=(232, 220, 192))
+    for k in range(4):
+        d.line((52 + k * 3, 82 + k, 60 + k * 3, 78 + k), fill=GOLD_L)
+    d.line((50, 33, 54, 33), fill=GOLD)
+    d.line((50, 33, 50, 37), fill=GOLD)
+    d.line((110, 33, 106, 33), fill=GOLD)
+    d.line((110, 33, 110, 37), fill=GOLD)
+    disc(d, 80, 20, 3, SKIN)
+    rect(d, 77, 23, 83, 29, (176, 32, 46))
+    save(img, "valet")
+
+
+def art_rally(rng) -> None:
+    """Le Rallye : la orange en dérapage autour d'un plot, traces de pneus en arc."""
+    img, d = canvas()
+    garage(img, d, 22)
+    for k in range(22):
+        a = math.pi * (0.2 + k / 24)
+        x = 80 + 34 * math.cos(a)
+        y = 64 + 20 * math.sin(a)
+        d.point((x, y), fill=(24, 24, 24))
+        d.point((x + 3, y - 4), fill=(24, 24, 24))
+    for (x, y) in ((80, 62), (40, 40), (120, 44), (30, 80), (132, 82)):
+        d.polygon([(x - 3, y + 3), (x + 3, y + 3), (x, y - 5)], fill=(255, 106, 26))
+        d.line((x - 2, y, x + 2, y), fill=IVORY)
+    d.polygon([(96, 74), (126, 60), (132, 70), (102, 84)], fill=(232, 106, 26))
+    d.polygon([(106, 72), (118, 66), (121, 72), (109, 78)], fill=IVORY)
+    for k in range(5):
+        d.line((90 - k * 5, 80 + k, 96 - k * 5, 82 + k), fill=(200, 200, 200))
+    for i in range(4):
+        for j in range(2):
+            if (i + j) % 2 == 0:
+                rect(d, 6 + i * 4, 28 + j * 4, 9 + i * 4, 31 + j * 4, IVORY)
+    save(img, "rally")
+
+
+def art_torque(rng) -> None:
+    """La Clé dynamométrique : roue à flanc blanc, écrous en étoile, clé et cadran au vert."""
+    img, d = canvas()
+    garage(img, d, 30)
+    rect(d, 0, 22, W, 46, CAR_RED)
+    rect(d, 0, 44, W, 46, STEEL)
+    disc(d, 70, 58, 30, (10, 10, 10))
+    disc(d, 70, 58, 26, INK)
+    disc(d, 70, 58, 22, IVORY)
+    disc(d, 70, 58, 18, (110, 20, 28))
+    disc(d, 70, 58, 6, STEEL)
+    for k in range(5):
+        a = -math.pi / 2 + k * 2 * math.pi / 5
+        disc(d, 70 + 12 * math.cos(a), 58 + 12 * math.sin(a), 2, EMERALD if k < 3 else STEEL)
+    d.line((70 + 12 * math.cos(-math.pi / 2 + 4 * math.pi / 5), 58 + 12 * math.sin(-math.pi / 2 + 4 * math.pi / 5), 112, 92),
+           fill=(216, 220, 224), width=3)
+    rect(d, 106, 88, 116, 96, INK)
+    disc(d, 132, 26, 16, INK)
+    d.arc((118, 12, 146, 40), 300, 340, fill=EMERALD, width=4)
+    d.arc((118, 12, 146, 40), 340, 380, fill=RED, width=4)
+    d.line((132, 26, 142, 18), fill=RED, width=2)
+    save(img, "torque")
+
+
+def art_trunk(rng) -> None:
+    """Le Coffre : coffre ouvert vu de dessus, valises imbriquées, une dernière qui descend."""
+    img, d = canvas()
+    garage(img, d, 18)
+    rect(d, 34, 22, 126, 92, (26, 58, 106))
+    rect(d, 40, 30, 120, 86, (42, 36, 32))
+    pieces = [((40, 30, 72, 52), (106, 58, 26)), ((72, 30, 98, 46), (42, 58, 90)), ((98, 30, 120, 58), (90, 26, 26)),
+              ((40, 52, 64, 86), (58, 74, 42)), ((64, 52, 98, 68), (138, 106, 58))]
+    for (x0, y0, x1, y1), col in pieces:
+        rect(d, x0 + 1, y0 + 1, x1 - 1, y1 - 1, col)
+        d.line((x0 + (x1 - x0) // 3, y0 + 1, x0 + (x1 - x0) // 3, y1 - 1), fill=tuple(c // 2 for c in col))
+        rect(d, (x0 + x1) // 2 - 3, y1 - 4, (x0 + x1) // 2 + 3, y1 - 3, GOLD)
+    disc(d, 108, 76, 8, (232, 200, 208))
+    disc(d, 108, 76, 5, (138, 26, 58))
+    rect(d, 66, 72, 96, 84, (122, 90, 138))
+    d.rectangle((66, 72, 96, 84), outline=EMERALD)
+    rect(d, 26, 94, 134, 98, STEEL)
+    save(img, "trunk")
+
+
+def art_escape(rng) -> None:
+    """La Fuite : boulevard de nuit en perspective, la rouge déboîte, gyrophares au loin derrière."""
+    img, d = canvas()
+    rect(d, 0, 0, W, H, (7, 10, 20))
+    for x in range(0, W, 12):
+        hgt = 14 + (x * 7) % 20
+        rect(d, x, 40 - hgt, x + 10, 40, (20, 26, 42))
+        for wy in range(40 - hgt + 3, 38, 5):
+            if (x + wy) % 3 == 0:
+                d.point((x + 4, wy), fill=YELLOW)
+    d.text((48, 8), "LA MAISON", fill=MAGENTA)
+    d.polygon([(70, 40), (90, 40), (160, 100), (0, 100)], fill=(26, 26, 30))
+    for k in range(5):
+        y = 44 + k * k * 2.6
+        for lane in (-1, 0, 1):
+            x = 80 + lane * (y - 38) * 0.6
+            d.line((x, y, x + lane * 1.5, y + 3 + k), fill=IVORY)
+    d.polygon([(76, 52), (86, 52), (88, 60), (74, 60)], fill=(232, 220, 192))
+    d.polygon([(36, 68), (60, 68), (62, 84), (34, 84)], fill=CAR_RED)
+    rect(d, 40, 70, 56, 76, (32, 46, 60))
+    rect(d, 34, 82, 38, 84, RED)
+    rect(d, 58, 82, 62, 84, RED)
+    for x in (16, 144):
+        d.line((x, 100, x + (80 - x) * 0.4, 40), fill=STEEL_D)
+        disc(d, x + (80 - x) * 0.4, 40, 2, AMBER)
+    disc(d, 118, 96, 3, RED)
+    disc(d, 126, 96, 3, BLUE)
+    save(img, "escape")
+
+
 def main() -> None:
     rng = random.Random(1520)
     for fn in [art_charge, art_rhythm, art_bottles, art_memory, art_shells, art_darts, art_safe,
@@ -1225,7 +1378,8 @@ def main() -> None:
                art_tapdance, art_spotlight, art_tightrope, art_hattoss, art_mentalist,
                art_crepe, art_cutting, art_service, art_orders, art_souffle,
                art_pigeon, art_gutters, art_antenna, art_zipline, art_telescope,
-               art_smokerings, art_palet, art_dominoes, art_bluff, art_chess]:
+               art_smokerings, art_palet, art_dominoes, art_bluff, art_chess,
+               art_valet, art_rally, art_torque, art_trunk, art_escape]:
         fn(rng)
     print(f"{len(list(OUT.glob('trial_*.png')))} illustrations d'épreuves écrites dans {OUT.relative_to(ROOT)}")
 

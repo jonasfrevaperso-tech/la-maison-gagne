@@ -296,6 +296,20 @@ def chip_click(rng, f0=2400.0, dur=0.07, gain=1.0):
     return modal(rng, [f0 * r for r in ratios], decays, amps, dur, 1.2, (2500, 12000), 0.9) * gain
 
 
+def seeded_noise(seed, dur):
+    return np.random.default_rng(seed).uniform(-1, 1, int(dur * SR))
+
+
+def garage_engine(seed):
+    """Coup d'accélérateur d'un vieux six-cylindres : grondement qui monte puis retombe."""
+    t = t_axis(0.7)
+    f = 38 + 30 * np.sin(np.pi * np.clip(t / 0.7, 0, 1)) ** 2
+    ph = 2 * np.pi * np.cumsum(f) / SR
+    tone = np.sign(np.sin(ph)) * 0.5 + np.sin(2 * ph) * 0.4 + np.sin(3 * ph + 0.3) * 0.2
+    rumble = fft_filter(tone + seeded_noise(seed, 0.7) * 0.3, 0, 700)
+    return rumble * env_adsr(int(0.7 * SR), 0.04, 0.2, 0.7, 0.25) * 0.6
+
+
 def chip_place_v(seed):
     """Pose d'un jeton : petit choc mat sur le tapis puis un ou deux clics jeton contre jeton."""
     rng = np.random.default_rng(seed)
@@ -521,6 +535,14 @@ def sfx_defs():
     # 1.7 — la Pluie du Grand Lustre.
     d["chandelier"] = (lambda k: reverb(cluster(lambda f, dur=0.5: inst_bell(f, dur, 1.2, 3.1), 7, 0.045, 3400 * v(k)) * 0.45, 1.2, 0.35), 3)
     d["gust"] = (lambda k: fft_filter(noise(int(1.0 * SR)), 150, 1800) * env_adsr(int(1.0 * SR), 0.25, 0.2, 0.6, 0.45) * 0.55, 2)
+    # 2.0 — le Garage (graines propres : le flux global des autres sons ne bouge pas).
+    d["decor_engine"] = (lambda k: garage_engine(40 + k), 3)
+    d["decor_horn"] = (lambda k: addpad(square(415 * v(k), t_axis(0.35), 0.4), square(523 * v(k), t_axis(0.35), 0.4)) * env_adsr(int(0.35 * SR), 0.01, 0.05, 0.8, 0.05) * 0.2, 2)
+    d["decor_screech"] = (lambda k: fft_filter(seeded_noise(50 + k, 0.6), 1800, 4200) * (0.6 + 0.4 * np.sin(2 * np.pi * (31 + 4 * k) * t_axis(0.6))) * env_adsr(int(0.6 * SR), 0.03, 0.1, 0.7, 0.25) * 0.5, 3)
+    d["decor_bump"] = (lambda k: addpad(inst_kick(0.22) * 0.8, fft_filter(seeded_noise(60 + k, 0.18), 150, 1400) * env_exp(int(0.18 * SR), 0.04) * 0.6), 3)
+    d["decor_ratchet"] = (lambda k: cluster(inst_click, 5, 0.05, 2600 * v(k)) * 0.6, 3)
+    d["decor_torque"] = (lambda k: addpad(inst_clack(1900 * v(k), 0.06), inst_bell(2400 * v(k), 0.2, 1.0, 2.0) * 0.25), 3)
+    d["decor_trunk"] = (lambda k: addpad(inst_kick(0.3) * 0.6, inst_clack(260 * v(k), 0.12) * 0.7), 3)
     for style in ("jazz", "funk", "mambo"):
         d["groove_" + style] = ((lambda st: (lambda k: groove(st)))(style), 1)
     return d

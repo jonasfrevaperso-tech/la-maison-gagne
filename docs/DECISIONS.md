@@ -166,4 +166,30 @@ Format : D-NNN · date · décision · raison · alternatives écartées.
   - **Bluff** : tous les instants de tics sont tirés au début de la main. Le menteur raccourcit son rythme dès l'ouverture des mises. Une fausse piste (accès passager) apparaît plus tard dans la soirée. Le bot juge comme un joueur attentif : deux intervalles nettement plus courts que le rythme habituel, et non le simple compte de tics, trop bruité.
   - **Échecs éclair** : moteur pur `ChessMini` (coups légaux, échec, mat ; ni roque ni prise en passant). Les 42 positions (trois paliers) viennent de `tools/gen_chess_puzzles.py` (python-chess, graine fixe) : mat unique, ni promotion ni roque. `validate_data` revérifie chaque position avec `ChessMini`. Pièces Staunton en primitives, clic converti en case par `Stage3D.unproject_to_plane`.
   - Dominos, Bluff et Échecs mesurent la lecture et la réflexion, que le bot humain ne simule pas (1,00).
+- **D-091 · Salle 10, le Garage (5 épreuves) : les 50 épreuves sont atteintes.**
+  - **Décor commun en code (`GarageSet`) :** parking souterrain du casino. Dalles de béton (instance multiple ; couleurs de sommet lues en sRGB, sinon le béton sortait presque blanc), taches d'huile mates, piliers à bandes jaune et noir, néons dont un grésille, mur du fond « −2 ». La berline des années 50 est faite de primitives : caisse bicolore vernie, pare-brise inclinés, chromes, pneus à flanc blanc, roues avant directrices, feux stop et de recul allumables. `car_corners` donne la caisse pour les collisions, `cone` le plot de chantier.
+  - **Voitures :** le Car Kit de Kenney (CC0) était visé, mais son lien de téléchargement renvoie une page web. Les voitures sont donc construites en code, comme le reste du jeu.
+  - **Sons :** sept sons synthétisés (moteur, klaxon, crissement, choc, cliquet, déclic, malle), chacun avec sa propre graine. Le générateur n'est pas tout à fait reproductible : on ne versionne que les nouveaux fichiers.
+  - **Voiturier :** créneau en marche arrière.
+    - **Modèle :** « bicyclette », volant à vitesse de rotation limitée, pédale avec zone morte.
+    - **Contacts :** une caisse qui touche une voiture fait une bosse (cher). Sur le trottoir, seuls les pneus butent, car la caisse passe au-dessus ; un frottement coûte peu.
+    - **Bot :** il simule son propre modèle. Il choisit le départ d'où la manœuvre type (plein braquage, contre-braquage, redressement) finit dans la place, sans contact et avec une marge. Il contre-braque un peu tôt, s'arrête s'il manque de place derrière, puis se recentre en avançant.
+    - **Réglages :** places de 1,85 puis 1,7 longueur. Plus courtes, une manœuvre en deux arcs n'y entre plus.
+  - **Rallye :** tour chronométré.
+    - **Modèle :** vitesse décomposée en longitudinal et latéral. L'adhérence amortit le latéral ; au frein à main elle s'effondre et le lacet s'accélère.
+    - **Tracé :** le circuit (40 × 20 m, portes de 4 m) est écrit dans les données, avec deux tracés tirés au sort et un miroir possible. La porte de l'épingle va jusqu'au mur, avec un seul plot.
+    - **Collisions :** les plots se testent sur le rectangle de la caisse.
+    - **Bot :** il vise un point d'approche devant les portes qui demandent un grand changement de cap, et freine selon l'angle du virage suivant.
+  - **Clé dynamométrique :** deux roues, de 5 puis 6 écrous.
+    - **Couple :** l'écrou file, puis le couple monte de plus en plus vite. Un écrou trop serré foire. Un écrou pas assez serré se reprend.
+    - **Écrous rouillés :** ils font un faux pic d'aiguille qui ne compte pas.
+    - **Règle de l'étoile :** commencer un écrou voisin du précédent voile la roue.
+    - **Commandes :** jeu direct au doigt et à la souris (on touche l'écrou à serrer).
+  - **Coffre :** le coffre est découpé en bagages par coupes franches, puis quelques petits bagages sont soudés en sacs en L. Il existe donc toujours un rangement exact.
+    - **Ordre imposé :** le chariot montre les deux bagages suivants. Un bagage rangé peut être repris.
+    - **Bot :** il connaît la découpe d'origine. C'est une épreuve de réflexion : le bot humain obtient 1,00.
+  - **Fuite :** voiture fixe et route qui défile.
+    - **Circulation :** des rangées laissent toujours une file libre. Les voitures mettent leur clignotant 1 s avant de changer de file (si la place est libre), les camions sont longs et lents.
+    - **Police :** elle roule à vitesse constante. Un accrochage coûte presque toute la vitesse et 6 m d'écart, sinon le joueur inactif gagnait souvent.
+    - **Bot :** il compare l'espace libre devant dans chaque file, y compris la file d'après si on peut y passer.
 

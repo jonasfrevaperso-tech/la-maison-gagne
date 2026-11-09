@@ -1050,3 +1050,55 @@ TRIAL_CHESS_TASK,Les Blancs matent en un coup,White mates in one
 TRIAL_CHESS_MATE,Échec et mat !,Checkmate!
 TRIAL_CHESS_NOT_MATE,Pas mat…,Not mate…
 TRIAL_CHESS_FLAG,Le drapeau tombe !,Flag fell!
+TRIAL_VALET_HINT,"{move} : bas reculer, haut avancer, gauche / droite braquer","{move}: down reverse, up forward, left / right steer"
+TRIAL_VALET_HINT_MOUSE,"Maintiens {@click} et vise : haut avancer, bas reculer, côtés braquer","Hold {@click} and point: up forward, down reverse, sides steer"
+TRIAL_VALET_HINT_TOUCH,"Joystick : bas reculer, haut avancer, gauche / droite braquer","Joystick: down reverse, up forward, left / right steer"
+TRIAL_VALET_STATUS,Voiture %d / %d,Car %d / %d
+TRIAL_VALET_BUMPS,Bosses : %d,Dents: %d
+TRIAL_VALET_BUMP,Bosse !,Dent!
+TRIAL_VALET_PERFECT,Créneau parfait !,Perfect park!
+TRIAL_VALET_PARKED,Garée,Parked
+TRIAL_VALET_OUT,Mal garée,Badly parked
+TRIAL_VALET_LATE,Le client attend !,The guest is waiting!
+TRIAL_VALET_CURB,Trottoir !,Kerb!
+TRIAL_RALLY_HINT,{move} : braquer (bas : freiner) · maintiens {confirm} : frein à main,{move}: steer (down: brake) · hold {confirm}: handbrake
+TRIAL_RALLY_HINT_MOUSE,{@mouse} : la voiture va vers le pointeur · maintiens {@click} : frein à main,{@mouse}: the car heads for the pointer · hold {@click}: handbrake
+TRIAL_RALLY_HINT_TOUCH,Joystick : braquer · bouton maintenu : frein à main,Joystick: steer · hold the button: handbrake
+TRIAL_RALLY_HB_BUTTON,Frein à main,Handbrake
+TRIAL_RALLY_STATUS,Portes %d / %d,Gates %d / %d
+TRIAL_RALLY_PAR,Référence : %.0f s,Target: %.0f s
+TRIAL_RALLY_HANDBRAKE,Frein à main !,Handbrake!
+TRIAL_RALLY_FAULTS,Fautes : %d,Faults: %d
+TRIAL_RALLY_FINISH,Arrivée !,Finish!
+TRIAL_RALLY_LATE,Hors délai,Out of time
+TRIAL_RALLY_CONE,Plot !,Cone!
+TRIAL_RALLY_WALL,Mur !,Wall!
+TRIAL_TORQUE_HINT,"{move} : choisir l'écrou · maintiens {confirm} : serrer, relâche dans le vert","{move}: pick the nut · hold {confirm}: tighten, release in the green"
+TRIAL_TORQUE_HINT_MOUSE,"Maintiens {@click} sur un écrou pour le serrer, relâche dans le vert","Hold {@click} on a nut to tighten it, release in the green"
+TRIAL_TORQUE_HINT_TOUCH,"Maintiens le doigt sur un écrou pour le serrer, lâche dans le vert","Hold your finger on a nut to tighten it, let go in the green"
+TRIAL_TORQUE_DIAL,couple,torque
+TRIAL_TORQUE_STATUS,Roue %d / %d · écrous %d / %d,Wheel %d / %d · nuts %d / %d
+TRIAL_TORQUE_WARPS,Voilages : %d,Warps: %d
+TRIAL_TORQUE_WARP,Voilée !,Warped!
+TRIAL_TORQUE_TIGHT,Serré !,Tight!
+TRIAL_TORQUE_OVER,Un peu fort,A bit too tight
+TRIAL_TORQUE_STRIP,Foiré !,Stripped!
+TRIAL_TORQUE_WHEEL,Roue montée,Wheel on
+TRIAL_TORQUE_LATE,Le client s'impatiente,The guest is getting impatient
+TRIAL_TRUNK_HINT,{@dpad} : déplacer · {confirm} : poser · {qte_up} : tourner · {qte_left} : reprendre,{@dpad}: move · {confirm}: place · {qte_up}: turn · {qte_left}: take back
+TRIAL_TRUNK_HINT_MOUSE,{@click} sur une case : poser · {@right_click} : tourner · {@click} sur un bagage : le reprendre,{@click} a space: place · {@right_click}: turn · {@click} a piece: take it back
+TRIAL_TRUNK_HINT_TOUCH,Touche une case : poser · touche le chariot : tourner · touche un bagage : le reprendre,Tap a space: place · tap the trolley: turn · tap a piece: take it back
+TRIAL_TRUNK_STATUS,Coffre %d / %d · rempli à %d %%,Boot %d / %d · %d %% full
+TRIAL_TRUNK_NEXT,Encore %d,%d to go
+TRIAL_TRUNK_FULL,Tout est chargé !,All loaded!
+TRIAL_TRUNK_LEFT,Il en reste…,Some left over…
+TRIAL_TRUNK_LATE,Le client part sans ses valises !,The guest leaves without the luggage!
+TRIAL_ESCAPE_HINT,{move} : gauche / droite changer de file · maintiens {confirm} : freiner,{move}: left / right switch lanes · hold {confirm}: brake
+TRIAL_ESCAPE_HINT_MOUSE,{@click} à gauche / à droite : changer de file · maintiens {@click} au milieu : freiner,{@click} left / right: switch lanes · hold {@click} in the middle: brake
+TRIAL_ESCAPE_HINT_TOUCH,Touche à gauche / à droite : changer de file · maintiens au milieu : freiner,Tap left / right: switch lanes · hold the middle: brake
+TRIAL_ESCAPE_GAP,Police à %d m,Police %d m behind
+TRIAL_ESCAPE_CRASHES,Accrochages : %d,Scrapes: %d
+TRIAL_ESCAPE_CRASH,Accroché !,Scraped!
+TRIAL_ESCAPE_CAUGHT,Rattrapé !,Caught!
+TRIAL_ESCAPE_CLEAR,Semée !,Lost them!
+TRIAL_ESCAPE_CLOSE,Ils sont tout près…,They're right behind…

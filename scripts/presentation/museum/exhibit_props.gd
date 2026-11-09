@@ -101,6 +101,16 @@ static func build(trial_id: String) -> Node3D:
 			_bluff(n)
 		"chess":
 			_chess(n)
+		"valet":
+			_valet(n)
+		"rally":
+			_rally(n)
+		"torque":
+			_torque(n)
+		"trunk":
+			_trunk(n)
+		"escape":
+			_escape(n)
 		_:
 			var c: Node3D = CasinoChip3D.build(n, Palette.GOLD, 0.3)
 			c.position.y = 0.3
@@ -825,3 +835,86 @@ static func _chess(n: Node3D) -> void:
 	rook.scale = Vector3.ONE * 0.35
 	rook.position = Vector3(0.1, 0.024, -0.1)
 	n.add_child(rook)
+
+
+## Voiture miniature du Garage (échelle `k`), posée en `at`, cap `rot`.
+static func _mini_car(n: Node3D, col: Color, at: Vector3, rot: float, k: float = 0.075) -> Node3D:
+	var c: Node3D = GarageSet.car(col)["node"] as Node3D
+	c.scale = Vector3.ONE * k
+	c.position = at
+	c.rotation.y = rot
+	n.add_child(c)
+	return c
+
+
+static func _valet(n: Node3D) -> void:
+	# Créneau miniature : dalle de béton, bordure jaune, deux voitures garées, la rouge qui recule.
+	Stage3D.box(n, Vector3(0.7, 0.02, 0.4), Vector3(0, 0.01, 0), _m(GarageSet.CONCRETE, 0.0, 0.9))
+	Stage3D.box(n, Vector3(0.7, 0.03, 0.06), Vector3(0, 0.025, -0.17), _m(GarageSet.HAZARD, 0.0, 0.6))
+	_mini_car(n, GarageSet.CAR_COLORS[1], Vector3(0.13, 0.02, -0.07), 0.0)
+	_mini_car(n, GarageSet.CAR_COLORS[3], Vector3(-0.33, 0.02, -0.07), 0.0)
+	_mini_car(n, GarageSet.CAR_COLORS[0], Vector3(-0.02, 0.02, 0.03), -0.45)
+
+
+static func _rally(n: Node3D) -> void:
+	# Voiture orange en dérapage entre des plots, traces de pneus, damier.
+	Stage3D.box(n, Vector3(0.7, 0.02, 0.45), Vector3(0, 0.01, 0), _m(GarageSet.CONCRETE, 0.0, 0.9))
+	for k: int in 6:
+		var cone_n: Node3D = GarageSet.cone(n, Vector3(-0.28 + 0.11 * float(k), 0.02, -0.12 + 0.2 * float(k % 2)))
+		cone_n.scale = Vector3.ONE * 0.12
+	for k2: int in 6:
+		var mark_at: Vector3 = Vector3(-0.1 + 0.04 * float(k2), 0.022, 0.12 - 0.012 * float(k2 * k2))
+		var mark: MeshInstance3D = Stage3D.box(n, Vector3(0.05, 0.003, 0.012), mark_at, _m(Color("141414"), 0.0, 0.9))
+		mark.rotation.y = 0.2 * float(k2)
+	_mini_car(n, Color("e86a1a"), Vector3(0.12, 0.02, 0.0), 0.9)
+	for k3: int in 4:
+		Stage3D.box(n, Vector3(0.04, 0.004, 0.04), Vector3(-0.3, 0.022, -0.18 + 0.04 * float(k3) * 2.0), _m(Palette.IVORY, 0.0, 0.7))
+
+
+static func _torque(n: Node3D) -> void:
+	# Roue debout à flanc blanc, cinq écrous, clé dynamométrique posée en travers.
+	var wheel: Node3D = Node3D.new()
+	wheel.position = Vector3(0, 0.2, 0)
+	n.add_child(wheel)
+	var tyre: MeshInstance3D = Stage3D.cylinder(wheel, 0.2, 0.11, Vector3.ZERO, _m(Color("141414"), 0.0, 0.85))
+	tyre.rotation.x = PI * 0.5
+	var ww: MeshInstance3D = Stage3D.cylinder(wheel, 0.165, 0.005, Vector3(0, 0, 0.056), _m(Color("ece8dc"), 0.0, 0.6))
+	ww.rotation.x = PI * 0.5
+	var rim: MeshInstance3D = Stage3D.cylinder(wheel, 0.13, 0.03, Vector3(0, 0, 0.06), _m(GarageSet.CAR_COLORS[0], 0.5, 0.3))
+	rim.rotation.x = PI * 0.5
+	for k: int in 5:
+		var a: float = -PI * 0.5 + TAU * float(k) / 5.0
+		var nut_at: Vector3 = Vector3(cos(a) * 0.09, -sin(a) * 0.09, 0.08)
+		var nut: MeshInstance3D = Stage3D.cylinder(wheel, 0.014, 0.02, nut_at, _m(Color("b8bcc0"), 0.9, 0.3))
+		nut.rotation.x = PI * 0.5
+	var bar: MeshInstance3D = Stage3D.box(n, Vector3(0.5, 0.025, 0.025), Vector3(0.05, 0.02, 0.2), _m(Color("d8dce0"), 1.0, 0.15))
+	bar.rotation.y = 0.4
+	Stage3D.box(n, Vector3(0.12, 0.035, 0.035), Vector3(0.27, 0.02, 0.1), _m(Color("1a1a1a"), 0.0, 0.6)).rotation.y = 0.4
+
+
+static func _trunk(n: Node3D) -> void:
+	# Pile de valises de cuir à sangles et coins de laiton, carton à chapeau au sommet.
+	var cols: Array[Color] = [TrialTrunk.LEATHER[0], TrialTrunk.LEATHER[1], TrialTrunk.LEATHER[2]]
+	var brass: StandardMaterial3D = _m(SmokingSet.BRASS, 0.85, 0.25)
+	var y: float = 0.0
+	for k: int in 3:
+		var sz: Vector3 = Vector3(0.5 - 0.1 * float(k), 0.12, 0.32 - 0.04 * float(k))
+		var bag: MeshInstance3D = Stage3D.box(n, sz, Vector3(0.02 * float(k), y + sz.y * 0.5, 0), _m(cols[k], 0.05, 0.5))
+		bag.rotation.y = 0.15 * float(k - 1)
+		Stage3D.box(bag, Vector3(0.025, sz.y + 0.006, sz.z - 0.01), Vector3(-sz.x * 0.25, 0, 0), _m(cols[k].darkened(0.45), 0.0, 0.6))
+		Stage3D.box(bag, Vector3(0.025, sz.y + 0.006, sz.z - 0.01), Vector3(sz.x * 0.25, 0, 0), _m(cols[k].darkened(0.45), 0.0, 0.6))
+		Stage3D.box(bag, Vector3(0.08, 0.02, 0.02), Vector3(0, sz.y * 0.5 + 0.01, sz.z * 0.5 - 0.03), brass)
+		y += sz.y
+	Stage3D.cylinder(n, 0.09, 0.14, Vector3(0.05, y + 0.07, 0), _m(Color("e8c8d0"), 0.0, 0.6))
+	Stage3D.cylinder(n, 0.092, 0.02, Vector3(0.05, y + 0.13, 0), _m(Color("8a1a3a"), 0.0, 0.5))
+
+
+static func _escape(n: Node3D) -> void:
+	# Tronçon de boulevard : asphalte, pointillés, la rouge en fuite, la police derrière.
+	Stage3D.box(n, Vector3(0.36, 0.02, 0.75), Vector3(0, 0.01, 0), _m(Color("1a1a1e"), 0.0, 0.75))
+	for k: int in 5:
+		Stage3D.box(n, Vector3(0.008, 0.002, 0.07), Vector3(0, 0.021, -0.3 + 0.15 * float(k)), _m(Color("e8e0c8"), 0.0, 0.6))
+	_mini_car(n, GarageSet.CAR_COLORS[0], Vector3(-0.08, 0.02, -0.02), PI * 0.5, 0.06)
+	var cop: Node3D = _mini_car(n, Color("141418"), Vector3(0.08, 0.02, 0.32), PI * 0.5, 0.06)
+	Stage3D.box(cop, Vector3(0.2, 0.14, 0.3), Vector3(1.2, 1.36, -0.25), Stage3D.glow(Color(0.9, 0.1, 0.1), 4.0))
+	Stage3D.box(cop, Vector3(0.2, 0.14, 0.3), Vector3(1.2, 1.36, 0.25), Stage3D.glow(Color(0.2, 0.4, 1.0), 4.0))

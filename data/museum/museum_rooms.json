@@ -151,5 +151,22 @@
       "bluff",
       "chess"
     ]
+  },
+  {
+    "id": "garage",
+    "name_fr": "Le Garage",
+    "name_en": "The Garage",
+    "desc_fr": "Béton, néons et belles américaines : les épreuves du parking souterrain du casino.",
+    "desc_en": "Concrete, neon tubes and vintage cars: the trials of the casino's underground car park.",
+    "wall": "2a2c2e",
+    "floor": "4a4844",
+    "accent": "e8b820",
+    "exhibits": [
+      "valet",
+      "rally",
+      "torque",
+      "trunk",
+      "escape"
+    ]
   }
 ]

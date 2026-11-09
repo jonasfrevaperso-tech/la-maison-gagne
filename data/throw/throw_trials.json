@@ -1161,5 +1161,293 @@
     "solution": "g1b6"
    }
   ]
+ },
+ {
+  "id": "valet",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Le Voiturier",
+  "name_en": "The Valet",
+  "desc_fr": "Gare la berline d'un client en créneau, en marche arrière, entre deux voitures. Le volant met du temps à tourner : anticipe. Braque à fond vers le trottoir, puis contre-braque au bon moment. Chaque bosse sur une carrosserie se paie.",
+  "desc_en": "Parallel-park a guest's sedan, in reverse, between two cars. The wheel takes time to turn: anticipate. Full lock towards the kerb, then counter-steer at the right moment. Every dent costs you.",
+  "tuto_fr": [
+   "Bas : reculer · haut : avancer · gauche / droite : braquer.",
+   "Recule en braquant vers le trottoir, puis contre-braque pour te redresser.",
+   "Arrête-toi droit, près du trottoir, entre les équerres dorées. Évite les bosses !"
+  ],
+  "tuto_en": [
+   "Down: reverse · up: drive forward · left / right: steer.",
+   "Reverse with the wheel turned towards the kerb, then counter-steer to straighten up.",
+   "Stop straight, close to the kerb, between the golden corners. No dents!"
+  ],
+  "touch_stick": true
+ },
+ {
+  "id": "rally",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Le Rallye",
+  "name_en": "The Rally",
+  "desc_fr": "Un tour chrono du niveau −2, entre les plots. La voiture accélère toute seule : braque, et tire le frein à main pour la faire pivoter dans l'épingle du fond. Passe les portes dans l'ordre ; chaque plot renversé, chaque mur touché te coûte.",
+  "desc_en": "A timed lap of level −2, between the cones. The car accelerates on its own: steer, and pull the handbrake to swing it round the hairpin at the end. Take the gates in order; every cone knocked over and every wall hit costs you.",
+  "tuto_fr": [
+   "Gauche / droite : braquer. La voiture accélère seule ; bas : freiner.",
+   "Maintiens le frein à main : l'arrière décroche et la voiture pivote. Relâche pour repartir.",
+   "Passe les portes dans l'ordre (flèche dorée). Plots et murs coûtent des points."
+  ],
+  "tuto_en": [
+   "Left / right: steer. The car accelerates on its own; down: brake.",
+   "Hold the handbrake: the rear steps out and the car swings round. Release to drive on.",
+   "Take the gates in order (golden arrow). Cones and walls cost points."
+  ],
+  "touch_stick": true,
+  "touch_pad": [
+   "ui_spin"
+  ],
+  "touch_labels": {
+   "ui_spin": "TRIAL_RALLY_HB_BUTTON"
+  },
+  "courses": [
+   {
+    "start": [
+     -16.0,
+     6.0,
+     0.0
+    ],
+    "gates": [
+     [
+      -10.0,
+      4.0,
+      -10.0,
+      8.0
+     ],
+     [
+      -3.0,
+      1.2,
+      -3.0,
+      5.2
+     ],
+     [
+      4.0,
+      4.0,
+      4.0,
+      8.0
+     ],
+     [
+      8.5,
+      0.0,
+      20.0,
+      0.0,
+      1
+     ],
+     [
+      5.0,
+      -8.0,
+      5.0,
+      -4.0
+     ],
+     [
+      -4.0,
+      -5.0,
+      -4.0,
+      -1.0
+     ],
+     [
+      -14.0,
+      -8.0,
+      -14.0,
+      -4.0
+     ]
+    ],
+    "cones": [
+     [
+      -18,
+      0.0
+     ],
+     [
+      -15,
+      0.0
+     ],
+     [
+      -12,
+      0.0
+     ],
+     [
+      -9,
+      0.0
+     ],
+     [
+      -6,
+      0.0
+     ],
+     [
+      -3,
+      0.0
+     ],
+     [
+      0,
+      0.0
+     ],
+     [
+      3,
+      0.0
+     ],
+     [
+      6,
+      0.0
+     ]
+    ]
+   },
+   {
+    "start": [
+     -16.0,
+     3.2,
+     0.0
+    ],
+    "gates": [
+     [
+      -10.0,
+      1.2,
+      -10.0,
+      5.2
+     ],
+     [
+      -3.0,
+      4.0,
+      -3.0,
+      8.0
+     ],
+     [
+      4.0,
+      1.2,
+      4.0,
+      5.2
+     ],
+     [
+      8.5,
+      0.0,
+      20.0,
+      0.0,
+      1
+     ],
+     [
+      5.0,
+      -8.0,
+      5.0,
+      -4.0
+     ],
+     [
+      -4.0,
+      -5.0,
+      -4.0,
+      -1.0
+     ],
+     [
+      -14.0,
+      -8.0,
+      -14.0,
+      -4.0
+     ]
+    ],
+    "cones": [
+     [
+      -18,
+      0.0
+     ],
+     [
+      -15,
+      0.0
+     ],
+     [
+      -12,
+      0.0
+     ],
+     [
+      -9,
+      0.0
+     ],
+     [
+      -6,
+      0.0
+     ],
+     [
+      -3,
+      0.0
+     ],
+     [
+      0,
+      0.0
+     ],
+     [
+      3,
+      0.0
+     ],
+     [
+      6,
+      0.0
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "id": "torque",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "La Clé dynamométrique",
+  "name_en": "The Torque Wrench",
+  "desc_fr": "Remonte les roues de la voiture d'un client. Choisis un écrou, maintiens pour serrer, relâche quand l'aiguille est dans le vert. L'écrou file, se bloque, puis le couple grimpe de plus en plus vite : trop serré, le filetage foire. Serre en étoile, jamais deux voisins de suite — et méfie-toi des écrous rouillés, qui font un faux pic.",
+  "desc_en": "Put a guest's wheels back on. Pick a nut, hold to tighten, release when the needle is in the green. The nut runs down, seats, then the torque climbs faster and faster: too tight and the thread strips. Tighten in a star, never two neighbours in a row — and beware rusty nuts, which give a false peak.",
+  "tuto_fr": [
+   "Gauche / droite : choisir l'écrou. Maintiens pour serrer, relâche dans le vert.",
+   "Serre en étoile : jamais deux écrous voisins de suite, sinon la roue se voile.",
+   "Les écrous rouillés accrochent : l'aiguille saute puis retombe. Continue à serrer !"
+  ],
+  "tuto_en": [
+   "Left / right: pick the nut. Hold to tighten, release in the green.",
+   "Tighten in a star: never two neighbouring nuts in a row, or the wheel warps.",
+   "Rusty nuts stick: the needle jumps then drops back. Keep tightening!"
+  ],
+  "touch_direct": true
+ },
+ {
+  "id": "trunk",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "Le Coffre",
+  "name_en": "The Boot",
+  "desc_fr": "Charge tous les bagages du client dans le coffre. Le chariot les apporte dans l'ordre : pose chacun où tu veux, tourné si besoin. Tout tient pile — à condition de ne pas te fermer de porte. Tu peux reprendre un bagage déjà rangé.",
+  "desc_en": "Load all the guest's luggage into the boot. The trolley brings it in order: put each piece where you like, turned if needed. It all fits exactly — as long as you don't box yourself in. You can take back a piece you've already stowed.",
+  "tuto_fr": [
+   "Croix : déplacer le bagage. Confirme pour le poser.",
+   "Haut (Y) : le tourner. Gauche (X) : reprendre le dernier bagage rangé.",
+   "Tout tient pile : regarde les deux bagages suivants sur le chariot avant de poser."
+  ],
+  "tuto_en": [
+   "D-pad: move the piece. Confirm to put it down.",
+   "Up (Y): turn it. Left (X): take back the last piece you stowed.",
+   "It all fits exactly: check the next two pieces on the trolley before you place."
+  ],
+  "touch_direct": true
+ },
+ {
+  "id": "escape",
+  "stage": "full",
+  "weight": 1.0,
+  "name_fr": "La Fuite",
+  "name_en": "The Getaway",
+  "desc_fr": "Sortie en trombe du parking, la police aux trousses, sur le boulevard de nuit. La voiture roule à fond : change de file au bon moment pour doubler. La police roule à vitesse constante : chaque dépassement creuse l'écart, chaque accrochage te fait perdre presque toute ta vitesse. Gare aux clignotants !",
+  "desc_en": "Burst out of the car park with the police on your tail, down the boulevard at night. The car is flat out: switch lanes at the right moment to overtake. The police hold a steady speed: every overtake widens the gap, every scrape costs you almost all your speed. Watch the indicators!",
+  "tuto_fr": [
+   "Gauche / droite : changer de file. Maintiens (ou bas) : freiner.",
+   "Avant de déboîter, vérifie la file d'à côté : une voiture peut y arriver.",
+   "Les voitures qui clignotent vont changer de file. Garde l'écart avec la police !"
+  ],
+  "tuto_en": [
+   "Left / right: switch lanes. Hold (or down): brake.",
+   "Before pulling out, check the next lane: a car may be coming.",
+   "Cars with their indicator on are about to switch lanes. Keep ahead of the police!"
+  ],
+  "touch_direct": true
  }
 ]
