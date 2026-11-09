@@ -53,6 +53,14 @@ une main sur un vrai téléphone peut juger. Cocher, noter le modèle et la vers
 - [ ] Musée : la maquette de la Mémoire ne scintille pas ; geste Retour en épreuve ouvre la pause.
 - [x] Mémoire après une partie avec Billard et Musée (`dumpsys meminfo`) : PSS 1,06 Go (Pixel 7, 1.9.0).
 
+## 2.0.0 — La Grande Saison
+- [x] Installée par-dessus la 1.9.0 (même clé) : partie en cours et médailles du Musée conservées (Pixel 7).
+- [x] Musée : dix salles, socles de marbre, cartons illustrés encadrés ; le Garage s'ouvre par « Salle précédente » (Pixel 7).
+- [x] La Fuite lancée au toucher, démonstration du tuto (Pixel 7). Constat : texte d'étape qui débordait du carton, corrigé (`text_fit`).
+- [x] Mémoire à l'écran titre (`dumpsys meminfo`) : PSS 652 Mo, dont 392 Mo « Graphics » (Pixel 7, 2.0.0).
+- [ ] Une épreuve de chaque nouvelle salle jouée au doigt (Claquettes, Service, Gouttières, Dominos, Coffre).
+- [ ] Options → « Exporter mes données » : sélecteur de fichiers du système, archive ouverte sur PC.
+
 ## Système
 - [x] Bouton/geste Retour : ferme la surcouche, sinon ouvre la pause ; sur le titre, demande avant de quitter.
 - [x] Mise en arrière-plan en pleine épreuve, retour : jeu en pause, rien de perdu.
